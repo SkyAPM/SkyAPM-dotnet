@@ -1,5 +1,7 @@
 version: 0.1.0-alpha-{build}
 
+image: Visual Studio 2017
+
 configuration: Release
 
 skip_commits:
@@ -11,3 +13,23 @@ skip_commits:
     - generate_protos_macos.sh
     - generate_protos_linux.sh
     - .gitignore
+
+branches:
+  only:
+  - master
+
+skip_tags: true
+
+dotnet_csproj:
+  patch: true
+  file: src\**\*.csproj
+  version: '{version}'
+  package_version: '{version}'
+  assembly_version: '{version}'
+  file_version: '{version}'
+  informational_version: '{version}'
+
+build_script:
+- cmd: >-
+    dotnet restore
+    dotnet build -c Release
