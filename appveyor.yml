@@ -1,0 +1,13 @@
+version: 0.1.0-alpha-{build}
+
+configuration: Release
+
+skip_commits:
+  files:
+    - CONTIBUTING.md
+    - LICENSE
+    - README.md
+    - generate_protos.bat
+    - generate_protos_macos.sh
+    - generate_protos_linux.sh
+    - .gitignore
