@@ -1,6 +1,3 @@
-
-
-
 SkyWalking C#/.NET instrument agent
 ==========
 
