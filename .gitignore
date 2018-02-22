@@ -259,3 +259,5 @@ paket-files/
 publish.*.bat
 
 BenchmarkDotNet.Artifacts/
+
+tools/
