@@ -3,14 +3,14 @@
   <Import Project="..\..\build\common.props" />
 
   <PropertyGroup>
-    <Description>SkyWalking Core abstractions and interfaces for apm agent.</Description>
-    <AssemblyTitle>SkyWalking.Abstractions</AssemblyTitle>
+    <Description>SkyWalking core components.</Description>
+    <AssemblyTitle>SkyWalking.Core</AssemblyTitle>
     <TargetFrameworks>netstandard1.6;net45</TargetFrameworks>
-    <AssemblyName>SkyWalking.Abstractions</AssemblyName>
-    <PackageId>SkyWalking.Abstractions</PackageId>
+    <AssemblyName>SkyWalking.Core</AssemblyName>
+    <PackageId>SkyWalking.Core</PackageId>
     <PackageTags>SkyWalking,APM</PackageTags>
     <PackageReleaseNotes></PackageReleaseNotes>
     <RootNamespace>SkyWalking</RootNamespace>
   </PropertyGroup>
-  
+
 </Project>
