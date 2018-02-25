@@ -12,5 +12,9 @@
     <PackageReleaseNotes></PackageReleaseNotes>
     <RootNamespace>SkyWalking</RootNamespace>
   </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SkyWalking.NetworkProtocol\SkyWalking.NetworkProtocol.csproj" />
+  </ItemGroup>
   
 </Project>

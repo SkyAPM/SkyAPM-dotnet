@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading;
 
-namespace SkyWalking.Abstractions
+namespace SkyWalking.Context
 {
     /// <summary>
     /// Context manager controls the whole context of tracing. Since .NET server application runs as same as Java,
@@ -10,9 +10,9 @@ namespace SkyWalking.Abstractions
     /// </summary>
     public static class ContextManager
     {
-        private static ThreadLocal<AbstractTracerContext> CONTEXT = new ThreadLocal<AbstractTracerContext>();
+        private static readonly ThreadLocal<ITracerContext> CONTEXT = new ThreadLocal<ITracerContext>();
 
-        private static AbstractTracerContext GetOrCreate(String operationName, bool forceSampling)
+        private static ITracerContext GetOrCreate(String operationName, bool forceSampling)
         {
             if (!CONTEXT.IsValueCreated)
             {
