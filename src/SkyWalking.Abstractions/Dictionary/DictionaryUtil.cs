@@ -16,15 +16,15 @@
  *
  */
 
-namespace SkyWalking.Context.Dictionary
+namespace SkyWalking.Dictionary
 {
     public static class DictionaryUtil
     {
-        public static readonly int nullValue = 0;
+        public static readonly int NullValue = 0;
 
         public static bool IsNull(int id)
         {
-            return id == nullValue;
+            return id == NullValue;
         }
     }
 }
