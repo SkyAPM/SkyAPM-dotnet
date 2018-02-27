@@ -262,8 +262,5 @@ BenchmarkDotNet.Artifacts/
 
 tools/
 
-<<<<<<< HEAD
 *.proto
-=======
-protos/*
->>>>>>> c3fa90cb58f6d7f56fd47dd82395bb26b86d7938
+
