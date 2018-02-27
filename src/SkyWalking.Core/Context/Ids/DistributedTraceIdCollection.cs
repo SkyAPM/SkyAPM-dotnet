@@ -20,11 +20,11 @@ using System.Collections.Generic;
 
 namespace SkyWalking.Context.Ids
 {
-    public class DistributedTraceIds
+    public class DistributedTraceIdCollection : IDistributedTraceIdCollection
     {
         private readonly List<DistributedTraceId> _relatedGlobalTraces;
 
-        public DistributedTraceIds()
+        public DistributedTraceIdCollection()
         {
             _relatedGlobalTraces = new List<DistributedTraceId>();
         }

@@ -13,4 +13,8 @@
     <RootNamespace>SkyWalking</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\SkyWalking.Abstractions\SkyWalking.Abstractions.csproj" />
+  </ItemGroup>
+
 </Project>
