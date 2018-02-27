@@ -28,6 +28,26 @@ namespace SkyWalking.Context
         private string _headValue;
         private CarrierItem _next;
 
+        public virtual string HeadKey
+        {
+            get
+            {
+                return _headKey;
+            }
+        }
+
+        public virtual string HeadValue
+        {
+            get
+            {
+                return _headValue;
+            }
+            set
+            {
+                _headValue = value;
+            }
+        }
+
         public CarrierItem(String headKey, String headValue)
         {
             _headKey = headKey;

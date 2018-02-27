@@ -16,13 +16,34 @@
  *
  */
 
+using SkyWalking.Context.Ids;
 
 namespace SkyWalking.Context
 {
-    public class CarrierItemHead : CarrierItem
+    public interface IContextCarrier
     {
-        public CarrierItemHead(CarrierItem next) : base(string.Empty, string.Empty, next)
-        {
-        }
+        DistributedTraceId DistributedTraceId { get; set; }
+
+        int EntryApplicationInstanceId { get; set; }
+
+        string EntryOperationName { get; set; }
+
+        int ParentApplicationInstanceId { get; set; }
+
+        string ParentOperationName { get; set; }
+
+        string PeerHost { get; set; }
+
+        int SpanId { get; set; }
+
+        ID TraceSegmentId { get; set; }
+
+        DistributedTraceId PrimaryDistributedTraceId { get; }
+
+        bool IsValid { get; }
+
+        IContextCarrier Deserialize(string text);
+
+        string Serialize();
     }
 }

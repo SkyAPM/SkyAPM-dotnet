@@ -16,13 +16,21 @@
  *
  */
 
+using System;
 
 namespace SkyWalking.Context
 {
-    public class CarrierItemHead : CarrierItem
+    public class SW3CarrierItem : CarrierItem
     {
-        public CarrierItemHead(CarrierItem next) : base(string.Empty, string.Empty, next)
+        public const String HEADER_NAME = "sw3";
+        private IContextCarrier _carrier;
+
+        public SW3CarrierItem(IContextCarrier carrier, CarrierItem next)
+            : base(HEADER_NAME, carrier.Serialize(), next)
         {
+            _carrier = carrier;
         }
+
+        public override string HeadValue { get => base.HeadValue; set => _carrier.Deserialize(value); }
     }
 }

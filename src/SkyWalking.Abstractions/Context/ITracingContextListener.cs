@@ -16,13 +16,13 @@
  *
  */
 
+using System;
+using System.Collections.Generic;
+using System.Text;
 
 namespace SkyWalking.Context
 {
-    public class CarrierItemHead : CarrierItem
+    interface ITracingContextListener
     {
-        public CarrierItemHead(CarrierItem next) : base(string.Empty, string.Empty, next)
-        {
-        }
     }
 }

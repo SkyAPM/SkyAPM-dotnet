@@ -16,13 +16,18 @@
  *
  */
 
+using System;
 
 namespace SkyWalking.Context
 {
-    public class CarrierItemHead : CarrierItem
+    public interface IInjectable
     {
-        public CarrierItemHead(CarrierItem next) : base(string.Empty, string.Empty, next)
-        {
-        }
+        IContextCarrier GetCarrier();
+
+        /// <summary>
+        /// @return peer, represent ipv4, ipv6, hostname, or cluster addresses list.
+        /// </summary>
+        /// <returns></returns>
+        String GetPeer();
     }
 }
