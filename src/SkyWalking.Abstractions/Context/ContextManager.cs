@@ -24,5 +24,10 @@ namespace SkyWalking.Context
             }
 
         }
+
+        public static IContextSnapshot Capture()
+        {
+            return null;
+        }
     }
 }

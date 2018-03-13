@@ -10,7 +10,7 @@ namespace SkyWalking.Context.Tag
 
         protected override void Set(ISpan span, string tagValue)
         {
-            span.SetTag(Key, tagValue);
+            span.Tag(Key, tagValue);
         }
     }
 }

@@ -31,7 +31,7 @@ namespace SkyWalking.Context.Trace
         /// <param name="key"></param>
         /// <param name="value"></param>
         /// <returns></returns>
-        ISpan SetTag(string key, string value);
+        ISpan Tag(string key, string value);
 
         ISpan SetLayer(SpanLayer layer);
 
@@ -48,6 +48,22 @@ namespace SkyWalking.Context.Trace
 
         bool IsExit { get; }
 
+        ISpan Log(long timestamp, IDictionary<string, object> @event);
+
         ISpan SetOperationName(string operationName);
+
+        ISpan Start();
+        
+        int SpanId { get; }
+        
+        string OperationName { get; }
+        
+        int OperationId { get; }
+
+        ISpan SetOperationId(int operationId);
+
+        ISpan Start(long timestamp);
+        
+        void Ref(ITraceSegmentRef traceSegmentRef);
     }
 }
