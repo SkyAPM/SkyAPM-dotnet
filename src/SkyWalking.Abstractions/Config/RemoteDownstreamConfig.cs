@@ -17,7 +17,7 @@
  */
 
 using System.Collections.Generic;
-using SkyWalking.Dictionary;
+using SkyWalking.Dictionarys;
 
 namespace SkyWalking.Config
 {

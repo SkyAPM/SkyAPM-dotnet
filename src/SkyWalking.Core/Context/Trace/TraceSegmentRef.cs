@@ -17,8 +17,9 @@
  */
 
 using System.Linq;
+using SkyWalking.Config;
 using SkyWalking.Context.Ids;
-using SkyWalking.Dictionary;
+using SkyWalking.Dictionarys;
 using SkyWalking.NetworkProtocol;
 
 namespace SkyWalking.Context.Trace
@@ -55,7 +56,7 @@ namespace SkyWalking.Context.Trace
             }
 
             string entryOperationName = carrier.EntryOperationName;
-            if (entryOperationName.First()=='#')
+            if (entryOperationName.First() == '#')
             {
                 _entryOperationName = entryOperationName.Substring(1);
             }
@@ -63,9 +64,9 @@ namespace SkyWalking.Context.Trace
             {
                 int.TryParse(entryOperationName, out _entryOperationId);
             }
-            
+
             string parentOperationName = carrier.EntryOperationName;
-            if (parentOperationName.First()=='#')
+            if (parentOperationName.First() == '#')
             {
                 _parentOperationName = parentOperationName.Substring(1);
             }
@@ -74,9 +75,34 @@ namespace SkyWalking.Context.Trace
                 int.TryParse(parentOperationName, out _parentOperationId);
             }
         }
-        
-        
-        
+
+        public TraceSegmentRef(IContextSnapshot contextSnapshot)
+        {
+            _type = SegmentRefType.CrossThread;
+            _traceSegmentId = contextSnapshot.TraceSegmentId;
+            _spanId = contextSnapshot.SpanId;
+            _parentApplicationInstanceId = RemoteDownstreamConfig.Agent.ApplicationInstanceId;
+            _entryApplicationInstanceId = contextSnapshot.EntryApplicationInstanceId;
+            string entryOperationName = contextSnapshot.EntryOperationName;
+            if (entryOperationName.First() == '#')
+            {
+                _entryOperationName = entryOperationName.Substring(1);
+            }
+            else
+            {
+                int.TryParse(entryOperationName, out _entryOperationId);
+            }
+
+            string parentOperationName = contextSnapshot.EntryOperationName;
+            if (parentOperationName.First() == '#')
+            {
+                _parentOperationName = parentOperationName.Substring(1);
+            }
+            else
+            {
+                int.TryParse(parentOperationName, out _parentOperationId);
+            }
+        }
 
         public bool Equals(ITraceSegmentRef other)
         {
@@ -121,10 +147,48 @@ namespace SkyWalking.Context.Trace
         public int EntryOperationId => _entryOperationId;
 
         public int EntryApplicationInstance => _entryApplicationInstanceId;
-        
+
         public TraceSegmentReference Transform()
         {
-            throw new System.NotImplementedException();
+            TraceSegmentReference traceSegmentReference = new TraceSegmentReference();
+            if (_type == SegmentRefType.CrossProcess)
+            {
+                traceSegmentReference.RefType = RefType.CrossProcess;
+                traceSegmentReference.ParentApplicationInstanceId = _parentApplicationInstanceId;
+                if (_peerId == DictionaryUtil.NullValue)
+                {
+                    traceSegmentReference.NetworkAddress = _peerHost;
+                }
+                else
+                {
+                    traceSegmentReference.NetworkAddressId = _peerId;
+                }
+            }
+            else
+            {
+                traceSegmentReference.RefType = RefType.CrossThread;
+            }
+
+            traceSegmentReference.EntryApplicationInstanceId = _entryApplicationInstanceId;
+            traceSegmentReference.ParentTraceSegmentId = _traceSegmentId.Transform();
+            traceSegmentReference.ParentSpanId = _spanId;
+            if (_entryOperationId == DictionaryUtil.NullValue)
+            {
+                traceSegmentReference.EntryServiceName = _entryOperationName;
+            }
+            else
+            {
+                traceSegmentReference.EntryServiceId = _entryOperationId;
+            }
+            if (_parentOperationId == DictionaryUtil.NullValue)
+            {
+                traceSegmentReference.ParentServiceName = _parentOperationName;
+            }
+            else
+            {
+                traceSegmentReference.ParentServiceId = _parentOperationId;
+            }
+            return traceSegmentReference;
         }
     }
 }

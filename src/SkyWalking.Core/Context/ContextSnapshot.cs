@@ -19,7 +19,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using SkyWalking.Context.Ids;
-using SkyWalking.Dictionary;
+using SkyWalking.Dictionarys;
 
 namespace SkyWalking.Context
 {

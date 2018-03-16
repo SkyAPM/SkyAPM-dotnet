@@ -1,11 +1,14 @@
-﻿using SkyWalking.Context.Ids;
-using SkyWalking.Dictionary;
+﻿using System.Collections.Generic;
+using System.Linq;
+using SkyWalking.Context.Ids;
+using SkyWalking.Dictionarys;
 
 namespace SkyWalking.Context
 {
     public class ContextCarrier : IContextCarrier
     {
         private ID _traceSegmentId;
+
         /// <summary>
         /// id of parent span
         /// </summary>
@@ -37,30 +40,54 @@ namespace SkyWalking.Context
         private string _parentOPerationName;
 
         private DistributedTraceId _primaryDistributedTraceId;
-        
-        
-        
-        public DistributedTraceId DistributedTraceId { get; set; }
-        
-        public int EntryApplicationInstanceId { get; set; }
+
+
+        public DistributedTraceId DistributedTraceId
+        {
+            get { return _primaryDistributedTraceId; }
+        }
+
+        public int EntryApplicationInstanceId
+        {
+            get { return _entryApplicationInstanceId; }
+            set { _entryApplicationInstanceId = value; }
+        }
 
         public string EntryOperationName
         {
             get { return _entryOperationName; }
             set { _entryOperationName = "#" + value; }
         }
-        
-        public int ParentApplicationInstanceId { get; set; }
-        
-        public string ParentOperationName { get; set; }
-        
-        public string PeerHost { get; set; }
-        
-        public int SpanId { get; set; }
-        
-        public ID TraceSegmentId { get; set; }
-        
-        public DistributedTraceId PrimaryDistributedTraceId { get; }
+
+        public int ParentApplicationInstanceId
+        {
+            get { return _parentApplicationInstanceId; }
+            set { _parentApplicationInstanceId = value; }
+        }
+
+        public string ParentOperationName
+        {
+            get { return _parentOPerationName; }
+            set { _parentOPerationName = "#" + value; }
+        }
+
+        public string PeerHost
+        {
+            get { return _peerHost; }
+            set { _peerHost = value; }
+        }
+
+        public int SpanId
+        {
+            get { return _spanId; }
+            set { _spanId = value; }
+        }
+
+        public ID TraceSegmentId
+        {
+            get { return _traceSegmentId; }
+            set { _traceSegmentId = value; }
+        }
 
         public bool IsValid
         {
@@ -113,6 +140,11 @@ namespace SkyWalking.Context
                 PrimaryDistributedTraceId.Encode);
         }
 
+        public DistributedTraceId PrimaryDistributedTraceId
+        {
+            get { return _primaryDistributedTraceId; }
+        }
+
         public CarrierItem Items
         {
             get
@@ -121,6 +153,11 @@ namespace SkyWalking.Context
                 CarrierItemHead head = new CarrierItemHead(carrierItem);
                 return head;
             }
+        }
+
+        public void SetDistributedTraceIds(IEnumerable<DistributedTraceId> distributedTraceIds)
+        {
+            _primaryDistributedTraceId = distributedTraceIds.FirstOrDefault();
         }
     }
 }
