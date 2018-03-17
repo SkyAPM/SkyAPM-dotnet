@@ -18,9 +18,10 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
 using SkyWalking.Dictionarys;
+using SkyWalking.NetworkProtocol;
 using SkyWalking.NetworkProtocol.Trace;
+using System.Linq;
 
 namespace SkyWalking.Context.Trace
 {
@@ -34,7 +35,7 @@ namespace SkyWalking.Context.Trace
         protected Dictionary<string, string> _tags;
         protected string _operationName;
         protected int _operationId;
-        protected SpanLayer _layer;
+        protected SpanLayer? _layer;
 
         /// <summary>
         /// The start time of this Span.
@@ -64,7 +65,7 @@ namespace SkyWalking.Context.Trace
         /// </summary>
         protected ICollection<ITraceSegmentRef> _refs;
 
-        protected AbstractTracingSpan(int spanId,int parentSpanId,string operationName)
+        protected AbstractTracingSpan(int spanId, int parentSpanId, string operationName)
         {
             _operationName = operationName;
             _operationId = DictionaryUtil.NullValue;
@@ -72,7 +73,7 @@ namespace SkyWalking.Context.Trace
             _parnetSpanId = parentSpanId;
         }
 
-        protected AbstractTracingSpan(int spanId,int parentSpanId,int operationId)
+        protected AbstractTracingSpan(int spanId, int parentSpanId, int operationId)
         {
             _operationName = null;
             _operationId = operationId;
@@ -80,24 +81,48 @@ namespace SkyWalking.Context.Trace
             _parnetSpanId = parentSpanId;
         }
 
-        public virtual bool IsEntry => throw new NotImplementedException();
+        public abstract bool IsEntry { get; }
 
-        public virtual bool IsExit => throw new NotImplementedException();
+        public abstract bool IsExit { get; }
 
-        public virtual int SpanId => throw new NotImplementedException();
+        public virtual int SpanId => _spanId;
 
-        public virtual string OperationName => throw new NotImplementedException();
+        public virtual string OperationName
+        {
+            get
+            {
+                return _operationName;
+            }
+            set
+            {
+                _operationName = value;
+                _operationId = DictionaryUtil.NullValue;
+            }
+        }
 
-        public virtual int OperationId => throw new NotImplementedException();
+        public virtual int OperationId
+        {
+            get
+            {
+                return _operationId;
+            }
+            set
+            {
+                _operationId = value;
+                _operationName = null;
+            }
+        }
 
         public virtual ISpan SetComponent(IComponent component)
         {
-            throw new NotImplementedException();
+            _componentId = component.Id;
+            return this;
         }
 
         public virtual ISpan SetComponent(string componentName)
         {
-            throw new NotImplementedException();
+            _componentName = componentName;
+            return this;
         }
 
         public virtual ISpan Tag(string key, string value)
@@ -112,22 +137,41 @@ namespace SkyWalking.Context.Trace
 
         public virtual ISpan SetLayer(SpanLayer layer)
         {
-            throw new NotImplementedException();
+            _layer = layer;
+            return this;
         }
 
+        /// <summary>
+        /// Record an exception event of the current walltime timestamp.
+        /// </summary>
         public virtual ISpan Log(Exception exception)
         {
-            throw new NotImplementedException();
+            EnsureLogs();
+            _logs.Add(new LogDataEntity.Builder()
+                .Add("event", "error")
+                .Add("error.kind", exception.GetType().FullName)
+                .Add("message", exception.Message)
+                .Add("stack", exception.StackTrace)
+                .Build(DateTime.UtcNow.GetTimeMillis()));
+            return this;
         }
 
         public virtual ISpan ErrorOccurred()
         {
-            throw new NotImplementedException();
+            _errorOccurred = true;
+            return this;
         }
 
-        public virtual ISpan Log(long timestamp, IDictionary<string, object> @event)
+        public virtual ISpan Log(long timestamp, IDictionary<string, object> events)
         {
-            throw new NotImplementedException();
+            EnsureLogs();
+            LogDataEntity.Builder builder = new LogDataEntity.Builder();
+            foreach (var @event in events)
+            {
+                builder.Add(@event.Key, @event.Value.ToString());
+            }
+            _logs.Add(builder.Build(timestamp));
+            return this;
         }
 
         public virtual ISpan SetOperationName(string operationName)
@@ -137,25 +181,111 @@ namespace SkyWalking.Context.Trace
 
         public virtual ISpan Start()
         {
-            throw new NotImplementedException();
-        }
-
-        public virtual ISpan SetOperationId(int operationId)
-        {
-            throw new NotImplementedException();
+            _startTime = DateTime.UtcNow.GetTimeMillis();
+            return this;
         }
 
         public virtual ISpan Start(long timestamp)
         {
-            throw new NotImplementedException();
+            _startTime = timestamp;
+            return this;
         }
 
         public virtual void Ref(ITraceSegmentRef traceSegmentRef)
         {
-            throw new NotImplementedException();
+            if (_refs == null)
+            {
+                _refs = new List<ITraceSegmentRef>();
+            }
+            if (!_refs.Contains(traceSegmentRef))
+            {
+                _refs.Add(traceSegmentRef);
+            }
         }
 
-        //todo
-        //public virtual bool Finish(ITraceSegmentRef)
+        /// <summary>
+        /// Finish the active Span. When it is finished, it will be archived by the given {@link TraceSegment}, which owners it
+        /// </summary>
+        /// <param name="owner"></param>
+        /// <returns></returns>
+        public virtual bool Finish(ITraceSegment owner)
+        {
+            _endTime = DateTime.UtcNow.GetTimeMillis();
+            owner.Archive(this);
+            return true;
+        }
+
+        public virtual SpanObject Transform()
+        {
+            SpanObject spanObject = new SpanObject();
+
+            spanObject.SpanId = _spanId;
+            spanObject.ParentSpanId = _parnetSpanId;
+            spanObject.StartTime = _startTime;
+            spanObject.EndTime = _endTime;
+
+            if (_operationId != DictionaryUtil.NullValue)
+            {
+                spanObject.OperationNameId = _operationId;
+            }
+            else
+            {
+                spanObject.OperationName = _operationName;
+            }
+
+            if (IsEntry)
+            {
+                spanObject.SpanType = SpanType.Entry;
+            }
+            else if (IsExit)
+            {
+                spanObject.SpanType = SpanType.Exit;
+            }
+            else
+            {
+                spanObject.SpanType = SpanType.Local;
+            }
+
+            if (_layer.HasValue)
+            {
+                spanObject.SpanLayer = (NetworkProtocol.SpanLayer)((int)_layer.Value);
+            }
+
+            if (_componentId != DictionaryUtil.NullValue)
+            {
+                spanObject.ComponentId = _componentId;
+            }
+            else
+            {
+                spanObject.Component = _componentName;
+            }
+
+            spanObject.IsError = _errorOccurred;
+
+            if (_tags != null)
+            {
+                spanObject.Tags.Add(_tags.Select(x => new KeyWithStringValue { Key = x.Key, Value = x.Value }));
+            }
+
+            if (_logs != null)
+            {
+                spanObject.Logs.Add(_logs.Select(x => x.Transform()));
+            }
+
+            if (_refs != null)
+            {
+                spanObject.Refs.Add(_refs.Select(x => x.Transform()));
+            }
+
+            return spanObject;
+        }
+
+        private void EnsureLogs()
+        {
+            if (_logs == null)
+            {
+                _logs = new LinkedList<LogDataEntity>();
+            }
+        }
     }
 }

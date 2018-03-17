@@ -18,6 +18,7 @@
 
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using SkyWalking.NetworkProtocol;
 
 namespace SkyWalking.Context.Trace
 {
@@ -66,6 +67,17 @@ namespace SkyWalking.Context.Trace
             {
                 return new LogDataEntity(timestamp, _logs);
             }
+        }
+
+        public LogMessage Transform()
+        {
+            LogMessage logMessage = new LogMessage();
+            logMessage.Time = _timestamp;
+            foreach(var log in _logs)
+            {
+                logMessage.Data.Add(new KeyWithStringValue { Key = log.Key, Value = log.Value });
+            }
+            return logMessage;
         }
     }
 }

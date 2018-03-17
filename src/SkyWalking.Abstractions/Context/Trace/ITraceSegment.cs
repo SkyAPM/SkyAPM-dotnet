@@ -16,18 +16,38 @@
  *
  */
 
-using System;
 using System.Collections.Generic;
-using System.Text;
+using SkyWalking.Context.Ids;
+using SkyWalking.NetworkProtocol;
 
 namespace SkyWalking.Context.Trace
 {
-    public enum SpanLayer
+    public interface ITraceSegment
     {
-        DB = 1,
-        RPC_FRAMEWORK = 2,
-        HTTP = 3,
-        MQ = 4,
-        CACHE = 5
+        void Archive(AbstractTracingSpan finishedSpan);
+
+        ITraceSegment Finish(bool isSizeLimited);
+
+        int ApplicationId { get; }
+
+        int ApplicationInstanceId { get; }
+
+        IEnumerable<ITraceSegmentRef> Refs { get; }
+
+        IEnumerable<DistributedTraceId> RelatedGlobalTraces { get; }
+
+        ID TraceSegmentId { get; }
+
+        bool HasRef { get; }
+
+        bool IsIgnore { get; set; }
+
+        bool IsSingleSpanSegment { get; }
+
+        void Ref(ITraceSegmentRef refSegment);
+
+        void RelatedGlobalTrace(DistributedTraceId distributedTraceId);
+
+        UpstreamSegment Transform();
     }
 }

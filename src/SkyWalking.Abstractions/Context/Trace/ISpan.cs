@@ -74,11 +74,9 @@ namespace SkyWalking.Context.Trace
         
         int SpanId { get; }
         
-        string OperationName { get; }
+        string OperationName { get; set; }
         
-        int OperationId { get; }
-
-        ISpan SetOperationId(int operationId);
+        int OperationId { get; set; }
 
         ISpan Start(long timestamp);
         
