@@ -174,11 +174,6 @@ namespace SkyWalking.Context.Trace
             return this;
         }
 
-        public virtual ISpan SetOperationName(string operationName)
-        {
-            throw new NotImplementedException();
-        }
-
         public virtual ISpan Start()
         {
             _startTime = DateTime.UtcNow.GetTimeMillis();

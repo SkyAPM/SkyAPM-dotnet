@@ -68,8 +68,6 @@ namespace SkyWalking.Context.Trace
 
         ISpan Log(long timestamp, IDictionary<string, object> @event);
 
-        ISpan SetOperationName(string operationName);
-
         ISpan Start();
         
         int SpanId { get; }
