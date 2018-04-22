@@ -19,6 +19,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using SkyWalking.Utils;
 
 namespace SkyWalking.Diagnostics
 {
@@ -28,9 +29,10 @@ namespace SkyWalking.Diagnostics
 
         public TracingDiagnosticObserver(IEnumerable<ITracingDiagnosticProcessor> tracingDiagnosticProcessors)
         {
-            _tracingDiagnosticProcessors = tracingDiagnosticProcessors ?? throw new ArgumentNullException(nameof(tracingDiagnosticProcessors));
+            _tracingDiagnosticProcessors = tracingDiagnosticProcessors ??
+                                           throw new ArgumentNullException(nameof(tracingDiagnosticProcessors));
         }
-        
+
         public void OnCompleted()
         {
         }
@@ -41,7 +43,7 @@ namespace SkyWalking.Diagnostics
 
         public void OnNext(DiagnosticListener listener)
         {
-            foreach (var diagnosticProcessor in _tracingDiagnosticProcessors)
+            foreach (var diagnosticProcessor in _tracingDiagnosticProcessors.Distinct(x => x.ListenerName))
             {
                 if (listener.Name == diagnosticProcessor.ListenerName)
                 {
