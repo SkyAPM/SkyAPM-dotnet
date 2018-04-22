@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\..\build\common.props" />
+  <PropertyGroup>
+    <Description>Microsoft.Extensions.DependencyInjection (IServiceCollection) support for SkyWalking.</Description>
+    <AssemblyTitle>SkyWalking.Extensions.DependencyInjection</AssemblyTitle>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <AssemblyName>SkyWalking.Extensions.DependencyInjection</AssemblyName>
+    <PackageId>SkyWalking.Extensions.DependencyInjection</PackageId>
+    <PackageTags>SkyWalking;APM;Diagnostics</PackageTags>
+    <PackageReleaseNotes>
+    </PackageReleaseNotes>
+    <RootNamespace>SkyWalking.Extensions.DependencyInjection</RootNamespace>
+  </PropertyGroup>
+</Project>
