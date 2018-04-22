@@ -18,7 +18,7 @@
 
 namespace SkyWalking.Diagnostics
 {
-    public interface ITracingDiagnosticListener
+    public interface ITracingDiagnosticProcessor
     {
         string ListenerName { get; }
     }

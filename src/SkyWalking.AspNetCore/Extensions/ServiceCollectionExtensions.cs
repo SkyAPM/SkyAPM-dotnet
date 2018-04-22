@@ -19,7 +19,6 @@
 using System;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Http;
 using SkyWalking.AspNetCore.Diagnostics;
@@ -55,8 +54,9 @@ namespace SkyWalking.AspNetCore
 
             services.AddHttpClient<TracingHttpClient>("sw-tracing");
 
+            services.AddSingleton<TracingDiagnosticObserver, AdatpeTracingDiagnosticObserver>();
             services.AddSingleton<IHostedService, SkyWalkingHostedService>();
-            services.AddSingleton<ITracingDiagnosticListener, HostingDiagnosticListener>();
+            services.AddSingleton<ITracingDiagnosticProcessor, HostingDiagnosticProcessor>();
             services.AddTransient<HttpMessageHandlerBuilder, TracingHttpMessageHandlerBuilder>();
             
             return services;
