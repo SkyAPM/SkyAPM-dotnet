@@ -26,7 +26,7 @@ namespace SkyWalking.AspNetCore
 {
     public static class ServiceCollectionExtensions
     {
-        public static SkyWalkingBuilder AddSkyWalkingCore(this IServiceCollection services,
+        public static SkyWalkingBuilder AddSkyWalking(this IServiceCollection services,
             Action<SkyWalkingOptions> options)
         {
             if (options == null)
@@ -37,7 +37,7 @@ namespace SkyWalking.AspNetCore
             return services.Configure(options).AddSkyWalkingCore();
         }
 
-        public static SkyWalkingBuilder AddSkyWalkingCore(this IServiceCollection services,
+        public static SkyWalkingBuilder AddSkyWalking(this IServiceCollection services,
             IConfiguration configuration)
         {
             return services.Configure<SkyWalkingOptions>(configuration).AddSkyWalkingCore();

@@ -26,7 +26,7 @@ namespace SkyWalking.Sample.Frontend
         {
             services.AddMvc();
             
-            services.AddSkyWalkingCore(option =>
+            services.AddSkyWalking(option =>
             {
                 option.DirectServers = "localhost:11800";
                 option.ApplicationCode = "asp-net-core-frontend";
