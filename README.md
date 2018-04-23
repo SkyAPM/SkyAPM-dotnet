@@ -70,7 +70,7 @@ public class ValuesController : Controller
     public async Task<string> Get(int id, [FromServices] IHttpClientFactory httpClientFactory)
     {
         var httpClient = httpClientFactory.CreateClient("sw-tracing");
-        return await httpClient.GetStringAsync("http://api.xxx.com/values");
+        return httpClient.GetStringAsync("http://api.xxx.com/values");
     }
 }
 ```
