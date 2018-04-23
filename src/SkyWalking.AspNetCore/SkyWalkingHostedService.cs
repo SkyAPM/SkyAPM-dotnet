@@ -38,6 +38,7 @@ namespace SkyWalking.AspNetCore
         public SkyWalkingHostedService(IOptions<SkyWalkingOptions> options, IHostingEnvironment hostingEnvironment,
             TracingDiagnosticObserver diagnosticObserver, ILoggerFactory loggerFactory)
         {
+       
             if (string.IsNullOrEmpty(options.Value.DirectServers))
             {
                 throw new ArgumentException("DirectServers cannot be empty or null.");
@@ -69,6 +70,9 @@ namespace SkyWalking.AspNetCore
             {
                 _logger.Error("SkyWalking Agent start fail.", e);
             }
+            await GrpcChannelManager.Instance.ConnectAsync();
+            await ServiceManager.Instance.Initialize();
+            DiagnosticListener.AllListeners.Subscribe(_diagnosticObserver);
         }
 
         public async Task StopAsync(CancellationToken cancellationToken)

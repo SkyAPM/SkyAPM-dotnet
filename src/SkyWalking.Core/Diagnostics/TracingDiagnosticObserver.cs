@@ -27,7 +27,7 @@ namespace SkyWalking.Diagnostics
     public abstract class TracingDiagnosticObserver : IObserver<DiagnosticListener>
     {
         private static readonly ILogger _logger = LogManager.GetLogger<TracingDiagnosticObserver>();
-        
+
         private readonly IEnumerable<ITracingDiagnosticProcessor> _tracingDiagnosticProcessors;
 
         public TracingDiagnosticObserver(IEnumerable<ITracingDiagnosticProcessor> tracingDiagnosticProcessors)
