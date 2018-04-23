@@ -70,9 +70,6 @@ namespace SkyWalking.AspNetCore
             {
                 _logger.Error("SkyWalking Agent start fail.", e);
             }
-            await GrpcChannelManager.Instance.ConnectAsync();
-            await ServiceManager.Instance.Initialize();
-            DiagnosticListener.AllListeners.Subscribe(_diagnosticObserver);
         }
 
         public async Task StopAsync(CancellationToken cancellationToken)
