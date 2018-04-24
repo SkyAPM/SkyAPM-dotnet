@@ -25,84 +25,102 @@ using SkyWalking.Boot;
 using SkyWalking.Config;
 using SkyWalking.Context;
 using SkyWalking.Dictionarys;
+using SkyWalking.Logging;
 using SkyWalking.NetworkProtocol;
 
 namespace SkyWalking.Remote
 {
     public class GrpcApplicationService : TimerService
     {
+        private static readonly ILogger _logger = LogManager.GetLogger<GrpcApplicationService>();
+        private readonly Random _random = new Random();
         public override int Order { get; } = -1;
 
-        protected override async Task Initializing(CancellationToken token)
-        {
-            var application = new Application {ApplicationCode = AgentConfig.ApplicationCode};
-            var applicationRegisterService =
-                new ApplicationRegisterService.ApplicationRegisterServiceClient(GrpcChannelManager.Instance.Channel);
+        protected override TimeSpan Interval { get; } = TimeSpan.FromSeconds(5);
 
-            var applicationId = default(int?);
-
-            while (!applicationId.HasValue || DictionaryUtil.IsNull(applicationId.Value))
-            {
-                var applicationMapping = await applicationRegisterService.applicationCodeRegisterAsync(application);
-                applicationId = applicationMapping?.Application?.Value;
-            }
-
-            RemoteDownstreamConfig.Agent.ApplicationId = applicationId.Value;
-
-            var instanceDiscoveryService =
-                new InstanceDiscoveryService.InstanceDiscoveryServiceClient(GrpcChannelManager.Instance.Channel);
-
-            var agentUUID = Guid.NewGuid().ToString().Replace("-", "");
-            var registerTime = DateTime.UtcNow.GetTimeMillis();
-
-            var hostName = Dns.GetHostName();
-           
-            var osInfo = new OSInfo
-            {
-                Hostname = hostName,
-                OsName = Environment.OSVersion.ToString(),
-                ProcessNo = Process.GetCurrentProcess().Id
-            };
-
-            // todo fix Device not configured
-            //var ipv4s = Dns.GetHostAddresses(hostName);          
-            //foreach (var ipAddress in ipv4s.Where(x => x.AddressFamily == AddressFamily.InterNetwork))
-            //   osInfo.Ipv4S.Add(ipAddress.ToString());
-
-            var applicationInstance = new ApplicationInstance
-            {
-                ApplicationId = applicationId.Value,
-                AgentUUID = agentUUID,
-                RegisterTime = registerTime,
-                Osinfo = osInfo
-            };
-
-            var applicationInstanceId = 0;
-           
-            while (DictionaryUtil.IsNull(applicationInstanceId))
-            {
-                var applicationInstanceMapping = await instanceDiscoveryService.registerInstanceAsync(applicationInstance);
-                applicationInstanceId = applicationInstanceMapping.ApplicationInstanceId;
-            }
-
-            RemoteDownstreamConfig.Agent.ApplicationInstanceId = applicationInstanceId;
-
-        }
-
-        protected override TimeSpan Interval { get; } = TimeSpan.FromMinutes(1);
-           
         protected override async Task Execute(CancellationToken token)
         {
-            var instanceDiscoveryService =
-                new InstanceDiscoveryService.InstanceDiscoveryServiceClient(GrpcChannelManager.Instance.Channel);
-
-            var heartbeat = new ApplicationInstanceHeartbeat
+            if (!DictionaryUtil.IsNull(RemoteDownstreamConfig.Agent.ApplicationId) &&
+                !DictionaryUtil.IsNull(RemoteDownstreamConfig.Agent.ApplicationInstanceId))
             {
-                ApplicationInstanceId = RemoteDownstreamConfig.Agent.ApplicationInstanceId,
-                HeartbeatTime = DateTime.UtcNow.GetTimeMillis()
-            };
-            
-            await instanceDiscoveryService.heartbeatAsync(heartbeat);
+                return;
+            }
+
+            GrpcConnection availableConnection = null;
+            try
+            {
+                availableConnection =
+                    GrpcConnectionManager.Instance.GetAvailableConnection(_random.Next());
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e.Message, e);
+            }
+           
+            if (availableConnection == null)
+            {
+                return;
+            }
+
+            if (DictionaryUtil.IsNull(RemoteDownstreamConfig.Agent.ApplicationId))
+            {
+                var application = new Application {ApplicationCode = AgentConfig.ApplicationCode};
+                var applicationRegisterService =
+                    new ApplicationRegisterService.ApplicationRegisterServiceClient(availableConnection.GrpcChannel);
+                var applicationMapping = await applicationRegisterService.applicationCodeRegisterAsync(application);
+                var applicationId = applicationMapping?.Application?.Value;
+                if (!applicationId.HasValue || DictionaryUtil.IsNull(applicationId.Value))
+                {
+                    return;
+                }
+
+                _logger.Debug(
+                    $"{DateTime.Now} Register application success, applicationCode:{application.ApplicationCode},applicationId:{applicationId.Value}");
+                RemoteDownstreamConfig.Agent.ApplicationId = applicationId.Value;
+            }
+
+            if (DictionaryUtil.IsNull(RemoteDownstreamConfig.Agent.ApplicationInstanceId))
+            {
+                var instanceDiscoveryService =
+                    new InstanceDiscoveryService.InstanceDiscoveryServiceClient(availableConnection.GrpcChannel);
+
+                var agentUUID = Guid.NewGuid().ToString().Replace("-", "");
+                var registerTime = DateTime.UtcNow.GetTimeMillis();
+
+                var hostName = Dns.GetHostName();
+
+                var osInfo = new OSInfo
+                {
+                    Hostname = hostName,
+                    OsName = Environment.OSVersion.ToString(),
+                    ProcessNo = Process.GetCurrentProcess().Id
+                };
+
+                // todo fix Device not configured
+                //var ipv4s = Dns.GetHostAddresses(hostName);          
+                //foreach (var ipAddress in ipv4s.Where(x => x.AddressFamily == AddressFamily.InterNetwork))
+                //   osInfo.Ipv4S.Add(ipAddress.ToString());
+
+                var applicationInstance = new ApplicationInstance
+                {
+                    ApplicationId = RemoteDownstreamConfig.Agent.ApplicationId,
+                    AgentUUID = agentUUID,
+                    RegisterTime = registerTime,
+                    Osinfo = osInfo
+                };
+
+                var applicationInstanceMapping =
+                    await instanceDiscoveryService.registerInstanceAsync(applicationInstance);
+                var applicationInstanceId = applicationInstanceMapping.ApplicationInstanceId;
+
+                if (!DictionaryUtil.IsNull(applicationInstanceId))
+                {
+                    RemoteDownstreamConfig.Agent.ApplicationInstanceId = applicationInstanceId;
+                    _logger.Debug(
+                        $"{DateTime.Now} Register application instance success,applicationInstanceId:{applicationInstanceId}");
+                }
+            }
+
         }
     }
 }

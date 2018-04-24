@@ -61,7 +61,7 @@ namespace SkyWalking.AspNetCore
             _logger.Info("SkyWalking Agent starting...");
             try
             {
-                await GrpcChannelManager.Instance.ConnectAsync();
+                await GrpcConnectionManager.Instance.ConnectAsync();
                 await ServiceManager.Instance.Initialize();
                 DiagnosticListener.AllListeners.Subscribe(_diagnosticObserver);
                 _logger.Info("SkyWalking Agent started.");
@@ -77,7 +77,7 @@ namespace SkyWalking.AspNetCore
             _logger.Info("SkyWalking Agent stopping...");
             try
             {
-                await GrpcChannelManager.Instance.ShutdownAsync();
+                await GrpcConnectionManager.Instance.ShutdownAsync();
                 ServiceManager.Instance.Dispose();
                 _logger.Info("SkyWalking Agent stopped.");
             }
