@@ -67,7 +67,7 @@ public void ConfigureServices(IServiceCollection services)
 public class ValuesController : Controller
 {
     [HttpGet("{id}")]
-    public async Task<string> Get(int id, [FromServices] IHttpClientFactory httpClientFactory)
+    public Task<string> Get(int id, [FromServices] IHttpClientFactory httpClientFactory)
     {
         var httpClient = httpClientFactory.CreateClient("sw-tracing");
         return httpClient.GetStringAsync("http://api.xxx.com/values");
