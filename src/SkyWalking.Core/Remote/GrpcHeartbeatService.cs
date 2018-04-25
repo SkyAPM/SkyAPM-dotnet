@@ -33,16 +33,18 @@ namespace SkyWalking.Remote
         private static readonly ILogger _logger = LogManager.GetLogger<GrpcHeartbeatService>();
         private readonly Random _random = new Random();
         protected override TimeSpan Interval { get; } = TimeSpan.FromMinutes(1);
-           
+
         protected override async Task Execute(CancellationToken token)
         {
             if (DictionaryUtil.IsNull(RemoteDownstreamConfig.Agent.ApplicationInstanceId))
             {
                 return;
             }
+
+            GrpcConnection availableConnection = null;
             try
             {
-                var availableConnection =
+                availableConnection =
                     GrpcConnectionManager.Instance.GetAvailableConnection(_random.Next());
 
                 var instanceDiscoveryService =
@@ -53,15 +55,16 @@ namespace SkyWalking.Remote
                     ApplicationInstanceId = RemoteDownstreamConfig.Agent.ApplicationInstanceId,
                     HeartbeatTime = DateTime.UtcNow.GetTimeMillis()
                 };
-            
+
                 await instanceDiscoveryService.heartbeatAsync(heartbeat);
 
                 _logger.Debug($"{DateTime.Now} Heartbeat.");
             }
             catch (Exception e)
             {
-                _logger.Error($"{DateTime.Now} Heartbeat fail.", e);
-            } 
+                _logger.Warning($"{DateTime.Now} Heartbeat fail. {e.Message}");
+                availableConnection?.CheckState();
+            }
         }
     }
 }

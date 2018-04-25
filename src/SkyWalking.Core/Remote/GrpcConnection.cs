@@ -56,16 +56,17 @@ namespace SkyWalking.Remote
                 var deadLine = DateTime.UtcNow.AddSeconds(5);
                 await _internalChannel.ConnectAsync(deadLine);
                 _state = GrpcConnectionState.Ready;
+                _Logger.Info($"Grpc channel connect success, server:{_internalChannel.Target}");
             }
             catch (TaskCanceledException ex)
             {
                 _state = GrpcConnectionState.Failure;
-                _Logger.Error($"{DateTime.Now} gRPC channel connect timeout.", ex);
+                _Logger.Warning($"Grpc channel connect timeout.{ex.Message}");
             }
             catch (Exception ex)
             {
                 _state = GrpcConnectionState.Failure;
-                _Logger.Error($"{DateTime.Now} gRPC channel connect fail.", ex);
+                _Logger.Warning($"Grpc channel connect fail.{ex.Message}");
             }
 
             return _state == GrpcConnectionState.Ready;
@@ -79,7 +80,7 @@ namespace SkyWalking.Remote
             }
             catch (Exception e)
             {
-                _Logger.Error("gRPC channel shutdown fail.", e);
+                _Logger.Error("Grpc channel shutdown fail.", e);
             }
             finally
             {
@@ -87,9 +88,17 @@ namespace SkyWalking.Remote
             }
         }
 
-        private void CheckState()
+        public void CheckState()
         {
-            _state = (GrpcConnectionState) (int) _internalChannel.State;
+            var channelState = (int) _internalChannel.State;
+            if ((int) _state == channelState)
+            {
+                return;
+            }
+
+            _Logger.Debug($"Grpc channel state changed. {_state} -> {_internalChannel.State}");
+
+            _state = (GrpcConnectionState)channelState;
         }
     }
 }

@@ -52,9 +52,10 @@ namespace SkyWalking.Remote
                 return;
             }
 
+            GrpcConnection availableConnection = null;
             try
             {
-                var availableConnection =
+                availableConnection  =
                     GrpcConnectionManager.Instance.GetAvailableConnection(traceSegment.RelatedGlobalTraces.First());
                 var segment = traceSegment.Transform();
                 var traceSegmentService =
@@ -70,7 +71,8 @@ namespace SkyWalking.Remote
             }
             catch (Exception e)
             {
-                _logger.Error("Transform and send UpstreamSegment to collector fail.", e);
+                _logger.Warning($"Transform and send UpstreamSegment to collector fail. {e.Message}");
+                availableConnection?.CheckState();
             }
         }
     }

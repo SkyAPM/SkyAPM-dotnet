@@ -69,7 +69,7 @@ namespace SkyWalking.Remote
             var availableConnections = _connections.Where(x => x.State == GrpcConnectionState.Ready).ToArray();
             if (availableConnections.Length == 0)
             {
-                _logger.Debug($"{DateTime.Now} Not found available connection.");
+                _logger.Debug("Not found available connection.");
                 throw new InvalidOperationException("Not found available connection.");
             }
 
