@@ -33,7 +33,6 @@ namespace SkyWalking.Remote
     public class GrpcApplicationService : TimerService
     {
         private static readonly ILogger _logger = LogManager.GetLogger<GrpcApplicationService>();
-        private readonly Random _random = new Random();
         public override int Order { get; } = -1;
 
         protected override TimeSpan Interval { get; } = TimeSpan.FromSeconds(15);
@@ -46,13 +45,17 @@ namespace SkyWalking.Remote
                 return;
             }
 
-            GrpcConnection availableConnection = null;
+            var availableConnection = GrpcConnectionManager.Instance.GetAvailableConnection();
 
-            try
+            if (availableConnection == null)
             {
-                availableConnection =
-                    GrpcConnectionManager.Instance.GetAvailableConnection(_random.Next());
-                
+                _logger.Warning(
+                    $"Register application fail. {GrpcConnectionManager.NotFoundErrorMessage}");
+                return;
+            }
+            
+            try
+            {   
                 if (DictionaryUtil.IsNull(RemoteDownstreamConfig.Agent.ApplicationId))
                 {
                     var application = new Application {ApplicationCode = AgentConfig.ApplicationCode};
@@ -63,13 +66,13 @@ namespace SkyWalking.Remote
                     var applicationId = applicationMapping?.Application?.Value;
                     if (!applicationId.HasValue || DictionaryUtil.IsNull(applicationId.Value))
                     {
-                        _logger.Debug(
+                        _logger.Warning(
                             "Register application fail. Server response null.");
                         return;
                     }
 
-                    _logger.Debug(
-                        $"Register application success, applicationCode : {application.ApplicationCode}, applicationId : {applicationId.Value}");
+                    _logger.Info(
+                        $"Register application success. [applicationCode] = {application.ApplicationCode}. [applicationId] = {applicationId.Value}");
                     RemoteDownstreamConfig.Agent.ApplicationId = applicationId.Value;
                 }
 
@@ -106,22 +109,23 @@ namespace SkyWalking.Remote
                     var applicationInstanceId = 0;
                     var retry = 0;
 
-                    while (retry++ < 3 && DictionaryUtil.IsNull(applicationInstanceId))
+                    while (retry++ <= 3 && DictionaryUtil.IsNull(applicationInstanceId))
                     {
                         var applicationInstanceMapping =
                             await instanceDiscoveryService.registerInstanceAsync(applicationInstance);
+                        await Task.Delay(TimeSpan.FromSeconds(1), token);
                         applicationInstanceId = applicationInstanceMapping.ApplicationInstanceId;
                     }
 
                     if (!DictionaryUtil.IsNull(applicationInstanceId))
                     {
                         RemoteDownstreamConfig.Agent.ApplicationInstanceId = applicationInstanceId;
-                        _logger.Debug(
-                            $"Register application instance success, applicationInstanceId : {applicationInstanceId}");
+                        _logger.Info(
+                            $"Register application instance success. [applicationInstanceId] = {applicationInstanceId}");
                     }
                     else
                     {
-                        _logger.Debug(
+                        _logger.Warning(
                             "Register application instance fail. Server response null.");
                     }
                 }
@@ -129,7 +133,7 @@ namespace SkyWalking.Remote
             catch (Exception exception)
             {
                 _logger.Warning($"Try register application fail. {exception.Message}");
-                availableConnection?.CheckState();
+                availableConnection?.Failure();
             }
         }
     }

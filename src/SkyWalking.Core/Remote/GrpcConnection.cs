@@ -25,26 +25,26 @@ namespace SkyWalking.Remote
 {
     public class GrpcConnection
     {
-        private static readonly ILogger _Logger = LogManager.GetLogger<GrpcConnection>();
+        private static readonly ILogger _logger = LogManager.GetLogger<GrpcConnection>();
 
         private readonly Channel _internalChannel;
+        private readonly string _server;
         private GrpcConnectionState _state = GrpcConnectionState.Idle;
-        private readonly string _connectionId = Guid.NewGuid().ToString();
-
-        public string ConnectionId => _connectionId;
 
         public Channel GrpcChannel => _internalChannel;
 
         public GrpcConnectionState State => _state;
 
+        public string Server => _server;
+
         public GrpcConnection(string server)
         {
+            _server = server;
             _internalChannel = new Channel(server, ChannelCredentials.Insecure);
         }
-
+      
         public async Task<bool> ConnectAsync()
         {
-            CheckState();
             if (_state == GrpcConnectionState.Ready)
             {
                 return true;
@@ -56,17 +56,17 @@ namespace SkyWalking.Remote
                 var deadLine = DateTime.UtcNow.AddSeconds(5);
                 await _internalChannel.ConnectAsync(deadLine);
                 _state = GrpcConnectionState.Ready;
-                _Logger.Info($"Grpc channel connect success, server:{_internalChannel.Target}");
+                _logger.Info($"Grpc channel connect success. [Server] = {_internalChannel.Target}");
             }
             catch (TaskCanceledException ex)
             {
                 _state = GrpcConnectionState.Failure;
-                _Logger.Warning($"Grpc channel connect timeout.{ex.Message}");
+                _logger.Warning($"Grpc channel connect timeout. {ex.Message}");
             }
             catch (Exception ex)
             {
                 _state = GrpcConnectionState.Failure;
-                _Logger.Warning($"Grpc channel connect fail.{ex.Message}");
+                _logger.Warning($"Grpc channel connect fail. {ex.Message}");
             }
 
             return _state == GrpcConnectionState.Ready;
@@ -80,25 +80,29 @@ namespace SkyWalking.Remote
             }
             catch (Exception e)
             {
-                _Logger.Error("Grpc channel shutdown fail.", e);
+                _logger.Warning($"Grpc channel shutdown fail. {e.Message}");
             }
             finally
-            {
+            { 
                 _state = GrpcConnectionState.Shutdown;
             }
         }
 
-        public void CheckState()
+        public bool CheckState()
         {
-            var channelState = (int) _internalChannel.State;
-            if ((int) _state == channelState)
+            return _state == GrpcConnectionState.Ready && _internalChannel.State == ChannelState.Ready;
+        }
+
+        public void Failure()
+        {
+            var currentState = _state;
+            
+            if (GrpcConnectionState.Ready == currentState)
             {
-                return;
+                _logger.Debug($"Grpc channel state changed. {_state} -> {_internalChannel.State}");
             }
 
-            _Logger.Debug($"Grpc channel state changed. {_state} -> {_internalChannel.State}");
-
-            _state = (GrpcConnectionState)channelState;
+            _state = GrpcConnectionState.Failure;
         }
     }
 }

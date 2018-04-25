@@ -24,13 +24,16 @@ using SkyWalking.Boot;
 namespace SkyWalking.Remote
 {
     public class GrpcConnectionService : TimerService
-
     {
         protected override TimeSpan Interval { get; } = TimeSpan.FromMinutes(1);
-        
-        protected override Task Execute(CancellationToken token)
+
+        protected override async Task Execute(CancellationToken token)
         {
-            return GrpcConnectionManager.Instance.ConnectAsync();
+            var connection = GrpcConnectionManager.Instance.GetAvailableConnection();
+            if (connection == null || !connection.CheckState())
+            {
+                await GrpcConnectionManager.Instance.ConnectAsync();
+            }
         }
     }
 }

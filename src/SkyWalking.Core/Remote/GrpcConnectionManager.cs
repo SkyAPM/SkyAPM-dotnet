@@ -19,11 +19,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Threading.Tasks;
-using Grpc.Core;
+using Nito.AsyncEx;
 using SkyWalking.Config;
 using SkyWalking.Logging;
-using SkyWalking.NetworkProtocol.Trace;
 
 namespace SkyWalking.Remote
 {
@@ -31,55 +32,65 @@ namespace SkyWalking.Remote
     {
         private static readonly ILogger _logger = LogManager.GetLogger<GrpcConnectionManager>();
         private static readonly GrpcConnectionManager _client = new GrpcConnectionManager();
+        public const string NotFoundErrorMessage = "Not found available connection.";
 
         public static GrpcConnectionManager Instance => _client;
 
-        private ICollection<GrpcConnection> _connections = new List<GrpcConnection>();
+        private readonly Random _random = new Random();
+        private readonly AsyncLock _lock = new AsyncLock();
+        private GrpcConnection _connection;
 
         private GrpcConnectionManager()
         {
-            foreach (var server in RemoteDownstreamConfig.Collector.gRPCServers)
+        }
+
+        public async Task ConnectAsync()
+        {
+            // using async lock
+            using (await _lock.LockAsync())
             {
-                _connections.Add(new GrpcConnection(server));
+                if (_connection != null && _connection.CheckState())
+                {
+                    return;
+                }
+
+                _connection = new GrpcConnection(GetServer(_connection?.Server));
+                await _connection.ConnectAsync();
             }
         }
 
-        public Task ConnectAsync()
+        public async Task ShutdownAsync()
         {
-            foreach (var connection in _connections)
-            {
-                connection.ConnectAsync();
-            }
-
-            return Task.CompletedTask;
+            await _connection?.ShutdowmAsync();
         }
 
-        public Task ShutdownAsync()
+        public GrpcConnection GetAvailableConnection()
         {
-            foreach (var connection in _connections)
+            var connection = _connection;
+            if (connection == null || connection.State != GrpcConnectionState.Ready)
             {
-                connection.ShutdowmAsync();
+                _logger.Debug(NotFoundErrorMessage);
+                return null;
             }
-
-            return Task.CompletedTask;
+            
+            return connection;
         }
 
-        public GrpcConnection GetAvailableConnection(object key)
+        private string GetServer(string currentServer)
         {
-            var availableConnections = _connections.Where(x => x.State == GrpcConnectionState.Ready).ToArray();
-            if (availableConnections.Length == 0)
+            var servers = RemoteDownstreamConfig.Collector.gRPCServers.Distinct().ToArray();
+            if (servers.Length == 1)
             {
-                _logger.Debug("Not found available connection.");
-                throw new InvalidOperationException("Not found available connection.");
+                return servers[0];
             }
 
-            if (availableConnections.Length == 1)
+            if (currentServer != null)
             {
-                return availableConnections[0];
+                servers = servers.Where(x => x != currentServer).ToArray();
             }
 
-            var index = key.GetHashCode() % availableConnections.Length;
-            return availableConnections[index];
+            var index = _random.Next() % servers.Length;
+            return servers[index];
         }
     }
 }

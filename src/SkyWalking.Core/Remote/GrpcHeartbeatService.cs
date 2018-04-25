@@ -31,22 +31,31 @@ namespace SkyWalking.Remote
     public class GrpcHeartbeatService : TimerService
     {
         private static readonly ILogger _logger = LogManager.GetLogger<GrpcHeartbeatService>();
-        private readonly Random _random = new Random();
         protected override TimeSpan Interval { get; } = TimeSpan.FromMinutes(1);
+
+        protected override async Task Starting(CancellationToken token)
+        {
+            await Task.Delay(TimeSpan.FromSeconds(15));
+        }
 
         protected override async Task Execute(CancellationToken token)
         {
             if (DictionaryUtil.IsNull(RemoteDownstreamConfig.Agent.ApplicationInstanceId))
             {
+                _logger.Warning($"{DateTime.Now} Heartbeat fail. Application instance is not registered.");
                 return;
             }
 
-            GrpcConnection availableConnection = null;
+            var availableConnection = GrpcConnectionManager.Instance.GetAvailableConnection();
+
+            if (availableConnection == null)
+            {
+                _logger.Warning($"{DateTime.Now} Heartbeat fail. {GrpcConnectionManager.NotFoundErrorMessage}");
+                return;
+            }
+            
             try
             {
-                availableConnection =
-                    GrpcConnectionManager.Instance.GetAvailableConnection(_random.Next());
-
                 var instanceDiscoveryService =
                     new InstanceDiscoveryService.InstanceDiscoveryServiceClient(availableConnection.GrpcChannel);
 
@@ -63,7 +72,7 @@ namespace SkyWalking.Remote
             catch (Exception e)
             {
                 _logger.Warning($"{DateTime.Now} Heartbeat fail. {e.Message}");
-                availableConnection?.CheckState();
+                availableConnection?.Failure();
             }
         }
     }
