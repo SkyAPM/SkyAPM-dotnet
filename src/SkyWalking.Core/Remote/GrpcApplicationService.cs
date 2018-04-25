@@ -106,7 +106,7 @@ namespace SkyWalking.Remote
                     var applicationInstanceId = 0;
                     var retry = 0;
 
-                    while (retry < 3 && DictionaryUtil.IsNull(applicationInstanceId))
+                    while (retry++ < 3 && DictionaryUtil.IsNull(applicationInstanceId))
                     {
                         var applicationInstanceMapping =
                             await instanceDiscoveryService.registerInstanceAsync(applicationInstance);
