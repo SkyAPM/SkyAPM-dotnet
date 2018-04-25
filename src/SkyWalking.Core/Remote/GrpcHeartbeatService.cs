@@ -53,7 +53,7 @@ namespace SkyWalking.Remote
                 var heartbeat = new ApplicationInstanceHeartbeat
                 {
                     ApplicationInstanceId = RemoteDownstreamConfig.Agent.ApplicationInstanceId,
-                    HeartbeatTime = DateTime.UtcNow.GetTimeMillis()
+                    HeartbeatTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()
                 };
 
                 await instanceDiscoveryService.heartbeatAsync(heartbeat);

@@ -78,8 +78,8 @@ namespace SkyWalking.Remote
                     var instanceDiscoveryService =
                         new InstanceDiscoveryService.InstanceDiscoveryServiceClient(availableConnection.GrpcChannel);
 
-                    var agentUUID = Guid.NewGuid().ToString().Replace("-", "");
-                    var registerTime = DateTime.UtcNow.GetTimeMillis();
+                    var agentUUID = Guid.NewGuid().ToString("N");
+                    var registerTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 
                     var hostName = Dns.GetHostName();
 
