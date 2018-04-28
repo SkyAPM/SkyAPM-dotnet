@@ -16,6 +16,7 @@
  *
  */
 
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
@@ -26,7 +27,7 @@ namespace SkyWalking.Diagnostics
         private readonly MethodInfo _method;
         private readonly ITracingDiagnosticProcessor _diagnosticProcessor;
         private readonly string _diagnosticName;
-        private readonly ParameterInfo[] _parameters;
+        private readonly IParameterResolver[] _parameterResolvers;
 
         public TracingDiagnosticMethod(ITracingDiagnosticProcessor diagnosticProcessor, MethodInfo method,
             string diagnosticName)
@@ -34,40 +35,35 @@ namespace SkyWalking.Diagnostics
             _diagnosticProcessor = diagnosticProcessor;
             _method = method;
             _diagnosticName = diagnosticName;
-            _parameters = method.GetParameters();
+            _parameterResolvers = GetParameterResolvers(method).ToArray();
         }
 
-        public void Invoke(string diagnosticName, object arg)
+        public void Invoke(string diagnosticName, object value)
         {
             if (_diagnosticName != diagnosticName)
             {
                 return;
             }
 
-            if (arg == null || _parameters.Length == 0)
+            var args = new object[_parameterResolvers.Length];
+            for (var i = 0; i < _parameterResolvers.Length; i++)
             {
-                _method.Invoke(_diagnosticProcessor, new object[_parameters.Length]);
-                return;
+                args[i] = _parameterResolvers[i].Resolve(value);
             }
 
-            var parameters = _parameters;
+            _method.Invoke(value, args);
+        }
 
-            var methodArgs = new object[parameters.Length];
-
-            var argTypeProperties = arg.GetType().GetProperties();
-
-            for (var i = 0; i < parameters.Length; i++)
+        private static IEnumerable<IParameterResolver> GetParameterResolvers(MethodInfo methodInfo)
+        {
+            foreach (var parameter in methodInfo.GetParameters())
             {
-                var property = argTypeProperties.FirstOrDefault(x => x.PropertyType == parameters[i].ParameterType);
-                if (property == null)
+                var binder = parameter.GetCustomAttribute<ParameterBinder>();
+                if (binder != null)
                 {
-                    continue;
+                    yield return binder;
                 }
-
-                methodArgs[i] = property.GetValue(arg);
             }
-
-            _method.Invoke(_diagnosticProcessor, methodArgs);
         }
     }
 }
