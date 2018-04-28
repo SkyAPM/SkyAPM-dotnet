@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-using DotNetCore.CAP;
 using Microsoft.AspNetCore.Mvc;
 
 namespace SkyWalking.Sample.Backend.Controllers
@@ -25,24 +24,5 @@ namespace SkyWalking.Sample.Backend.Controllers
             var httpClient = new HttpClient();
             return await httpClient.GetStringAsync("http://www.baidu.com");
         }
-
-        [CapSubscribe("skywalking.cap.publish")]
-        public void Consumer(Person person)
-        {
-            Console.WriteLine(person.ToString());
-            Console.WriteLine("[skywalking.cap.publish] subscriber has been invoked!");
-        }
-
-    }
-
-    public class Person
-    {
-        public string Name { get; set; }
-        public int Age { get; set; }
-
-        public override string ToString()
-        {
-            return $"Person output, Name:{Name}, Age:{Age}";
-        }
-    }
+    } 
 }
