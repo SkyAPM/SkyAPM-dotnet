@@ -1,5 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+  
   <Import Project="..\..\build\common.props" />
+
   <PropertyGroup>
     <Description>SkyWalking.Diagnostics.HttpClient notifies outgoing Http requests.</Description>
     <AssemblyTitle>SkyWalking.Diagnostics.HttpClient</AssemblyTitle>
@@ -11,6 +13,7 @@
     </PackageReleaseNotes>
     <RootNamespace>SkyWalking.Diagnostics.HttpClient</RootNamespace>
   </PropertyGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\SkyWalking.Abstractions\SkyWalking.Abstractions.csproj" />
     <ProjectReference Include="..\SkyWalking.Core\SkyWalking.Core.csproj" />
