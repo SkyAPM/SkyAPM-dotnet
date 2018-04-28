@@ -57,7 +57,6 @@ namespace SkyWalking.Diagnostics.CAP
             var span = ContextManager.CreateExitSpan(operationName, contextCarrier, peer);
             span.SetComponent(ComponentsDefine.CAP);
             span.SetLayer(SpanLayer.MQ);
-            span.Tag(Tags.SpanKind.Key, Tags.MqProducer.Key);
             span.Tag(Tags.MqTopic.Key, eventData.BrokerTopicName);
             foreach (var item in contextCarrier.Items)
             {
@@ -110,7 +109,6 @@ namespace SkyWalking.Diagnostics.CAP
             var span = ContextManager.CreateEntrySpan(operationName, carrier);
             span.SetComponent(ComponentsDefine.CAP);
             span.SetLayer(SpanLayer.MQ);
-            span.Tag(Tags.SpanKind.Key, Tags.MqConsumer.Key);
             span.Tag(Tags.MqTopic.Key, eventData.BrokerTopicName);
         }
 
