@@ -63,6 +63,10 @@ namespace SkyWalking.Diagnostics
                 {
                     yield return binder;
                 }
+                else
+                {
+                    yield return new NullParameterResolver();
+                }
             }
         }
     }
