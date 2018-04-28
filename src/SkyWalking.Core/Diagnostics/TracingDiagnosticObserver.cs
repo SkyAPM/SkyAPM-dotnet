@@ -18,22 +18,16 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using SkyWalking.Logging;
-using SkyWalking.Utils;
 
 namespace SkyWalking.Diagnostics
 {
-    public abstract class TracingDiagnosticObserver : IObserver<DiagnosticListener>
+    internal class TracingDiagnosticObserver : IObserver<KeyValuePair<string, object>>
     {
-        private static readonly ILogger _logger = LogManager.GetLogger<TracingDiagnosticObserver>();
+        private readonly TracingDiagnosticMethodCollection _methodCollection;
 
-        private readonly IEnumerable<ITracingDiagnosticProcessor> _tracingDiagnosticProcessors;
-
-        public TracingDiagnosticObserver(IEnumerable<ITracingDiagnosticProcessor> tracingDiagnosticProcessors)
+        public TracingDiagnosticObserver(ITracingDiagnosticProcessor tracingDiagnosticProcessor)
         {
-            _tracingDiagnosticProcessors = tracingDiagnosticProcessors ??
-                                           throw new ArgumentNullException(nameof(tracingDiagnosticProcessors));
+            _methodCollection = new TracingDiagnosticMethodCollection(tracingDiagnosticProcessor);
         }
 
         public void OnCompleted()
@@ -44,19 +38,12 @@ namespace SkyWalking.Diagnostics
         {
         }
 
-        public void OnNext(DiagnosticListener listener)
+        public void OnNext(KeyValuePair<string, object> value)
         {
-            foreach (var diagnosticProcessor in _tracingDiagnosticProcessors.Distinct(x => x.ListenerName))
+            foreach (var method in _methodCollection)
             {
-                if (listener.Name == diagnosticProcessor.ListenerName)
-                {
-                    OnNext(listener, diagnosticProcessor);
-                    _logger.Debug($"TracingDiagnosticObserver subscribe diagnosticListener named [{diagnosticProcessor.ListenerName}].");
-                }
+                method.Invoke(value.Key, value.Value);
             }
         }
-
-        protected abstract void OnNext(DiagnosticListener listener,
-            ITracingDiagnosticProcessor diagnosticProcessor);
     }
 }
