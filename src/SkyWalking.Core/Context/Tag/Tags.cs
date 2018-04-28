@@ -61,32 +61,6 @@ namespace SkyWalking.Context.Tag
         /// </summary>
         public static readonly StringTag MqTopic = new StringTag("mq.topic");
 
-        /// <summary>
-        /// 
-        /// </summary>
-        public static readonly StringTag ErrorMessage = new StringTag("error.message");
-
-        /// <summary>
-        /// SpanKind hints at the relationship between spans, e.g. client/server.
-        /// </summary>
-        public static readonly StringTag SpanKind = new StringTag("span.kind");
-
-        /// <summary>
-        /// A static readonlyant for setting the span to indicate that it represents a producer span, in a messaging scenario.
-        /// </summary>
-        public static readonly StringTag MqProducer = new StringTag("producer");
-
-        /// <summary>
-        /// A static readonlyant for setting the span to indicate that it represents a consumer span, in a messaging scenario.
-        /// </summary>
-        public static readonly StringTag MqConsumer = new StringTag("consumer");
-
-        ///// <summary>
-        ///// MessageBusDestination records an address at which messages can be exchanged. E.g. A Kafka record has an
-        ///// associated "topic name" that can be extracted by the instrumented producer or consumer and stored using this tag.
-        ///// </summary>
-        //public static readonly StringTag MessageBusDestination = new StringTag("message_bus.destination");
-
         public static class HTTP
         {
             public static readonly StringTag Method = new StringTag("http.method");
