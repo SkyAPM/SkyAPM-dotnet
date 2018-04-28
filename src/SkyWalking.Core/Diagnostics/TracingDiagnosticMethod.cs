@@ -51,7 +51,7 @@ namespace SkyWalking.Diagnostics
                 args[i] = _parameterResolvers[i].Resolve(value);
             }
 
-            _method.Invoke(value, args);
+            _method.Invoke(_diagnosticProcessor, args);
         }
 
         private static IEnumerable<IParameterResolver> GetParameterResolvers(MethodInfo methodInfo)
