@@ -3,15 +3,16 @@
     <TargetFramework>netcoreapp2.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <Folder Include="wwwroot\" />
-  </ItemGroup>
-  <ItemGroup>
     <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="2.0.3" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\SkyWalking.AspNetCore\SkyWalking.AspNetCore.csproj" />
+    <ProjectReference Include="..\..\src\SkyWalking.Diagnostics.CAP\SkyWalking.Diagnostics.CAP.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="DotNetCore.CAP" Version="2.2.2-preview-40816597" />
+    <PackageReference Include="DotNetCore.CAP.Kafka" Version="2.2.2-preview-40816597" />
+    <PackageReference Include="DotNetCore.CAP.MySql" Version="2.2.2-preview-40816597" />
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.0" />
   </ItemGroup>
 </Project>

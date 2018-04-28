@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using DotNetCore.CAP;
 using Microsoft.AspNetCore.Mvc;
 
 namespace SkyWalking.Sample.Backend.Controllers
@@ -14,7 +15,7 @@ namespace SkyWalking.Sample.Backend.Controllers
         [HttpGet]
         public IEnumerable<string> Get()
         {
-            return new string[] {"value1", "value2"};
+            return new string[] { "value1", "value2" };
         }
 
         // GET api/values/5
@@ -25,22 +26,23 @@ namespace SkyWalking.Sample.Backend.Controllers
             return await httpClient.GetStringAsync("http://www.baidu.com");
         }
 
-        // POST api/values
-        [HttpPost]
-        public void Post([FromBody] string value)
+        [CapSubscribe("skywalking.cap.publish")]
+        public void Consumer(Person person)
         {
+            Console.WriteLine(person.ToString());
+            Console.WriteLine("[skywalking.cap.publish] subscriber has been invoked!");
         }
 
-        // PUT api/values/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
+    }
 
-        // DELETE api/values/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
+    public class Person
+    {
+        public string Name { get; set; }
+        public int Age { get; set; }
+
+        public override string ToString()
         {
+            return $"Person output, Name:{Name}, Age:{Age}";
         }
     }
 }

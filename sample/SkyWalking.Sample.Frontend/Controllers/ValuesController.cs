@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
+using DotNetCore.CAP;
 using Microsoft.AspNetCore.Mvc;
+using MySql.Data.MySqlClient;
 
 namespace SkyWalking.Sample.Frontend.Controllers
 {
@@ -13,32 +15,30 @@ namespace SkyWalking.Sample.Frontend.Controllers
         public async Task<IEnumerable<string>> Get()
         {
             await new HttpClient().GetAsync("http://localhost:5002/api/values");
-            return new string[] {"value1", "value2"};
+            return new string[] { "value1", "value2" };
         }
 
-        // GET api/values/5
-        [HttpGet("{id}")]
-        public string Get(int id)
+        [HttpGet]
+        [Route("~/publish")]
+        public IActionResult CapPublish([FromServices] ICapPublisher capPublisher)
         {
-            return "value";
-        }
+            using (var connection = new MySqlConnection(Startup.ConnectionString))
+            {
+                connection.Open();
 
-        // POST api/values
-        [HttpPost]
-        public void Post([FromBody] string value)
-        {
-        }
+                var transaction = connection.BeginTransaction();
 
-        // PUT api/values/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
+                capPublisher.Publish("skywalking.cap.publish", new Person { Name = "Alexina", Age = 18 }, transaction);
 
-        // DELETE api/values/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
+                transaction.Commit();
+            }
+            return Ok();
         }
+    }
+
+    public class Person
+    {
+        public string Name { get; set; }
+        public int Age { get; set; }
     }
 }
