@@ -26,40 +26,66 @@ namespace SkyWalking.Context.Tag
     {
         public static readonly StringTag Url = new StringTag("url");
 
-        /**
-         * STATUS_CODE records the http status code of the response.
-         */
+        /// <summary>
+        /// STATUS_CODE records the http status code of the response.
+        /// </summary>
         public static readonly StringTag StatusCode = new StringTag("status_code");
 
-        /**
-         * DB_TYPE records database type, such as sql, redis, cassandra and so on.
-         */
+        /// <summary>
+        /// DB_TYPE records database type, such as sql, redis, cassandra and so on.
+        /// </summary>
         public static readonly StringTag DbType = new StringTag("db.type");
 
-        /**
-         * DB_INSTANCE records database instance name.
-         */
+        /// <summary>
+        /// DB_INSTANCE records database instance name.
+        /// </summary>
         public static readonly StringTag DbInstance = new StringTag("db.instance");
 
-        /**
-         * DB_STATEMENT records the sql statement of the database access.
-         */
+        /// <summary>
+        /// DB_STATEMENT records the sql statement of the database access.
+        /// </summary>
         public static readonly StringTag DbStatement = new StringTag("db.statement");
 
-        /**
-         * DB_BIND_VARIABLES records the bind variables of sql statement.
-         */
+        /// <summary>
+        /// DB_BIND_VARIABLES records the bind variables of sql statement.
+        /// </summary>
         public static readonly StringTag DbBindVariables = new StringTag("db.bind_vars");
 
-        /**
-         * MQ_BROKER records the broker address of message-middleware
-         */
-        public static  readonly StringTag MqBorker = new StringTag("mq.broker");
+        /// <summary>
+        /// MQ_BROKER records the broker address of message-middleware
+        /// </summary>
+        public static readonly StringTag MqBorker = new StringTag("mq.broker");
 
-        /**
-         * MQ_TOPIC records the topic name of message-middleware
-         */
+        /// <summary>
+        /// MQ_TOPIC records the topic name of message-middleware
+        /// </summary>
         public static readonly StringTag MqTopic = new StringTag("mq.topic");
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public static readonly StringTag ErrorMessage = new StringTag("error.message");
+
+        /// <summary>
+        /// SpanKind hints at the relationship between spans, e.g. client/server.
+        /// </summary>
+        public static readonly StringTag SpanKind = new StringTag("span.kind");
+
+        /// <summary>
+        /// A static readonlyant for setting the span to indicate that it represents a producer span, in a messaging scenario.
+        /// </summary>
+        public static readonly StringTag MqProducer = new StringTag("producer");
+
+        /// <summary>
+        /// A static readonlyant for setting the span to indicate that it represents a consumer span, in a messaging scenario.
+        /// </summary>
+        public static readonly StringTag MqConsumer = new StringTag("consumer");
+
+        ///// <summary>
+        ///// MessageBusDestination records an address at which messages can be exchanged. E.g. A Kafka record has an
+        ///// associated "topic name" that can be extracted by the instrumented producer or consumer and stored using this tag.
+        ///// </summary>
+        //public static readonly StringTag MessageBusDestination = new StringTag("message_bus.destination");
 
         public static class HTTP
         {

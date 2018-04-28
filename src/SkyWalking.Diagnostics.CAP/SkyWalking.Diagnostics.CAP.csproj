@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="..\..\build\common.props" />
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Description>SkyWalking.Diagnostics.CAP notifies of CAP messages.</Description>
+    <AssemblyTitle>SkyWalking.Diagnostics.CAP</AssemblyTitle>
+    <AssemblyName>SkyWalking.Diagnostics.CAP</AssemblyName>
+    <PackageId>SkyWalking.Diagnostics.CAP</PackageId>
+    <PackageTags>SkyWalking;APM;CAP</PackageTags>
+    <RootNamespace>SkyWalking.Diagnostics.CAP</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DotNetCore.CAP" Version="2.2.2-preview-40816597" />
+    <PackageReference Include="Microsoft.Extensions.DiagnosticAdapter" Version="2.1.0-preview2-final" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SkyWalking.Abstractions\SkyWalking.Abstractions.csproj" />
+    <ProjectReference Include="..\SkyWalking.Core\SkyWalking.Core.csproj" />
+    <ProjectReference Include="..\SkyWalking.Extensions.DependencyInjection\SkyWalking.Extensions.DependencyInjection.csproj" />
+  </ItemGroup>
+
+</Project>
