@@ -15,14 +15,14 @@ namespace SkyWalking.Core.Tests.Diagnostics
             [PropertyAttribute(Name = "Name")] string eventName, 
             [Property] DateTime Timestamp)
         {
-            Assert.Equal(eventName, "Executing");
+            Assert.Equal("Executing", eventName);
             this.Timestamp = Timestamp;
         }
 
         [DiagnosticName(FakeDiagnosticListener.Executed)]
         public void Executed([Object] FakeDiagnosticListenerData data)
         {
-            Assert.Equal(data.Name, "Executed");
+            Assert.Equal("Executed", data.Name);
             Timestamp = data.Timestamp;
         }
     }

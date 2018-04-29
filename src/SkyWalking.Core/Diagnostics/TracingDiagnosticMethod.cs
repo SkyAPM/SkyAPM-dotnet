@@ -61,6 +61,20 @@ namespace SkyWalking.Diagnostics
                 var binder = parameter.GetCustomAttribute<ParameterBinder>();
                 if (binder != null)
                 {
+                    if(binder is ObjectAttribute objectBinder)
+                    {
+                        if (objectBinder.TargetType == null)
+                        {
+                            objectBinder.TargetType = parameter.ParameterType;
+                        }
+                    }
+                    if(binder is PropertyAttribute propertyBinder)
+                    {
+                        if (propertyBinder.Name == null)
+                        {
+                            propertyBinder.Name = parameter.Name;
+                        }
+                    }
                     yield return binder;
                 }
                 else
