@@ -24,7 +24,7 @@ namespace SkyWalking.Diagnostics.HttpClient.Tests
             using (var tracerContextListener = new FakeIgnoreTracerContextListener())
             {
                 var httpClient = new System.Net.Http.HttpClient();
-                await httpClient.GetAsync("https://www.baidu.com");
+                await httpClient.GetAsync("https://github.com");
                 Assert.Equal(1, tracerContextListener.Counter);
             }
         }
