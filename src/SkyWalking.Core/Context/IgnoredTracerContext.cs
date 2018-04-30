@@ -17,9 +17,7 @@
  */
 
 using System.Collections.Generic;
-using System.Net.Http.Headers;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices.ComTypes;
 using SkyWalking.Context.Trace;
 using SkyWalking.Utils;
 

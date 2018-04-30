@@ -47,11 +47,12 @@ namespace SkyWalking.Diagnostics.HttpClient
         public void HttpResponse([Property(Name = "Response")] HttpResponseMessage response)
         {
             var span = ContextManager.ActiveSpan;
-            if (span != null && span.IsExit)
+            if (span != null && response != null)
             {
                 Tags.StatusCode.Set(span, response.StatusCode.ToString());
-                ContextManager.StopSpan(span);
             }
+
+            ContextManager.StopSpan(span);
         }
 
         [DiagnosticName("System.Net.Http.Exception")]
