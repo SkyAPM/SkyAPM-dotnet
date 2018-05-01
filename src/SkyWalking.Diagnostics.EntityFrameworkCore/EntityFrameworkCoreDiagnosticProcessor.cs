@@ -73,7 +73,11 @@ namespace SkyWalking.Diagnostics.EntityFrameworkCore
             {
                 return;
             }
-            span.Log(eventData.Exception);
+
+            if (eventData != null)
+            {
+                span.Log(eventData.Exception);
+            }
             span.ErrorOccurred();
             ContextManager.StopSpan(span);
         }
