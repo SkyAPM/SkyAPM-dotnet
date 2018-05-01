@@ -16,12 +16,76 @@
  *
  */
 
+using System;
+using System.Data.Common;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.EntityFrameworkCore.Storage.Internal;
+using SkyWalking.Context;
+using SkyWalking.Context.Tag;
+using SkyWalking.Context.Trace;
+using SkyWalking.NetworkProtocol.Trace;
 
 namespace SkyWalking.Diagnostics.EntityFrameworkCore
 {
     public class EntityFrameworkCoreDiagnosticProcessor : ITracingDiagnosticProcessor
     {
+        private Func<CommandEventData, string> _operationNameResolver;
+
         public string ListenerName => DbLoggerCategory.Name;
+
+        /// <summary>
+        /// A delegate that returns the OpenTracing "operation name" for the given command.
+        /// </summary>
+        public Func<CommandEventData, string> OperationNameResolver
+        {
+            get
+            {
+                return _operationNameResolver ??
+                       (_operationNameResolver = (data) => "DB " + data.ExecuteMethod.ToString());
+            }
+            set => _operationNameResolver = value ?? throw new ArgumentNullException(nameof(OperationNameResolver));
+        }
+
+        [DiagnosticName("Microsoft.EntityFrameworkCore.Database.Command.CommandExecuting")]
+        public void CommandExecuting([Object]CommandEventData eventData)
+        {
+            var operationName = OperationNameResolver(eventData);
+            var span = ContextManager.CreateLocalSpan(operationName);
+            span.SetComponent(ComponentsDefine.EntityFrameworkCore);
+            span.SetLayer(SpanLayer.DB);
+            Tags.DbInstance.Set(span, eventData.Command.Connection.Database);
+            Tags.DbStatement.Set(span, eventData.Command.CommandText);
+            Tags.DbBindVariables.Set(span, BuildParameterVariables(eventData.Command.Parameters));
+        }
+
+        [DiagnosticName("Microsoft.EntityFrameworkCore.Database.Command.CommandExecuted")]
+        public void CommandExecuted()
+        {
+            ContextManager.StopSpan();
+        }
+
+        [DiagnosticName("Microsoft.EntityFrameworkCore.Database.Command.CommandError")]
+        public void CommandError(CommandErrorEventData eventData)
+        {
+            var span = ContextManager.ActiveSpan;
+            if (span == null)
+            {
+                return;
+            }
+            span.Log(eventData.Exception);
+            span.ErrorOccurred();
+            ContextManager.StopSpan(span);
+        }
+
+        private string BuildParameterVariables(DbParameterCollection dbParameters)
+        {
+            if (dbParameters == null)
+            {
+                return string.Empty;
+            }
+
+            return dbParameters.FormatParameters(false);
+        }
     }
 }
