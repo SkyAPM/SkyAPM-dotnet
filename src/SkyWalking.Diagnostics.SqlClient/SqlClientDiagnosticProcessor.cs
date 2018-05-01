@@ -61,6 +61,7 @@ namespace SkyWalking.Diagnostics.SqlClient
             var span = ContextManager.ActiveSpan;
             span?.ErrorOccurred();
             span?.Log(ex);
+            ContextManager.StopSpan(span);
         }
     }
 }
