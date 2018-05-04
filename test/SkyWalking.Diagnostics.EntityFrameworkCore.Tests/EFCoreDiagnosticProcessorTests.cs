@@ -58,8 +58,7 @@ namespace SkyWalking.Diagnostics.EntityFrameworkCore.Tests
         {
             var processorObserver = new TracingDiagnosticProcessorObserver(new[]
             {
-                new EntityFrameworkCoreDiagnosticProcessor(new EFCoreComponentResolver(new List<IEFCoreComponentProvider>()
-                    {new DefaultEFCoreComponentProvider()}))
+                new EntityFrameworkCoreDiagnosticProcessor(new EFCoreComponentResolver(new List<IEFCoreComponentProvider>()))
             });
 
             DiagnosticListener.AllListeners.Subscribe(processorObserver);

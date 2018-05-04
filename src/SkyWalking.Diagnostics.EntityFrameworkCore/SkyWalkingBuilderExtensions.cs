@@ -18,6 +18,7 @@
 
 using System;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using SkyWalking.Extensions.DependencyInjection;
 
 namespace SkyWalking.Diagnostics.EntityFrameworkCore
@@ -31,9 +32,8 @@ namespace SkyWalking.Diagnostics.EntityFrameworkCore
                 throw new ArgumentNullException(nameof(builder));
             }
 
-            builder.Services.AddSingleton<ITracingDiagnosticProcessor, EntityFrameworkCoreDiagnosticProcessor>();
-            builder.Services.AddSingleton<IEFCoreComponentResolver, EFCoreComponentResolver>();
-            builder.Services.AddSingleton<IEFCoreComponentProvider, DefaultEFCoreComponentProvider>();
+            builder.Services.TryAddSingleton<ITracingDiagnosticProcessor, EntityFrameworkCoreDiagnosticProcessor>();
+            builder.Services.TryAddSingleton<IEFCoreComponentResolver, EFCoreComponentResolver>();
             
             return builder;
         }
