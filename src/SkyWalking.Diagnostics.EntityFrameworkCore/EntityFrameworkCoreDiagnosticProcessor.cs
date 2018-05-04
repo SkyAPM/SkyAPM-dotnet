@@ -20,6 +20,7 @@ using System;
 using System.Data.Common;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.EntityFrameworkCore.Storage.Internal;
 using SkyWalking.Context;
 using SkyWalking.Context.Tag;
@@ -31,6 +32,7 @@ namespace SkyWalking.Diagnostics.EntityFrameworkCore
     public class EntityFrameworkCoreDiagnosticProcessor : ITracingDiagnosticProcessor
     {
         private Func<CommandEventData, string> _operationNameResolver;
+        private readonly IEFCoreComponentResolver _componentResolver;
 
         public string ListenerName => DbLoggerCategory.Name;
 
@@ -47,12 +49,17 @@ namespace SkyWalking.Diagnostics.EntityFrameworkCore
             set => _operationNameResolver = value ?? throw new ArgumentNullException(nameof(OperationNameResolver));
         }
 
+        public EntityFrameworkCoreDiagnosticProcessor(IEFCoreComponentResolver componentResolver)
+        {
+            _componentResolver = componentResolver;
+        }
+
         [DiagnosticName("Microsoft.EntityFrameworkCore.Database.Command.CommandExecuting")]
         public void CommandExecuting([Object]CommandEventData eventData)
         {
             var operationName = OperationNameResolver(eventData);
-            var span = ContextManager.CreateLocalSpan(operationName);
-            span.SetComponent(ComponentsDefine.EntityFrameworkCore);
+            var span = ContextManager.CreateExitSpan(operationName, eventData.Command.Connection.DataSource);
+            span.SetComponent(_componentResolver.Resolve(eventData.Command.Connection));
             span.SetLayer(SpanLayer.DB);
             Tags.DbType.Set(span, "Sql");
             Tags.DbInstance.Set(span, eventData.Command.Connection.Database);

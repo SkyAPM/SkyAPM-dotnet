@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
@@ -57,7 +58,8 @@ namespace SkyWalking.Diagnostics.EntityFrameworkCore.Tests
         {
             var processorObserver = new TracingDiagnosticProcessorObserver(new[]
             {
-                new EntityFrameworkCoreDiagnosticProcessor()
+                new EntityFrameworkCoreDiagnosticProcessor(new EFCoreComponentResolver(new List<IEFCoreComponentProvider>()
+                    {new DefaultEFCoreComponentProvider()}))
             });
 
             DiagnosticListener.AllListeners.Subscribe(processorObserver);

@@ -16,26 +16,15 @@
  *
  */
 
-using System;
-using Microsoft.Extensions.DependencyInjection;
-using SkyWalking.Extensions.DependencyInjection;
+using System.Data.Common;
+using SkyWalking.NetworkProtocol.Trace;
 
 namespace SkyWalking.Diagnostics.EntityFrameworkCore
 {
-    public static class SkyWalkingBuilderExtensions
+    public interface IEFCoreComponentProvider
     {
-        public static SkyWalkingBuilder AddEntityFrameworkCore(this SkyWalkingBuilder builder)
-        {
-            if (builder == null)
-            {
-                throw new ArgumentNullException(nameof(builder));
-            }
+        IComponent Component { get; }
 
-            builder.Services.AddSingleton<ITracingDiagnosticProcessor, EntityFrameworkCoreDiagnosticProcessor>();
-            builder.Services.AddSingleton<IEFCoreComponentResolver, EFCoreComponentResolver>();
-            builder.Services.AddSingleton<IEFCoreComponentProvider, DefaultEFCoreComponentProvider>();
-            
-            return builder;
-        }
+        bool Match(DbConnection connection);
     }
 }
