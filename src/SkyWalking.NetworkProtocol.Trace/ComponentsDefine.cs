@@ -37,17 +37,27 @@ namespace SkyWalking.NetworkProtocol.Trace
         
         public static readonly OfficialComponent SqlServer = new OfficialComponent(3006, "SqlServer");
         
+        public static readonly OfficialComponent Npgsql = new OfficialComponent(3007, "Npgsql");
+        
+        public static readonly OfficialComponent MySqlConnector = new OfficialComponent(3008, "MySqlConnector");
+        
+        public static readonly OfficialComponent EntityFrameworkCore_InMemory = new OfficialComponent(3009, "EntityFrameworkCore.InMemory");
+        
+        public static readonly OfficialComponent EntityFrameworkCore_SqlServer = new OfficialComponent(3010, "EntityFrameworkCore.SqlServer");
+        
+        public static readonly OfficialComponent EntityFrameworkCore_Sqlite = new OfficialComponent(3011, "EntityFrameworkCore.Sqlite");
+        
+        public static readonly OfficialComponent Pomelo_EntityFrameworkCore_MySql = new OfficialComponent(3012, "Pomelo.EntityFrameworkCore.MySql");
+        
+        public static readonly OfficialComponent Npgsql_EntityFrameworkCore_PostgreSQL = new OfficialComponent(3013, "Npgsql.EntityFrameworkCore.PostgreSQL");
+        
+        public static readonly OfficialComponent InMemoryDatabase = new OfficialComponent(3014, "InMemoryDatabase");
+        
         private static readonly ComponentsDefine _instance = new ComponentsDefine();
 
-        public ComponentsDefine Instance
-        {
-            get
-            {
-                return _instance;
-            }
-        }
+        public ComponentsDefine Instance => _instance;
 
-        private Dictionary<int, string> _components;
+        private readonly Dictionary<int, string> _components;
 
         private ComponentsDefine()
         {
