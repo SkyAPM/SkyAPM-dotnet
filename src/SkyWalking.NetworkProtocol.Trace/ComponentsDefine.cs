@@ -68,6 +68,14 @@ namespace SkyWalking.NetworkProtocol.Trace
             AddComponent(CAP);
             AddComponent(StackExchange_Redis);
             AddComponent(SqlServer);
+            AddComponent(Npgsql);
+            AddComponent(MySqlConnector);
+            AddComponent(EntityFrameworkCore_InMemory);
+            AddComponent(EntityFrameworkCore_SqlServer);
+            AddComponent(EntityFrameworkCore_Sqlite);
+            AddComponent(Pomelo_EntityFrameworkCore_MySql);
+            AddComponent(Npgsql_EntityFrameworkCore_PostgreSQL);
+            AddComponent(InMemoryDatabase);
         }
 
         private void AddComponent(OfficialComponent component)
