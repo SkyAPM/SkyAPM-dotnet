@@ -18,9 +18,11 @@
 
 using System;
 using System.Data.Common;
+using System.Runtime.InteropServices.ComTypes;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Storage.Internal;
+using SkyWalking.Config;
 using SkyWalking.Context;
 using SkyWalking.Context.Tag;
 using SkyWalking.Context.Trace;
@@ -30,7 +32,7 @@ namespace SkyWalking.Diagnostics.EntityFrameworkCore
     public class EntityFrameworkCoreDiagnosticProcessor : ITracingDiagnosticProcessor
     {
         private Func<CommandEventData, string> _operationNameResolver;
-        private readonly IEFCoreComponentResolver _componentResolver;
+        private readonly IEfCoreSpanFactory _efCoreSpanFactory;
 
         public string ListenerName => DbLoggerCategory.Name;
 
@@ -47,17 +49,16 @@ namespace SkyWalking.Diagnostics.EntityFrameworkCore
             set => _operationNameResolver = value ?? throw new ArgumentNullException(nameof(OperationNameResolver));
         }
 
-        public EntityFrameworkCoreDiagnosticProcessor(IEFCoreComponentResolver componentResolver)
+        public EntityFrameworkCoreDiagnosticProcessor(IEfCoreSpanFactory spanFactory)
         {
-            _componentResolver = componentResolver;
+            _efCoreSpanFactory = spanFactory;
         }
 
         [DiagnosticName("Microsoft.EntityFrameworkCore.Database.Command.CommandExecuting")]
-        public void CommandExecuting([Object]CommandEventData eventData)
+        public void CommandExecuting([Object] CommandEventData eventData)
         {
             var operationName = OperationNameResolver(eventData);
-            var span = ContextManager.CreateExitSpan(operationName, eventData.Command.Connection.DataSource);
-            span.SetComponent(_componentResolver.Resolve(eventData.Command.Connection));
+            var span = _efCoreSpanFactory.Create(operationName, eventData);
             span.SetLayer(SpanLayer.DB);
             Tags.DbType.Set(span, "Sql");
             Tags.DbInstance.Set(span, eventData.Command.Connection.Database);
