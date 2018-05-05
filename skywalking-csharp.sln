@@ -54,6 +54,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "EntityFrameworkCore", "Enti
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SkyWalking.Diagnostics.EntityFrameworkCore.Sqlite", "src\SkyWalking.Diagnostics.EntityFrameworkCore.Sqlite\SkyWalking.Diagnostics.EntityFrameworkCore.Sqlite.csproj", "{F5C529C9-23C4-46B7-84FF-E86C6D17EB3E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SkyWalking.Diagnostics.EntityFrameworkCore.Pomelo.MySql", "src\SkyWalking.Diagnostics.EntityFrameworkCore.Pomelo.MySql\SkyWalking.Diagnostics.EntityFrameworkCore.Pomelo.MySql.csproj", "{7BD880F3-2886-4EE6-9569-114613AFFCBC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -124,6 +126,10 @@ Global
 		{F5C529C9-23C4-46B7-84FF-E86C6D17EB3E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F5C529C9-23C4-46B7-84FF-E86C6D17EB3E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F5C529C9-23C4-46B7-84FF-E86C6D17EB3E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7BD880F3-2886-4EE6-9569-114613AFFCBC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7BD880F3-2886-4EE6-9569-114613AFFCBC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7BD880F3-2886-4EE6-9569-114613AFFCBC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7BD880F3-2886-4EE6-9569-114613AFFCBC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -148,6 +154,7 @@ Global
 		{A4E67E09-3156-4D30-B451-F24F706E96C4} = {79ED86A5-E9B9-49B2-9354-C911C079D03E}
 		{CD334460-8E61-41EB-9762-62C6A342CACB} = {A4E67E09-3156-4D30-B451-F24F706E96C4}
 		{F5C529C9-23C4-46B7-84FF-E86C6D17EB3E} = {A4E67E09-3156-4D30-B451-F24F706E96C4}
+		{7BD880F3-2886-4EE6-9569-114613AFFCBC} = {A4E67E09-3156-4D30-B451-F24F706E96C4}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {94C0DA2C-CCCB-4314-93A2-9809B5DD0583}

@@ -18,6 +18,7 @@
 
 using System;
 using System.Data.Common;
+using System.Linq;
 using System.Runtime.InteropServices.ComTypes;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -44,7 +45,11 @@ namespace SkyWalking.Diagnostics.EntityFrameworkCore
             get
             {
                 return _operationNameResolver ??
-                       (_operationNameResolver = (data) => "DB " + data.ExecuteMethod.ToString());
+                       (_operationNameResolver = (data) =>
+                       {
+                           var commandType = data.Command.CommandText?.Split(' ');
+                           return "DB " + (commandType.FirstOrDefault() ?? data.ExecuteMethod.ToString());
+                       });
             }
             set => _operationNameResolver = value ?? throw new ArgumentNullException(nameof(OperationNameResolver));
         }
