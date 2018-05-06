@@ -22,9 +22,9 @@ namespace SkyWalking.Diagnostics.EntityFrameworkCore
 {
     public static class DatabaseProviderBuilderExtensions
     {
-        public static DatabaseProviderBuilder AddPomeloMysql(this DatabaseProviderBuilder builder)
+        public static DatabaseProviderBuilder AddNpgsql(this DatabaseProviderBuilder builder)
         {
-            builder.Services.AddSingleton<IEfCoreSpanMetadataProvider, MySqlEFCoreSpanMetadataProvider>();
+            builder.Services.AddSingleton<IEfCoreSpanMetadataProvider, NpgsqlEFCoreSpanMetadataProvider>();
             return builder;
         }
     }

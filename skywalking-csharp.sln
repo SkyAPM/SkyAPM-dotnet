@@ -56,6 +56,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SkyWalking.Diagnostics.Enti
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SkyWalking.Diagnostics.EntityFrameworkCore.Pomelo.MySql", "src\SkyWalking.Diagnostics.EntityFrameworkCore.Pomelo.MySql\SkyWalking.Diagnostics.EntityFrameworkCore.Pomelo.MySql.csproj", "{7BD880F3-2886-4EE6-9569-114613AFFCBC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SkyWalking.Diagnostics.EntityFrameworkCore.Npgsql", "src\SkyWalking.Diagnostics.EntityFrameworkCore.Npgsql\SkyWalking.Diagnostics.EntityFrameworkCore.Npgsql.csproj", "{F8D96C30-369C-4FCB-B5B2-02EAA74199C9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -130,6 +132,10 @@ Global
 		{7BD880F3-2886-4EE6-9569-114613AFFCBC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7BD880F3-2886-4EE6-9569-114613AFFCBC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7BD880F3-2886-4EE6-9569-114613AFFCBC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F8D96C30-369C-4FCB-B5B2-02EAA74199C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F8D96C30-369C-4FCB-B5B2-02EAA74199C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F8D96C30-369C-4FCB-B5B2-02EAA74199C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F8D96C30-369C-4FCB-B5B2-02EAA74199C9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -155,6 +161,7 @@ Global
 		{CD334460-8E61-41EB-9762-62C6A342CACB} = {A4E67E09-3156-4D30-B451-F24F706E96C4}
 		{F5C529C9-23C4-46B7-84FF-E86C6D17EB3E} = {A4E67E09-3156-4D30-B451-F24F706E96C4}
 		{7BD880F3-2886-4EE6-9569-114613AFFCBC} = {A4E67E09-3156-4D30-B451-F24F706E96C4}
+		{F8D96C30-369C-4FCB-B5B2-02EAA74199C9} = {A4E67E09-3156-4D30-B451-F24F706E96C4}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {94C0DA2C-CCCB-4314-93A2-9809B5DD0583}

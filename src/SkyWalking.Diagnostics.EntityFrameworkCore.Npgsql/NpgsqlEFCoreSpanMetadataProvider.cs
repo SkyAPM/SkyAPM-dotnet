@@ -16,16 +16,24 @@
  *
  */
 
-using Microsoft.Extensions.DependencyInjection;
+using System.Data.Common;
+using Npgsql;
+using SkyWalking.NetworkProtocol.Trace;
 
 namespace SkyWalking.Diagnostics.EntityFrameworkCore
 {
-    public static class DatabaseProviderBuilderExtensions
+    public class NpgsqlEFCoreSpanMetadataProvider : IEfCoreSpanMetadataProvider
     {
-        public static DatabaseProviderBuilder AddPomeloMysql(this DatabaseProviderBuilder builder)
+        public IComponent Component { get; } = ComponentsDefine.Npgsql_EntityFrameworkCore_PostgreSQL;
+        
+        public bool Match(DbConnection connection)
         {
-            builder.Services.AddSingleton<IEfCoreSpanMetadataProvider, MySqlEFCoreSpanMetadataProvider>();
-            return builder;
+           return connection is NpgsqlConnection;
+        }
+
+        public string GetPeer(DbConnection connection)
+        {
+            return connection.DataSource;
         }
     }
 }
