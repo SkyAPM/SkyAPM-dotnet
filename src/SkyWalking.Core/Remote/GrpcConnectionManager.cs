@@ -41,7 +41,7 @@ namespace SkyWalking.Remote
         {
         }
 
-        public async Task ConnectAsync()
+        public async Task ConnectAsync(long timeout)
         {
             // using async lock
             using (await _lock.LockAsync())
@@ -52,7 +52,7 @@ namespace SkyWalking.Remote
                 }
 
                 _connection = new GrpcConnection(GetServer(_connection?.Server));
-                await _connection.ConnectAsync();
+                await _connection.ConnectAsync(timeout);
             }
         }
 
