@@ -128,15 +128,14 @@ namespace SkyWalking.Remote
                     Osinfo = osInfo
                 };
 
-                var applicationInstanceMapping =
-                    await instanceDiscoveryService.registerInstanceAsync(applicationInstance);
-
                 var retry = 0;
                 var applicationInstanceId = 0;
                 while (retry++ < 5 && DictionaryUtil.IsNull(applicationInstanceId))
                 {
-                    await Task.Delay(500, token);
-                    applicationInstanceId = applicationInstanceMapping.ApplicationId;
+                    await Task.Delay(500, token);    
+                    var applicationInstanceMapping =
+                        await instanceDiscoveryService.registerInstanceAsync(applicationInstance);
+                    applicationInstanceId = applicationInstanceMapping.ApplicationInstanceId;
                 }
 
                 if (!DictionaryUtil.IsNull(applicationInstanceId))
