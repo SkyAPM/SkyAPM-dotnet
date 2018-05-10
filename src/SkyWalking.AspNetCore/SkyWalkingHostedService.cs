@@ -63,7 +63,7 @@ namespace SkyWalking.AspNetCore
             try
             {
                 DiagnosticListener.AllListeners.Subscribe(_diagnosticObserver);
-                await GrpcConnectionManager.Instance.ConnectAsync(15);
+                await GrpcConnectionManager.Instance.ConnectAsync(3);
                 await ServiceManager.Instance.Initialize();
                 _logger.Info("SkyWalking Agent started.");
             }

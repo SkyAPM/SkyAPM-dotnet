@@ -45,12 +45,15 @@ namespace SkyWalking.Remote
                 return;
             }
 
+            if (!GrpcConnectionManager.Instance.Available)
+            {
+                return;
+            }
+
             var availableConnection = GrpcConnectionManager.Instance.GetAvailableConnection();
 
             if (availableConnection == null)
             {
-                _logger.Warning(
-                    $"Register application fail. {GrpcConnectionManager.NotFoundErrorMessage}");
                 return;
             }
 
@@ -61,7 +64,7 @@ namespace SkyWalking.Remote
             }
             catch (Exception exception)
             {
-                _logger.Warning($"Try register application fail. {exception.Message}");
+                _logger.Warning($"Register application fail. {exception.Message}");
                 availableConnection.Failure();
             }
         }

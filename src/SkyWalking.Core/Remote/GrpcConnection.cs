@@ -79,7 +79,7 @@ namespace SkyWalking.Remote
             }
             catch (Exception e)
             {
-                _logger.Warning($"Grpc channel shutdown fail. {e.Message}");
+                _logger.Debug($"Grpc channel shutdown fail. {e.Message}");
             }
             finally
             { 

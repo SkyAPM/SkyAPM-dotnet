@@ -42,7 +42,7 @@ namespace SkyWalking.Remote
         {
             if (DictionaryUtil.IsNull(RemoteDownstreamConfig.Agent.ApplicationInstanceId))
             {
-                _logger.Warning($"{DateTime.Now} Heartbeat fail. Application instance is not registered.");
+                _logger.Debug($"{DateTime.Now} Heartbeat fail. Application instance is not registered.");
                 return;
             }
 
@@ -50,7 +50,7 @@ namespace SkyWalking.Remote
 
             if (availableConnection == null)
             {
-                _logger.Warning($"{DateTime.Now} Heartbeat fail. {GrpcConnectionManager.NotFoundErrorMessage}");
+                _logger.Debug($"{DateTime.Now} Heartbeat fail. {GrpcConnectionManager.NotFoundErrorMessage}");
                 return;
             }
             
@@ -71,8 +71,8 @@ namespace SkyWalking.Remote
             }
             catch (Exception e)
             {
-                _logger.Warning($"{DateTime.Now} Heartbeat fail. {e.Message}");
-                availableConnection?.Failure();
+                _logger.Debug($"{DateTime.Now} Heartbeat fail. {e.Message}");
+                availableConnection.Failure();
             }
         }
     }
