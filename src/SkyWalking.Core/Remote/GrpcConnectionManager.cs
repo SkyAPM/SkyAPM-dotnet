@@ -43,7 +43,7 @@ namespace SkyWalking.Remote
         {
         }
 
-        public async Task ConnectAsync(long timeout)
+        public async Task ConnectAsync(TimeSpan timeout)
         {
             // using async lock
             using (await _lock.LockAsync())

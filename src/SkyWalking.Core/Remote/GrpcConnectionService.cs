@@ -32,7 +32,7 @@ namespace SkyWalking.Remote
             if (!GrpcConnectionManager.Instance.Available)
             {
                 // default timeout = 5s
-                await GrpcConnectionManager.Instance.ConnectAsync(5);
+                await GrpcConnectionManager.Instance.ConnectAsync(TimeSpan.FromSeconds(5));
             }
         }
     }

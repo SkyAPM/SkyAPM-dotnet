@@ -43,7 +43,7 @@ namespace SkyWalking.Remote
             _internalChannel = new Channel(server, ChannelCredentials.Insecure);
         }
       
-        public async Task<bool> ConnectAsync(long timeout)
+        public async Task<bool> ConnectAsync(TimeSpan timeout)
         {
             if (_state == GrpcConnectionState.Ready)
             {
@@ -52,7 +52,7 @@ namespace SkyWalking.Remote
             _state = GrpcConnectionState.Connecting;
             try
             {
-                var deadLine = DateTime.UtcNow.AddSeconds(timeout);
+                var deadLine = DateTime.UtcNow.AddSeconds(timeout.TotalSeconds);
                 await _internalChannel.ConnectAsync(deadLine);
                 _state = GrpcConnectionState.Ready;
                 _logger.Info($"Grpc channel connect success. [Server] = {_internalChannel.Target}");
