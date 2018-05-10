@@ -75,15 +75,19 @@ namespace SkyWalking.Remote
             {
                 var application = new Application {ApplicationCode = AgentConfig.ApplicationCode};
                 var applicationRegisterService =
-                    new ApplicationRegisterService.ApplicationRegisterServiceClient(availableConnection
-                        .GrpcChannel);
-                var applicationMapping = await applicationRegisterService.applicationCodeRegisterAsync(application);
+                    new ApplicationRegisterService.ApplicationRegisterServiceClient(availableConnection.GrpcChannel);
+                
                 var retry = 0;
                 var applicationId = 0;
-                while (retry++ < 5 && DictionaryUtil.IsNull(applicationId))
+                while (retry++ < 3 && DictionaryUtil.IsNull(applicationId))
                 {
-                    await Task.Delay(500, token);
+                    var applicationMapping = await applicationRegisterService.applicationCodeRegisterAsync(application);
                     applicationId = applicationMapping?.Application?.Value ?? 0;
+                    if (!DictionaryUtil.IsNull(applicationId))
+                    {
+                        break;
+                    }
+                    await Task.Delay(500, token);  
                 }
 
                 if (DictionaryUtil.IsNull(applicationId))
@@ -134,11 +138,14 @@ namespace SkyWalking.Remote
                 var retry = 0;
                 var applicationInstanceId = 0;
                 while (retry++ < 5 && DictionaryUtil.IsNull(applicationInstanceId))
-                {
-                    await Task.Delay(500, token);    
-                    var applicationInstanceMapping =
-                        await instanceDiscoveryService.registerInstanceAsync(applicationInstance);
+                {  
+                    var applicationInstanceMapping =await instanceDiscoveryService.registerInstanceAsync(applicationInstance);
                     applicationInstanceId = applicationInstanceMapping.ApplicationInstanceId;
+                    if (!DictionaryUtil.IsNull(applicationInstanceId))
+                    {
+                        break;
+                    }
+                    await Task.Delay(500, token);  
                 }
 
                 if (!DictionaryUtil.IsNull(applicationInstanceId))
