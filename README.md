@@ -25,7 +25,7 @@ A quick list of SkyWalking .NET Core Agent's capabilities
 ### Deploy SkyWalking Collector
 
 #### Requirements
-- (SkyWalking Collector 5.0.0-beta +)[https://github.com/apache/incubator-skywalking/releases]
+- SkyWalking Collector 5.0.0-beta or higher. [Download](https://github.com/apache/incubator-skywalking/releases)
 
 ### Install SkyWalking .NET Core Agent
 
