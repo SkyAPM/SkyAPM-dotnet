@@ -1,5 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="..\..\build\common.props" />
+  <Import Project="..\..\..\build\common.props" />
   <PropertyGroup>
     <Description>SkyWalking gRPC protocol and generated codes.</Description>
     <AssemblyTitle>SkyWalking.NetworkProtocol</AssemblyTitle>
@@ -13,7 +13,7 @@
   <ItemGroup>
     <PackageReference Include="Google.Protobuf" Version="3.5.1" />
     <PackageReference Include="Google.Protobuf.Tools" Version="3.5.1" />
-    <PackageReference Include="Grpc" Version="1.9.0" />
-    <PackageReference Include="Grpc.Tools" Version="1.9.0" />
+    <PackageReference Include="Grpc" Version="1.12.0" />
+    <PackageReference Include="Grpc.Tools" Version="1.12.0" />
   </ItemGroup>
 </Project>

@@ -1,5 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="..\..\build\common.props" />
+  <Import Project="..\..\..\build\common.props" />
   <PropertyGroup>
     <Description>SkyWalking core components.</Description>
     <AssemblyTitle>SkyWalking.Core</AssemblyTitle>
@@ -13,7 +13,6 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\SkyWalking.Abstractions\SkyWalking.Abstractions.csproj" />
-    <ProjectReference Include="..\SkyWalking.NetworkProtocol.Trace\SkyWalking.NetworkProtocol.Trace.csproj" />
     <ProjectReference Include="..\SkyWalking.NetworkProtocol\SkyWalking.NetworkProtocol.csproj" />
   </ItemGroup>
   <ItemGroup>

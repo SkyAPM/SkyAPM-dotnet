@@ -1,3 +1,6 @@
-[submodule "protos"]
-	path = protos
+[submodule "src/protocol/network"]
+	path = src/protocol/network
 	url = https://github.com/apache/incubator-skywalking-data-collect-protocol.git
+[submodule "src/coreclr"]
+	path = src/coreclr
+	url = https://github.com/dotnet/coreclr.git
