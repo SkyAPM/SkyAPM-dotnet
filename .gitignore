@@ -264,3 +264,10 @@ tools/
 
 *.proto
 
+# profiler
+cmake-build-debug/
+CMakeFiles/
+CMakeCache.txt
+Makefile
+dist/
+coreclr/
