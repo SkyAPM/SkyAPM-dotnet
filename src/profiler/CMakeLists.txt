@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.10)
 project(profiler)
 
+set(PROFILER_CMALE_BUILD_TYPE "Debug")
+
 if(CMAKE_BUILD_TYPE STREQUAL DEBUG OR CMAKE_BUILD_TYPE STREQUAL Debug OR CMAKE_BUILD_TYPE STREQUAL debug)
     set(PROFILER_CMALE_BUILD_TYPE "Debug")
 endif()
@@ -35,4 +37,9 @@ include_directories(${CMAKE_BINARY_DIR}/../coreclr/bin/Product/${PROFILER_CMAKE_
 
 add_compile_options(-fPIC -lexpat -fms-extensions -DPLATFORM_UNIX -DPAL_STDCPP_COMPAT -DBIT64 -std=c++11)
 
-add_library(profiler SHARED profiler.cpp profiler.h ProfilerFactory.cpp ProfilerFactory.h)
+add_library(profiler SHARED
+        core/CorProfilerCallbackImpl.cpp core/CorProfilerCallbackImpl.h
+        core/CorProfilerFactory.cpp core/CorProfilerFactory.h
+        core/GuidDefine.h
+        core/CorProfiler.cpp core/CorProfiler.h
+        Main.cpp)

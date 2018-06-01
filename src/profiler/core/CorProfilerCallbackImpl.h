@@ -5,7 +5,9 @@
 #ifndef PROFILER_CORPROFILERCALLBACKIMPL_H
 #define PROFILER_CORPROFILERCALLBACKIMPL_H
 
+#include <cor.h>
 #include <corprof.h>
+#include "GuidDefine.h"
 
 
 class CorProfilerCallbackImpl : public ICorProfilerCallback3 {

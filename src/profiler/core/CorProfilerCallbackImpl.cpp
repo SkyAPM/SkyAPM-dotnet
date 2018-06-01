@@ -15,9 +15,11 @@ CorProfilerCallbackImpl::~CorProfilerCallbackImpl()
 }
 
 HRESULT STDMETHODCALLTYPE CorProfilerCallbackImpl::QueryInterface(REFIID riId, void **ppvObject) {
-    if (riId == IID_ICorProfilerCallback3 ||
-        riId == IID_ICorProfilerCallback2 ||
-        riId == IID_ICorProfilerCallback) {
+    if (riId == IID__ICorProfilerCallback3 ||
+        riId == IID__ICorProfilerCallback2 ||
+        riId == IID__ICorProfilerCallback ||
+        riId == IID__IUnknown) {
+
         *ppvObject = this;
         this->AddRef();
 
@@ -47,7 +49,7 @@ ULONG STDMETHODCALLTYPE CorProfilerCallbackImpl::Release(void)
 HRESULT STDMETHODCALLTYPE CorProfilerCallbackImpl::Initialize(IUnknown *pICorProfilerInfoUnk)
 {
     ICorProfilerInfo3 *info;
-    HRESULT hr = pICorProfilerInfoUnk->QueryInterface(IID_ICorProfilerInfo3, (void **) &info);
+    HRESULT hr = pICorProfilerInfoUnk->QueryInterface(IID__ICorProfilerInfo3, (void **) &info);
     if (hr == S_OK && info != NULL)
     {
         info->SetEventMask(COR_PRF_MONITOR_JIT_COMPILATION | COR_PRF_MONITOR_ASSEMBLY_LOADS | COR_PRF_MONITOR_CLASS_LOADS);
@@ -96,7 +98,6 @@ HRESULT STDMETHODCALLTYPE CorProfilerCallbackImpl::AssemblyLoadFinished(Assembly
 
 HRESULT STDMETHODCALLTYPE CorProfilerCallbackImpl::AssemblyUnloadStarted(AssemblyID assemblyId)
 {
-    LogProfilerActivity("AssemblyUnloadStarted\n");
     return S_OK;
 }
 
@@ -304,7 +305,6 @@ HRESULT STDMETHODCALLTYPE CorProfilerCallbackImpl::ObjectsAllocatedByClass(ULONG
 
 HRESULT STDMETHODCALLTYPE CorProfilerCallbackImpl::ObjectReferences(ObjectID objectId, ClassID classId, ULONG cObjectRefs, ObjectID objectRefIds[])
 {
-    LogProfilerActivity("ObjectReferences\n");
     return S_OK;
 }
 
