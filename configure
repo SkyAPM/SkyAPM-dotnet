@@ -1,0 +1,14 @@
+#! /bin/sh
+
+ROOT_DIR=`pwd`
+BUILD_DIR=`echo ${ROOT_DIR}/build`
+DIST_DIR=`echo ${ROOT_DIR}/dist`
+SRC_DIR=`echo ${ROOT_DIR}/src`
+PROFILER_DIR=`echo ${SRC_DIR}/profiler`
+CORECLR_DIR=`echo ${SRC_DIR}/coreclr`
+
+echo "ROOT_DIR=${ROOT_DIR}"
+echo "BUILD_DIR=${BUILD_DIR}"
+echo "SRC_DIR=${SRC_DIR}"
+
+. build/makefile

@@ -31,7 +31,7 @@ HRESULT STDMETHODCALLTYPE CorProfiler::AssemblyLoadStarted(AssemblyID assemblyId
     return S_OK;
 }
 
-HRESULT STDMETHODCALLTYPE CorProfilerCallbackImpl::JITCompilationStarted(FunctionID functionId, BOOL fIsSafeToBlock)
+HRESULT STDMETHODCALLTYPE CorProfiler::JITCompilationStarted(FunctionID functionId, BOOL fIsSafeToBlock)
 {
 
     return S_OK;
