@@ -101,7 +101,12 @@ public:
 
 private:
     LONG m_referenceCount;
+    ICorProfilerInfo3 *info;
 
+protected:
+    ICorProfilerInfo3* GetCorProfilerInfo3() {
+        return info;
+    }
 };
 
 

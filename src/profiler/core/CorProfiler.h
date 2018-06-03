@@ -12,6 +12,7 @@ public:
     CorProfiler();
     ~CorProfiler();
     virtual HRESULT STDMETHODCALLTYPE AssemblyLoadStarted(AssemblyID assemblyId) override;
+    virtual HRESULT STDMETHODCALLTYPE JITCompilationStarted(FunctionID functionId, BOOL fIsSafeToBlock) override;
 };
 
 

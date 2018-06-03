@@ -48,21 +48,20 @@ ULONG STDMETHODCALLTYPE CorProfilerCallbackImpl::Release(void)
 
 HRESULT STDMETHODCALLTYPE CorProfilerCallbackImpl::Initialize(IUnknown *pICorProfilerInfoUnk)
 {
-    ICorProfilerInfo3 *info;
     HRESULT hr = pICorProfilerInfoUnk->QueryInterface(IID__ICorProfilerInfo3, (void **) &info);
     if (hr == S_OK && info != NULL)
     {
         info->SetEventMask(COR_PRF_MONITOR_JIT_COMPILATION | COR_PRF_MONITOR_ASSEMBLY_LOADS | COR_PRF_MONITOR_CLASS_LOADS);
-
-        info->Release();
-        info = NULL;
+        return S_OK;
     }
 
-    return S_OK;
+    return E_FAIL;
 }
 
 HRESULT STDMETHODCALLTYPE CorProfilerCallbackImpl::Shutdown(void)
 {
+    info->Release();
+    info = NULL;
     return S_OK;
 }
 
