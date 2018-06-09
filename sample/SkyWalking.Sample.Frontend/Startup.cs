@@ -24,6 +24,7 @@ namespace SkyWalking.Sample.Frontend
             {
                 option.DirectServers = "localhost:11800";
                 option.ApplicationCode = "asp-net-core-frontend";
+                option.SamplePer3Secs = 3;
             }); 
         }
 
