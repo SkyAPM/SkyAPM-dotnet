@@ -23,17 +23,17 @@ message(STATUS profiler_build_arch=${PROFILER_CMAKE_BUILD_ARCH})
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_SHARED_LIBRARY_PREFIX "skywalking-")
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/../../dist/${PROFILER_CMALE_BUILD_TYPE}/${PROFILER_CMAKE_BUILD_PLATFORM}_${PROFILER_CMAKE_BUILD_ARCH})
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/../../dist/${PROFILER_CMALE_BUILD_TYPE}/${PROFILER_CMAKE_BUILD_PLATFORM}_${PROFILER_CMAKE_BUILD_ARCH})
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_DEBUG ${PROJECT_SOURCE_DIR}/../../dist/${PROFILER_CMALE_BUILD_TYPE}/${PROFILER_CMAKE_BUILD_PLATFORM}_${PROFILER_CMAKE_BUILD_ARCH})
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE ${PROJECT_SOURCE_DIR}/../../dist/${PROFILER_CMALE_BUILD_TYPE}/${PROFILER_CMAKE_BUILD_PLATFORM}_${PROFILER_CMAKE_BUILD_ARCH})
 
 set(CMAKE_CXX_FLAGS_DEBUG "$ENV{CXXFLAGS} -O0 -Wall -g -ggdb ")
 set(CMAKE_CXX_FLAGS_RELEASE "$ENV{CXXFLAGS} -O3 -Wall")
 
-include_directories(${CMAKE_BINARY_DIR}/../coreclr/src/pal/inc/rt)
-include_directories(${CMAKE_BINARY_DIR}/../coreclr/src/pal/prebuilt/inc)
-include_directories(${CMAKE_BINARY_DIR}/../coreclr/src/pal/inc)
-include_directories(${CMAKE_BINARY_DIR}/../coreclr/src/inc)
-include_directories(${CMAKE_BINARY_DIR}/../coreclr/bin/Product/${PROFILER_CMAKE_BUILD_PLATFORM}.${PROFILER_CMAKE_BUILD_ARCH}.${PROFILER_CMALE_BUILD_TYPE}/inc)
+include_directories(${PROJECT_SOURCE_DIR}/../coreclr/src/pal/inc/rt)
+include_directories(${PROJECT_SOURCE_DIR}/../coreclr/src/pal/prebuilt/inc)
+include_directories(${PROJECT_SOURCE_DIR}/../coreclr/src/pal/inc)
+include_directories(${PROJECT_SOURCE_DIR}/../coreclr/src/inc)
+include_directories(${PROJECT_SOURCE_DIR}/../coreclr/bin/Product/${PROFILER_CMAKE_BUILD_PLATFORM}.${PROFILER_CMAKE_BUILD_ARCH}.${PROFILER_CMALE_BUILD_TYPE}/inc)
 
 add_compile_options(-fPIC -lexpat -fms-extensions -DPLATFORM_UNIX -DPAL_STDCPP_COMPAT -DBIT64 -std=c++11)
 
