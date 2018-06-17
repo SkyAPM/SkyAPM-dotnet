@@ -59,7 +59,7 @@ namespace SkyWalking.Sampling
                 _atomicInteger.Value = 0;
             }
 
-            return Task.CompletedTask;
+            return TaskUtils.CompletedTask;
         }
     }
 }
