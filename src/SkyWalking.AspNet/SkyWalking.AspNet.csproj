@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\..\build\common.props" />
+  <PropertyGroup>
+    <TargetFramework>net461</TargetFramework>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyName>SkyWalking.AspNet</AssemblyName>
+    <AssemblyTitle>SkyWalking.AspNet</AssemblyTitle>
+    <PackageId>SkyWalking.AspNet</PackageId>
+    <PackageTags>SkyWalking;APM;Tracing</PackageTags>
+    <Description>SkyWalking ASP.NET Agent.</Description>
+    <RootNamespace>SkyWalking.AspNet</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SkyWalking.Core\SkyWalking.Core.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.Web.Infrastructure" />
+    <Reference Include="System.Web" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Nito.AsyncEx" Version="4.0.1" />
+  </ItemGroup>
+</Project>
