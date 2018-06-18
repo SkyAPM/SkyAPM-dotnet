@@ -17,6 +17,10 @@
  */
 
 using Microsoft.Web.Infrastructure.DynamicModuleHelper;
+using System.Web;
+using SkyWalking.AspNet;
+
+[assembly:PreApplicationStartMethod(typeof(SkyWalkingModuleRegister), "Register")]
 
 namespace SkyWalking.AspNet
 {

@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\..\build\common.props" />
   <PropertyGroup>
-    <TargetFramework>net461</TargetFramework>
+    <TargetFrameworks>net45;net451;net452;net46;net461;net462;net47;net471</TargetFrameworks>
   </PropertyGroup>
   <PropertyGroup>
     <AssemblyName>SkyWalking.AspNet</AssemblyName>
@@ -16,9 +16,10 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Microsoft.Web.Infrastructure" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Net.Http, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <HintPath>..\..\..\..\..\..\..\..\Library\Frameworks\Mono.framework\Versions\Current\lib\mono\4.5\System.Net.Http.dll</HintPath>
+    </Reference>
     <Reference Include="System.Web" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Nito.AsyncEx" Version="4.0.1" />
   </ItemGroup>
 </Project>

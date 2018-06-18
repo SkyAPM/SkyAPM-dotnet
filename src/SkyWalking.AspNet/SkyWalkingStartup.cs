@@ -17,10 +17,12 @@
  */
 
 using System;
+using System.Reflection;
 using System.Threading.Tasks;
-using Nito.AsyncEx;
+using System.Web.Configuration;
 using SkyWalking.AspNet.Logging;
 using SkyWalking.Boot;
+using SkyWalking.Config;
 using SkyWalking.Logging;
 using SkyWalking.Remote;
 
@@ -30,6 +32,7 @@ namespace SkyWalking.AspNet
     {
         public void Start()
         {
+            LoadConfigurationSetting();
             LogManager.SetLoggerFactory(new DebugLoggerFactoryAdapter());
             AsyncContext.Run(async () => await StartAsync());
         }
@@ -38,6 +41,29 @@ namespace SkyWalking.AspNet
         {
             await GrpcConnectionManager.Instance.ConnectAsync(TimeSpan.FromSeconds(3));
             await ServiceManager.Instance.Initialize();
+        }
+
+        private void LoadConfigurationSetting()
+        {
+            CollectorConfig.DirectServers = GetAppSetting(nameof(CollectorConfig.DirectServers), true);
+            AgentConfig.ApplicationCode = GetAppSetting(nameof(AgentConfig.ApplicationCode), true);
+            AgentConfig.Namespace = GetAppSetting(nameof(AgentConfig.Namespace), false);
+            var samplePer3Secs = GetAppSetting(nameof(AgentConfig.SamplePer3Secs), false);
+            if (int.TryParse(samplePer3Secs, out var v))
+            {
+                AgentConfig.SamplePer3Secs = v;
+            }
+        }
+
+        private string GetAppSetting(string key, bool @throw)
+        {
+            var value = WebConfigurationManager.AppSettings[key];
+            if (@throw && string.IsNullOrEmpty(value))
+            {
+                throw new InvalidOperationException($"Cannot read valid '{key}' in AppSettings.");
+            }
+
+            return value;
         }
     }
 }

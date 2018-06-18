@@ -17,7 +17,13 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.Web;
+using SkyWalking.Context;
+using SkyWalking.Context.Tag;
+using SkyWalking.Context.Trace;
+using SkyWalking.NetworkProtocol.Trace;
+using SkyWalking.Utils;
 
 namespace SkyWalking.AspNet
 {
@@ -36,13 +42,58 @@ namespace SkyWalking.AspNet
             application.EndRequest += ApplicationOnEndRequest;
         }
 
-        private void ApplicationOnEndRequest(object sender, EventArgs e)
-        {
-            
-        }
-
         private void ApplicationOnBeginRequest(object sender, EventArgs e)
         {
+            var httpApplication = sender as HttpApplication;
+            var httpContext = httpApplication.Context;
+            var carrier = new ContextCarrier();
+            foreach (var item in carrier.Items)
+                item.HeadValue = httpContext.Request.Headers[item.HeadKey];
+            var httpRequestSpan = ContextManager.CreateEntrySpan($"{Config.AgentConfig.ApplicationCode} {httpContext.Request.Path}", carrier);
+            httpRequestSpan.AsHttp();
+            httpRequestSpan.SetComponent(ComponentsDefine.AspNet);
+            Tags.Url.Set(httpRequestSpan, httpContext.Request.Path);
+            Tags.HTTP.Method.Set(httpRequestSpan, httpContext.Request.HttpMethod);
+            httpRequestSpan.Log(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
+                new Dictionary<string, object>
+                {
+                    {"event", "AspNet BeginRequest"},
+                    {"message", $"Request starting {httpContext.Request.Url.Scheme} {httpContext.Request.HttpMethod} {httpContext.Request.Url.OriginalString}"}
+                });
+        }
+        
+        private void ApplicationOnEndRequest(object sender, EventArgs e)
+        {
+            var httpRequestSpan = ContextManager.ActiveSpan;
+            if (httpRequestSpan == null)
+            {
+                return;
+            }
+
+            var httpApplication = sender as HttpApplication;
+            var httpContext = httpApplication.Context;
+            
+            var statusCode = httpContext.Response.StatusCode;
+            if (statusCode >= 400)
+            {
+                httpRequestSpan.ErrorOccurred();
+            }
+
+            Tags.StatusCode.Set(httpRequestSpan, statusCode.ToString());
+
+            var exception = httpContext.Error;
+            if (exception != null)
+            {
+                httpRequestSpan.ErrorOccurred().Log(exception);
+            }
+            
+            httpRequestSpan.Log(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
+                new Dictionary<string, object>
+                {
+                    {"event", "AspNetCore Hosting EndRequest"},
+                    {"message", $"Request finished {httpContext.Response.StatusCode} {httpContext.Response.ContentType}"}
+                });
+            ContextManager.StopSpan(httpRequestSpan);
         }
     }
 }
