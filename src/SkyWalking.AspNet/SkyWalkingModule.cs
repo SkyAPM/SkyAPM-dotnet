@@ -19,10 +19,12 @@
 using System;
 using System.Collections.Generic;
 using System.Web;
+using SkyWalking.Boot;
 using SkyWalking.Context;
 using SkyWalking.Context.Tag;
 using SkyWalking.Context.Trace;
 using SkyWalking.NetworkProtocol.Trace;
+using SkyWalking.Remote;
 using SkyWalking.Utils;
 
 namespace SkyWalking.AspNet
@@ -33,6 +35,7 @@ namespace SkyWalking.AspNet
         
         public void Dispose()
         {
+            _skyWalkingStartup.Dispose();
         }
 
         public void Init(HttpApplication application)

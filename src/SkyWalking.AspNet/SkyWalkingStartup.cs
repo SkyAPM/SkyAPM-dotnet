@@ -28,7 +28,7 @@ using SkyWalking.Remote;
 
 namespace SkyWalking.AspNet
 {
-    public class SkyWalkingStartup
+    public class SkyWalkingStartup : IDisposable
     {
         public void Start()
         {
@@ -64,6 +64,12 @@ namespace SkyWalking.AspNet
             }
 
             return value;
+        }
+
+        public void Dispose()
+        {
+            AsyncContext.Run(async () => await GrpcConnectionManager.Instance.ShutdownAsync());
+            ServiceManager.Instance.Dispose();
         }
     }
 }
