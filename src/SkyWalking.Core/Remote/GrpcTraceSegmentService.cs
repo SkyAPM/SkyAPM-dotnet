@@ -42,7 +42,7 @@ namespace SkyWalking.Remote
             TracingContext.ListenerManager.Remove(this);
             if(_traceSegments.Count > 0)
             {
-                Task.Run(() => BatchSendTraceSegments());
+                Task.Run(() => BatchSendTraceSegments(true));
             }
             base.Dispose();
         }
@@ -70,46 +70,60 @@ namespace SkyWalking.Remote
 
         protected async override Task Execute(CancellationToken token)
         {
-            await BatchSendTraceSegments();
+            await BatchSendTraceSegments(false);
         }
 
-        private async Task BatchSendTraceSegments()
+        /// <summary>
+        /// Batch send the queued trace segments to collector until the number of left segments 
+        /// equals zero or lessthan batchsize denpends on the forceClear param
+        /// </summary>
+        /// <param name="forceClear">wether we should send all segments in the queue 
+        /// or leave the last lessthan batchsize segments for the next batch send process</param>
+        /// <returns></returns>
+        private async Task BatchSendTraceSegments(bool forceClear)
         {
-            if (_traceSegments.Count == 0)
-                return;
-
-            var availableConnection = GrpcConnectionManager.Instance.GetAvailableConnection();
-            if (availableConnection == null)
+            do
             {
-                _logger.Warning(
-                    $"Transform and send UpstreamSegment to collector fail. {GrpcConnectionManager.NotFoundErrorMessage}");
-                return;
-            }
+                if (_traceSegments.Count == 0)
+                    return;
 
-            var segments = new List<ITraceSegment>();
-            var i = 0;
-            while ((_batchSize <= 0 || i++ < _batchSize) && _traceSegments.TryDequeue(out var segment))
-                segments.Add(segment);
-
-            try
-            {
-                var traceSegmentService =
-                    new TraceSegmentService.TraceSegmentServiceClient(availableConnection.GrpcChannel);
-                using (var asyncClientStreamingCall = traceSegmentService.collect())
+                var availableConnection = GrpcConnectionManager.Instance.GetAvailableConnection();
+                if (availableConnection == null)
                 {
-                    segments.ForEach(async segment => await asyncClientStreamingCall.RequestStream.WriteAsync(segment.Transform()));
-                    await asyncClientStreamingCall.RequestStream.CompleteAsync();
-                    await asyncClientStreamingCall.ResponseAsync;
+                    _logger.Warning(
+                        $"Transform and send UpstreamSegment to collector fail. {GrpcConnectionManager.NotFoundErrorMessage}");
+                    return;
                 }
 
-                _logger.Debug(
-                        $"Transform and send UpstreamSegment to collector. [Total TraceSegment Count] = {segments.Count}");
-            }
-            catch (Exception e)
-            {
-                _logger.Warning($"Transform and send UpstreamSegment to collector fail. {e.Message}");
-                availableConnection?.Failure();
-            }
+                var segments = new List<ITraceSegment>();
+                var i = 0;
+                while ((_batchSize <= 0 || i++ < _batchSize) && _traceSegments.TryDequeue(out var segment))
+                    segments.Add(segment);
+                if (segments.Count == 0)
+                    return;
+
+                try
+                {
+                    var traceSegmentService =
+                        new TraceSegmentService.TraceSegmentServiceClient(availableConnection.GrpcChannel);
+                    using (var asyncClientStreamingCall = traceSegmentService.collect())
+                    {
+                        segments.ForEach(async segment => await asyncClientStreamingCall.RequestStream.WriteAsync(segment.Transform()));
+                        await asyncClientStreamingCall.RequestStream.CompleteAsync();
+                        await asyncClientStreamingCall.ResponseAsync;
+                    }
+
+                    _logger.Debug(
+                            $"Transform and send UpstreamSegment to collector. [Total TraceSegment Count] = {segments.Count}");
+                }
+                catch (Exception e)
+                {
+                    _logger.Warning($"Transform and send UpstreamSegment to collector fail. {e.Message}");
+                    availableConnection?.Failure();
+                    return;
+                }
+
+            } while (forceClear || _traceSegments.Count >= _batchSize);
         }
     }
 }
