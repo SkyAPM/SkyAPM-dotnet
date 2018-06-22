@@ -79,8 +79,8 @@ namespace SkyWalking.AspNetCore
             _logger.Info("SkyWalking Agent stopping...");
             try
             {
-                await GrpcConnectionManager.Instance.ShutdownAsync();
                 ServiceManager.Instance.Dispose();
+                await GrpcConnectionManager.Instance.ShutdownAsync();
                 _logger.Info("SkyWalking Agent stopped.");
             }
             catch (Exception e)

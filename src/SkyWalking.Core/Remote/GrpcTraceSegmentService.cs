@@ -17,6 +17,7 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -29,19 +30,30 @@ using SkyWalking.Utils;
 
 namespace SkyWalking.Remote
 {
-    public class GrpcTraceSegmentService : IBootService, ITracingContextListener
+    public class GrpcTraceSegmentService : TimerService, ITracingContextListener
     {
         private static readonly ILogger _logger = LogManager.GetLogger<GrpcTraceSegmentService>();
+        private static readonly System.Collections.Concurrent.ConcurrentQueue<ITraceSegment> _traceSegments
+            = new System.Collections.Concurrent.ConcurrentQueue<ITraceSegment>();
+        private static readonly int _batchSize = 1000;
 
-        public void Dispose()
+        public override void Dispose()
         {
             TracingContext.ListenerManager.Remove(this);
+            if(_traceSegments.Count > 0)
+            {
+                Task.Run(() => BatchSendTraceSegments());
+            }
+            base.Dispose();
         }
 
-        public int Order { get; } = 1;
+        public override int Order { get; } = 1;
 
-        public Task Initialize(CancellationToken token)
+        protected override TimeSpan Interval => TimeSpan.FromSeconds(1);
+
+        protected override Task Initializing(CancellationToken token)
         {
+            base.Initializing(token);
             TracingContext.ListenerManager.Add(this);
             return TaskUtils.CompletedTask;
         }
@@ -53,6 +65,19 @@ namespace SkyWalking.Remote
                 return;
             }
 
+            _traceSegments.Enqueue(traceSegment);
+        }
+
+        protected async override Task Execute(CancellationToken token)
+        {
+            await BatchSendTraceSegments();
+        }
+
+        private async Task BatchSendTraceSegments()
+        {
+            if (_traceSegments.Count == 0)
+                return;
+
             var availableConnection = GrpcConnectionManager.Instance.GetAvailableConnection();
             if (availableConnection == null)
             {
@@ -61,20 +86,24 @@ namespace SkyWalking.Remote
                 return;
             }
 
+            var segments = new List<ITraceSegment>();
+            var i = 0;
+            while ((_batchSize <= 0 || i++ < _batchSize) && _traceSegments.TryDequeue(out var segment))
+                segments.Add(segment);
+
             try
             {
-                var segment = traceSegment.Transform();
                 var traceSegmentService =
                     new TraceSegmentService.TraceSegmentServiceClient(availableConnection.GrpcChannel);
                 using (var asyncClientStreamingCall = traceSegmentService.collect())
                 {
-                    await asyncClientStreamingCall.RequestStream.WriteAsync(segment);
+                    segments.ForEach(async segment => await asyncClientStreamingCall.RequestStream.WriteAsync(segment.Transform()));
                     await asyncClientStreamingCall.RequestStream.CompleteAsync();
                     await asyncClientStreamingCall.ResponseAsync;
                 }
 
                 _logger.Debug(
-                    $"Transform and send UpstreamSegment to collector. [TraceSegmentId] = {traceSegment.TraceSegmentId} [GlobalTraceId] = {traceSegment.RelatedGlobalTraces.FirstOrDefault()}");
+                        $"Transform and send UpstreamSegment to collector. [Total TraceSegment Count] = {segments.Count}");
             }
             catch (Exception e)
             {
