@@ -54,6 +54,7 @@ namespace SkyWalking.AspNetCore
             AgentConfig.ApplicationCode = options.Value.ApplicationCode;
             CollectorConfig.DirectServers = options.Value.DirectServers;
             AgentConfig.SamplePer3Secs = options.Value.SamplePer3Secs;
+            AgentConfig.PendingSegmentsLimit = options.Value.PendingSegmentsLimit;
             _logger = LogManager.GetLogger<SkyWalkingHostedService>();
             _diagnosticObserver = diagnosticObserver;
         }

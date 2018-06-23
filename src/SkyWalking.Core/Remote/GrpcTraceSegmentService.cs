@@ -17,11 +17,13 @@
  */
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using SkyWalking.Boot;
+using SkyWalking.Config;
 using SkyWalking.Context;
 using SkyWalking.Context.Trace;
 using SkyWalking.Logging;
@@ -33,16 +35,15 @@ namespace SkyWalking.Remote
     public class GrpcTraceSegmentService : TimerService, ITracingContextListener
     {
         private static readonly ILogger _logger = LogManager.GetLogger<GrpcTraceSegmentService>();
-        private static readonly System.Collections.Concurrent.ConcurrentQueue<ITraceSegment> _traceSegments
-            = new System.Collections.Concurrent.ConcurrentQueue<ITraceSegment>();
-        private static readonly int _batchSize = 1000;
+        private static readonly ConcurrentQueue<ITraceSegment> _traceSegments
+            = new ConcurrentQueue<ITraceSegment>();
 
         public override void Dispose()
         {
             TracingContext.ListenerManager.Remove(this);
             if(_traceSegments.Count > 0)
             {
-                Task.Run(() => BatchSendTraceSegments(true));
+                BatchSendTraceSegments().GetAwaiter().GetResult();
             }
             base.Dispose();
         }
@@ -53,9 +54,8 @@ namespace SkyWalking.Remote
 
         protected override Task Initializing(CancellationToken token)
         {
-            base.Initializing(token);
             TracingContext.ListenerManager.Add(this);
-            return TaskUtils.CompletedTask;
+            return base.Initializing(token);
         }
 
         public async void AfterFinished(ITraceSegment traceSegment)
@@ -65,65 +65,53 @@ namespace SkyWalking.Remote
                 return;
             }
 
+            if (_traceSegments.Count >= AgentConfig.PendingSegmentsLimit && AgentConfig.PendingSegmentsLimit > 0)
+            {
+                _traceSegments.TryDequeue(out var v);
+            }
             _traceSegments.Enqueue(traceSegment);
         }
 
         protected async override Task Execute(CancellationToken token)
         {
-            await BatchSendTraceSegments(false);
+            await BatchSendTraceSegments();
         }
 
-        /// <summary>
-        /// Batch send the queued trace segments to collector until the number of left segments 
-        /// equals zero or lessthan batchsize denpends on the forceClear param
-        /// </summary>
-        /// <param name="forceClear">wether we should send all segments in the queue 
-        /// or leave the last lessthan batchsize segments for the next batch send process</param>
-        /// <returns></returns>
-        private async Task BatchSendTraceSegments(bool forceClear)
+        private async Task BatchSendTraceSegments()
         {
-            do
+            if (_traceSegments.Count == 0)
+                return;
+
+            var availableConnection = GrpcConnectionManager.Instance.GetAvailableConnection();
+            if (availableConnection == null)
             {
-                if (_traceSegments.Count == 0)
-                    return;
+                _logger.Warning(
+                    $"Transform and send UpstreamSegment to collector fail. {GrpcConnectionManager.NotFoundErrorMessage}");
+                return;
+            }
 
-                var availableConnection = GrpcConnectionManager.Instance.GetAvailableConnection();
-                if (availableConnection == null)
+            try
+            {
+                var traceSegmentService =
+                    new TraceSegmentService.TraceSegmentServiceClient(availableConnection.GrpcChannel);
+                using (var asyncClientStreamingCall = traceSegmentService.collect())
                 {
-                    _logger.Warning(
-                        $"Transform and send UpstreamSegment to collector fail. {GrpcConnectionManager.NotFoundErrorMessage}");
-                    return;
-                }
-
-                var segments = new List<ITraceSegment>();
-                var i = 0;
-                while ((_batchSize <= 0 || i++ < _batchSize) && _traceSegments.TryDequeue(out var segment))
-                    segments.Add(segment);
-                if (segments.Count == 0)
-                    return;
-
-                try
-                {
-                    var traceSegmentService =
-                        new TraceSegmentService.TraceSegmentServiceClient(availableConnection.GrpcChannel);
-                    using (var asyncClientStreamingCall = traceSegmentService.collect())
+                    while (_traceSegments.TryDequeue(out var segment))
                     {
-                        segments.ForEach(async segment => await asyncClientStreamingCall.RequestStream.WriteAsync(segment.Transform()));
-                        await asyncClientStreamingCall.RequestStream.CompleteAsync();
-                        await asyncClientStreamingCall.ResponseAsync;
+                        await asyncClientStreamingCall.RequestStream.WriteAsync(segment.Transform());
+                        _logger.Debug(
+                            $"Transform and send UpstreamSegment to collector. [TraceSegmentId] = {segment.TraceSegmentId} [GlobalTraceId] = {segment.RelatedGlobalTraces.FirstOrDefault()}");
                     }
-
-                    _logger.Debug(
-                            $"Transform and send UpstreamSegment to collector. [Total TraceSegment Count] = {segments.Count}");
+                    await asyncClientStreamingCall.RequestStream.CompleteAsync();
+                    await asyncClientStreamingCall.ResponseAsync;
                 }
-                catch (Exception e)
-                {
-                    _logger.Warning($"Transform and send UpstreamSegment to collector fail. {e.Message}");
-                    availableConnection?.Failure();
-                    return;
-                }
-
-            } while (forceClear || _traceSegments.Count >= _batchSize);
+            }
+            catch (Exception e)
+            {
+                _logger.Warning($"Transform and send UpstreamSegment to collector fail. {e.Message}");
+                availableConnection?.Failure();
+                return;
+            }
         }
     }
 }
