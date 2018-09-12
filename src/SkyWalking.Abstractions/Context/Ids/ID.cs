@@ -29,13 +29,7 @@ namespace SkyWalking.Context.Ids
         private readonly bool _isValid;
         private string _encoding;
 
-        public bool IsValid
-        {
-            get
-            {
-                return _isValid;
-            }
-        }
+        public bool IsValid => _isValid;
 
         public string Encode
         {

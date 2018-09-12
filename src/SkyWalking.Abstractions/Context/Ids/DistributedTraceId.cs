@@ -61,7 +61,7 @@ namespace SkyWalking.Context.Ids
         {
             if (other == null)
                 return false;
-            return _id != null ? _id.Equals(other._id) : other._id == null;
+            return _id?.Equals(other._id) ?? other._id == null;
         }
 
         public override bool Equals(object obj)
