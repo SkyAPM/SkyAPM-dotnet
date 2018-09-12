@@ -35,6 +35,12 @@ namespace SkyWalking.Client
             _stringValue = value;
         }
 
+        public StringOrIntValue(int intValue, string stringValue)
+        {
+            _intValue = intValue;
+            _stringValue = stringValue;
+        }
+
         public (string, int) GetValue()
         {
             return (_stringValue, _intValue);
