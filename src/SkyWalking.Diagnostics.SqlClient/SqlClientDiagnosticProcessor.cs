@@ -19,10 +19,10 @@
 using System;
 using System.Data.SqlClient;
 using System.Linq;
+using SkyWalking.Components;
 using SkyWalking.Context;
 using SkyWalking.Context.Tag;
 using SkyWalking.Context.Trace;
-using SkyWalking.NetworkProtocol.Trace;
 
 namespace SkyWalking.Diagnostics.SqlClient
 {

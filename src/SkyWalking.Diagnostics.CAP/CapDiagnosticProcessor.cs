@@ -19,10 +19,10 @@
 using System;
 using DotNetCore.CAP.Diagnostics;
 using DotNetCore.CAP.Infrastructure;
+using SkyWalking.Components;
 using SkyWalking.Context;
 using SkyWalking.Context.Tag;
 using SkyWalking.Context.Trace;
-using SkyWalking.NetworkProtocol.Trace;
 using CapEvents = DotNetCore.CAP.Diagnostics.CapDiagnosticListenerExtensions;
 
 

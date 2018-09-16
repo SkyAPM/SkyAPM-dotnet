@@ -21,7 +21,6 @@ using System.Collections.Generic;
 using System.Text;
 using SkyWalking.Dictionarys;
 using SkyWalking.NetworkProtocol;
-using SkyWalking.NetworkProtocol.Trace;
 
 namespace SkyWalking.Context.Trace
 {

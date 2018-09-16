@@ -16,8 +16,8 @@
  *
  */
 
+using SkyWalking.Components;
 using SkyWalking.Dictionarys;
-using SkyWalking.NetworkProtocol.Trace;
 
 namespace SkyWalking.Context.Trace
 {

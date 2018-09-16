@@ -18,10 +18,10 @@
 
 using System;
 using System.Net.Http;
+using SkyWalking.Components;
 using SkyWalking.Context;
 using SkyWalking.Context.Tag;
 using SkyWalking.Context.Trace;
-using SkyWalking.NetworkProtocol.Trace;
 
 namespace SkyWalking.Diagnostics.HttpClient
 {
