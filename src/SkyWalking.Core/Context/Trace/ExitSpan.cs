@@ -17,10 +17,9 @@
  */
 
 using System;
-using System.Collections.Generic;
-using System.Text;
+using SkyWalking.Client;
+using SkyWalking.Components;
 using SkyWalking.Dictionarys;
-using SkyWalking.NetworkProtocol;
 
 namespace SkyWalking.Context.Trace
 {
@@ -107,17 +106,12 @@ namespace SkyWalking.Context.Trace
 
         public override ISpan SetComponent(string componentName)
         {
-            if (_stackDepth == 1)
-            {
-                return base.SetComponent(componentName);
-            }
-
-            return this;
+            return _stackDepth == 1 ? base.SetComponent(componentName) : this;
         }
 
         public override string OperationName
         {
-            get { return base.OperationName; }
+            get => base.OperationName;
             set
             {
                 if (_stackDepth == 1)
@@ -129,7 +123,7 @@ namespace SkyWalking.Context.Trace
 
         public override int OperationId
         {
-            get { return base.OperationId; }
+            get => base.OperationId;
             set
             {
                 if (_stackDepth == 1)
@@ -139,18 +133,11 @@ namespace SkyWalking.Context.Trace
             }
         }
 
-        public override SpanObject Transform()
+        public override SpanRequest Transform()
         {
             var spanObject = base.Transform();
 
-            if (_peerId != DictionaryUtil.NullValue)
-            {
-                spanObject.PeerId = _peerId;
-            }
-            else
-            {
-                spanObject.Peer = _peer;
-            }
+            spanObject.Peer = new StringOrIntValue(_peerId, _peer);
 
             return spanObject;
         }

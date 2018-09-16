@@ -17,26 +17,26 @@
  */
 
 using System.Linq;
+using SkyWalking.Client;
 using SkyWalking.Config;
 using SkyWalking.Context.Ids;
 using SkyWalking.Dictionarys;
-using SkyWalking.NetworkProtocol;
 
 namespace SkyWalking.Context.Trace
 {
     public class TraceSegmentRef : ITraceSegmentRef
     {
-        private SegmentRefType _type;
-        private ID _traceSegmentId;
-        private int _spanId = -1;
-        private int _peerId = DictionaryUtil.NullValue;
-        private string _peerHost;
-        private int _entryApplicationInstanceId = DictionaryUtil.NullValue;
-        private int _parentApplicationInstanceId = DictionaryUtil.NullValue;
-        private string _entryOperationName;
-        private int _entryOperationId = DictionaryUtil.NullValue;
-        private string _parentOperationName;
-        private int _parentOperationId = DictionaryUtil.NullValue;
+        private readonly SegmentRefType _type;
+        private readonly ID _traceSegmentId;
+        private readonly int _spanId = -1;
+        private readonly int _peerId = DictionaryUtil.NullValue;
+        private readonly string _peerHost;
+        private readonly int _entryApplicationInstanceId = DictionaryUtil.NullValue;
+        private readonly int _parentApplicationInstanceId = DictionaryUtil.NullValue;
+        private readonly string _entryOperationName;
+        private readonly int _entryOperationId = DictionaryUtil.NullValue;
+        private readonly string _parentOperationName;
+        private readonly int _parentOperationId = DictionaryUtil.NullValue;
 
         public TraceSegmentRef(IContextCarrier carrier)
         {
@@ -148,45 +148,28 @@ namespace SkyWalking.Context.Trace
 
         public int EntryApplicationInstanceId => _entryApplicationInstanceId;
 
-        public TraceSegmentReference Transform()
+        public TraceSegmentReferenceRequest Transform()
         {
-            TraceSegmentReference traceSegmentReference = new TraceSegmentReference();
+            TraceSegmentReferenceRequest traceSegmentReference = new TraceSegmentReferenceRequest();
             if (_type == SegmentRefType.CrossProcess)
             {
-                traceSegmentReference.RefType = RefType.CrossProcess;
-                if (_peerId == DictionaryUtil.NullValue)
-                {
-                    traceSegmentReference.NetworkAddress = _peerHost;
-                }
-                else
-                {
-                    traceSegmentReference.NetworkAddressId = _peerId;
-                }
+                traceSegmentReference.RefType = (int) SegmentRefType.CrossProcess;
+                traceSegmentReference.NetworkAddress = new StringOrIntValue(_peerId, _peerHost);
             }
             else
             {
-                traceSegmentReference.RefType = RefType.CrossThread;
+                traceSegmentReference.RefType = (int) SegmentRefType.CrossThread;
             }
+
             traceSegmentReference.ParentApplicationInstanceId = _parentApplicationInstanceId;
             traceSegmentReference.EntryApplicationInstanceId = _entryApplicationInstanceId;
             traceSegmentReference.ParentTraceSegmentId = _traceSegmentId.Transform();
             traceSegmentReference.ParentSpanId = _spanId;
-            if (_entryOperationId == DictionaryUtil.NullValue)
-            {
-                traceSegmentReference.EntryServiceName = _entryOperationName;
-            }
-            else
-            {
-                traceSegmentReference.EntryServiceId = _entryOperationId;
-            }
-            if (_parentOperationId == DictionaryUtil.NullValue)
-            {
-                traceSegmentReference.ParentServiceName = _parentOperationName;
-            }
-            else
-            {
-                traceSegmentReference.ParentServiceId = _parentOperationId;
-            }
+
+            traceSegmentReference.EntryServiceName = new StringOrIntValue(_entryOperationId, _entryOperationName);
+
+            traceSegmentReference.ParentServiceName = new StringOrIntValue(_parentOperationId, _parentOperationName);
+
             return traceSegmentReference;
         }
     }

@@ -18,10 +18,9 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using Google.Protobuf;
+using SkyWalking.Client;
 using SkyWalking.Config;
 using SkyWalking.Context.Ids;
-using SkyWalking.NetworkProtocol;
 
 namespace SkyWalking.Context.Trace
 {
@@ -30,7 +29,7 @@ namespace SkyWalking.Context.Trace
         private readonly IList<ITraceSegmentRef> _refs;
         private readonly IList<AbstractTracingSpan> _spans;
         private readonly DistributedTraceIdCollection _relatedGlobalTraces;
-        private bool _isSizeLimited = false;
+        private bool _isSizeLimited;
 
 
         public int ApplicationId => RemoteDownstreamConfig.Agent.ApplicationId;
@@ -85,22 +84,22 @@ namespace SkyWalking.Context.Trace
             _relatedGlobalTraces.Append(distributedTraceId);
         }
 
-        public UpstreamSegment Transform()
+        public TraceSegmentRequest Transform()
         {
-            var upstreamSegment = new UpstreamSegment();
-            upstreamSegment.GlobalTraceIds.AddRange(_relatedGlobalTraces.GetRelatedGlobalTraces()
-                .Select(x => x.ToUniqueId()));
+            var upstreamSegment = new TraceSegmentRequest
+            {
+                UniqueIds = _relatedGlobalTraces.GetRelatedGlobalTraces()
+                    .Select(x => x.ToUniqueId()).ToArray()
+            };
 
-            var traceSegment = new TraceSegmentObject {TraceSegmentId = TraceSegmentId.Transform()};
-
-            traceSegment.Spans.AddRange(_spans.Select(x => x.Transform()));
-
-            traceSegment.ApplicationId = ApplicationId;
-            traceSegment.ApplicationInstanceId = ApplicationInstanceId;
-            traceSegment.IsSizeLimited = _isSizeLimited;
-
-            upstreamSegment.Segment = traceSegment.ToByteString();
-
+            upstreamSegment.Segment = new TraceSegmentObjectRequest
+            {
+                SegmentId = TraceSegmentId.Transform(),
+                Spans = _spans.Select(x => x.Transform()).ToArray(),
+                ApplicationId = ApplicationId,
+                ApplicationInstanceId = ApplicationInstanceId
+            };
+            
             return upstreamSegment;
         }
 
