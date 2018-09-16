@@ -15,5 +15,7 @@
     <PackageReference Include="Google.Protobuf.Tools" Version="3.6.1" />
     <PackageReference Include="Grpc" Version="1.15.0-pre1" />
     <PackageReference Include="Grpc.Tools" Version="1.15.0-pre1" />
+    <PackageReference Include="System.Runtime" Version="4.3.0" />
+    <PackageReference Include="System.Threading.ThreadPool" Version="4.3.0" />
   </ItemGroup>
 </Project>
