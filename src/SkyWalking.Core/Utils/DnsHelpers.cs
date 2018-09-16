@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Licensed to the OpenSkywalking under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -16,12 +16,31 @@
  *
  */
 
-using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Net.Sockets;
 
 namespace SkyWalking.Utils
 {
-    internal static class TaskUtils
+    public static class DnsHelpers
     {
-        public static readonly Task CompletedTask = Task.FromResult(0);
+        public static string GetHostName()
+        {
+            return Dns.GetHostName();
+        }
+
+        public static string[] GetIpV4s()
+        {
+            try
+            {
+                var ipAddresses = Dns.GetHostAddresses(Dns.GetHostName());
+                return ipAddresses.Where(x => x.AddressFamily == AddressFamily.InterNetwork).Select(ipAddress => ipAddress.ToString()).ToArray();
+            }
+            catch
+            {
+                return new string[0];
+            }
+        }
     }
 }

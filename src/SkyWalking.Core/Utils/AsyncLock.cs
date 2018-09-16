@@ -25,39 +25,39 @@ namespace SkyWalking.Utils
     internal class AsyncLock
     {
         private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1);
-        private readonly Releaser _releaser;
-        private readonly Task<Releaser> _releaserTask;
+        private readonly Release _release;
+        private readonly Task<Release> _releaseTask;
 
         public AsyncLock()
         {
-            _releaser = new Releaser(this);
-            _releaserTask = Task.FromResult(_releaser);
+            _release = new Release(this);
+            _releaseTask = Task.FromResult(_release);
         }
 
-        public Task<Releaser> LockAsync(CancellationToken cancellationToken = default(CancellationToken))
+        public Task<Release> LockAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
             var wait = _semaphore.WaitAsync(cancellationToken);
 
             return wait.IsCompleted
-                ? _releaserTask
+                ? _releaseTask
                 : wait.ContinueWith(
-                    (_, state) => ((AsyncLock) state)._releaser,
+                    (_, state) => ((AsyncLock) state)._release,
                     this, CancellationToken.None,
                     TaskContinuationOptions.ExecuteSynchronously, TaskScheduler.Default);
         }
 
-        public Releaser Lock()
+        public Release Lock()
         {
             _semaphore.Wait();
 
-            return _releaser;
+            return _release;
         }
 
-        public struct Releaser : IDisposable
+        public struct Release : IDisposable
         {
             private readonly AsyncLock _toRelease;
 
-            internal Releaser(AsyncLock toRelease)
+            internal Release(AsyncLock toRelease)
             {
                 _toRelease = toRelease;
             }

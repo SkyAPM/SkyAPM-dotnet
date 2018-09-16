@@ -1,3 +1,5 @@
+using System;
+
 namespace SkyWalking
 {
     public class RuntimeEnvironment : IRuntimeEnvironment
@@ -6,8 +8,8 @@ namespace SkyWalking
 
         public NullableValue ApplicationInstanceId { get; internal set; }
 
-        public string ApplicationCode { get; internal set; }
-
-        public bool Initialized => ApplicationId.HasValue && ApplicationInstanceId.HasValue && !string.IsNullOrWhiteSpace(ApplicationCode);
+        public bool Initialized => ApplicationId.HasValue && ApplicationInstanceId.HasValue;
+        
+        public Guid AgentUUID { get; } = Guid.NewGuid();
     }
 }

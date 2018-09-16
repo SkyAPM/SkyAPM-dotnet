@@ -16,6 +16,8 @@
  *
  */
 
+using System;
+
 namespace SkyWalking
 {
     public interface IRuntimeEnvironment
@@ -24,8 +26,8 @@ namespace SkyWalking
         
         NullableValue ApplicationInstanceId { get; }
         
-        string ApplicationCode { get; }
-        
         bool Initialized { get; }
+        
+        Guid AgentUUID { get; }
     }
 }
