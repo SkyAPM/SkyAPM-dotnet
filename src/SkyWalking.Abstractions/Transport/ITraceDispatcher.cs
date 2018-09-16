@@ -1,8 +1,8 @@
-﻿/*
+/*
  * Licensed to the OpenSkywalking under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
+ * The OpenSkywalking licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
  *
@@ -16,24 +16,20 @@
  *
  */
 
+
 using System;
-using Microsoft.Extensions.DependencyInjection;
-using SkyWalking.Extensions.DependencyInjection;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 
-namespace SkyWalking.Diagnostics.SqlClient
+namespace SkyWalking.Transport
 {
-    public static class SkyWalkingBuilderExtensions
+    public interface ITraceDispatcher
     {
-        public static SkyWalkingBuilder AddSqlClient(this SkyWalkingBuilder builder)
-        {
-            if (builder == null)
-            {
-                throw new ArgumentNullException(nameof(builder));
-            }
+        Func<IEnumerable<TraceSegmentRequest>,CancellationToken, Task> Transporter { get; set; }
 
-            builder.Services.AddSingleton<IDiagnosticProcessor, SqlClientDiagnosticProcessor>();
-            
-            return builder;
-        }
+        bool Dispatch(TraceSegmentRequest segment);
+
+        Task Flush(CancellationToken token = default(CancellationToken));
     }
 }

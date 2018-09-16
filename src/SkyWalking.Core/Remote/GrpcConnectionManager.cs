@@ -27,7 +27,7 @@ namespace SkyWalking.Remote
 {
     public class GrpcConnectionManager
     {
-        private static readonly ILogger _logger = LogManager.GetLogger<GrpcConnectionManager>();
+        private static readonly IInstrumentationLogger InstrumentationLogger = LogManager.GetLogger<GrpcConnectionManager>();
 
         public const string NotFoundErrorMessage = "Not found available connection.";
 
@@ -74,7 +74,7 @@ namespace SkyWalking.Remote
             var connection = _connection;
             if (connection == null || connection.State != GrpcConnectionState.Ready)
             {
-                _logger.Debug(NotFoundErrorMessage);
+                InstrumentationLogger.Debug(NotFoundErrorMessage);
                 return null;
             }
 

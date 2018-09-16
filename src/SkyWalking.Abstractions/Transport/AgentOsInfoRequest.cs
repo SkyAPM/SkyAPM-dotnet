@@ -1,8 +1,8 @@
-﻿/*
+/*
  * Licensed to the OpenSkywalking under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
+ * The OpenSkywalking licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
  *
@@ -16,14 +16,16 @@
  *
  */
 
-using SkyWalking.Boot;
-
-namespace SkyWalking.Sampling
+namespace SkyWalking.Transport
 {
-    public interface ISampler : IBootService
+    public class AgentOsInfoRequest
     {
-        bool TrySampling();
+        public string OsName { get; set; }
 
-        void ForceSampled();
+        public string HostName { get; set; }
+
+        public int ProcessNo { get; set; }
+
+        public string[] IpAddress { get; set; }
     }
 }

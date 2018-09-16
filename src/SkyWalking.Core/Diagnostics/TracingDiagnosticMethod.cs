@@ -25,11 +25,11 @@ namespace SkyWalking.Diagnostics
     internal class TracingDiagnosticMethod
     {
         private readonly MethodInfo _method;
-        private readonly ITracingDiagnosticProcessor _diagnosticProcessor;
+        private readonly IDiagnosticProcessor _diagnosticProcessor;
         private readonly string _diagnosticName;
         private readonly IParameterResolver[] _parameterResolvers;
 
-        public TracingDiagnosticMethod(ITracingDiagnosticProcessor diagnosticProcessor, MethodInfo method,
+        public TracingDiagnosticMethod(IDiagnosticProcessor diagnosticProcessor, MethodInfo method,
             string diagnosticName)
         {
             _diagnosticProcessor = diagnosticProcessor;

@@ -26,7 +26,7 @@ namespace SkyWalking.Diagnostics
     {
         private readonly List<TracingDiagnosticMethod> _methods;
 
-        public TracingDiagnosticMethodCollection(ITracingDiagnosticProcessor diagnosticProcessor)
+        public TracingDiagnosticMethodCollection(IDiagnosticProcessor diagnosticProcessor)
         {
             _methods = new List<TracingDiagnosticMethod>();
             foreach (var method in diagnosticProcessor.GetType().GetMethods())

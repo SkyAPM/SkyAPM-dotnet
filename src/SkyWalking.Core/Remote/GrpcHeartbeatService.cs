@@ -30,7 +30,7 @@ namespace SkyWalking.Remote
 {
     public class GrpcHeartbeatService : TimerService
     {
-        private static readonly ILogger _logger = LogManager.GetLogger<GrpcHeartbeatService>();
+        private static readonly IInstrumentationLogger InstrumentationLogger = LogManager.GetLogger<GrpcHeartbeatService>();
         protected override TimeSpan Interval { get; } = TimeSpan.FromMinutes(1);
 
         protected override async Task Starting(CancellationToken token)
@@ -42,7 +42,7 @@ namespace SkyWalking.Remote
         {
             if (DictionaryUtil.IsNull(RemoteDownstreamConfig.Agent.ApplicationInstanceId))
             {
-                _logger.Debug($"{DateTime.Now} Heartbeat fail. Application instance is not registered.");
+                InstrumentationLogger.Debug($"{DateTime.Now} Heartbeat fail. Application instance is not registered.");
                 return;
             }
 
@@ -50,7 +50,7 @@ namespace SkyWalking.Remote
 
             if (availableConnection == null)
             {
-                _logger.Debug($"{DateTime.Now} Heartbeat fail. {GrpcConnectionManager.NotFoundErrorMessage}");
+                InstrumentationLogger.Debug($"{DateTime.Now} Heartbeat fail. {GrpcConnectionManager.NotFoundErrorMessage}");
                 return;
             }
             
@@ -67,11 +67,11 @@ namespace SkyWalking.Remote
 
                 await instanceDiscoveryService.heartbeatAsync(heartbeat);
 
-                _logger.Debug($"{DateTime.Now} Heartbeat.");
+                InstrumentationLogger.Debug($"{DateTime.Now} Heartbeat.");
             }
             catch (Exception e)
             {
-                _logger.Debug($"{DateTime.Now} Heartbeat fail. {e.Message}");
+                InstrumentationLogger.Debug($"{DateTime.Now} Heartbeat fail. {e.Message}");
                 availableConnection.Failure();
             }
         }

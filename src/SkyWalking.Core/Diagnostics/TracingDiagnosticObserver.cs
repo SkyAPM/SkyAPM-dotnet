@@ -25,9 +25,9 @@ namespace SkyWalking.Diagnostics
     {
         private readonly TracingDiagnosticMethodCollection _methodCollection;
 
-        public TracingDiagnosticObserver(ITracingDiagnosticProcessor tracingDiagnosticProcessor)
+        public TracingDiagnosticObserver(IDiagnosticProcessor diagnosticProcessor)
         {
-            _methodCollection = new TracingDiagnosticMethodCollection(tracingDiagnosticProcessor);
+            _methodCollection = new TracingDiagnosticMethodCollection(diagnosticProcessor);
         }
 
         public void OnCompleted()

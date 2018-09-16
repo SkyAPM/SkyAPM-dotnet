@@ -17,15 +17,29 @@
  */
 
 using System;
-using System.Threading;
-using System.Threading.Tasks;
 
-namespace SkyWalking.Boot
+namespace SkyWalking.Logging
 {
-    public interface IBootService : IDisposable
+    internal class NullInstrumentationLogger : IInstrumentationLogger
     {
-        int Order { get; }
-        
-        Task Initialize(CancellationToken token);
+        public void Debug(string message)
+        {
+        }
+
+        public void Info(string message)
+        {
+        }
+
+        public void Warning(string message)
+        {
+        }
+
+        public void Error(string message, Exception exception)
+        {
+        }
+
+        public void Trace(string message)
+        {
+        }
     }
 }

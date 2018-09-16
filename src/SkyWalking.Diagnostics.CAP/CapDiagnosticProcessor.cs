@@ -31,7 +31,7 @@ namespace SkyWalking.Diagnostics.CAP
     /// <summary>
     ///  Diagnostics processor for listen and process releted events of CAP.
     /// </summary>
-    public class CapDiagnosticProcessor : ITracingDiagnosticProcessor
+    public class CapDiagnosticProcessor : IDiagnosticProcessor
     {
         private Func<BrokerEventData, string> _brokerOperationNameResolver;
 

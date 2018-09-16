@@ -18,7 +18,7 @@
 
 using System.Collections.Generic;
 
-namespace SkyWalking.Client
+namespace SkyWalking.Transport
 {
     public class TraceSegmentRequest
     {

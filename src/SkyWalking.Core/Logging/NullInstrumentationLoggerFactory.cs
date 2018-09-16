@@ -16,10 +16,15 @@
  *
  */
 
-namespace SkyWalking.Diagnostics
+using System;
+
+namespace SkyWalking.Logging
 {
-    public interface ITracingDiagnosticProcessor
+    internal class NullInstrumentationLoggerFactory : IInstrumentationLoggerFactory
     {
-        string ListenerName { get; }
+        public IInstrumentationLogger CreateLogger(Type type)
+        {
+            return new NullInstrumentationLogger();
+        }
     }
 }

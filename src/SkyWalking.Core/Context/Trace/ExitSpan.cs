@@ -17,7 +17,7 @@
  */
 
 using System;
-using SkyWalking.Client;
+using SkyWalking.Transport;
 using SkyWalking.Components;
 using SkyWalking.Dictionarys;
 

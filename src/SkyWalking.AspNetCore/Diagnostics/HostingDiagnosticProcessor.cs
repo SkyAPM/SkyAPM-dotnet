@@ -29,7 +29,7 @@ using SkyWalking.Diagnostics;
 
 namespace SkyWalking.AspNetCore.Diagnostics
 {
-    public class HostingDiagnosticProcessor : ITracingDiagnosticProcessor
+    public class HostingDiagnosticProcessor : IDiagnosticProcessor
     {
         public string ListenerName { get; } = "Microsoft.AspNetCore";
 

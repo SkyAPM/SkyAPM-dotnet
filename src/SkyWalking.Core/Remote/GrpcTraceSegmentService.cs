@@ -34,7 +34,7 @@ namespace SkyWalking.Remote
 {
     public class GrpcTraceSegmentService : TimerService, ITracingContextListener
     {
-        private static readonly ILogger _logger = LogManager.GetLogger<GrpcTraceSegmentService>();
+        private static readonly IInstrumentationLogger InstrumentationLogger = LogManager.GetLogger<GrpcTraceSegmentService>();
         private static readonly ConcurrentQueue<ITraceSegment> _traceSegments
             = new ConcurrentQueue<ITraceSegment>();
 
@@ -85,7 +85,7 @@ namespace SkyWalking.Remote
             var availableConnection = GrpcConnectionManager.Instance.GetAvailableConnection();
             if (availableConnection == null)
             {
-                _logger.Warning(
+                InstrumentationLogger.Warning(
                     $"Transform and send UpstreamSegment to collector fail. {GrpcConnectionManager.NotFoundErrorMessage}");
                 return;
             }
@@ -99,7 +99,7 @@ namespace SkyWalking.Remote
                     while (_traceSegments.TryDequeue(out var segment))
                     {
                         await asyncClientStreamingCall.RequestStream.WriteAsync(segment.Transform());
-                        _logger.Debug(
+                        InstrumentationLogger.Debug(
                             $"Transform and send UpstreamSegment to collector. [TraceSegmentId] = {segment.TraceSegmentId} [GlobalTraceId] = {segment.RelatedGlobalTraces.FirstOrDefault()}");
                     }
                     await asyncClientStreamingCall.RequestStream.CompleteAsync();
@@ -108,7 +108,7 @@ namespace SkyWalking.Remote
             }
             catch (Exception e)
             {
-                _logger.Warning($"Transform and send UpstreamSegment to collector fail. {e.Message}");
+                InstrumentationLogger.Warning($"Transform and send UpstreamSegment to collector fail. {e.Message}");
                 availableConnection?.Failure();
                 return;
             }

@@ -31,7 +31,7 @@ namespace SkyWalking.Diagnostics.EntityFrameworkCore
                 throw new ArgumentNullException(nameof(builder));
             }
 
-            builder.Services.AddSingleton<ITracingDiagnosticProcessor, EntityFrameworkCoreDiagnosticProcessor>();
+            builder.Services.AddSingleton<IDiagnosticProcessor, EntityFrameworkCoreDiagnosticProcessor>();
             builder.Services.AddSingleton<IEfCoreSpanFactory, EfCoreSpanFactory>();
 
             if (optionAction != null)

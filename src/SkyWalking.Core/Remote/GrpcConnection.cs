@@ -25,7 +25,7 @@ namespace SkyWalking.Remote
 {
     public class GrpcConnection
     {
-        private static readonly ILogger _logger = LogManager.GetLogger<GrpcConnection>();
+        private static readonly IInstrumentationLogger InstrumentationLogger = LogManager.GetLogger<GrpcConnection>();
 
         public Channel GrpcChannel { get; }
 
@@ -55,17 +55,17 @@ namespace SkyWalking.Remote
                 var deadLine = DateTime.UtcNow.AddSeconds(timeout.TotalSeconds);
                 await GrpcChannel.ConnectAsync(deadLine);
                 State = GrpcConnectionState.Ready;
-                _logger.Info($"Grpc channel connect success. [Server] = {GrpcChannel.Target}");
+                InstrumentationLogger.Info($"Grpc channel connect success. [Server] = {GrpcChannel.Target}");
             }
             catch (TaskCanceledException ex)
             {
                 State = GrpcConnectionState.Failure;
-                _logger.Warning($"Grpc channel connect timeout. {ex.Message}");
+                InstrumentationLogger.Warning($"Grpc channel connect timeout. {ex.Message}");
             }
             catch (Exception ex)
             {
                 State = GrpcConnectionState.Failure;
-                _logger.Warning($"Grpc channel connect fail. {ex.Message}");
+                InstrumentationLogger.Warning($"Grpc channel connect fail. {ex.Message}");
             }
 
             return State == GrpcConnectionState.Ready;
@@ -79,7 +79,7 @@ namespace SkyWalking.Remote
             }
             catch (Exception e)
             {
-                _logger.Debug($"Grpc channel shutdown fail. {e.Message}");
+                InstrumentationLogger.Debug($"Grpc channel shutdown fail. {e.Message}");
             }
             finally
             { 
@@ -98,7 +98,7 @@ namespace SkyWalking.Remote
             
             if (GrpcConnectionState.Ready == currentState)
             {
-                _logger.Debug($"Grpc channel state changed. {State} -> {GrpcChannel.State}");
+                InstrumentationLogger.Debug($"Grpc channel state changed. {State} -> {GrpcChannel.State}");
             }
 
             State = GrpcConnectionState.Failure;

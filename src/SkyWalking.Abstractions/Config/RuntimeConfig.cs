@@ -1,8 +1,8 @@
-﻿/*
+/*
  * Licensed to the OpenSkywalking under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
+ * The OpenSkywalking licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
  *
@@ -16,17 +16,12 @@
  *
  */
 
-using System;
-
-namespace SkyWalking.Utils
+namespace SkyWalking.Config
 {
-#if NET45 || NET451
-    public static class DateTimeOffsetExtensions
+    public class RuntimeConfig
     {
-        public static long ToUnixTimeMilliseconds(this DateTimeOffset dateTimeOffset)
-        {
-            return dateTimeOffset.UtcDateTime.Ticks / 10000L - 62135596800000L;
-        }
+        public NullableValue ApplicationId { get; set; }
+
+        public NullableValue ApplicationInstance { get; set; }
     }
-#endif
 }

@@ -38,7 +38,7 @@ namespace SkyWalking.Diagnostics.HttpClient.Tests
             
             var httpClientDiagnosticProcessor = new HttpClientDiagnosticProcessor();
             
-            var observer = new TracingDiagnosticProcessorObserver(new ITracingDiagnosticProcessor[]
+            var observer = new TracingDiagnosticProcessorObserver(new IDiagnosticProcessor[]
                 {httpClientDiagnosticProcessor});
             
             DiagnosticListener.AllListeners.Subscribe(observer);

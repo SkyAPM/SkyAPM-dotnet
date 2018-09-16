@@ -30,7 +30,7 @@ using SkyWalking.Context.Trace;
 
 namespace SkyWalking.Diagnostics.EntityFrameworkCore
 {
-    public class EntityFrameworkCoreDiagnosticProcessor : ITracingDiagnosticProcessor
+    public class EntityFrameworkCoreDiagnosticProcessor : IDiagnosticProcessor
     {
         private const string TRACE_ORM = "TRACE_ORM";
         private Func<CommandEventData, string> _operationNameResolver;

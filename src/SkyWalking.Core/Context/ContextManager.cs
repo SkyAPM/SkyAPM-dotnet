@@ -23,7 +23,6 @@ using System.Threading.Tasks;
 using SkyWalking.Boot;
 using SkyWalking.Config;
 using SkyWalking.Context.Trace;
-using SkyWalking.Dictionarys;
 using SkyWalking.Sampling;
 using SkyWalking.Utils;
 
@@ -61,7 +60,7 @@ namespace SkyWalking.Context
                         else
                         {
                             var sampler = ServiceManager.Instance.GetService<SamplingService>();
-                            if (forceSampling || sampler.TrySampling())
+                            if (forceSampling || sampler.Sampled())
                             {
                                 _context.Value = new TracingContext();
                             }

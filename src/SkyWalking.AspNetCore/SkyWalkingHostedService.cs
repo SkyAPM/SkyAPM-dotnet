@@ -34,10 +34,10 @@ namespace SkyWalking.AspNetCore
     public class SkyWalkingHostedService : IHostedService
     {
         private readonly TracingDiagnosticProcessorObserver _diagnosticObserver;
-        private readonly ILogger _logger;
+        private readonly IInstrumentationLogger _instrumentationLogger;
 
         public SkyWalkingHostedService(IOptions<SkyWalkingOptions> options, IHostingEnvironment hostingEnvironment,
-            TracingDiagnosticProcessorObserver diagnosticObserver, ILoggerFactory loggerFactory)
+            TracingDiagnosticProcessorObserver diagnosticObserver, IInstrumentationLoggerFactory instrumentationLoggerFactory)
         {
 
             if (string.IsNullOrEmpty(options.Value.DirectServers))
@@ -50,45 +50,45 @@ namespace SkyWalking.AspNetCore
                 options.Value.ApplicationCode = hostingEnvironment.ApplicationName;
             }
 
-            LogManager.SetLoggerFactory(loggerFactory);
+            LogManager.SetLoggerFactory(instrumentationLoggerFactory);
             AgentConfig.ApplicationCode = options.Value.ApplicationCode;
             CollectorConfig.DirectServers = options.Value.DirectServers;
             AgentConfig.SamplePer3Secs = options.Value.SamplePer3Secs;
             AgentConfig.PendingSegmentsLimit = options.Value.PendingSegmentsLimit;
             CollectorConfig.Authentication = options.Value.Authentication;
             CollectorConfig.CertificatePath = options.Value.CertificatePath;
-            _logger = LogManager.GetLogger<SkyWalkingHostedService>();
+            _instrumentationLogger = LogManager.GetLogger<SkyWalkingHostedService>();
             _diagnosticObserver = diagnosticObserver;
         }
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
-            _logger.Info("SkyWalking Agent starting...");
+            _instrumentationLogger.Info("SkyWalking Agent starting...");
             try
             {
                 DiagnosticListener.AllListeners.Subscribe(_diagnosticObserver);
                 await GrpcConnectionManager.Instance.ConnectAsync(TimeSpan.FromSeconds(3));
                 await ServiceManager.Instance.Initialize();
-                _logger.Info("SkyWalking Agent started.");
+                _instrumentationLogger.Info("SkyWalking Agent started.");
             }
             catch (Exception e)
             {
-                _logger.Error("SkyWalking Agent start fail.", e);
+                _instrumentationLogger.Error("SkyWalking Agent start fail.", e);
             }
         }
 
         public async Task StopAsync(CancellationToken cancellationToken)
         {
-            _logger.Info("SkyWalking Agent stopping...");
+            _instrumentationLogger.Info("SkyWalking Agent stopping...");
             try
             {
                 ServiceManager.Instance.Dispose();
                 await GrpcConnectionManager.Instance.ShutdownAsync();
-                _logger.Info("SkyWalking Agent stopped.");
+                _instrumentationLogger.Info("SkyWalking Agent stopped.");
             }
             catch (Exception e)
             {
-                _logger.Error("SkyWalking Agent stop fail.", e);
+                _instrumentationLogger.Error("SkyWalking Agent stop fail.", e);
             }
 
         }

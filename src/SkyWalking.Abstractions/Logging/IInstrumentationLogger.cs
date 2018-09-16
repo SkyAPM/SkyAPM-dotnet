@@ -20,11 +20,16 @@ using System;
 
 namespace SkyWalking.Logging
 {
-    internal class NullLoggerFactory : ILoggerFactory
+    public interface IInstrumentationLogger
     {
-        public ILogger CreateLogger(Type type)
-        {
-            return new NullLogger();
-        }
+        void Debug(string message);
+
+        void Info(string message);
+
+        void Warning(string message);
+
+        void Error(string message, Exception exception);
+
+        void Trace(string message);
     }
 }

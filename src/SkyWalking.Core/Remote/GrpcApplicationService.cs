@@ -36,7 +36,7 @@ namespace SkyWalking.Remote
 {
     public class GrpcApplicationService : TimerService
     {
-        private static readonly ILogger _logger = LogManager.GetLogger<GrpcApplicationService>();
+        private static readonly IInstrumentationLogger InstrumentationLogger = LogManager.GetLogger<GrpcApplicationService>();
         public override int Order { get; } = -1;
 
         protected override TimeSpan Interval { get; } = TimeSpan.FromSeconds(15);
@@ -73,7 +73,7 @@ namespace SkyWalking.Remote
             }
             catch (Exception exception)
             {
-                _logger.Warning($"Register application fail. {exception.Message}");
+                InstrumentationLogger.Warning($"Register application fail. {exception.Message}");
                 availableConnection.Failure();
             }
         }
@@ -101,12 +101,12 @@ namespace SkyWalking.Remote
 
                 if (DictionaryUtil.IsNull(applicationId))
                 {
-                    _logger.Warning(
+                    InstrumentationLogger.Warning(
                         "Register application fail. Server response null.");
                     return;
                 }
 
-                _logger.Info(
+                InstrumentationLogger.Info(
                     $"Register application success. [applicationCode] = {application.ApplicationCode}. [applicationId] = {applicationId}");
                 RemoteDownstreamConfig.Agent.ApplicationId = applicationId;
             }
@@ -158,12 +158,12 @@ namespace SkyWalking.Remote
                 if (!DictionaryUtil.IsNull(applicationInstanceId))
                 {
                     RemoteDownstreamConfig.Agent.ApplicationInstanceId = applicationInstanceId;
-                    _logger.Info(
+                    InstrumentationLogger.Info(
                         $"Register application instance success. [applicationInstanceId] = {applicationInstanceId}");
                 }
                 else
                 {
-                    _logger.Warning(
+                    InstrumentationLogger.Warning(
                         "Register application instance fail. Server response null.");
                 }
             }
@@ -182,7 +182,7 @@ namespace SkyWalking.Remote
             }
             catch (Exception e)
             {
-                _logger.Warning($"Get host addresses fail. {e.Message}");
+                InstrumentationLogger.Warning($"Get host addresses fail. {e.Message}");
                 return new string[0];
             }
         }

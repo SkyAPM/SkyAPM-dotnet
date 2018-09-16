@@ -245,7 +245,7 @@ namespace SkyWalking.Context
 
             if (!_segment.HasRef && _segment.IsSingleSpanSegment)
             {
-                if (!_sampler.TrySampling())
+                if (!_sampler.Sampled())
                 {
                     finishedSegment.IsIgnore = true;
                 }

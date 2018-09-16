@@ -16,7 +16,7 @@
  *
  */
 
-namespace SkyWalking.Client
+namespace SkyWalking
 {
     public struct StringOrIntValue
     {

@@ -22,23 +22,23 @@ namespace SkyWalking.Logging
 {
     public static class LogManager
     {
-        private static readonly ILoggerFactory defaultLoggerFactory = new NullLoggerFactory();
-        private static ILoggerFactory _loggerFactory;
+        private static readonly IInstrumentationLoggerFactory DefaultInstrumentationLoggerFactory = new NullInstrumentationLoggerFactory();
+        private static IInstrumentationLoggerFactory _instrumentationLoggerFactory;
 
-        public static ILogger GetLogger(Type type)
+        public static IInstrumentationLogger GetLogger(Type type)
         {
-            var loggerFactory = _loggerFactory ?? defaultLoggerFactory;
+            var loggerFactory = _instrumentationLoggerFactory ?? DefaultInstrumentationLoggerFactory;
             return loggerFactory.CreateLogger(type);
         }
 
-        public static ILogger GetLogger<T>()
+        public static IInstrumentationLogger GetLogger<T>()
         {
             return GetLogger(typeof(T));
         }
 
-        public static void SetLoggerFactory(ILoggerFactory loggerFactory)
+        public static void SetLoggerFactory(IInstrumentationLoggerFactory instrumentationLoggerFactory)
         {
-            _loggerFactory = loggerFactory;
+            _instrumentationLoggerFactory = instrumentationLoggerFactory;
         }
     }
 }

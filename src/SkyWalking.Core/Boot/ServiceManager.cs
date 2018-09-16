@@ -28,7 +28,7 @@ namespace SkyWalking.Boot
 {
     public class ServiceManager : IDisposable
     {
-        private static readonly ILogger _logger = LogManager.GetLogger<ServiceManager>();
+        private static readonly IInstrumentationLogger InstrumentationLogger = LogManager.GetLogger<ServiceManager>();
         private static readonly ServiceManager _instance = new ServiceManager();
 
         public static ServiceManager Instance => _instance;
@@ -68,11 +68,11 @@ namespace SkyWalking.Boot
                 {
                     await service.Initialize(_tokenSource.Token);
                     _services.Add(service.GetType(), service);
-                    _logger.Debug($"ServiceManager loaded {service.GetType()}.");
+                    InstrumentationLogger.Debug($"ServiceManager loaded {service.GetType()}.");
                 }
                 catch (Exception e)
                 {
-                    _logger.Error($"ServiceManager loaded {service.GetType()} fail.",e);
+                    InstrumentationLogger.Error($"ServiceManager loaded {service.GetType()} fail.",e);
                 }      
             }
         }
@@ -87,11 +87,11 @@ namespace SkyWalking.Boot
                 {
                     var service = item as IBootService;
                     service?.Dispose();
-                    _logger.Debug($"ServiceManager dispose {item.GetType()}.");
+                    InstrumentationLogger.Debug($"ServiceManager dispose {item.GetType()}.");
                 }
                 catch (Exception e)
                 {
-                    _logger.Error($"ServiceManager dispose {item.GetType()} fail.", e);
+                    InstrumentationLogger.Error($"ServiceManager dispose {item.GetType()} fail.", e);
                 }
             }
             _tokenSource.Dispose();

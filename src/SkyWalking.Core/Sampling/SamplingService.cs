@@ -32,7 +32,7 @@ namespace SkyWalking.Sampling
         private readonly int _sample_N_Per_3_Secs = AgentConfig.SamplePer3Secs;
         private readonly bool _sample_on = AgentConfig.SamplePer3Secs > 0;
 
-        public bool TrySampling()
+        public bool Sampled()
         {
             if (!_sample_on)
             {

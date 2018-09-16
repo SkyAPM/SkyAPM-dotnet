@@ -18,7 +18,7 @@
 
 
 using System;
-using SkyWalking.Client;
+using SkyWalking.Transport;
 
 namespace SkyWalking.Context.Ids
 {

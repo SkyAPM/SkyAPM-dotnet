@@ -16,20 +16,12 @@
  *
  */
 
-using System;
-
-namespace SkyWalking.Logging
+namespace SkyWalking
 {
-    public interface ILogger
+    public interface ISampler
     {
-        void Debug(string message);
+        bool Sampled();
 
-        void Info(string message);
-
-        void Warning(string message);
-
-        void Error(string message, Exception exception);
-
-        void Trace(string message);
+        void ForceSampled();
     }
 }

@@ -16,19 +16,12 @@
  *
  */
 
-namespace SkyWalking.Client
+namespace SkyWalking.Config
 {
-    public struct NullableValue
+    public interface IConfigAccessor
     {
-        private const int NULL_VALUE = 0;
-        
-        public int Value { get; }
+        T Get<T>(params string[] sections) where T : class, new();
 
-        public NullableValue(int value)
-        {
-            Value = value;
-        }
-
-        public bool HasValue => Value != NULL_VALUE;
+        T Value<T>(string key, params string[] sections);
     }
 }

@@ -25,7 +25,7 @@ using SkyWalking.Context.Trace;
 
 namespace SkyWalking.Diagnostics.HttpClient
 {
-    public class HttpClientDiagnosticProcessor : ITracingDiagnosticProcessor
+    public class HttpClientDiagnosticProcessor : IDiagnosticProcessor
     {
         public string ListenerName { get; } = "HttpHandlerDiagnosticListener";
 

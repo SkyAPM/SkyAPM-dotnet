@@ -16,20 +16,14 @@
  *
  */
 
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-
-namespace SkyWalking.Client
+namespace SkyWalking.Config
 {
-    public interface ISkyWalkingClient
+    public class InstrumentationConfig
     {
-        Task<NullableValue> RegisterApplicationAsync(string applicationCode);
+        public string Namespace { get; set; }
 
-        Task<NullableValue> RegisterApplicationInstanceAsync(int applicationId, Guid agentUUID, long registerTime, AgentOsInfo osInfo);
+        public string ApplicationCode { get; set; }
 
-        Task Heartbeat(int applicationInstance, long heartbeatTime);
-
-        Task Collect(IEnumerable<TraceSegmentRequest> request);
+        public int SpanLimitPerSegment { get; set; } = 300;
     }
 }

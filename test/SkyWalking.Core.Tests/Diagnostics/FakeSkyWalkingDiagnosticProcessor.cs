@@ -4,7 +4,7 @@ using Xunit;
     
 namespace SkyWalking.Core.Tests.Diagnostics
 {
-    public class FakeTracingDiagnosticProcessor : ITracingDiagnosticProcessor
+    public class FakeDiagnosticProcessor : IDiagnosticProcessor
     {
         public string ListenerName { get; } = FakeDiagnosticListener.ListenerName;
         

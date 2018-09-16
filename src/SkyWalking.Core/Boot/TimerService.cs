@@ -26,7 +26,7 @@ namespace SkyWalking.Boot
 {
     public abstract class TimerService : IBootService
     {
-        private static readonly ILogger _logger = LogManager.GetLogger<TimerService>();
+        private static readonly IInstrumentationLogger InstrumentationLogger = LogManager.GetLogger<TimerService>();
         protected abstract TimeSpan Interval { get; }
         private Task _task;
 
@@ -50,7 +50,7 @@ namespace SkyWalking.Boot
                         }
                         catch (Exception e)
                         {
-                            _logger.Error($"{GetType().Name} execute fail.", e);
+                            InstrumentationLogger.Error($"{GetType().Name} execute fail.", e);
                         }
                         await Task.Delay(Interval, token);
                     }  

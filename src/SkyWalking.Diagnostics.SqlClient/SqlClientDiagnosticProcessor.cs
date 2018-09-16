@@ -26,7 +26,7 @@ using SkyWalking.Context.Trace;
 
 namespace SkyWalking.Diagnostics.SqlClient
 {
-    public class SqlClientDiagnosticProcessor : ITracingDiagnosticProcessor
+    public class SqlClientDiagnosticProcessor : IDiagnosticProcessor
     {
         private const string TRACE_ORM = "TRACE_ORM";
         public string ListenerName { get; } = SqlClientDiagnosticStrings.DiagnosticListenerName;

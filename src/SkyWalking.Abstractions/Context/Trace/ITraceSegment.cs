@@ -17,7 +17,7 @@
  */
 
 using System.Collections.Generic;
-using SkyWalking.Client;
+using SkyWalking.Transport;
 using SkyWalking.Context.Ids;
 
 namespace SkyWalking.Context.Trace

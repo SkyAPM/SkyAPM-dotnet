@@ -18,8 +18,7 @@
 
 using System;
 using System.Collections.Generic;
-using SkyWalking.Dictionarys;
-using SkyWalking.Client;
+using SkyWalking.Transport;
 using SkyWalking.Components;
 
 namespace SkyWalking.Context.Trace
@@ -67,7 +66,6 @@ namespace SkyWalking.Context.Trace
         protected AbstractTracingSpan(int spanId, int parentSpanId, string operationName)
         {
             _operationName = operationName;
-            _operationId = DictionaryUtil.NullValue;
             _spanId = spanId;
             _parnetSpanId = parentSpanId;
         }
@@ -88,17 +86,17 @@ namespace SkyWalking.Context.Trace
 
         public virtual string OperationName
         {
-            get { return _operationName; }
+            get => _operationName;
             set
             {
                 _operationName = value;
-                _operationId = DictionaryUtil.NullValue;
+                _operationId = 0;
             }
         }
 
         public virtual int OperationId
         {
-            get { return _operationId; }
+            get => _operationId;
             set
             {
                 _operationId = value;

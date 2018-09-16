@@ -16,12 +16,10 @@
  *
  */
 
-namespace SkyWalking.Config
+namespace SkyWalking
 {
-    public static class DictionaryConfig
+    public interface IDiagnosticProcessor
     {
-        public static int ApplicationCodeBufferSize { get; set; } = 10 * 10000;
-
-        public static int OperationNameBufferSize { get; set; } = 1000 * 10000;
+        string ListenerName { get; }
     }
 }

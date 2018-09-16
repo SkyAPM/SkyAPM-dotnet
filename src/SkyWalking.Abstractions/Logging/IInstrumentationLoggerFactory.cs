@@ -17,25 +17,11 @@
  */
 
 using System;
-using MSLoggerFactory= Microsoft.Extensions.Logging.ILoggerFactory;
-using Microsoft.Extensions.Logging;
-using ILoggerFactory = SkyWalking.Logging.ILoggerFactory;
-using ILogger = SkyWalking.Logging.ILogger;
 
-namespace SkyWalking.AspNetCore.Logging
+namespace SkyWalking.Logging
 {
-    internal class LoggerFactoryAdapter : ILoggerFactory
+    public interface IInstrumentationLoggerFactory
     {
-        private readonly MSLoggerFactory _loggerFactory;
-
-        public LoggerFactoryAdapter(MSLoggerFactory loggerFactory)
-        {
-            _loggerFactory = loggerFactory;
-        }
-
-        public ILogger CreateLogger(Type type)
-        {
-            return new LoggerAdapter(_loggerFactory.CreateLogger(type));
-        }
+        IInstrumentationLogger CreateLogger(Type type);
     }
 }

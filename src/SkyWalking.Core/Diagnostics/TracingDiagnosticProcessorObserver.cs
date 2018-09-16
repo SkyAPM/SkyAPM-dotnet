@@ -26,11 +26,11 @@ namespace SkyWalking.Diagnostics
 {
     public class TracingDiagnosticProcessorObserver : IObserver<DiagnosticListener>
     {
-        private static readonly ILogger _logger = LogManager.GetLogger<TracingDiagnosticProcessorObserver>();
+        private static readonly IInstrumentationLogger InstrumentationLogger = LogManager.GetLogger<TracingDiagnosticProcessorObserver>();
 
-        private readonly IEnumerable<ITracingDiagnosticProcessor> _tracingDiagnosticProcessors;
+        private readonly IEnumerable<IDiagnosticProcessor> _tracingDiagnosticProcessors;
 
-        public TracingDiagnosticProcessorObserver(IEnumerable<ITracingDiagnosticProcessor> tracingDiagnosticProcessors)
+        public TracingDiagnosticProcessorObserver(IEnumerable<IDiagnosticProcessor> tracingDiagnosticProcessors)
         {
             _tracingDiagnosticProcessors = tracingDiagnosticProcessors ??
                                            throw new ArgumentNullException(nameof(tracingDiagnosticProcessors));
@@ -51,14 +51,14 @@ namespace SkyWalking.Diagnostics
                 if (listener.Name == diagnosticProcessor.ListenerName)
                 {
                     Subscribe(listener, diagnosticProcessor);
-                    _logger.Debug(
+                    InstrumentationLogger.Debug(
                         $"TracingDiagnosticObserver subscribe diagnosticListener named [{diagnosticProcessor.ListenerName}].");
                 }
             }
         }
 
         protected virtual void Subscribe(DiagnosticListener listener,
-            ITracingDiagnosticProcessor diagnosticProcessor)
+            IDiagnosticProcessor diagnosticProcessor)
         {
             listener.Subscribe(new TracingDiagnosticObserver(diagnosticProcessor));
         }
