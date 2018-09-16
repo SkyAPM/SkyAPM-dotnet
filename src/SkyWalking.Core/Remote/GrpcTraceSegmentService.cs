@@ -72,7 +72,7 @@ namespace SkyWalking.Remote
             _traceSegments.Enqueue(traceSegment);
         }
 
-        protected async override Task Execute(CancellationToken token)
+        protected override async Task Execute(CancellationToken token)
         {
             await BatchSendTraceSegments();
         }

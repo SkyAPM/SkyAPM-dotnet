@@ -19,11 +19,8 @@
 using System;
 using System.Collections.Generic;
 using SkyWalking.Dictionarys;
-using SkyWalking.NetworkProtocol;
-using SkyWalking.NetworkProtocol.Trace;
-using System.Linq;
 using SkyWalking.Client;
-using SkyWalking.Utils;
+using SkyWalking.Components;
 
 namespace SkyWalking.Context.Trace
 {

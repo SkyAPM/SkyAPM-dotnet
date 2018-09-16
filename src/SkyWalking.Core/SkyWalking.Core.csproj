@@ -13,7 +13,6 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\SkyWalking.Abstractions\SkyWalking.Abstractions.csproj" />
-    <ProjectReference Include="..\SkyWalking.NetworkProtocol.Trace\SkyWalking.NetworkProtocol.Trace.csproj" />
     <ProjectReference Include="..\SkyWalking.NetworkProtocol\SkyWalking.NetworkProtocol.csproj" />
   </ItemGroup>
   <ItemGroup>
