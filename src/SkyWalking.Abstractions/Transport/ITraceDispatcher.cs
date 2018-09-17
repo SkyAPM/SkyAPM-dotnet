@@ -16,9 +16,6 @@
  *
  */
 
-
-using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -29,5 +26,7 @@ namespace SkyWalking.Transport
         bool Dispatch(TraceSegmentRequest segment);
 
         Task Flush(CancellationToken token = default(CancellationToken));
+
+        void Close();
     }
 }

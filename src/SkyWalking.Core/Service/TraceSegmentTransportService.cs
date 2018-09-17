@@ -16,10 +16,44 @@
  *
  */
 
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+using SkyWalking.Config;
+using SkyWalking.Context;
+using SkyWalking.Context.Trace;
+using SkyWalking.Logging;
+using SkyWalking.Transport;
+
 namespace SkyWalking.Service
 {
-    public class TraceSegmentTransportService
+    public class TraceSegmentTransportService : InstrumentationService, ITracingContextListener
     {
-        
+        private readonly TransportConfig _config;
+        private readonly ITraceDispatcher _dispatcher;
+
+        public TraceSegmentTransportService(IConfigAccessor configAccessor, ITraceDispatcher dispatcher,
+            IInstrumentationClient instrumentation, IRuntimeEnvironment runtimeEnvironment, IInstrumentationLoggerFactory loggerFactory)
+            : base(instrumentation, runtimeEnvironment, loggerFactory)
+        {
+            _dispatcher = dispatcher;
+            _config = configAccessor.Get<TransportConfig>();
+            Period = TimeSpan.FromSeconds(_config.Interval);
+        }
+
+        protected override TimeSpan DueTime { get; } = TimeSpan.FromSeconds(5);
+
+        protected override TimeSpan Period { get; }
+
+        protected override async Task ExecuteAsync(CancellationToken cancellationToken)
+        {
+            await _dispatcher.Flush(cancellationToken);
+        }
+
+        public void AfterFinished(ITraceSegment traceSegment)
+        {
+            if (!traceSegment.IsIgnore)
+                _dispatcher.Dispatch(traceSegment.Transform());
+        }
     }
 }
