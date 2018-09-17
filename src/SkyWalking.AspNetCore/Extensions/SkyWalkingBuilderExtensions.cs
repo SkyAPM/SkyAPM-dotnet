@@ -31,7 +31,7 @@ namespace SkyWalking.AspNetCore
         public static SkyWalkingBuilder AddHosting(this SkyWalkingBuilder builder)
         {   
             builder.Services.AddSingleton<IHostedService, SkyWalkingHostedService>();
-            builder.Services.AddSingleton<IDiagnosticProcessor, HostingDiagnosticProcessor>();
+            builder.Services.AddSingleton<ITracingDiagnosticProcessor, HostingTracingDiagnosticProcessor>();
             builder.Services.AddSingleton<IInstrumentationLoggerFactory, InstrumentationLoggerFactoryAdapter>();
             return builder;
         }

@@ -31,7 +31,7 @@ namespace SkyWalking.Diagnostics.HttpClient
                 throw new ArgumentNullException(nameof(builder));
             }
 
-            builder.Services.AddSingleton<IDiagnosticProcessor, HttpClientDiagnosticProcessor>();
+            builder.Services.AddSingleton<ITracingDiagnosticProcessor, HttpClientTracingDiagnosticProcessor>();
             
             return builder;
         }

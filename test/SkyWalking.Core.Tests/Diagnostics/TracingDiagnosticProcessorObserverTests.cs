@@ -11,8 +11,8 @@ namespace SkyWalking.Core.Tests.Diagnostics
         public void Property_Binder_Invoke_Test()
         {
             var listener = new FakeDiagnosticListener();
-            var fakeProcessor = new FakeDiagnosticProcessor();
-            var observer = new TracingDiagnosticProcessorObserver(new IDiagnosticProcessor[] {fakeProcessor});
+            var fakeProcessor = new FakeTracingDiagnosticProcessor();
+            var observer = new TracingDiagnosticProcessorObserver(new ITracingDiagnosticProcessor[] {fakeProcessor});
             DiagnosticListener.AllListeners.Subscribe(observer);
 
             var timeStamp = DateTime.Now;
@@ -30,8 +30,8 @@ namespace SkyWalking.Core.Tests.Diagnostics
         public void Object_Binder_Invoke_Test()
         {
             var listener = new FakeDiagnosticListener();
-            var fakeProcessor = new FakeDiagnosticProcessor();
-            var observer = new TracingDiagnosticProcessorObserver(new IDiagnosticProcessor[] {fakeProcessor});
+            var fakeProcessor = new FakeTracingDiagnosticProcessor();
+            var observer = new TracingDiagnosticProcessorObserver(new ITracingDiagnosticProcessor[] {fakeProcessor});
             DiagnosticListener.AllListeners.Subscribe(observer);
 
             var timeStamp = DateTime.Now;

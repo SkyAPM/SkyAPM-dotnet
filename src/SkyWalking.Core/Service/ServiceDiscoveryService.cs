@@ -18,7 +18,6 @@
 
 using System;
 using System.Diagnostics;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using SkyWalking.Config;
@@ -36,8 +35,8 @@ namespace SkyWalking.Service
 
         protected override TimeSpan Period { get; } = TimeSpan.FromSeconds(30);
 
-        public ServiceDiscoveryService(IConfigAccessor configAccessor, IInstrumentationClient client, IRuntimeEnvironment runtimeEnvironment,
-            IInstrumentationLoggerFactory loggerFactory)
+        public ServiceDiscoveryService(IConfigAccessor configAccessor, IInstrumentationClient client,
+            IRuntimeEnvironment runtimeEnvironment, IInstrumentationLoggerFactory loggerFactory)
             : base(client, runtimeEnvironment, loggerFactory)
         {
             _config = configAccessor.Get<InstrumentationConfig>();

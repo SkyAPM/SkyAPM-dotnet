@@ -19,7 +19,6 @@
 using System;
 using SkyWalking.Transport;
 using SkyWalking.Components;
-using SkyWalking.Dictionarys;
 
 namespace SkyWalking.Context.Trace
 {
@@ -32,7 +31,7 @@ namespace SkyWalking.Context.Trace
             : base(spanId, parentSpanId, operationName)
         {
             _peer = peer;
-            _peerId = DictionaryUtil.NullValue;
+            _peerId = 0;
         }
 
         public ExitSpan(int spanId, int parentSpanId, int operationId, int peerId)
@@ -46,7 +45,7 @@ namespace SkyWalking.Context.Trace
             : base(spanId, parentSpanId, operationId)
         {
             _peer = peer;
-            _peerId = DictionaryUtil.NullValue;
+            _peerId = 0;
         }
 
         public ExitSpan(int spanId, int parentSpanId, String operationName, int peerId)

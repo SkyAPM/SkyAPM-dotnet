@@ -17,7 +17,6 @@
  */
 
 using SkyWalking.Components;
-using SkyWalking.Dictionarys;
 
 namespace SkyWalking.Context.Trace
 {
@@ -119,7 +118,7 @@ namespace SkyWalking.Context.Trace
 
         private void ClearWhenRestart()
         {
-            _componentId = DictionaryUtil.NullValue;
+            _componentId = 0;
             _componentName = null;
             _layer = null;
             _logs = null;

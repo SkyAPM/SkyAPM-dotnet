@@ -15,7 +15,7 @@ namespace SkyWalking.Diagnostics.HttpClient.Tests
             /*AgentConfig.ApplicationCode = "HttpClientDiagnosticTests";
             CollectorConfig.DirectServers = "HttpClientDiagnosticTests.xx:50000";
 
-            var httpClientDiagnosticProcessor = new HttpClientDiagnosticProcessor();
+            var httpClientDiagnosticProcessor = new HttpClientTracingDiagnosticProcessor();
 
             var observer = new TracingDiagnosticProcessorObserver(new ITracingDiagnosticProcessor[]
                 {httpClientDiagnosticProcessor});
@@ -36,9 +36,9 @@ namespace SkyWalking.Diagnostics.HttpClient.Tests
             AgentConfig.ApplicationCode = "HttpClientDiagnosticTests";
             CollectorConfig.DirectServers = "HttpClientDiagnosticTests.xx:50000";
             
-            var httpClientDiagnosticProcessor = new HttpClientDiagnosticProcessor();
+            var httpClientDiagnosticProcessor = new HttpClientTracingDiagnosticProcessor();
             
-            var observer = new TracingDiagnosticProcessorObserver(new IDiagnosticProcessor[]
+            var observer = new TracingDiagnosticProcessorObserver(new ITracingDiagnosticProcessor[]
                 {httpClientDiagnosticProcessor});
             
             DiagnosticListener.AllListeners.Subscribe(observer);

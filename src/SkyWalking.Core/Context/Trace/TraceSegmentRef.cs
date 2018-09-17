@@ -20,7 +20,6 @@ using System.Linq;
 using SkyWalking.Transport;
 using SkyWalking.Config;
 using SkyWalking.Context.Ids;
-using SkyWalking.Dictionarys;
 
 namespace SkyWalking.Context.Trace
 {
@@ -29,14 +28,14 @@ namespace SkyWalking.Context.Trace
         private readonly SegmentRefType _type;
         private readonly ID _traceSegmentId;
         private readonly int _spanId = -1;
-        private readonly int _peerId = DictionaryUtil.NullValue;
+        private readonly int _peerId = 0;
         private readonly string _peerHost;
-        private readonly int _entryApplicationInstanceId = DictionaryUtil.NullValue;
-        private readonly int _parentApplicationInstanceId = DictionaryUtil.NullValue;
+        private readonly int _entryApplicationInstanceId = 0;
+        private readonly int _parentApplicationInstanceId = 0;
         private readonly string _entryOperationName;
-        private readonly int _entryOperationId = DictionaryUtil.NullValue;
+        private readonly int _entryOperationId = 0;
         private readonly string _parentOperationName;
-        private readonly int _parentOperationId = DictionaryUtil.NullValue;
+        private readonly int _parentOperationId = 0;
 
         public TraceSegmentRef(IContextCarrier carrier)
         {
@@ -81,7 +80,7 @@ namespace SkyWalking.Context.Trace
             _type = SegmentRefType.CrossThread;
             _traceSegmentId = contextSnapshot.TraceSegmentId;
             _spanId = contextSnapshot.SpanId;
-            _parentApplicationInstanceId = RemoteDownstreamConfig.Agent.ApplicationInstanceId;
+            _parentApplicationInstanceId = RuntimeEnvironment.Instance.ApplicationInstanceId.Value;
             _entryApplicationInstanceId = contextSnapshot.EntryApplicationInstanceId;
             string entryOperationName = contextSnapshot.EntryOperationName;
             if (entryOperationName.First() == '#')

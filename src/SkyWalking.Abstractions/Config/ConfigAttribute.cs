@@ -1,8 +1,8 @@
-﻿/*
+/*
  * Licensed to the OpenSkywalking under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
+ * The OpenSkywalking licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
  *
@@ -16,20 +16,17 @@
  *
  */
 
-#if NET45 || NET451
-using System.Runtime.Remoting.Messaging;
+using System;
 
-namespace SkyWalking.Utils
+namespace SkyWalking.Config
 {
-    internal class AsyncLocal<T>
+    public class ConfigAttribute : Attribute
     {
-        private static readonly string key = "sw-" + typeof(T).FullName;
+        public string[] Sections { get; }
 
-        public T Value
+        public ConfigAttribute(params string[] sections)
         {
-            get => (T) CallContext.LogicalGetData(key);
-            set => CallContext.LogicalSetData(key, value);
+            Sections = sections;
         }
     }
 }
-#endif

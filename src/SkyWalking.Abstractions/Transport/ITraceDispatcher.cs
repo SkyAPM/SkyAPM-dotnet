@@ -26,8 +26,6 @@ namespace SkyWalking.Transport
 {
     public interface ITraceDispatcher
     {
-        Func<IEnumerable<TraceSegmentRequest>,CancellationToken, Task> Transporter { get; set; }
-
         bool Dispatch(TraceSegmentRequest segment);
 
         Task Flush(CancellationToken token = default(CancellationToken));

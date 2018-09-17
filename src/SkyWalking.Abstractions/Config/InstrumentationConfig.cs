@@ -18,6 +18,7 @@
 
 namespace SkyWalking.Config
 {
+    [Config("SkyWalking")]
     public class InstrumentationConfig
     {
         public string Namespace { get; set; }

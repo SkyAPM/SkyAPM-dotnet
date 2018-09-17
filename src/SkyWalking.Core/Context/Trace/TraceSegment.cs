@@ -19,7 +19,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using SkyWalking.Transport;
-using SkyWalking.Config;
 using SkyWalking.Context.Ids;
 
 namespace SkyWalking.Context.Trace
@@ -31,10 +30,9 @@ namespace SkyWalking.Context.Trace
         private readonly DistributedTraceIdCollection _relatedGlobalTraces;
         private bool _isSizeLimited;
 
+        public int ApplicationId => RuntimeEnvironment.Instance.ApplicationId.Value;
 
-        public int ApplicationId => RemoteDownstreamConfig.Agent.ApplicationId;
-
-        public int ApplicationInstanceId => RemoteDownstreamConfig.Agent.ApplicationInstanceId;
+        public int ApplicationInstanceId => RuntimeEnvironment.Instance.ApplicationInstanceId.Value;
 
         public IEnumerable<ITraceSegmentRef> Refs => _refs;
 

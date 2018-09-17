@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Licensed to the OpenSkywalking under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -16,21 +16,19 @@
  *
  */
 
-using System;
-using System.Threading;
-using System.Threading.Tasks;
-using SkyWalking.Boot;
-using SkyWalking.Config;
+using System.Runtime.CompilerServices;
 using SkyWalking.Utils;
 
-namespace SkyWalking.Sampling
+namespace SkyWalking
 {
-    // ReSharper disable once ClassNeverInstantiated.Global
-    public class SamplingService :TimerService, ISampler
+    public class DefaultSampler : ISampler
     {
-        private readonly AtomicInteger _atomicInteger = new AtomicInteger();
-        private readonly int _sample_N_Per_3_Secs = AgentConfig.SamplePer3Secs;
-        private readonly bool _sample_on = AgentConfig.SamplePer3Secs > 0;
+        public static DefaultSampler Instance { get; } = new DefaultSampler();
+        
+        private readonly AtomicInteger _idx = new AtomicInteger();
+        
+        private int _samplePer3Secs;
+        private bool _sample_on;
 
         public bool Sampled()
         {
@@ -39,27 +37,27 @@ namespace SkyWalking.Sampling
                 return true;
             }
 
-            return _atomicInteger.Increment() < _sample_N_Per_3_Secs;
+            return _idx.Increment() < _samplePer3Secs;
         }
 
         public void ForceSampled()
         {
             if (_sample_on)
             {
-                _atomicInteger.Increment();
+                _idx.Increment();
             }
         }
 
-        protected override TimeSpan Interval { get; } = TimeSpan.FromSeconds(3);
-        
-        protected override Task Execute(CancellationToken token)
+        [MethodImpl(MethodImplOptions.Synchronized)]
+        internal void SetSamplePer3Secs(int samplePer3Secs)
         {
-            if (_sample_on)
-            {
-                _atomicInteger.Value = 0;
-            }
+            _samplePer3Secs = samplePer3Secs;
+            _sample_on = samplePer3Secs > -1;
+        }
 
-            return TaskUtils.CompletedTask;
+        internal void Reset()
+        {
+            _idx.Value = 0;
         }
     }
 }

@@ -16,7 +16,6 @@
  *
  */
 
-using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -24,7 +23,6 @@ using SkyWalking.Boot;
 using SkyWalking.Config;
 using SkyWalking.Context.Trace;
 using SkyWalking.Sampling;
-using SkyWalking.Utils;
 
 namespace SkyWalking.Context
 {

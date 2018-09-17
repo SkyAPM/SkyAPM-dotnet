@@ -22,7 +22,6 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using SkyWalking.Boot;
 using SkyWalking.Context.Trace;
-using SkyWalking.Dictionarys;
 using SkyWalking.Sampling;
 using SkyWalking.Utils;
 
@@ -62,7 +61,7 @@ namespace SkyWalking.Context
             carrier.SpanId = span.SpanId;
             carrier.ParentApplicationInstanceId = _segment.ApplicationInstanceId;
 
-            if (DictionaryUtil.IsNull(peerId))
+            if (peerId == 0)
             {
                 carrier.PeerHost = peer;
             }
@@ -78,7 +77,7 @@ namespace SkyWalking.Context
 
             carrier.EntryApplicationInstanceId = metaValue.entryApplicationInstanceId;
 
-            if (DictionaryUtil.IsNull(metaValue.operationId))
+            if (metaValue.operationId == 0)
             {
                 carrier.EntryOperationName = metaValue.operationName;
             }
@@ -88,7 +87,7 @@ namespace SkyWalking.Context
             }
 
             var parentOperationId = firstSpan.OperationId;
-            if (DictionaryUtil.IsNull(parentOperationId))
+            if (parentOperationId == 0)
             {
                 carrier.ParentOperationName = firstSpan.OperationName;
             }
@@ -283,7 +282,7 @@ namespace SkyWalking.Context
 
             snapshot.EntryApplicationInstanceId = metaValue.entryApplicationInstanceId;
 
-            if (DictionaryUtil.IsNull(metaValue.operationId))
+            if (metaValue.operationId == 0)
             {
                 snapshot.EntryOperationName = metaValue.operationName;
             }
@@ -294,7 +293,7 @@ namespace SkyWalking.Context
 
             var parentSpan = _activeSpanStacks.Last();
 
-            if (DictionaryUtil.IsNull(parentSpan.OperationId))
+            if (parentSpan.OperationId == 0)
             {
                 snapshot.ParentOperationName = parentSpan.OperationName;
             }

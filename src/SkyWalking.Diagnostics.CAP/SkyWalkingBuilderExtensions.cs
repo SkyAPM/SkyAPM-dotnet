@@ -31,7 +31,7 @@ namespace SkyWalking.Diagnostics.CAP
                 throw new ArgumentNullException(nameof(builder));
             }
 
-            builder.Services.AddSingleton<IDiagnosticProcessor, CapDiagnosticProcessor>();
+            builder.Services.AddSingleton<ITracingDiagnosticProcessor, CapTracingDiagnosticProcessor>();
             
             return builder;
         }

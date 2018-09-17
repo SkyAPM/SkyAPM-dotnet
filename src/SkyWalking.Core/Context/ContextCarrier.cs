@@ -19,7 +19,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using SkyWalking.Context.Ids;
-using SkyWalking.Dictionarys;
 
 namespace SkyWalking.Context
 {
@@ -35,12 +34,12 @@ namespace SkyWalking.Context
         /// <summary>
         /// id of parent application instance
         /// </summary>
-        private int _parentApplicationInstanceId = DictionaryUtil.NullValue;
+        private int _parentApplicationInstanceId = 0;
 
         /// <summary>
         /// id of first application instance in this distributed trace
         /// </summary>
-        private int _entryApplicationInstanceId = DictionaryUtil.NullValue;
+        private int _entryApplicationInstanceId = 0;
 
         /// <summary>
         /// peer(ipv4/ipv6/hostname + port) of the server , from client side .
@@ -135,8 +134,8 @@ namespace SkyWalking.Context
                 return _traceSegmentId != null
                        && _traceSegmentId.IsValid
                        && _spanId > -1
-                       && _parentApplicationInstanceId != DictionaryUtil.NullValue
-                       && _entryApplicationInstanceId != DictionaryUtil.NullValue
+                       && _parentApplicationInstanceId != 0
+                       && _entryApplicationInstanceId != 0
                        && !string.IsNullOrEmpty(_peerHost)
                        && !string.IsNullOrEmpty(_parentOperationName)
                        && !string.IsNullOrEmpty(_entryOperationName)
