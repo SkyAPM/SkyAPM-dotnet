@@ -32,7 +32,7 @@ namespace SkyWalking.Service
             IRuntimeEnvironment runtimeEnvironment, IInstrumentationLoggerFactory loggerFactory)
             : base(instrumentation, runtimeEnvironment, loggerFactory)
         {
-            _config =  configAccessor.Get<SamplingConfig>();
+            _config = configAccessor.Get<SamplingConfig>();
             DefaultSampler.Instance.SetSamplePer3Secs(_config.SamplePer3Secs);
         }
 

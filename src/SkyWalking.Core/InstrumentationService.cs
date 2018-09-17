@@ -21,22 +21,22 @@ using System.Threading;
 using System.Threading.Tasks;
 using SkyWalking.Logging;
 
-namespace SkyWalking.Service
+namespace SkyWalking
 {
-    public abstract class InstrumentationService : IInstrumentationService
+    public abstract class InstrumentationService : IInstrumentationService, IDisposable
     {
         private Timer _timer;
         private CancellationTokenSource _cancellationTokenSource;
-        
-        protected readonly IInstrumentationLogger _logger;
-        protected readonly IRuntimeEnvironment _runtimeEnvironment;
-        protected readonly IInstrumentationClient _instrumentation;
+
+        protected readonly IInstrumentationLogger Logger;
+        protected readonly IRuntimeEnvironment RuntimeEnvironment;
+        protected readonly IInstrumentationClient Instrumentation;
 
         protected InstrumentationService(IInstrumentationClient instrumentation, IRuntimeEnvironment runtimeEnvironment, IInstrumentationLoggerFactory loggerFactory)
         {
-            _instrumentation = instrumentation;
-            _runtimeEnvironment = runtimeEnvironment;
-            _logger = loggerFactory.CreateLogger(GetType());
+            Instrumentation = instrumentation;
+            RuntimeEnvironment = runtimeEnvironment;
+            Logger = loggerFactory.CreateLogger(GetType());
         }
 
         public Task StartAsync(CancellationToken cancellationToken = default(CancellationToken))
@@ -44,17 +44,17 @@ namespace SkyWalking.Service
             _cancellationTokenSource = new CancellationTokenSource();
             var source = CancellationTokenSource.CreateLinkedTokenSource(_cancellationTokenSource.Token, cancellationToken);
             _timer = new Timer(Callback, source, DueTime, Period);
-            _logger.Debug($"Start {GetType().Name}.");
+            Logger.Debug($"Start {GetType().Name}.");
             return Task.CompletedTask;
         }
 
         public Task StopAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
             _cancellationTokenSource?.Cancel();
-            _logger.Debug($"Stop {GetType().Name}.");
+            Logger.Debug($"Stop {GetType().Name}.");
             return Task.CompletedTask;
         }
-        
+
         public void Dispose()
         {
             _timer?.Dispose();
@@ -67,13 +67,13 @@ namespace SkyWalking.Service
                 await ExecuteAsync(token.Token);
             }
         }
-        
-        protected virtual bool CanExecute() => _runtimeEnvironment.Initialized;
+
+        protected virtual bool CanExecute() => RuntimeEnvironment.Initialized;
 
         protected abstract TimeSpan DueTime { get; }
 
         protected abstract TimeSpan Period { get; }
 
-        protected abstract Task ExecuteAsync(CancellationToken cancellationToken);    
+        protected abstract Task ExecuteAsync(CancellationToken cancellationToken);
     }
 }

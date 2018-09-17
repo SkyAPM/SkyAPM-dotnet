@@ -53,10 +53,10 @@ namespace SkyWalking.Service
 
         private async Task RegisterApplication(CancellationToken cancellationToken)
         {
-            if (!_runtimeEnvironment.ApplicationId.HasValue)
+            if (!RuntimeEnvironment.ApplicationId.HasValue)
             {
-                var value = await Polling(3, () => _instrumentation.RegisterApplicationAsync(_config.ApplicationCode, cancellationToken), cancellationToken);
-                if (value.HasValue && _runtimeEnvironment is RuntimeEnvironment environment)
+                var value = await Polling(3, () => Instrumentation.RegisterApplicationAsync(_config.ApplicationCode, cancellationToken), cancellationToken);
+                if (value.HasValue && RuntimeEnvironment is RuntimeEnvironment environment)
                 {
                     environment.ApplicationId = value;
                 }
@@ -65,7 +65,7 @@ namespace SkyWalking.Service
 
         private async Task RegisterApplicationInstance(CancellationToken cancellationToken)
         {
-            if (_runtimeEnvironment.ApplicationId.HasValue && !_runtimeEnvironment.ApplicationInstanceId.HasValue)
+            if (RuntimeEnvironment.ApplicationId.HasValue && !RuntimeEnvironment.ApplicationInstanceId.HasValue)
             {
                 var osInfoRequest = new AgentOsInfoRequest
                 {
@@ -75,9 +75,9 @@ namespace SkyWalking.Service
                     ProcessNo = Process.GetCurrentProcess().Id
                 };
                 var value = await Polling(3,
-                    () => _instrumentation.RegisterApplicationInstanceAsync(_runtimeEnvironment.ApplicationId.Value, _runtimeEnvironment.AgentUUID,
+                    () => Instrumentation.RegisterApplicationInstanceAsync(RuntimeEnvironment.ApplicationId.Value, RuntimeEnvironment.AgentUUID,
                         DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(), osInfoRequest, cancellationToken), cancellationToken);
-                if (value.HasValue && _runtimeEnvironment is RuntimeEnvironment environment)
+                if (value.HasValue && RuntimeEnvironment is RuntimeEnvironment environment)
                 {
                     environment.ApplicationInstanceId = value;
                 }
@@ -103,15 +103,15 @@ namespace SkyWalking.Service
 
         private async Task Heartbeat(CancellationToken cancellationToken)
         {
-            if (_runtimeEnvironment.Initialized)
+            if (RuntimeEnvironment.Initialized)
             {
                 try
                 {
-                    await _instrumentation.HeartbeatAsync(_runtimeEnvironment.ApplicationInstanceId.Value, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(), cancellationToken);
+                    await Instrumentation.HeartbeatAsync(RuntimeEnvironment.ApplicationInstanceId.Value, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(), cancellationToken);
                 }
                 catch (Exception e)
                 {
-                    _logger.Error("Heartbeat error.", e);
+                    Logger.Error("Heartbeat error.", e);
                 }
             }
         }

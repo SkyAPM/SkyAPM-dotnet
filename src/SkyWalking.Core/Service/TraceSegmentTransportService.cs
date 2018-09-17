@@ -2,7 +2,7 @@
  * Licensed to the OpenSkywalking under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
- * The OpenSkywalking licenses this file to You under the Apache License, Version 2.0
+ * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
  *
@@ -16,15 +16,10 @@
  *
  */
 
-using System.Threading;
-using System.Threading.Tasks;
-
-namespace SkyWalking
+namespace SkyWalking.Service
 {
-    public interface IInstrumentationService
+    public class TraceSegmentTransportService
     {
-        Task StartAsync(CancellationToken cancellationToken = default(CancellationToken));
-
-        Task StopAsync(CancellationToken cancellationToken = default(CancellationToken));
+        
     }
 }
