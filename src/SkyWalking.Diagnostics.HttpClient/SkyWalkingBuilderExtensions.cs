@@ -24,16 +24,16 @@ namespace SkyWalking.Diagnostics.HttpClient
 {
     public static class SkyWalkingBuilderExtensions
     {
-        public static SkyWalkingBuilder AddHttpClient(this SkyWalkingBuilder builder)
+        public static SkyWalkingExtensions AddHttpClient(this SkyWalkingExtensions extensions)
         {
-            if (builder == null)
+            if (extensions == null)
             {
-                throw new ArgumentNullException(nameof(builder));
+                throw new ArgumentNullException(nameof(extensions));
             }
 
-            builder.Services.AddSingleton<ITracingDiagnosticProcessor, HttpClientTracingDiagnosticProcessor>();
+            extensions.Services.AddSingleton<ITracingDiagnosticProcessor, HttpClientTracingDiagnosticProcessor>();
             
-            return builder;
+            return extensions;
         }
     }
 }

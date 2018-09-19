@@ -27,7 +27,7 @@ namespace SkyWalking.AspNetCore
 {
     public static class ServiceCollectionExtensions
     {
-        public static SkyWalkingBuilder AddSkyWalking(this IServiceCollection services,
+        public static SkyWalkingExtensions AddSkyWalking(this IServiceCollection services,
             Action<SkyWalkingOptions> options)
         {
             if (options == null)
@@ -38,20 +38,20 @@ namespace SkyWalking.AspNetCore
             return services.Configure(options).AddSkyWalkingCore();
         }
 
-        public static SkyWalkingBuilder AddSkyWalking(this IServiceCollection services,
+        public static SkyWalkingExtensions AddSkyWalking(this IServiceCollection services,
             IConfiguration configuration)
         {
             return services.Configure<SkyWalkingOptions>(configuration).AddSkyWalkingCore();
         }
 
-        private static SkyWalkingBuilder AddSkyWalkingCore(this IServiceCollection services)
+        private static SkyWalkingExtensions AddSkyWalkingCore(this IServiceCollection services)
         {
             if (services == null)
             {
                 throw new ArgumentNullException(nameof(services));
             }
 
-            var builder = new SkyWalkingBuilder(services);
+            var builder = new SkyWalkingExtensions(services);
 
             builder.AddHosting().AddDiagnostics().AddHttpClient().AddSqlClient();
 

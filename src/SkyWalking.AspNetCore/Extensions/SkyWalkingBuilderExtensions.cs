@@ -28,18 +28,18 @@ namespace SkyWalking.AspNetCore
 {
     internal static class SkyWalkingBuilderExtensions
     {
-        public static SkyWalkingBuilder AddHosting(this SkyWalkingBuilder builder)
-        {   
-            builder.Services.AddSingleton<IHostedService, SkyWalkingHostedService>();
-            builder.Services.AddSingleton<ITracingDiagnosticProcessor, HostingTracingDiagnosticProcessor>();
-            builder.Services.AddSingleton<IInstrumentationLoggerFactory, InstrumentationLoggerFactoryAdapter>();
-            return builder;
+        public static SkyWalkingExtensions AddHosting(this SkyWalkingExtensions extensions)
+        {
+            extensions.Services.AddSingleton<IHostedService, InstrumentationHostedService>();
+            extensions.Services.AddSingleton<ITracingDiagnosticProcessor, HostingTracingDiagnosticProcessor>();
+            extensions.Services.AddSingleton<IInstrumentationLoggerFactory, InstrumentationLoggerFactoryAdapter>();
+            return extensions;
         }
 
-        public static SkyWalkingBuilder AddDiagnostics(this SkyWalkingBuilder builder)
+        public static SkyWalkingExtensions AddDiagnostics(this SkyWalkingExtensions extensions)
         {
-            builder.Services.AddSingleton<TracingDiagnosticProcessorObserver>();
-            return builder;
+            extensions.Services.AddSingleton<TracingDiagnosticProcessorObserver>();
+            return extensions;
         }
     }
 }

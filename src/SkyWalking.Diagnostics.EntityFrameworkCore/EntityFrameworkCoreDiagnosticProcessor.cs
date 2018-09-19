@@ -19,11 +19,9 @@
 using System;
 using System.Data.Common;
 using System.Linq;
-using System.Runtime.InteropServices.ComTypes;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Storage.Internal;
-using SkyWalking.Config;
 using SkyWalking.Context;
 using SkyWalking.Context.Tag;
 using SkyWalking.Context.Trace;

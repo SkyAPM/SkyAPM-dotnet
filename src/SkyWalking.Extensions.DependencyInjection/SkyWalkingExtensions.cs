@@ -20,11 +20,11 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace SkyWalking.Extensions.DependencyInjection
 {
-    public class SkyWalkingBuilder
+    public class SkyWalkingExtensions
     {
         public IServiceCollection Services { get; }
 
-        public SkyWalkingBuilder(IServiceCollection services)
+        public SkyWalkingExtensions(IServiceCollection services)
         {
             Services = services;
         }

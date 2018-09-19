@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Licensed to the OpenSkywalking under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -16,24 +16,29 @@
  *
  */
 
-using System;
-using Microsoft.Extensions.DependencyInjection;
-using SkyWalking.Extensions.DependencyInjection;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Hosting;
 
-namespace SkyWalking.Diagnostics.SqlClient
+namespace SkyWalking.AspNetCore
 {
-    public static class SkyWalkingBuilderExtensions
+    public class InstrumentationHostedService : IHostedService
     {
-        public static SkyWalkingExtensions AddSqlClient(this SkyWalkingExtensions extensions)
-        {
-            if (extensions == null)
-            {
-                throw new ArgumentNullException(nameof(extensions));
-            }
+        private readonly IInstrumentationServiceStartup _startup;
 
-            extensions.Services.AddSingleton<ITracingDiagnosticProcessor, SqlClientTracingDiagnosticProcessor>();
-            
-            return extensions;
+        public InstrumentationHostedService(IInstrumentationServiceStartup startup)
+        {
+            _startup = startup;
+        }
+
+        public Task StartAsync(CancellationToken cancellationToken)
+        {
+            return _startup.StartAsync(cancellationToken);
+        }
+
+        public Task StopAsync(CancellationToken cancellationToken)
+        {
+            return _startup.StopAsync(cancellationToken);
         }
     }
 }

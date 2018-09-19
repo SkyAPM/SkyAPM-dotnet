@@ -24,16 +24,16 @@ namespace SkyWalking.Diagnostics.CAP
 {
     public static class SkyWalkingBuilderExtensions
     {
-        public static SkyWalkingBuilder AddCap(this SkyWalkingBuilder builder)
+        public static SkyWalkingExtensions AddCap(this SkyWalkingExtensions extensions)
         {
-            if (builder == null)
+            if (extensions == null)
             {
-                throw new ArgumentNullException(nameof(builder));
+                throw new ArgumentNullException(nameof(extensions));
             }
 
-            builder.Services.AddSingleton<ITracingDiagnosticProcessor, CapTracingDiagnosticProcessor>();
+            extensions.Services.AddSingleton<ITracingDiagnosticProcessor, CapTracingDiagnosticProcessor>();
             
-            return builder;
+            return extensions;
         }
     }
 }
