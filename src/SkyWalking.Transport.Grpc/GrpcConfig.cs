@@ -2,7 +2,7 @@
  * Licensed to the OpenSkywalking under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
- * The OpenSkywalking licenses this file to You under the Apache License, Version 2.0
+ * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
  *
@@ -16,11 +16,26 @@
  *
  */
 
-namespace SkyWalking.Config
+using System;
+using SkyWalking.Config;
+
+namespace SkyWalking.Transport.Grpc
 {
-    [Config("SkyWalking", "Sampling")]
-    public class SamplingConfig
+    [Config("SkyWalking", "Transport","gRPC")]
+    public class GrpcConfig
     {
-        public int SamplePer3Secs { get; set; } = -1;
+        public string[] Servers { get; set; }
+        
+        public int ConnectTimeout { get; set; }
+        
+        public int Timeout { get; set; }
+    }
+
+    public static class GrpcConfigExtensions
+    {
+        public static DateTime GetTimeout(this GrpcConfig config)
+        {
+            return DateTime.UtcNow.AddMilliseconds(config.Timeout);
+        }
     }
 }

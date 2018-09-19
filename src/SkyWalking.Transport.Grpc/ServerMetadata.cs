@@ -2,7 +2,7 @@
  * Licensed to the OpenSkywalking under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
- * The OpenSkywalking licenses this file to You under the Apache License, Version 2.0
+ * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
  *
@@ -16,21 +16,21 @@
  *
  */
 
-namespace SkyWalking.Config
+namespace SkyWalking.Transport.Grpc
 {
-    [Config("SkyWalking", "Transport")]
-    public class TransportConfig
+    public struct ServerMetadata
     {
-        public int PendingSegmentLimit { get; set; } = 30000;
-        
-        /// <summary>
-        /// Flush Interval Millisecond
-        /// </summary>
-        public int Interval { get; set; } = 3000;
+        public string Address { get; }
 
-        /// <summary>
-        /// Data queued beyond this time will be discarded.
-        /// </summary>
-        public int PendingSegmentTimeout { get; set; } = 1000;
-    }
+        public string Token { get; }
+
+        public string CertificatePath { get; }
+
+        public ServerMetadata(string address, string certificate, string token)
+        {
+            Address = address;
+            CertificatePath = certificate;
+            Token = token;
+        }
+    } 
 }
