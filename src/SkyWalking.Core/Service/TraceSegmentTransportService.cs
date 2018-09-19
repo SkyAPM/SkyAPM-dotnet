@@ -38,16 +38,16 @@ namespace SkyWalking.Service
         {
             _dispatcher = dispatcher;
             _config = configAccessor.Get<TransportConfig>();
-            Period = TimeSpan.FromSeconds(_config.Interval);
+            Period = TimeSpan.FromMilliseconds(_config.Interval);
         }
 
-        protected override TimeSpan DueTime { get; } = TimeSpan.FromSeconds(5);
+        protected override TimeSpan DueTime { get; } = TimeSpan.FromSeconds(3);
 
         protected override TimeSpan Period { get; }
 
-        protected override async Task ExecuteAsync(CancellationToken cancellationToken)
+        protected override Task ExecuteAsync(CancellationToken cancellationToken)
         {
-            await _dispatcher.Flush(cancellationToken);
+            return _dispatcher.Flush(cancellationToken);
         }
 
         public void AfterFinished(ITraceSegment traceSegment)

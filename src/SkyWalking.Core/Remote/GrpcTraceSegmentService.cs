@@ -65,7 +65,7 @@
 //                return;
 //            }
 //
-//            if (_traceSegments.Count >= AgentConfig.PendingSegmentsLimit && AgentConfig.PendingSegmentsLimit > 0)
+//            if (_traceSegments.Count >= AgentConfig.PendingSegmentLimit && AgentConfig.PendingSegmentLimit > 0)
 //            {
 //                _traceSegments.TryDequeue(out var v);
 //            }

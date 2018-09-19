@@ -17,6 +17,7 @@
  */
 
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using SkyWalking.Config;
@@ -30,47 +31,40 @@ namespace SkyWalking.Transport
         private readonly IInstrumentationClient _instrumentationClient;
         private readonly ConcurrentQueue<TraceSegmentRequest> _segmentQueue;
         private readonly Task _consumer;
-        private readonly CancellationTokenSource _consumerCancellation;
+        private readonly int _queueTimeout;
 
         public BlockingTraceDispatcher(IConfigAccessor configAccessor, IInstrumentationClient client)
         {
             _config = configAccessor.Get<TransportConfig>();
             _instrumentationClient = client;
-            _limitCollection = new BlockingCollection<TraceSegmentRequest>(_config.PendingSegmentsLimit);
             _segmentQueue = new ConcurrentQueue<TraceSegmentRequest>();
-            _consumerCancellation = new CancellationTokenSource();
-            _consumer = Task.Factory.StartNew(
-                Consumer, _consumerCancellation.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+            _limitCollection = new BlockingCollection<TraceSegmentRequest>(_segmentQueue, _config.PendingSegmentLimit);
+            _queueTimeout = _config.PendingSegmentTimeout;
         }
 
         public bool Dispatch(TraceSegmentRequest segment)
         {
-            if (_limitCollection.IsAddingCompleted)
-            {
-                return false;
-            }
-
-            _limitCollection.Add(segment);
-            return true;
+            return !_limitCollection.IsAddingCompleted && _limitCollection.TryAdd(segment, _queueTimeout);
         }
 
         public Task Flush(CancellationToken token = default(CancellationToken))
         {
-            throw new System.NotImplementedException();
+            var limit = _config.PendingSegmentLimit;
+            var index = 0;
+            var segments = new List<TraceSegmentRequest>(limit);
+            while (index++ < limit && _segmentQueue.TryDequeue(out var request))
+            {
+                segments.Add(request);
+            }
+
+            // send async
+            _instrumentationClient.CollectAsync(segments, token);
+            return Task.CompletedTask;
         }
 
         public void Close()
         {
             _limitCollection.CompleteAdding();
-            _consumerCancellation.Cancel();
-        }
-
-        private void Consumer()
-        {
-            foreach (var consumingItem in _limitCollection.GetConsumingEnumerable(_consumerCancellation.Token))
-            {
-                _segmentQueue.Enqueue(consumingItem);
-            }
         }
     }
 }
