@@ -34,7 +34,7 @@
 //{
 //    public class GrpcTraceSegmentService : TimerService, ITracingContextListener
 //    {
-//        private static readonly IInstrumentationLogger InstrumentationLogger = LogManager.GetLogger<GrpcTraceSegmentService>();
+//        private static readonly ILogger Logger = LogManager.GetLogger<GrpcTraceSegmentService>();
 //        private static readonly ConcurrentQueue<ITraceSegment> _traceSegments
 //            = new ConcurrentQueue<ITraceSegment>();
 //
@@ -85,7 +85,7 @@
 //            var availableConnection = GrpcConnectionManager.Instance.GetAvailableConnection();
 //            if (availableConnection == null)
 //            {
-//                InstrumentationLogger.Warning(
+//                Logger.Warning(
 //                    $"Transform and send UpstreamSegment to collector fail. {GrpcConnectionManager.NotFoundErrorMessage}");
 //                return;
 //            }
@@ -99,7 +99,7 @@
 //                    while (_traceSegments.TryDequeue(out var segment))
 //                    {
 //                        await asyncClientStreamingCall.RequestStream.WriteAsync(segment.Transform());
-//                        InstrumentationLogger.Debug(
+//                        Logger.Debug(
 //                            $"Transform and send UpstreamSegment to collector. [TraceSegmentId] = {segment.TraceSegmentId} [GlobalTraceId] = {segment.RelatedGlobalTraces.FirstOrDefault()}");
 //                    }
 //                    await asyncClientStreamingCall.RequestStream.CompleteAsync();
@@ -108,7 +108,7 @@
 //            }
 //            catch (Exception e)
 //            {
-//                InstrumentationLogger.Warning($"Transform and send UpstreamSegment to collector fail. {e.Message}");
+//                Logger.Warning($"Transform and send UpstreamSegment to collector fail. {e.Message}");
 //                availableConnection?.Failure();
 //                return;
 //            }

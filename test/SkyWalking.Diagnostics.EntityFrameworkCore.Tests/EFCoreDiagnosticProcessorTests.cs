@@ -4,6 +4,7 @@ using System.Diagnostics;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using SkyWalking.Diagnostics.EntityFrameworkCore.Tests.Fakes;
+using SkyWalking.Logging;
 using Xunit;
 
 namespace SkyWalking.Diagnostics.EntityFrameworkCore.Tests
@@ -22,7 +23,7 @@ namespace SkyWalking.Diagnostics.EntityFrameworkCore.Tests
             _options = new DbContextOptionsBuilder<FakeDbContext>()
                 .UseSqlite(connection)
                 .Options;
-            
+
             using (var dbContext = new FakeDbContext(_options))
             {
                 dbContext.Database.EnsureCreated();
@@ -59,7 +60,7 @@ namespace SkyWalking.Diagnostics.EntityFrameworkCore.Tests
             var processorObserver = new TracingDiagnosticProcessorObserver(new[]
             {
                 new EntityFrameworkCoreTracingDiagnosticProcessor(new EfCoreSpanFactory(new List<IEfCoreSpanMetadataProvider>()))
-            });
+            }, new NullLoggerFactory());
 
             DiagnosticListener.AllListeners.Subscribe(processorObserver);
 
@@ -77,6 +78,7 @@ namespace SkyWalking.Diagnostics.EntityFrameworkCore.Tests
                 {
                     // ignored
                 }
+
                 Assert.Equal(1, tracerContextListener.Counter);
             }
         }

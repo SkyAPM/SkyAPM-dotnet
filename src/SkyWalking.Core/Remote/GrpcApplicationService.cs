@@ -36,7 +36,7 @@
 //{
 //    public class GrpcApplicationService : TimerService
 //    {
-//        private static readonly IInstrumentationLogger InstrumentationLogger = LogManager.GetLogger<GrpcApplicationService>();
+//        private static readonly ILogger Logger = LogManager.GetLogger<GrpcApplicationService>();
 //        public override int Order { get; } = -1;
 //
 //        protected override TimeSpan Interval { get; } = TimeSpan.FromSeconds(15);
@@ -73,7 +73,7 @@
 //            }
 //            catch (Exception exception)
 //            {
-//                InstrumentationLogger.Warning($"Register application fail. {exception.Message}");
+//                Logger.Warning($"Register application fail. {exception.Message}");
 //                availableConnection.Failure();
 //            }
 //        }
@@ -101,12 +101,12 @@
 //
 //                if (DictionaryUtil.IsNull(applicationId))
 //                {
-//                    InstrumentationLogger.Warning(
+//                    Logger.Warning(
 //                        "Register application fail. Server response null.");
 //                    return;
 //                }
 //
-//                InstrumentationLogger.Info(
+//                Logger.Information(
 //                    $"Register application success. [applicationCode] = {application.ApplicationCode}. [applicationId] = {applicationId}");
 //                RemoteDownstreamConfig.Agent.ApplicationId = applicationId;
 //            }
@@ -158,12 +158,12 @@
 //                if (!DictionaryUtil.IsNull(applicationInstanceId))
 //                {
 //                    RemoteDownstreamConfig.Agent.ApplicationInstanceId = applicationInstanceId;
-//                    InstrumentationLogger.Info(
+//                    Logger.Information(
 //                        $"Register application instance success. [applicationInstanceId] = {applicationInstanceId}");
 //                }
 //                else
 //                {
-//                    InstrumentationLogger.Warning(
+//                    Logger.Warning(
 //                        "Register application instance fail. Server response null.");
 //                }
 //            }
@@ -182,7 +182,7 @@
 //            }
 //            catch (Exception e)
 //            {
-//                InstrumentationLogger.Warning($"Get host addresses fail. {e.Message}");
+//                Logger.Warning($"Get host addresses fail. {e.Message}");
 //                return new string[0];
 //            }
 //        }

@@ -29,7 +29,7 @@ namespace SkyWalking.Service
         private readonly SamplingConfig _config;
 
         public SamplingRefreshService(IConfigAccessor configAccessor, IInstrumentationClient instrumentation,
-            IRuntimeEnvironment runtimeEnvironment, IInstrumentationLoggerFactory loggerFactory)
+            IRuntimeEnvironment runtimeEnvironment, ILoggerFactory loggerFactory)
             : base(instrumentation, runtimeEnvironment, loggerFactory)
         {
             _config = configAccessor.Get<SamplingConfig>();

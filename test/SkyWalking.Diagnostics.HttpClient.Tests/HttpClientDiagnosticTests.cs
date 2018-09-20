@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Threading.Tasks;
 using SkyWalking.Config;
+using SkyWalking.Logging;
 using Xunit;
 
 namespace SkyWalking.Diagnostics.HttpClient.Tests
@@ -35,12 +36,12 @@ namespace SkyWalking.Diagnostics.HttpClient.Tests
         {
             AgentConfig.ApplicationCode = "HttpClientDiagnosticTests";
             CollectorConfig.DirectServers = "HttpClientDiagnosticTests.xx:50000";
-            
+
             var httpClientDiagnosticProcessor = new HttpClientTracingDiagnosticProcessor();
-            
+
             var observer = new TracingDiagnosticProcessorObserver(new ITracingDiagnosticProcessor[]
-                {httpClientDiagnosticProcessor});
-            
+                {httpClientDiagnosticProcessor}, new NullLoggerFactory());
+
             DiagnosticListener.AllListeners.Subscribe(observer);
 
             using (var tracerContextListener = new FakeIgnoreTracerContextListener())
@@ -53,7 +54,7 @@ namespace SkyWalking.Diagnostics.HttpClient.Tests
                 catch (Exception e)
                 {
                 }
-              
+
                 Assert.Equal(1, tracerContextListener.Counter);
             }
         }

@@ -17,28 +17,21 @@
  */
 
 using System;
+using System.Diagnostics;
+using SkyWalking.Logging;
 
-namespace SkyWalking.Logging
+namespace SkyWalking.AspNet.Logging
 {
-    public static class LogManager
+    internal class DebugLoggerFactoryAdapter : ILoggerFactory
     {
-        private static readonly IInstrumentationLoggerFactory DefaultInstrumentationLoggerFactory = new NullInstrumentationLoggerFactory();
-        private static IInstrumentationLoggerFactory _instrumentationLoggerFactory;
-
-        public static IInstrumentationLogger GetLogger(Type type)
+        public DebugLoggerFactoryAdapter()
         {
-            var loggerFactory = _instrumentationLoggerFactory ?? DefaultInstrumentationLoggerFactory;
-            return loggerFactory.CreateLogger(type);
+            Debug.Listeners.Add(new TextWriterTraceListener(Console.Out));
         }
 
-        public static IInstrumentationLogger GetLogger<T>()
+        public ILogger CreateLogger(Type type)
         {
-            return GetLogger(typeof(T));
-        }
-
-        public static void SetLoggerFactory(IInstrumentationLoggerFactory instrumentationLoggerFactory)
-        {
-            _instrumentationLoggerFactory = instrumentationLoggerFactory;
+            return new DebugLoggerAdapter(type);
         }
     }
 }

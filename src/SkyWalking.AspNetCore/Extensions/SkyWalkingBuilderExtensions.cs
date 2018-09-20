@@ -32,7 +32,7 @@ namespace SkyWalking.AspNetCore
         {
             extensions.Services.AddSingleton<IHostedService, InstrumentationHostedService>();
             extensions.Services.AddSingleton<ITracingDiagnosticProcessor, HostingTracingDiagnosticProcessor>();
-            extensions.Services.AddSingleton<IInstrumentationLoggerFactory, InstrumentationLoggerFactoryAdapter>();
+            extensions.Services.AddSingleton<ILoggerFactory, LoggerFactoryAdapter>();
             return extensions;
         }
 

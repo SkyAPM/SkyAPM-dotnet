@@ -32,10 +32,10 @@
 //    public class SkyWalkingHostedService : IHostedService
 //    {
 //        private readonly TracingDiagnosticProcessorObserver _diagnosticObserver;
-//        private readonly IInstrumentationLogger _instrumentationLogger;
+//        private readonly ILogger _instrumentationLogger;
 //
 //        public SkyWalkingHostedService(IOptions<SkyWalkingOptions> options, IHostingEnvironment hostingEnvironment,
-//            TracingDiagnosticProcessorObserver diagnosticObserver, IInstrumentationLoggerFactory instrumentationLoggerFactory)
+//            TracingDiagnosticProcessorObserver diagnosticObserver, ILoggerFactory loggerFactory)
 //        {
 //
 //            if (string.IsNullOrEmpty(options.Value.DirectServers))
@@ -48,7 +48,7 @@
 //                options.Value.ApplicationCode = hostingEnvironment.ApplicationName;
 //            }
 //
-//            LogManager.SetLoggerFactory(instrumentationLoggerFactory);
+//            LogManager.SetLoggerFactory(loggerFactory);
 //            AgentConfig.ApplicationCode = options.Value.ApplicationCode;
 //            CollectorConfig.DirectServers = options.Value.DirectServers;
 //            AgentConfig.SamplePer3Secs = options.Value.SamplePer3Secs;
@@ -61,13 +61,13 @@
 //
 //        public async Task StartAsync(CancellationToken cancellationToken)
 //        {
-//            _instrumentationLogger.Info("SkyWalking Agent starting...");
+//            _instrumentationLogger.Information("SkyWalking Agent starting...");
 //            try
 //            {
 //                DiagnosticListener.AllListeners.Subscribe(_diagnosticObserver);
 //                await GrpcConnectionManager.Instance.ConnectAsync(TimeSpan.FromSeconds(3));
 //                await ServiceManager.Instance.Initialize();
-//                _instrumentationLogger.Info("SkyWalking Agent started.");
+//                _instrumentationLogger.Information("SkyWalking Agent started.");
 //            }
 //            catch (Exception e)
 //            {
@@ -77,12 +77,12 @@
 //
 //        public async Task StopAsync(CancellationToken cancellationToken)
 //        {
-//            _instrumentationLogger.Info("SkyWalking Agent stopping...");
+//            _instrumentationLogger.Information("SkyWalking Agent stopping...");
 //            try
 //            {
 //                ServiceManager.Instance.Dispose();
 //                await GrpcConnectionManager.Instance.ShutdownAsync();
-//                _instrumentationLogger.Info("SkyWalking Agent stopped.");
+//                _instrumentationLogger.Information("SkyWalking Agent stopped.");
 //            }
 //            catch (Exception e)
 //            {

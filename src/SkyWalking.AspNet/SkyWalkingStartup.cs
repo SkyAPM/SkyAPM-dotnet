@@ -33,7 +33,7 @@ namespace SkyWalking.AspNet
         public void Start()
         {
             LoadConfigurationSetting();
-            LogManager.SetLoggerFactory(new DebugInstrumentationLoggerFactoryAdapter());
+            LogManager.SetLoggerFactory(new DebugLoggerFactoryAdapter());
             AsyncContext.Run(async () => await StartAsync());
         }
 

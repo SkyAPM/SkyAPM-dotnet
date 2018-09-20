@@ -27,7 +27,7 @@
 //{
 //    public class GrpcConnectionManager
 //    {
-//        private static readonly IInstrumentationLogger InstrumentationLogger = LogManager.GetLogger<GrpcConnectionManager>();
+//        private static readonly ILogger Logger = LogManager.GetLogger<GrpcConnectionManager>();
 //
 //        public const string NotFoundErrorMessage = "Not found available connection.";
 //
@@ -74,7 +74,7 @@
 //            var connection = _connection;
 //            if (connection == null || connection.State != GrpcConnectionState.Ready)
 //            {
-//                InstrumentationLogger.Debug(NotFoundErrorMessage);
+//                Logger.Debug(NotFoundErrorMessage);
 //                return null;
 //            }
 //

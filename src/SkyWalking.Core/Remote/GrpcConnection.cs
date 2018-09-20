@@ -25,7 +25,7 @@
 //{
 //    public class GrpcConnection
 //    {
-//        private static readonly IInstrumentationLogger InstrumentationLogger = LogManager.GetLogger<GrpcConnection>();
+//        private static readonly ILogger Logger = LogManager.GetLogger<GrpcConnection>();
 //
 //        public Channel GrpcChannel { get; }
 //
@@ -55,17 +55,17 @@
 //                var deadLine = DateTime.UtcNow.AddSeconds(timeout.TotalSeconds);
 //                await GrpcChannel.ConnectAsync(deadLine);
 //                State = GrpcConnectionState.Ready;
-//                InstrumentationLogger.Info($"Grpc channel connect success. [Server] = {GrpcChannel.Target}");
+//                Logger.Information($"Grpc channel connect success. [Server] = {GrpcChannel.Target}");
 //            }
 //            catch (TaskCanceledException ex)
 //            {
 //                State = GrpcConnectionState.Failure;
-//                InstrumentationLogger.Warning($"Grpc channel connect timeout. {ex.Message}");
+//                Logger.Warning($"Grpc channel connect timeout. {ex.Message}");
 //            }
 //            catch (Exception ex)
 //            {
 //                State = GrpcConnectionState.Failure;
-//                InstrumentationLogger.Warning($"Grpc channel connect fail. {ex.Message}");
+//                Logger.Warning($"Grpc channel connect fail. {ex.Message}");
 //            }
 //
 //            return State == GrpcConnectionState.Ready;
@@ -79,7 +79,7 @@
 //            }
 //            catch (Exception e)
 //            {
-//                InstrumentationLogger.Debug($"Grpc channel shutdown fail. {e.Message}");
+//                Logger.Debug($"Grpc channel shutdown fail. {e.Message}");
 //            }
 //            finally
 //            { 
@@ -98,7 +98,7 @@
 //            
 //            if (GrpcConnectionState.Ready == currentState)
 //            {
-//                InstrumentationLogger.Debug($"Grpc channel state changed. {State} -> {GrpcChannel.State}");
+//                Logger.Debug($"Grpc channel state changed. {State} -> {GrpcChannel.State}");
 //            }
 //
 //            State = GrpcConnectionState.Failure;

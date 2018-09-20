@@ -62,6 +62,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SkyWalking.Sample.AspNet", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SkyWalking.Transport.Grpc", "src\SkyWalking.Transport.Grpc\SkyWalking.Transport.Grpc.csproj", "{FF2FC3FB-D112-45C1-AF34-1FE37D55F682}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SkyWalking.Extensions.Logging", "src\SkyWalking.Extensions.Logging\SkyWalking.Extensions.Logging.csproj", "{16F35181-4DB8-429D-9670-32A3DB7F0681}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -148,6 +150,10 @@ Global
 		{FF2FC3FB-D112-45C1-AF34-1FE37D55F682}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FF2FC3FB-D112-45C1-AF34-1FE37D55F682}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FF2FC3FB-D112-45C1-AF34-1FE37D55F682}.Release|Any CPU.Build.0 = Release|Any CPU
+		{16F35181-4DB8-429D-9670-32A3DB7F0681}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{16F35181-4DB8-429D-9670-32A3DB7F0681}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{16F35181-4DB8-429D-9670-32A3DB7F0681}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{16F35181-4DB8-429D-9670-32A3DB7F0681}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -176,6 +182,7 @@ Global
 		{3A454A8A-A1B7-4C6D-BE08-52D956F95CC1} = {79ED86A5-E9B9-49B2-9354-C911C079D03E}
 		{C3649845-E458-448D-B97D-C7E231E1D040} = {844CEACD-4C85-4B15-9E2B-892B01FDA4BB}
 		{FF2FC3FB-D112-45C1-AF34-1FE37D55F682} = {CBFF7EE0-69D7-4D6A-9BBD-8E567FF4D810}
+		{16F35181-4DB8-429D-9670-32A3DB7F0681} = {79ED86A5-E9B9-49B2-9354-C911C079D03E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {94C0DA2C-CCCB-4314-93A2-9809B5DD0583}

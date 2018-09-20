@@ -17,44 +17,47 @@
  */
 
 using System;
-using Microsoft.Extensions.Logging;
 using SkyWalking.Logging;
-using MSLogger = Microsoft.Extensions.Logging.ILogger;
 
-namespace SkyWalking.AspNetCore.Logging
+namespace SkyWalking.AspNet.Logging
 {
-    internal class InstrumentationLoggerAdapter :  IInstrumentationLogger
+    internal class DebugLoggerAdapter : ILogger
     {
-        private readonly MSLogger _logger;
+        private readonly Type type;
 
-        public InstrumentationLoggerAdapter(MSLogger logger)
+        public DebugLoggerAdapter(Type type)
         {
-            _logger = logger;
+            this.type = type;
         }
-        
+
         public void Debug(string message)
         {
-            _logger.LogDebug(message);
+            WriteLine("debug", message);
         }
 
         public void Info(string message)
         {
-            _logger.LogInformation(message);
+            WriteLine("info", message);
         }
 
         public void Warning(string message)
         {
-            _logger.LogWarning(message);
+            WriteLine("warn", message);
         }
 
         public void Error(string message, Exception exception)
         {
-            _logger.LogError(exception, message);
+            WriteLine("error", message + Environment.NewLine + exception);
         }
 
         public void Trace(string message)
         {
-            _logger.LogTrace(message);
+            WriteLine("trace", message);
+        }
+
+        private void WriteLine(string level, string message)
+        {
+            System.Diagnostics.Debug.WriteLine($"{DateTime.Now} : [{level}] [{type.Name}] {message}");
         }
     }
 }

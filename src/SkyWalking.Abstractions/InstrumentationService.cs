@@ -28,11 +28,11 @@ namespace SkyWalking
         private Timer _timer;
         private CancellationTokenSource _cancellationTokenSource;
 
-        protected readonly IInstrumentationLogger Logger;
+        protected readonly ILogger Logger;
         protected readonly IRuntimeEnvironment RuntimeEnvironment;
         protected readonly IInstrumentationClient Instrumentation;
 
-        protected InstrumentationService(IInstrumentationClient instrumentation, IRuntimeEnvironment runtimeEnvironment, IInstrumentationLoggerFactory loggerFactory)
+        protected InstrumentationService(IInstrumentationClient instrumentation, IRuntimeEnvironment runtimeEnvironment, ILoggerFactory loggerFactory)
         {
             Instrumentation = instrumentation;
             RuntimeEnvironment = runtimeEnvironment;

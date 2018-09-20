@@ -29,10 +29,10 @@ namespace SkyWalking.Transport.Grpc
     public class GrpcInstrumentationClient : IInstrumentationClient
     {
         private readonly ConnectionManager _connectionManager;
-        private readonly IInstrumentationLogger _logger;
+        private readonly ILogger _logger;
         private readonly GrpcConfig _config;
 
-        public GrpcInstrumentationClient(ConnectionManager connectionManager, IConfigAccessor configAccessor, IInstrumentationLoggerFactory loggerFactory)
+        public GrpcInstrumentationClient(ConnectionManager connectionManager, IConfigAccessor configAccessor, ILoggerFactory loggerFactory)
         {
             _connectionManager = connectionManager;
             _config = configAccessor.Get<GrpcConfig>();

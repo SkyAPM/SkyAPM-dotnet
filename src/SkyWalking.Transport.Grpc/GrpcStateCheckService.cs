@@ -28,7 +28,7 @@ namespace SkyWalking.Transport.Grpc
         private readonly ConnectionManager _connectionManager;
 
         public GrpcStateCheckService(ConnectionManager connectionManager, IInstrumentationClient instrumentation, IRuntimeEnvironment runtimeEnvironment,
-            IInstrumentationLoggerFactory loggerFactory) : base(
+            ILoggerFactory loggerFactory) : base(
             instrumentation, runtimeEnvironment, loggerFactory)
         {
             _connectionManager = connectionManager;

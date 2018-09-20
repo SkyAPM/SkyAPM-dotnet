@@ -30,7 +30,7 @@ namespace SkyWalking.Transport.Grpc
         private readonly Random _random = new Random();
         private readonly AsyncLock _lock = new AsyncLock();
 
-        private readonly IInstrumentationLogger _logger;
+        private readonly ILogger _logger;
         private readonly GrpcConfig _config;
 
         private volatile Channel _channel;
@@ -39,7 +39,7 @@ namespace SkyWalking.Transport.Grpc
 
         public bool Ready => _channel != null && _state == ConnectionState.Connected && _channel.State == ChannelState.Ready;
 
-        public ConnectionManager(IInstrumentationLoggerFactory loggerFactory, IConfigAccessor configAccessor)
+        public ConnectionManager(ILoggerFactory loggerFactory, IConfigAccessor configAccessor)
         {
             _logger = loggerFactory.CreateLogger(typeof(ConnectionManager));
             _config = configAccessor.Get<GrpcConfig>();
@@ -68,7 +68,7 @@ namespace SkyWalking.Transport.Grpc
                     var deadLine = DateTime.UtcNow.AddMilliseconds(_config.ConnectTimeout);
                     await _channel.ConnectAsync(deadLine);
                     _state = ConnectionState.Connected;
-                    _logger.Info($"gRPC server connect success. [Server] = {_channel.Target}");
+                    _logger.Information($"gRPC server connect success. [Server] = {_channel.Target}");
                 }
                 catch (TaskCanceledException ex)
                 {

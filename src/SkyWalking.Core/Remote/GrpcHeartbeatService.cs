@@ -30,7 +30,7 @@
 //{
 //    public class GrpcHeartbeatService : TimerService
 //    {
-//        private static readonly IInstrumentationLogger InstrumentationLogger = LogManager.GetLogger<GrpcHeartbeatService>();
+//        private static readonly ILogger Logger = LogManager.GetLogger<GrpcHeartbeatService>();
 //        protected override TimeSpan Interval { get; } = TimeSpan.FromMinutes(1);
 //
 //        protected override async Task Starting(CancellationToken token)
@@ -42,7 +42,7 @@
 //        {
 //            if (DictionaryUtil.IsNull(RemoteDownstreamConfig.Agent.ApplicationInstanceId))
 //            {
-//                InstrumentationLogger.Debug($"{DateTime.Now} Heartbeat fail. Application instance is not registered.");
+//                Logger.Debug($"{DateTime.Now} Heartbeat fail. Application instance is not registered.");
 //                return;
 //            }
 //
@@ -50,7 +50,7 @@
 //
 //            if (availableConnection == null)
 //            {
-//                InstrumentationLogger.Debug($"{DateTime.Now} Heartbeat fail. {GrpcConnectionManager.NotFoundErrorMessage}");
+//                Logger.Debug($"{DateTime.Now} Heartbeat fail. {GrpcConnectionManager.NotFoundErrorMessage}");
 //                return;
 //            }
 //            
@@ -67,11 +67,11 @@
 //
 //                await instanceDiscoveryService.heartbeatAsync(heartbeat);
 //
-//                InstrumentationLogger.Debug($"{DateTime.Now} Heartbeat.");
+//                Logger.Debug($"{DateTime.Now} Heartbeat.");
 //            }
 //            catch (Exception e)
 //            {
-//                InstrumentationLogger.Debug($"{DateTime.Now} Heartbeat fail. {e.Message}");
+//                Logger.Debug($"{DateTime.Now} Heartbeat fail. {e.Message}");
 //                availableConnection.Failure();
 //            }
 //        }
