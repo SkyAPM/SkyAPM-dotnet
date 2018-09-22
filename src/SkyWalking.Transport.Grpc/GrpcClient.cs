@@ -26,17 +26,17 @@ using SkyWalking.NetworkProtocol;
 
 namespace SkyWalking.Transport.Grpc
 {
-    public class GrpcSkyWalkingClient : ISkyWalkingClient
+    public class GrpcClient : ISkyWalkingClient
     {
         private readonly ConnectionManager _connectionManager;
         private readonly ILogger _logger;
         private readonly GrpcConfig _config;
 
-        public GrpcSkyWalkingClient(ConnectionManager connectionManager, IConfigAccessor configAccessor, ILoggerFactory loggerFactory)
+        public GrpcClient(ConnectionManager connectionManager, IConfigAccessor configAccessor, ILoggerFactory loggerFactory)
         {
             _connectionManager = connectionManager;
             _config = configAccessor.Get<GrpcConfig>();
-            _logger = loggerFactory.CreateLogger(typeof(GrpcSkyWalkingClient));
+            _logger = loggerFactory.CreateLogger(typeof(GrpcClient));
         }
 
         public async Task<NullableValue> RegisterApplicationAsync(string applicationCode, CancellationToken cancellationToken = default(CancellationToken))
@@ -132,10 +132,23 @@ namespace SkyWalking.Transport.Grpc
             }
         }
 
-        public Task CollectAsync(IEnumerable<TraceSegmentRequest> request, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task CollectAsync(IEnumerable<TraceSegmentRequest> request, CancellationToken cancellationToken = default(CancellationToken))
         {
-            
-           return Task.CompletedTask;
+            if (!_connectionManager.Ready)
+            {
+                return;
+            }
+
+            var connection = _connectionManager.GetConnection();
+
+            var client = new TraceSegmentService.TraceSegmentServiceClient(connection);
+
+            using (var asyncClientStreamingCall = client.collect(null, null, cancellationToken))
+            {
+                await asyncClientStreamingCall.RequestStream.WriteAsync();
+                await asyncClientStreamingCall.RequestStream.CompleteAsync();
+                await asyncClientStreamingCall.ResponseAsync;
+            }
         }
     }
 }
