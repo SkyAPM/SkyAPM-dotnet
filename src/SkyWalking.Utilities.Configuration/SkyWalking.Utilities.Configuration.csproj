@@ -3,14 +3,14 @@
     <Import Project="..\..\build\common.props" />
     <PropertyGroup>
         <Description>SkyWalking configuration extensions.</Description>
-        <AssemblyTitle>SkyWalking.Extensions.Configuration</AssemblyTitle>
+        <AssemblyTitle>SkyWalking.Utilities.Configuration</AssemblyTitle>
         <TargetFramework>netstandard2.0</TargetFramework>
-        <AssemblyName>SkyWalking.Extensions.Configuration</AssemblyName>
-        <PackageId>SkyWalking.Extensions.Configuration</PackageId>
+        <AssemblyName>SkyWalking.Utilities.Configuration</AssemblyName>
+        <PackageId>SkyWalking.Utilities.Configuration</PackageId>
         <PackageTags>SkyWalking;APM;Diagnostics</PackageTags>
         <PackageReleaseNotes>
         </PackageReleaseNotes>
-        <RootNamespace>SkyWalking.Extensions.Configuration</RootNamespace>
+        <RootNamespace>SkyWalking.Utilities.Configuration</RootNamespace>
     </PropertyGroup>
     <ItemGroup>
       <ProjectReference Include="..\SkyWalking.Abstractions\SkyWalking.Abstractions.csproj" />

@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Licensed to the OpenSkywalking under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -16,24 +16,15 @@
  *
  */
 
-using System;
 using Microsoft.Extensions.DependencyInjection;
-using SkyWalking.Utilities.DependencyInjection;
 
-namespace SkyWalking.Diagnostics.CAP
+namespace SkyWalking.Utilities.DependencyInjection
 {
-    public static class SkyWalkingBuilderExtensions
+    public static class ServiceCollectionExtensions
     {
-        public static SkyWalkingExtensions AddCap(this SkyWalkingExtensions extensions)
+        public static SkyWalkingExtensions AddSkyWalkingExtensions(this IServiceCollection services)
         {
-            if (extensions == null)
-            {
-                throw new ArgumentNullException(nameof(extensions));
-            }
-
-            extensions.Services.AddSingleton<ITracingDiagnosticProcessor, CapTracingDiagnosticProcessor>();
-            
-            return extensions;
+            return new SkyWalkingExtensions(services);
         }
     }
 }

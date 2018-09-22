@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Licensed to the OpenSkywalking under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -16,24 +16,21 @@
  *
  */
 
-using System;
-using Microsoft.Extensions.DependencyInjection;
-using SkyWalking.Utilities.DependencyInjection;
+using System.Linq;
+using SkyWalking.Config;
 
-namespace SkyWalking.Diagnostics.SqlClient
+namespace SkyWalking.Utilities.Configuration
 {
-    public static class SkyWalkingBuilderExtensions
+    public static class ConfigSectionExtensions
     {
-        public static SkyWalkingExtensions AddSqlClient(this SkyWalkingExtensions extensions)
+        public static string GetSections(this ConfigAttribute config)
         {
-            if (extensions == null)
+            if (config.Sections == null || config.Sections.Length == 0)
             {
-                throw new ArgumentNullException(nameof(extensions));
+                return null;
             }
 
-            extensions.Services.AddSingleton<ITracingDiagnosticProcessor, SqlClientTracingDiagnosticProcessor>();
-            
-            return extensions;
+            return config.Sections.Length == 1 ? config.Sections[0] : config.Sections.Aggregate((x, y) => x + ":" + y);
         }
     }
 }

@@ -1,5 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
-using SkyWalking.Extensions.DependencyInjection;
+using SkyWalking.Utilities.DependencyInjection;
 
 namespace SkyWalking.AspNetCore.Diagnostics
 {

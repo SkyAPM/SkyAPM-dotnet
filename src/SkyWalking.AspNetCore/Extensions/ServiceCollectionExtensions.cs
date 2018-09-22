@@ -26,9 +26,9 @@ using SkyWalking.Diagnostics;
 using SkyWalking.Diagnostics.EntityFrameworkCore;
 using SkyWalking.Diagnostics.HttpClient;
 using SkyWalking.Diagnostics.SqlClient;
-using SkyWalking.Extensions.Configuration;
-using SkyWalking.Extensions.DependencyInjection;
-using SkyWalking.Extensions.Logging;
+using SkyWalking.Utilities.Configuration;
+using SkyWalking.Utilities.DependencyInjection;
+using SkyWalking.Utilities.Logging;
 using SkyWalking.Logging;
 using SkyWalking.Service;
 using SkyWalking.Transport;
@@ -66,7 +66,7 @@ namespace SkyWalking.AspNetCore
 
         private static IServiceCollection AddGrpcTransport(this IServiceCollection services)
         {
-            services.AddSingleton<ISkyWalkingClient, GrpcSkyWalkingClient>();
+            services.AddSingleton<ISkyWalkingClient, GrpcClient>();
             services.AddSingleton<ConnectionManager>();
             services.AddSingleton<IExecutionService, GrpcStateCheckService>();
             return services;
