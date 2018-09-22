@@ -50,19 +50,15 @@ namespace SkyWalking.Transport.Grpc
 
             var client = new ApplicationRegisterService.ApplicationRegisterServiceClient(connection);
 
-            try
-            {
-                var applicationMapping = await client.applicationCodeRegisterAsync(new Application {ApplicationCode = applicationCode},
-                    null, _config.GetTimeout(), cancellationToken);
+            return await ExecuteWithCatch(async () =>
+                {
+                    var applicationMapping = await client.applicationCodeRegisterAsync(new Application {ApplicationCode = applicationCode},
+                        null, _config.GetTimeout(), cancellationToken);
 
-                return new NullableValue(applicationMapping?.Application?.Value ?? 0);
-            }
-            catch (Exception ex)
-            {
-                _logger.Error($"Register application fail. ", ex);
-                _connectionManager.Failure(ex);
-                return NullableValue.Null;
-            }
+                    return new NullableValue(applicationMapping?.Application?.Value ?? 0);
+                },
+                () => NullableValue.Null,
+                () => ExceptionHelpers.RegisterApplicationError);
         }
 
         public async Task<NullableValue> RegisterApplicationInstanceAsync(int applicationId, Guid agentUUID, long registerTime, AgentOsInfoRequest osInfoRequest,
@@ -77,32 +73,28 @@ namespace SkyWalking.Transport.Grpc
 
             var client = new InstanceDiscoveryService.InstanceDiscoveryServiceClient(connection);
 
-            try
+            var applicationInstance = new ApplicationInstance
             {
-                var applicationInstance = new ApplicationInstance
+                ApplicationId = applicationId,
+                AgentUUID = agentUUID.ToString("N"),
+                RegisterTime = registerTime,
+                Osinfo = new OSInfo
                 {
-                    ApplicationId = applicationId,
-                    AgentUUID = agentUUID.ToString("N"),
-                    RegisterTime = registerTime,
-                    Osinfo = new OSInfo
-                    {
-                        OsName = osInfoRequest.OsName,
-                        Hostname = osInfoRequest.HostName,
-                        ProcessNo = osInfoRequest.ProcessNo
-                    }
-                };
+                    OsName = osInfoRequest.OsName,
+                    Hostname = osInfoRequest.HostName,
+                    ProcessNo = osInfoRequest.ProcessNo
+                }
+            };
 
-                applicationInstance.Osinfo.Ipv4S.AddRange(osInfoRequest.IpAddress);
+            applicationInstance.Osinfo.Ipv4S.AddRange(osInfoRequest.IpAddress);
 
-                var applicationInstanceMapping = await client.registerInstanceAsync(applicationInstance, null, _config.GetTimeout(), cancellationToken);
-                return new NullableValue(applicationInstanceMapping.ApplicationInstanceId);
-            }
-            catch (Exception ex)
-            {
-                _logger.Error("Register application instance error.", ex);
-                _connectionManager.Failure(ex);
-                return NullableValue.Null;
-            }
+            return await ExecuteWithCatch(async () =>
+                {
+                    var applicationInstanceMapping = await client.registerInstanceAsync(applicationInstance, null, _config.GetTimeout(), cancellationToken);
+                    return new NullableValue(applicationInstanceMapping?.ApplicationInstanceId ?? 0);
+                },
+                () => NullableValue.Null,
+                () => ExceptionHelpers.RegisterApplicationInstanceError);
         }
 
         public async Task HeartbeatAsync(int applicationInstance, long heartbeatTime, CancellationToken cancellationToken = default(CancellationToken))
@@ -121,15 +113,7 @@ namespace SkyWalking.Transport.Grpc
                 ApplicationInstanceId = applicationInstance,
                 HeartbeatTime = heartbeatTime
             };
-            try
-            {
-                await client.heartbeatAsync(heartbeat, null, _config.GetTimeout(), cancellationToken);
-            }
-            catch (Exception ex)
-            {
-                _logger.Error("Heartbeat error.", ex);
-                _connectionManager.Failure(ex);
-            }
+            await ExecuteWithCatch(async () => await client.heartbeatAsync(heartbeat, null, _config.GetTimeout(), cancellationToken), () => ExceptionHelpers.HeartbeatError);
         }
 
         public async Task CollectAsync(IEnumerable<TraceSegmentRequest> request, CancellationToken cancellationToken = default(CancellationToken))
@@ -142,12 +126,47 @@ namespace SkyWalking.Transport.Grpc
             var connection = _connectionManager.GetConnection();
 
             var client = new TraceSegmentService.TraceSegmentServiceClient(connection);
-
-            using (var asyncClientStreamingCall = client.collect(null, null, cancellationToken))
+            try
             {
-                await asyncClientStreamingCall.RequestStream.WriteAsync();
-                await asyncClientStreamingCall.RequestStream.CompleteAsync();
-                await asyncClientStreamingCall.ResponseAsync;
+                using (var asyncClientStreamingCall = client.collect(null, null, cancellationToken))
+                {
+                    foreach (var segment in request)
+                        await asyncClientStreamingCall.RequestStream.WriteAsync(TraceSegmentHelpers.Map(segment));
+                    await asyncClientStreamingCall.RequestStream.CompleteAsync();
+                    await asyncClientStreamingCall.ResponseAsync;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.Error("Heartbeat error.", ex);
+                _connectionManager.Failure(ex);
+            }
+        }
+
+        private async Task ExecuteWithCatch(Func<Task> task, Func<string> errMessage)
+        {
+            try
+            {
+                await task();
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(errMessage(), ex);
+                _connectionManager.Failure(ex);
+            }
+        }
+
+        private async Task<T> ExecuteWithCatch<T>(Func<Task<T>> task, Func<T> errCallback, Func<string> errMessage)
+        {
+            try
+            {
+                return await task();
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(errMessage(), ex);
+                _connectionManager.Failure(ex);
+                return errCallback();
             }
         }
     }

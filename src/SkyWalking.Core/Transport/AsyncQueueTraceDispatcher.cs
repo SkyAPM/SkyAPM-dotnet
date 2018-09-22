@@ -44,20 +44,24 @@ namespace SkyWalking.Transport
 
         public bool Dispatch(TraceSegmentRequest segment)
         {
+            // todo performance optimization for ConcurrentQueue
             if (_config.PendingSegmentLimit < _segmentQueue.Count || _cancellation.IsCancellationRequested)
             {
                 return false;
             }
 
             _segmentQueue.Enqueue(segment);
+
             _logger.Debug($"Dispatch trace segment. [SegmentId]={segment.Segment.SegmentId}.");
             return true;
         }
 
         public Task Flush(CancellationToken token = default(CancellationToken))
         {
-            var queued = _segmentQueue.Count;
-            var limit = queued <= _config.PendingSegmentLimit ? queued : _config.PendingSegmentLimit;
+            // todo performance optimization for ConcurrentQueue
+            //var queued = _segmentQueue.Count;
+            //var limit = queued <= _config.PendingSegmentLimit ? queued : _config.PendingSegmentLimit;
+            var limit = _config.PendingSegmentLimit;
             var index = 0;
             var segments = new List<TraceSegmentRequest>(limit);
             while (index++ < limit && _segmentQueue.TryDequeue(out var request))

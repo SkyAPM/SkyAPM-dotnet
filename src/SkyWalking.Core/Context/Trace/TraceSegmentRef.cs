@@ -158,6 +158,7 @@ namespace SkyWalking.Context.Trace
             else
             {
                 traceSegmentReference.RefType = (int) SegmentRefType.CrossThread;
+                traceSegmentReference.NetworkAddress = new StringOrIntValue();
             }
 
             traceSegmentReference.ParentApplicationInstanceId = _parentApplicationInstanceId;

@@ -29,6 +29,10 @@ namespace SkyWalking
             _stringValue = null;
         }
 
+        public bool HasIntValue => _intValue != 0;
+        
+        public bool HasStringValue => _stringValue != null;
+
         public StringOrIntValue(string value)
         {
             _intValue = 0;
@@ -41,6 +45,10 @@ namespace SkyWalking
             _stringValue = stringValue;
         }
 
+        public int GetIntValue() => _intValue;
+        
+        public string GetStringValue() => _stringValue;
+        
         public (string, int) GetValue()
         {
             return (_stringValue, _intValue);

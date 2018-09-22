@@ -74,11 +74,11 @@ namespace SkyWalking.Transport
 
         public bool IsError { get; set; }
 
-        public IList<TraceSegmentReferenceRequest> References { get; set; } = new List<TraceSegmentReferenceRequest>();
+        public IList<TraceSegmentReferenceRequest> References { get; } = new List<TraceSegmentReferenceRequest>();
 
-        public IList<KeyValuePair<string, string>> Tags { get; set; } = new List<KeyValuePair<string, string>>();
+        public IList<KeyValuePair<string, string>> Tags { get; } = new List<KeyValuePair<string, string>>();
 
-        public IList<LogDataRequest> Logs { get; set; } = new List<LogDataRequest>();
+        public IList<LogDataRequest> Logs { get; } = new List<LogDataRequest>();
     }
 
     public class TraceSegmentReferenceRequest
@@ -104,6 +104,6 @@ namespace SkyWalking.Transport
     {
         public long Timestamp { get; set; }
 
-        public IList<KeyValuePair<string, string>> Data { get; set; } = new List<KeyValuePair<string, string>>();
+        public IList<KeyValuePair<string, string>> Data { get; } = new List<KeyValuePair<string, string>>();
     }
 }
