@@ -21,11 +21,13 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using SkyWalking.Config;
+using SkyWalking.Logging;
 
 namespace SkyWalking.Transport
 {
     public class BlockingTraceDispatcher : ITraceDispatcher
     {
+        private readonly ILogger _logger;
         private readonly TransportConfig _config;
         private readonly BlockingCollection<TraceSegmentRequest> _limitCollection;
         private readonly IInstrumentationClient _instrumentationClient;
@@ -33,18 +35,32 @@ namespace SkyWalking.Transport
         private readonly Task _consumer;
         private readonly int _queueTimeout;
 
-        public BlockingTraceDispatcher(IConfigAccessor configAccessor, IInstrumentationClient client)
+        public BlockingTraceDispatcher(IConfigAccessor configAccessor, IInstrumentationClient client,ILoggerFactory loggerFactory)
         {
+            _logger = loggerFactory.CreateLogger(typeof(BlockingTraceDispatcher));
             _config = configAccessor.Get<TransportConfig>();
             _instrumentationClient = client;
             _segmentQueue = new ConcurrentQueue<TraceSegmentRequest>();
             _limitCollection = new BlockingCollection<TraceSegmentRequest>(_segmentQueue, _config.PendingSegmentLimit);
+            _logger.Information($"Init blockingQueue with limit {_config.PendingSegmentLimit}.");
             _queueTimeout = _config.PendingSegmentTimeout;
         }
 
         public bool Dispatch(TraceSegmentRequest segment)
         {
-            return !_limitCollection.IsAddingCompleted && _limitCollection.TryAdd(segment, _queueTimeout);
+            if (_limitCollection.IsAddingCompleted)
+            {
+                return false;
+            }
+
+            var result = _limitCollection.TryAdd(segment, _queueTimeout);
+
+            if (result)
+            {
+                _logger.Debug($"Dispatch trace segment. [SegmentId]={segment.Segment.SegmentId}.");
+            }
+            
+            return result;
         }
 
         public Task Flush(CancellationToken token = default(CancellationToken))

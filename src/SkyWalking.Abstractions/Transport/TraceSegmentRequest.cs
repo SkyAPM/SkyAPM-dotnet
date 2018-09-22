@@ -34,6 +34,11 @@ namespace SkyWalking.Transport
         public long Part2 { get; set; }
 
         public long Part3 { get; set; }
+
+        public override string ToString()
+        {
+            return $"{Part1}.{Part2}.{Part3}";
+        }
     }
 
     public class TraceSegmentObjectRequest

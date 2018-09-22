@@ -134,6 +134,7 @@ namespace SkyWalking.Transport.Grpc
 
         public Task CollectAsync(IEnumerable<TraceSegmentRequest> request, CancellationToken cancellationToken = default(CancellationToken))
         {
+            
            return Task.CompletedTask;
         }
     }
