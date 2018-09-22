@@ -68,17 +68,17 @@ namespace SkyWalking.Transport.Grpc
                     var deadLine = DateTime.UtcNow.AddMilliseconds(_config.ConnectTimeout);
                     await _channel.ConnectAsync(deadLine);
                     _state = ConnectionState.Connected;
-                    _logger.Information($"gRPC server connect success. [Server] = {_channel.Target}");
+                    _logger.Information($"Connected collector server[{_channel.Target}].");
                 }
                 catch (TaskCanceledException ex)
                 {
                     _state = ConnectionState.Failure;
-                    _logger.Warning($"gRPC server connect timeout. {ex.Message}");
+                    _logger.Error($"Connect collector timeout.", ex);
                 }
                 catch (Exception ex)
                 {
                     _state = ConnectionState.Failure;
-                    _logger.Warning($"gRPC server connect fail. {ex.Message}");
+                    _logger.Error($"Connect collector fail.", ex);
                 }
             }
         }
@@ -88,10 +88,11 @@ namespace SkyWalking.Transport.Grpc
             try
             {
                 await _channel?.ShutdownAsync();
+                _logger.Information($"Shutdown connection[{_channel.Target}].");
             }
             catch (Exception e)
             {
-                _logger.Debug($"gRPC connection shutdown fail. {e.Message}");
+                _logger.Error($"Shutdown connection fail.", e);
             }
             finally
             {
@@ -105,7 +106,7 @@ namespace SkyWalking.Transport.Grpc
 
             if (ConnectionState.Connected == currentState)
             {
-                _logger.Debug($"gRPC connection state changed. {_state} -> {_channel.State} . {exception.Message}");
+                _logger.Warning($"Connection state changed. {_state} -> {_channel.State} . {exception.Message}");
             }
 
             _state = ConnectionState.Failure;
@@ -120,10 +121,11 @@ namespace SkyWalking.Transport.Grpc
 
         private void EnsureServerAddress()
         {
-            var servers = _config.Servers;
+            var servers = _config.Servers.Split(',').ToArray();
             if (servers.Length == 1)
             {
                 _server = servers[0];
+                return;
             }
 
             if (_server != null)

@@ -29,5 +29,7 @@ namespace SkyWalking
         bool Initialized { get; }
         
         Guid AgentUUID { get; }
+        
+        IEnvironmentProvider Environment { get; }
     }
 }

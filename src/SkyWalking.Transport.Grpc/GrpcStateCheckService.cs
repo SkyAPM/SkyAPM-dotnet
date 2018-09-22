@@ -44,5 +44,7 @@ namespace SkyWalking.Transport.Grpc
                 await _connectionManager.ConnectAsync();
             }
         }
+
+        protected override bool CanExecute() => !_connectionManager.Ready;
     }
 }

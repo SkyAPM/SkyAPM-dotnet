@@ -20,12 +20,15 @@ namespace SkyWalking.Extensions.Logging
             _loggingConfig = configAccessor.Get<LoggingConfig>();
             _loggerFactory = new MSLoggerFactory();
             var instrumentationConfig = configAccessor.Get<InstrumentationConfig>();
+
+            var level = EventLevel(_loggingConfig.Level);
+            
             _loggerFactory.AddSerilog(new LoggerConfiguration().
                 MinimumLevel.Verbose().
                 Enrich.WithProperty("SourceContext", null).
-                Enrich.WithProperty("ApplicationCode", instrumentationConfig.ApplicationCode).
+                Enrich.WithProperty(nameof(instrumentationConfig.ApplicationCode), instrumentationConfig.ApplicationCode).
                 Enrich.FromLogContext().
-                WriteTo.RollingFile(_loggingConfig.FilePath, EventLevel(_loggingConfig.Level), outputTemplate).
+                WriteTo.RollingFile(_loggingConfig.FilePath, level, outputTemplate).
                 CreateLogger());
         }
 

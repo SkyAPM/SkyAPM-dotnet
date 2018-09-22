@@ -25,12 +25,7 @@ namespace SkyWalking.Sample.Backend
         {
             services.AddMvc();
 
-            services.AddSkyWalking(option =>
-            {
-                option.DirectServers = "localhost:11800";
-                option.ApplicationCode = "asp-net-core-backend";
-            }).
-            AddEntityFrameworkCore(c => { c.AddSqlite(); });
+            services.AddSkyWalkingCore();
 
             var sqliteConnection = new SqliteConnection("DataSource=:memory:");
             sqliteConnection.Open();

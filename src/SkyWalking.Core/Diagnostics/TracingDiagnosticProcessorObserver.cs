@@ -29,7 +29,7 @@ namespace SkyWalking.Diagnostics
         private readonly ILogger _logger;
         private readonly IEnumerable<ITracingDiagnosticProcessor> _tracingDiagnosticProcessors;
 
-        public TracingDiagnosticProcessorObserver(IEnumerable<ITracingDiagnosticProcessor> tracingDiagnosticProcessors,ILoggerFactory loggerFactory)
+        public TracingDiagnosticProcessorObserver(IEnumerable<ITracingDiagnosticProcessor> tracingDiagnosticProcessors, ILoggerFactory loggerFactory)
         {
             _logger = loggerFactory.CreateLogger(typeof(TracingDiagnosticProcessorObserver));
             _tracingDiagnosticProcessors = tracingDiagnosticProcessors ??
@@ -51,8 +51,8 @@ namespace SkyWalking.Diagnostics
                 if (listener.Name == diagnosticProcessor.ListenerName)
                 {
                     Subscribe(listener, diagnosticProcessor);
-                    _logger.Debug(
-                        $"TracingDiagnosticObserver subscribe diagnosticListener named [{diagnosticProcessor.ListenerName}].");
+                    _logger.Information(
+                        $"Loaded diagnostic listener [{diagnosticProcessor.ListenerName}].");
                 }
             }
         }

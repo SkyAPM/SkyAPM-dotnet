@@ -31,5 +31,7 @@ namespace SkyWalking
         public bool Initialized => ApplicationId.HasValue && ApplicationInstanceId.HasValue;
 
         public Guid AgentUUID { get; } = Guid.NewGuid();
+        
+        public IEnvironmentProvider Environment { get; set; }
     }
 }

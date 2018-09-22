@@ -20,7 +20,7 @@ namespace SkyWalking.Config
 {
     public interface IConfigAccessor
     {
-        T Get<T>(params string[] sections) where T : class, new();
+        T Get<T>() where T : class, new();
 
         T Value<T>(string key, params string[] sections);
     }

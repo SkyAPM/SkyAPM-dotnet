@@ -90,7 +90,7 @@ namespace SkyWalking.AspNetCore.Diagnostics
             ContextManager.ActiveSpan?.ErrorOccurred()?.Log(exception);
         }
         
-        [DiagnosticName("Microsoft.AspNetCore.Mvc.BeforeAction")]
+        //[DiagnosticName("Microsoft.AspNetCore.Mvc.BeforeAction")]
         public void BeforeAction([Property]ActionDescriptor actionDescriptor, [Property]HttpContext httpContext)
         {
             var span = httpContext.Items[HttpContextDiagnosticStrings.SpanKey] as ISpan;
@@ -103,7 +103,7 @@ namespace SkyWalking.AspNetCore.Diagnostics
             span.Log(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(), events);
         }
 
-        [DiagnosticName("Microsoft.AspNetCore.Mvc.AfterAction")]
+        //[DiagnosticName("Microsoft.AspNetCore.Mvc.AfterAction")]
         public void AfterAction([Property]ActionDescriptor actionDescriptor, [Property]HttpContext httpContext)
         {
             var span = httpContext.Items[HttpContextDiagnosticStrings.SpanKey] as ISpan;

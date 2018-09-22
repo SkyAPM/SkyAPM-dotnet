@@ -20,11 +20,7 @@ namespace SkyWalking.Sample.Frontend
         {
             services.AddMvc();
              
-            services.AddSkyWalking(option =>
-            {
-                option.DirectServers = "localhost:11800";
-                option.ApplicationCode = "asp-net-core-frontend";
-            }); 
+            services.AddSkyWalkingCore();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

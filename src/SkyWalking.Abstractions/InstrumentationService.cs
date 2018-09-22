@@ -44,14 +44,14 @@ namespace SkyWalking
             _cancellationTokenSource = new CancellationTokenSource();
             var source = CancellationTokenSource.CreateLinkedTokenSource(_cancellationTokenSource.Token, cancellationToken);
             _timer = new Timer(Callback, source, DueTime, Period);
-            Logger.Debug($"Start {GetType().Name}.");
+            Logger.Information($"Loaded instrument service [{GetType().FullName}].");
             return Task.CompletedTask;
         }
 
         public Task StopAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
             _cancellationTokenSource?.Cancel();
-            Logger.Debug($"Stop {GetType().Name}.");
+            Logger.Information($"Stopped instrument service {GetType().Name}.");
             return Task.CompletedTask;
         }
 

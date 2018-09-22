@@ -59,7 +59,7 @@ namespace SkyWalking.Transport.Grpc
             }
             catch (Exception ex)
             {
-                _logger.Error("Register application error.", ex);
+                _logger.Error("Register application fail.", ex);
                 _connectionManager.Failure(ex);
                 return NullableValue.Null;
             }

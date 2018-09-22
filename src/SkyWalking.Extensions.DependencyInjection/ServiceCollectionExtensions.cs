@@ -4,9 +4,9 @@ namespace SkyWalking.Extensions.DependencyInjection
 {
     public static class ServiceCollectionExtensions
     {
-        public static SkyWalkingExtensions AddSkyWalkingExtensions(this IServiceCollection sevices)
+        public static SkyWalkingExtensions AddSkyWalkingExtensions(this IServiceCollection services)
         {
-            return new SkyWalkingExtensions(sevices);
+            return new SkyWalkingExtensions(services);
         }
     }
 }
