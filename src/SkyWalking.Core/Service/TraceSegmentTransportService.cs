@@ -53,6 +53,7 @@ namespace SkyWalking.Service
 
         protected override Task Stopping(CancellationToken cancellationToke)
         {
+            _dispatcher.Close();
             TracingContext.ListenerManager.Remove(this);
             return Task.CompletedTask;
         }

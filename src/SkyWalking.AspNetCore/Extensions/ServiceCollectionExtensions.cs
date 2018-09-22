@@ -48,7 +48,7 @@ namespace SkyWalking.AspNetCore
                 throw new ArgumentNullException(nameof(services));
             }
 
-            services.AddSingleton<ITraceDispatcher, BlockingTraceDispatcher>();
+            services.AddSingleton<ITraceDispatcher, AsyncQueueTraceDispatcher>();
             services.AddSingleton<IInstrumentationService, TraceSegmentTransportService>();
             services.AddSingleton<IInstrumentationService, ServiceDiscoveryService>();
             services.AddSingleton<IInstrumentationService, SamplingRefreshService>();

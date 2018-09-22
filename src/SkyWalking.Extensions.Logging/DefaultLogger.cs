@@ -31,7 +31,7 @@ namespace SkyWalking.Extensions.Logging
 
         public void Error(string message, Exception exception)
         {
-            _readLogger.LogError(message, exception);
+            _readLogger.LogError(message + Environment.NewLine + exception);
         }
 
         public void Trace(string message)

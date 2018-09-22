@@ -25,46 +25,39 @@ using SkyWalking.Logging;
 
 namespace SkyWalking.Transport
 {
-    public class BlockingTraceDispatcher : ITraceDispatcher
+    public class AsyncQueueTraceDispatcher : ITraceDispatcher
     {
         private readonly ILogger _logger;
         private readonly TransportConfig _config;
-        private readonly BlockingCollection<TraceSegmentRequest> _limitCollection;
         private readonly IInstrumentationClient _instrumentationClient;
         private readonly ConcurrentQueue<TraceSegmentRequest> _segmentQueue;
-        private readonly Task _consumer;
-        private readonly int _queueTimeout;
+        private readonly CancellationTokenSource _cancellation;
 
-        public BlockingTraceDispatcher(IConfigAccessor configAccessor, IInstrumentationClient client,ILoggerFactory loggerFactory)
+        public AsyncQueueTraceDispatcher(IConfigAccessor configAccessor, IInstrumentationClient client, ILoggerFactory loggerFactory)
         {
-            _logger = loggerFactory.CreateLogger(typeof(BlockingTraceDispatcher));
-            _config = configAccessor.Get<TransportConfig>();
             _instrumentationClient = client;
+            _logger = loggerFactory.CreateLogger(typeof(AsyncQueueTraceDispatcher));
+            _config = configAccessor.Get<TransportConfig>();
             _segmentQueue = new ConcurrentQueue<TraceSegmentRequest>();
-            _limitCollection = new BlockingCollection<TraceSegmentRequest>(_segmentQueue, _config.PendingSegmentLimit);
-            _queueTimeout = _config.PendingSegmentTimeout;
+            _cancellation = new CancellationTokenSource();
         }
 
         public bool Dispatch(TraceSegmentRequest segment)
         {
-            if (_limitCollection.IsAddingCompleted)
+            if (_config.PendingSegmentLimit < _segmentQueue.Count || _cancellation.IsCancellationRequested)
             {
                 return false;
             }
 
-            var result = _limitCollection.TryAdd(segment);
-
-            if (result)
-            {
-                _logger.Debug($"Dispatch trace segment. [SegmentId]={segment.Segment.SegmentId}.");
-            }
-            
-            return result;
+            _segmentQueue.Enqueue(segment);
+            _logger.Debug($"Dispatch trace segment. [SegmentId]={segment.Segment.SegmentId}.");
+            return true;
         }
 
         public Task Flush(CancellationToken token = default(CancellationToken))
         {
-            var limit = _config.PendingSegmentLimit;
+            var queued = _segmentQueue.Count;
+            var limit = queued <= _config.PendingSegmentLimit ? queued : _config.PendingSegmentLimit;
             var index = 0;
             var segments = new List<TraceSegmentRequest>(limit);
             while (index++ < limit && _segmentQueue.TryDequeue(out var request))
@@ -73,13 +66,14 @@ namespace SkyWalking.Transport
             }
 
             // send async
-            _instrumentationClient.CollectAsync(segments, token);
+            if (segments.Count > 0)
+                _instrumentationClient.CollectAsync(segments, token);
             return Task.CompletedTask;
         }
 
         public void Close()
         {
-            _limitCollection.CompleteAdding();
+            _cancellation.Cancel();
         }
     }
 }
