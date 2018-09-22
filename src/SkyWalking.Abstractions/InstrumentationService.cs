@@ -48,11 +48,11 @@ namespace SkyWalking
             return Task.CompletedTask;
         }
 
-        public Task StopAsync(CancellationToken cancellationToken = default(CancellationToken))
-        {
+        public async Task StopAsync(CancellationToken cancellationToken = default(CancellationToken))
+        { 
             _cancellationTokenSource?.Cancel();
+            await Stopping(cancellationToken);
             Logger.Information($"Stopped instrument service {GetType().Name}.");
-            return Task.CompletedTask;
         }
 
         public void Dispose()
@@ -69,6 +69,8 @@ namespace SkyWalking
         }
 
         protected virtual bool CanExecute() => RuntimeEnvironment.Initialized;
+        
+        protected virtual Task Stopping(CancellationToken cancellationToke) => Task.CompletedTask;
 
         protected abstract TimeSpan DueTime { get; }
 

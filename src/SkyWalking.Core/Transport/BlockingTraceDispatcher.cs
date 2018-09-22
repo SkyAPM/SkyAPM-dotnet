@@ -42,7 +42,6 @@ namespace SkyWalking.Transport
             _instrumentationClient = client;
             _segmentQueue = new ConcurrentQueue<TraceSegmentRequest>();
             _limitCollection = new BlockingCollection<TraceSegmentRequest>(_segmentQueue, _config.PendingSegmentLimit);
-            _logger.Information($"Init blockingQueue with limit {_config.PendingSegmentLimit}.");
             _queueTimeout = _config.PendingSegmentTimeout;
         }
 
@@ -53,7 +52,7 @@ namespace SkyWalking.Transport
                 return false;
             }
 
-            var result = _limitCollection.TryAdd(segment, _queueTimeout);
+            var result = _limitCollection.TryAdd(segment);
 
             if (result)
             {

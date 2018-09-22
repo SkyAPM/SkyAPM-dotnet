@@ -22,13 +22,13 @@ namespace SkyWalking.Extensions.Logging
             var instrumentationConfig = configAccessor.Get<InstrumentationConfig>();
 
             var level = EventLevel(_loggingConfig.Level);
-            
+
             _loggerFactory.AddSerilog(new LoggerConfiguration().
                 MinimumLevel.Verbose().
                 Enrich.WithProperty("SourceContext", null).
                 Enrich.WithProperty(nameof(instrumentationConfig.ApplicationCode), instrumentationConfig.ApplicationCode).
                 Enrich.FromLogContext().
-                WriteTo.RollingFile(_loggingConfig.FilePath, level, outputTemplate).
+                WriteTo.RollingFile(_loggingConfig.FilePath, level, outputTemplate, null, 1073741824, 31, null, false, false, TimeSpan.FromMilliseconds(500)).
                 CreateLogger());
         }
 

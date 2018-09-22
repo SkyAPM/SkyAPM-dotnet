@@ -16,36 +16,59 @@
  *
  */
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using SkyWalking.Diagnostics;
+using SkyWalking.Logging;
 
 namespace SkyWalking
 {
-    public class InstrumentationServiceStartup: IInstrumentationServiceStartup
+    public class InstrumentationServiceStartup : IInstrumentationServiceStartup
     {
         private readonly TracingDiagnosticProcessorObserver _observer;
         private readonly IEnumerable<IInstrumentationService> _services;
-        
-        public InstrumentationServiceStartup(TracingDiagnosticProcessorObserver observer, IEnumerable<IInstrumentationService> services)
+        private readonly ILogger _logger;
+
+        public InstrumentationServiceStartup(TracingDiagnosticProcessorObserver observer, IEnumerable<IInstrumentationService> services, ILoggerFactory loggerFactory)
         {
             _observer = observer;
             _services = services;
-
+            _logger = loggerFactory.CreateLogger(typeof(InstrumentationServiceStartup));
         }
+
         public async Task StartAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
+            _logger.Information(Welcome());
             foreach (var service in _services)
                 await service.StartAsync(cancellationToken);
             DiagnosticListener.AllListeners.Subscribe(_observer);
+            _logger.Information("Started SkyWalking .NET Core Agent.");
         }
 
         public async Task StopAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
             foreach (var service in _services)
                 await service.StopAsync(cancellationToken);
+            _logger.Information("Stopped SkyWalking .NET Core Agent.");
+            // ReSharper disable once MethodSupportsCancellation
+            await Task.Delay(TimeSpan.FromSeconds(2));
+        }
+
+        private string Welcome()
+        {
+            var builder = new StringBuilder();
+            builder.AppendLine("Initializing ...");
+            builder.AppendLine();
+            builder.AppendLine("***************************************************************");
+            builder.AppendLine("*                                                             *");
+            builder.AppendLine("*                Welcome to Apache SkyWalking                 *");
+            builder.AppendLine("*                                                             *");
+            builder.AppendLine("***************************************************************");
+            return builder.ToString();
         }
     }
 }

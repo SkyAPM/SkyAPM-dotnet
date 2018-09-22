@@ -59,7 +59,7 @@ namespace SkyWalking.Service
                 if (value.HasValue && RuntimeEnvironment is RuntimeEnvironment environment)
                 {
                     environment.ApplicationId = value;
-                    Logger.Information($"Registered application {environment.ApplicationId.Value}.");
+                    Logger.Information($"Registered Application[Id={environment.ApplicationId.Value}].");
                 }
             }
         }
@@ -81,7 +81,7 @@ namespace SkyWalking.Service
                 if (value.HasValue && RuntimeEnvironment is RuntimeEnvironment environment)
                 {
                     environment.ApplicationInstanceId = value;
-                    Logger.Information($"Registered application instance {environment.ApplicationId.Value}.");
+                    Logger.Information($"Registered Application Instance[Id={environment.ApplicationInstanceId.Value}].");
                 }
             }
         }

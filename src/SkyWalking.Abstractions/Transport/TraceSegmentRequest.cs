@@ -77,8 +77,8 @@ namespace SkyWalking.Transport
         public IList<TraceSegmentReferenceRequest> References { get; set; } = new List<TraceSegmentReferenceRequest>();
 
         public IList<KeyValuePair<string, string>> Tags { get; set; } = new List<KeyValuePair<string, string>>();
-        
-        public IList<LogDataRequest> Logs { get; set; }
+
+        public IList<LogDataRequest> Logs { get; set; } = new List<LogDataRequest>();
     }
 
     public class TraceSegmentReferenceRequest

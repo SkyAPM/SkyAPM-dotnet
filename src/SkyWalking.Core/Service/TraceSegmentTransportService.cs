@@ -39,6 +39,7 @@ namespace SkyWalking.Service
             _dispatcher = dispatcher;
             _config = configAccessor.Get<TransportConfig>();
             Period = TimeSpan.FromMilliseconds(_config.Interval);
+            TracingContext.ListenerManager.Add(this);
         }
 
         protected override TimeSpan DueTime { get; } = TimeSpan.FromSeconds(3);
@@ -48,6 +49,12 @@ namespace SkyWalking.Service
         protected override Task ExecuteAsync(CancellationToken cancellationToken)
         {
             return _dispatcher.Flush(cancellationToken);
+        }
+
+        protected override Task Stopping(CancellationToken cancellationToke)
+        {
+            TracingContext.ListenerManager.Remove(this);
+            return Task.CompletedTask;
         }
 
         public void AfterFinished(ITraceSegment traceSegment)
