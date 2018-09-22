@@ -21,7 +21,7 @@ using System.Threading.Tasks;
 
 namespace SkyWalking
 {
-    public interface IInstrumentationService
+    public interface IExecutionService
     {
         Task StartAsync(CancellationToken cancellationToken = default(CancellationToken));
 

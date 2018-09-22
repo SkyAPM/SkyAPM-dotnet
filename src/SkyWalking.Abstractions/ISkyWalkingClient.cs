@@ -24,7 +24,7 @@ using SkyWalking.Transport;
 
 namespace SkyWalking
 {
-    public interface IInstrumentationClient
+    public interface ISkyWalkingClient
     {
         Task<NullableValue> RegisterApplicationAsync(string applicationCode, CancellationToken cancellationToken = default(CancellationToken));
 

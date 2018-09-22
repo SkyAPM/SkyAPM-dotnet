@@ -29,13 +29,13 @@ namespace SkyWalking.Transport
     {
         private readonly ILogger _logger;
         private readonly TransportConfig _config;
-        private readonly IInstrumentationClient _instrumentationClient;
+        private readonly ISkyWalkingClient _skyWalkingClient;
         private readonly ConcurrentQueue<TraceSegmentRequest> _segmentQueue;
         private readonly CancellationTokenSource _cancellation;
 
-        public AsyncQueueTraceDispatcher(IConfigAccessor configAccessor, IInstrumentationClient client, ILoggerFactory loggerFactory)
+        public AsyncQueueTraceDispatcher(IConfigAccessor configAccessor, ISkyWalkingClient client, ILoggerFactory loggerFactory)
         {
-            _instrumentationClient = client;
+            _skyWalkingClient = client;
             _logger = loggerFactory.CreateLogger(typeof(AsyncQueueTraceDispatcher));
             _config = configAccessor.Get<TransportConfig>();
             _segmentQueue = new ConcurrentQueue<TraceSegmentRequest>();
@@ -67,7 +67,7 @@ namespace SkyWalking.Transport
 
             // send async
             if (segments.Count > 0)
-                _instrumentationClient.CollectAsync(segments, token);
+                _skyWalkingClient.CollectAsync(segments, token);
             return Task.CompletedTask;
         }
 

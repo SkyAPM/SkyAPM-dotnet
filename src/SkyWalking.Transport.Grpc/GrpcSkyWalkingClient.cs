@@ -26,17 +26,17 @@ using SkyWalking.NetworkProtocol;
 
 namespace SkyWalking.Transport.Grpc
 {
-    public class GrpcInstrumentationClient : IInstrumentationClient
+    public class GrpcSkyWalkingClient : ISkyWalkingClient
     {
         private readonly ConnectionManager _connectionManager;
         private readonly ILogger _logger;
         private readonly GrpcConfig _config;
 
-        public GrpcInstrumentationClient(ConnectionManager connectionManager, IConfigAccessor configAccessor, ILoggerFactory loggerFactory)
+        public GrpcSkyWalkingClient(ConnectionManager connectionManager, IConfigAccessor configAccessor, ILoggerFactory loggerFactory)
         {
             _connectionManager = connectionManager;
             _config = configAccessor.Get<GrpcConfig>();
-            _logger = loggerFactory.CreateLogger(typeof(GrpcInstrumentationClient));
+            _logger = loggerFactory.CreateLogger(typeof(GrpcSkyWalkingClient));
         }
 
         public async Task<NullableValue> RegisterApplicationAsync(string applicationCode, CancellationToken cancellationToken = default(CancellationToken))

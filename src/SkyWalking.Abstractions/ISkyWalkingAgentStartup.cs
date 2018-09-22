@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace SkyWalking
 {
-    public interface IInstrumentationServiceStartup
+    public interface ISkyWalkingAgentStartup
     {
         Task StartAsync(CancellationToken cancellationToken = default(CancellationToken));
 

@@ -24,13 +24,13 @@ using SkyWalking.Logging;
 
 namespace SkyWalking.Service
 {
-    public class SamplingRefreshService : InstrumentationService
+    public class SamplingRefreshService : ExecutionService
     {
         private readonly SamplingConfig _config;
 
-        public SamplingRefreshService(IConfigAccessor configAccessor, IInstrumentationClient instrumentation,
+        public SamplingRefreshService(IConfigAccessor configAccessor, ISkyWalkingClient skyWalking,
             IRuntimeEnvironment runtimeEnvironment, ILoggerFactory loggerFactory)
-            : base(instrumentation, runtimeEnvironment, loggerFactory)
+            : base(skyWalking, runtimeEnvironment, loggerFactory)
         {
             _config = configAccessor.Get<SamplingConfig>();
             DefaultSampler.Instance.SetSamplePer3Secs(_config.SamplePer3Secs);

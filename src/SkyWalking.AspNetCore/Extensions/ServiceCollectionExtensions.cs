@@ -49,10 +49,10 @@ namespace SkyWalking.AspNetCore
             }
 
             services.AddSingleton<ITraceDispatcher, AsyncQueueTraceDispatcher>();
-            services.AddSingleton<IInstrumentationService, TraceSegmentTransportService>();
-            services.AddSingleton<IInstrumentationService, ServiceDiscoveryService>();
-            services.AddSingleton<IInstrumentationService, SamplingRefreshService>();
-            services.AddSingleton<IInstrumentationServiceStartup, InstrumentationServiceStartup>();
+            services.AddSingleton<IExecutionService, TraceSegmentTransportService>();
+            services.AddSingleton<IExecutionService, ServiceDiscoveryService>();
+            services.AddSingleton<IExecutionService, SamplingRefreshService>();
+            services.AddSingleton<ISkyWalkingAgentStartup, SkyWalkingAgentStartup>();
             services.AddSingleton<ISampler>(DefaultSampler.Instance);
             services.AddSingleton(RuntimeEnvironment.Instance);
             services.AddSingleton<TracingDiagnosticProcessorObserver>();
@@ -66,9 +66,9 @@ namespace SkyWalking.AspNetCore
 
         private static IServiceCollection AddGrpcTransport(this IServiceCollection services)
         {
-            services.AddSingleton<IInstrumentationClient, GrpcInstrumentationClient>();
+            services.AddSingleton<ISkyWalkingClient, GrpcSkyWalkingClient>();
             services.AddSingleton<ConnectionManager>();
-            services.AddSingleton<IInstrumentationService, GrpcStateCheckService>();
+            services.AddSingleton<IExecutionService, GrpcStateCheckService>();
             return services;
         }
         

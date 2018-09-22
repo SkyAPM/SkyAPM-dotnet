@@ -23,18 +23,18 @@ using SkyWalking.Logging;
 
 namespace SkyWalking
 {
-    public abstract class InstrumentationService : IInstrumentationService, IDisposable
+    public abstract class ExecutionService : IExecutionService, IDisposable
     {
         private Timer _timer;
         private CancellationTokenSource _cancellationTokenSource;
 
         protected readonly ILogger Logger;
         protected readonly IRuntimeEnvironment RuntimeEnvironment;
-        protected readonly IInstrumentationClient Instrumentation;
+        protected readonly ISkyWalkingClient SkyWalking;
 
-        protected InstrumentationService(IInstrumentationClient instrumentation, IRuntimeEnvironment runtimeEnvironment, ILoggerFactory loggerFactory)
+        protected ExecutionService(ISkyWalkingClient skyWalking, IRuntimeEnvironment runtimeEnvironment, ILoggerFactory loggerFactory)
         {
-            Instrumentation = instrumentation;
+            SkyWalking = skyWalking;
             RuntimeEnvironment = runtimeEnvironment;
             Logger = loggerFactory.CreateLogger(GetType());
         }

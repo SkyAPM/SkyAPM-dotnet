@@ -27,14 +27,14 @@ using SkyWalking.Transport;
 
 namespace SkyWalking.Service
 {
-    public class TraceSegmentTransportService : InstrumentationService, ITracingContextListener
+    public class TraceSegmentTransportService : ExecutionService, ITracingContextListener
     {
         private readonly TransportConfig _config;
         private readonly ITraceDispatcher _dispatcher;
 
         public TraceSegmentTransportService(IConfigAccessor configAccessor, ITraceDispatcher dispatcher,
-            IInstrumentationClient instrumentation, IRuntimeEnvironment runtimeEnvironment, ILoggerFactory loggerFactory)
-            : base(instrumentation, runtimeEnvironment, loggerFactory)
+            ISkyWalkingClient skyWalking, IRuntimeEnvironment runtimeEnvironment, ILoggerFactory loggerFactory)
+            : base(skyWalking, runtimeEnvironment, loggerFactory)
         {
             _dispatcher = dispatcher;
             _config = configAccessor.Get<TransportConfig>();

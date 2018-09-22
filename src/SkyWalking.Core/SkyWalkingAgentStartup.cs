@@ -27,17 +27,17 @@ using SkyWalking.Logging;
 
 namespace SkyWalking
 {
-    public class InstrumentationServiceStartup : IInstrumentationServiceStartup
+    public class SkyWalkingAgentStartup : ISkyWalkingAgentStartup
     {
         private readonly TracingDiagnosticProcessorObserver _observer;
-        private readonly IEnumerable<IInstrumentationService> _services;
+        private readonly IEnumerable<IExecutionService> _services;
         private readonly ILogger _logger;
 
-        public InstrumentationServiceStartup(TracingDiagnosticProcessorObserver observer, IEnumerable<IInstrumentationService> services, ILoggerFactory loggerFactory)
+        public SkyWalkingAgentStartup(TracingDiagnosticProcessorObserver observer, IEnumerable<IExecutionService> services, ILoggerFactory loggerFactory)
         {
             _observer = observer;
             _services = services;
-            _logger = loggerFactory.CreateLogger(typeof(InstrumentationServiceStartup));
+            _logger = loggerFactory.CreateLogger(typeof(SkyWalkingAgentStartup));
         }
 
         public async Task StartAsync(CancellationToken cancellationToken = default(CancellationToken))

@@ -27,7 +27,7 @@ using SkyWalking.Utils;
 
 namespace SkyWalking.Service
 {
-    public class ServiceDiscoveryService : InstrumentationService
+    public class ServiceDiscoveryService : ExecutionService
     {
         private readonly InstrumentationConfig _config;
 
@@ -35,7 +35,7 @@ namespace SkyWalking.Service
 
         protected override TimeSpan Period { get; } = TimeSpan.FromSeconds(30);
 
-        public ServiceDiscoveryService(IConfigAccessor configAccessor, IInstrumentationClient client,
+        public ServiceDiscoveryService(IConfigAccessor configAccessor, ISkyWalkingClient client,
             IRuntimeEnvironment runtimeEnvironment, ILoggerFactory loggerFactory)
             : base(client, runtimeEnvironment, loggerFactory)
         {
@@ -55,7 +55,7 @@ namespace SkyWalking.Service
         {
             if (!RuntimeEnvironment.ApplicationId.HasValue)
             {
-                var value = await Polling(3, () => Instrumentation.RegisterApplicationAsync(_config.ApplicationCode, cancellationToken), cancellationToken);
+                var value = await Polling(3, () => SkyWalking.RegisterApplicationAsync(_config.ApplicationCode, cancellationToken), cancellationToken);
                 if (value.HasValue && RuntimeEnvironment is RuntimeEnvironment environment)
                 {
                     environment.ApplicationId = value;
@@ -76,7 +76,7 @@ namespace SkyWalking.Service
                     ProcessNo = Process.GetCurrentProcess().Id
                 };
                 var value = await Polling(3,
-                    () => Instrumentation.RegisterApplicationInstanceAsync(RuntimeEnvironment.ApplicationId.Value, RuntimeEnvironment.AgentUUID,
+                    () => SkyWalking.RegisterApplicationInstanceAsync(RuntimeEnvironment.ApplicationId.Value, RuntimeEnvironment.AgentUUID,
                         DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(), osInfoRequest, cancellationToken), cancellationToken);
                 if (value.HasValue && RuntimeEnvironment is RuntimeEnvironment environment)
                 {
@@ -109,7 +109,7 @@ namespace SkyWalking.Service
             {
                 try
                 {
-                    await Instrumentation.HeartbeatAsync(RuntimeEnvironment.ApplicationInstanceId.Value, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(), cancellationToken);
+                    await SkyWalking.HeartbeatAsync(RuntimeEnvironment.ApplicationInstanceId.Value, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(), cancellationToken);
                     Logger.Debug($"Heartbeat at {DateTimeOffset.UtcNow}.");
                 }
                 catch (Exception e)

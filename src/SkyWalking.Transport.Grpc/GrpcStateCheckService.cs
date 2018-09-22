@@ -23,13 +23,13 @@ using SkyWalking.Logging;
 
 namespace SkyWalking.Transport.Grpc
 {
-    public class GrpcStateCheckService : InstrumentationService
+    public class GrpcStateCheckService : ExecutionService
     {
         private readonly ConnectionManager _connectionManager;
 
-        public GrpcStateCheckService(ConnectionManager connectionManager, IInstrumentationClient instrumentation, IRuntimeEnvironment runtimeEnvironment,
+        public GrpcStateCheckService(ConnectionManager connectionManager, ISkyWalkingClient skyWalking, IRuntimeEnvironment runtimeEnvironment,
             ILoggerFactory loggerFactory) : base(
-            instrumentation, runtimeEnvironment, loggerFactory)
+            skyWalking, runtimeEnvironment, loggerFactory)
         {
             _connectionManager = connectionManager;
         }
