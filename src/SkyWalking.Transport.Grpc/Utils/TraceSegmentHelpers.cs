@@ -17,7 +17,8 @@ namespace SkyWalking.Transport.Grpc
             {
                 TraceSegmentId = MapToUniqueId(request.Segment.SegmentId),
                 ApplicationId = request.Segment.ApplicationId,
-                ApplicationInstanceId = request.Segment.ApplicationInstanceId
+                ApplicationInstanceId = request.Segment.ApplicationInstanceId,
+                IsSizeLimited = false
             };
 
             traceSegment.Spans.Add(request.Segment.Spans.Select(MapToSpan).ToArray());

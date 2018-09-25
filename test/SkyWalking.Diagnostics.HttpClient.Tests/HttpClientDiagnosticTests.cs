@@ -34,8 +34,8 @@ namespace SkyWalking.Diagnostics.HttpClient.Tests
         [Fact]
         public async Task HttpClient_Request_Fail_Test()
         {
-            AgentConfig.ApplicationCode = "HttpClientDiagnosticTests";
-            CollectorConfig.DirectServers = "HttpClientDiagnosticTests.xx:50000";
+//            AgentConfig.ApplicationCode = "HttpClientDiagnosticTests";
+//            CollectorConfig.DirectServers = "HttpClientDiagnosticTests.xx:50000";
 
             var httpClientDiagnosticProcessor = new HttpClientTracingDiagnosticProcessor();
 

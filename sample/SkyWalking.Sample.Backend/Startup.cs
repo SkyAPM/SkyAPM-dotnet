@@ -24,9 +24,7 @@ namespace SkyWalking.Sample.Backend
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
-
-            services.AddSkyWalkingCore();
-
+            
             var sqliteConnection = new SqliteConnection("DataSource=:memory:");
             sqliteConnection.Open();
             

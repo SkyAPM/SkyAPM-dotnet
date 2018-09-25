@@ -18,7 +18,6 @@
 
 using System.Collections.Generic;
 using System.Threading;
-using SkyWalking.Config;
 using SkyWalking.Context.Trace;
 
 namespace SkyWalking.Context
@@ -53,13 +52,13 @@ namespace SkyWalking.Context
                 {
                     if (RuntimeEnvironment.Instance.Initialized)
                     {
-                        var suffixIdx = operationName.LastIndexOf('.');
-                        if (suffixIdx > -1 && AgentConfig.IgnoreSuffix.Contains(operationName.Substring(suffixIdx)))
-                        {
-                            _context.Value = new IgnoredTracerContext();
-                        }
-                        else
-                        {
+//                        var suffixIdx = operationName.LastIndexOf('.');
+//                        if (suffixIdx > -1 && AgentConfig.IgnoreSuffix.Contains(operationName.Substring(suffixIdx)))
+//                        {
+//                            _context.Value = new IgnoredTracerContext();
+//                        }
+//                        else
+//                        {
                             var sampler = DefaultSampler.Instance;
                             if (forceSampling || sampler.Sampled())
                             {
@@ -69,7 +68,7 @@ namespace SkyWalking.Context
                             {
                                 _context.Value = new IgnoredTracerContext();
                             }
-                        }
+//                        }
                     }
                     else
                     {

@@ -22,6 +22,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using SkyWalking.Components;
+using SkyWalking.Config;
 using SkyWalking.Context;
 using SkyWalking.Context.Tag;
 using SkyWalking.Context.Trace;
@@ -32,6 +33,12 @@ namespace SkyWalking.AspNetCore.Diagnostics
     public class HostingTracingDiagnosticProcessor : ITracingDiagnosticProcessor
     {
         public string ListenerName { get; } = "Microsoft.AspNetCore";
+        private readonly InstrumentationConfig _config;
+
+        public HostingTracingDiagnosticProcessor(IConfigAccessor configAccessor)
+        {
+            _config = configAccessor.Get<InstrumentationConfig>();
+        }
 
         [DiagnosticName("Microsoft.AspNetCore.Hosting.BeginRequest")]
         public void BeginRequest([Property] HttpContext httpContext)
@@ -39,7 +46,7 @@ namespace SkyWalking.AspNetCore.Diagnostics
             var carrier = new ContextCarrier();
             foreach (var item in carrier.Items)
                 item.HeadValue = httpContext.Request.Headers[item.HeadKey];
-            var httpRequestSpan = ContextManager.CreateEntrySpan($"{Config.AgentConfig.ApplicationCode} {httpContext.Request.Path}", carrier);
+            var httpRequestSpan = ContextManager.CreateEntrySpan($"{_config.ApplicationCode} {httpContext.Request.Path}", carrier);
             httpRequestSpan.AsHttp();
             httpRequestSpan.SetComponent(ComponentsDefine.AspNetCore);
             Tags.Url.Set(httpRequestSpan, httpContext.Request.Path);

@@ -17,7 +17,6 @@
  */
 
 using System;
-using System.Runtime.CompilerServices;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using SkyWalking.AspNetCore.Diagnostics;
@@ -33,9 +32,6 @@ using SkyWalking.Logging;
 using SkyWalking.Service;
 using SkyWalking.Transport;
 using SkyWalking.Transport.Grpc;
-
-[assembly:InternalsVisibleTo("SkyWalking.Sample.Frontend")]
-[assembly:InternalsVisibleTo("SkyWalking.Sample.Backend")]
 
 namespace SkyWalking.AspNetCore
 {

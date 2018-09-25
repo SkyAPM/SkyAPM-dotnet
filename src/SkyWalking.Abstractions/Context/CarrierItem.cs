@@ -58,14 +58,15 @@ namespace SkyWalking.Context
 
         public CarrierItem(String headKey, String headValue, CarrierItem next)
         {
-            if (string.IsNullOrEmpty(AgentConfig.Namespace))
-            {
-                _headKey = headKey;
-            }
-            else
-            {
-                _headKey = $"{AgentConfig.Namespace}-{headKey}";
-            }
+//            if (string.IsNullOrEmpty(AgentConfig.Namespace))
+//            {
+//                _headKey = headKey;
+//            }
+//            else
+//            {
+//                _headKey = $"{AgentConfig.Namespace}-{headKey}";
+//            }
+            _headKey = headKey;
             _headValue = headValue;
             _next = next;
         }

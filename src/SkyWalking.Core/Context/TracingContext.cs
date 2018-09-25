@@ -321,7 +321,7 @@ namespace SkyWalking.Context
 
         private bool IsLimitMechanismWorking()
         {
-            if (_spanIdGenerator < Config.AgentConfig.SpanLimitPerSegment)
+            if (_spanIdGenerator < 300)
             {
                 return false;
             }
