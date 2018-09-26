@@ -3,7 +3,6 @@ os: Visual Studio 2017
 branches:
   only:
   - master
-  - develop
 environment:
   BUILDING_ON_PLATFORM: win
   BuildEnvironment: appveyor
@@ -23,7 +22,7 @@ deploy:
   skip_symbols: true
   artifact: /artifacts\/packages\/.+\.nupkg/
   on:
-    branch: develop
+    branch: master
 - provider: NuGet
   server: https://api.nuget.org/v3/index.json
   api_key:
