@@ -28,11 +28,18 @@ namespace SkyWalking.Diagnostics.HttpClient
     public class HttpClientTracingDiagnosticProcessor : ITracingDiagnosticProcessor
     {
         public string ListenerName { get; } = "HttpHandlerDiagnosticListener";
+        
+        private readonly IContextCarrierFactory _contextCarrierFactory;
+
+        public HttpClientTracingDiagnosticProcessor(IContextCarrierFactory contextCarrierFactory)
+        {
+            _contextCarrierFactory = contextCarrierFactory;
+        }
 
         [DiagnosticName("System.Net.Http.Request")]
         public void HttpRequest([Property(Name = "Request")] HttpRequestMessage request)
         {
-            var contextCarrier = new ContextCarrier();
+            var contextCarrier = _contextCarrierFactory.Create();
             var peer = $"{request.RequestUri.Host}:{request.RequestUri.Port}";
             var span = ContextManager.CreateExitSpan(request.RequestUri.ToString(), contextCarrier, peer);
             Tags.Url.Set(span, request.RequestUri.ToString());

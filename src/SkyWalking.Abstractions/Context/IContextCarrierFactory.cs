@@ -2,7 +2,7 @@
  * Licensed to the OpenSkywalking under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
- * The OpenSkywalking licenses this file to You under the Apache License, Version 2.0
+ * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
  *
@@ -16,21 +16,10 @@
  *
  */
 
-using System;
-using SkyWalking.Config;
-
-namespace SkyWalking
+namespace SkyWalking.Context
 {
-    public interface IRuntimeEnvironment
+    public interface IContextCarrierFactory
     {
-        NullableValue ApplicationId { get; }
-
-        NullableValue ApplicationInstanceId { get; }
-
-        bool Initialized { get; }
-
-        Guid AgentUUID { get; }
-
-        IEnvironmentProvider Environment { get; }
+        IContextCarrier Create();
     }
 }

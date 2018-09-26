@@ -64,6 +64,12 @@ namespace SkyWalking.Context
 
         private DistributedTraceId _primaryDistributedTraceId;
 
+        private readonly string _namespace;
+
+        public ContextCarrier(string @namespace)
+        {
+            _namespace = @namespace;
+        }
 
         public DistributedTraceId DistributedTraceId => _primaryDistributedTraceId;
 
@@ -179,17 +185,14 @@ namespace SkyWalking.Context
                 PrimaryDistributedTraceId.Encode);
         }
 
-        public DistributedTraceId PrimaryDistributedTraceId
-        {
-            get { return _primaryDistributedTraceId; }
-        }
+        public DistributedTraceId PrimaryDistributedTraceId => _primaryDistributedTraceId;
 
         public CarrierItem Items
         {
             get
             {
-                SW3CarrierItem carrierItem = new SW3CarrierItem(this, null);
-                CarrierItemHead head = new CarrierItemHead(carrierItem);
+                var carrierItem = new SW3CarrierItem(this, null, _namespace);
+                var head = new CarrierItemHead(carrierItem, _namespace);
                 return head;
             }
         }

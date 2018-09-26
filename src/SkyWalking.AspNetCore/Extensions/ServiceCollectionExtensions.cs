@@ -21,6 +21,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using SkyWalking.AspNetCore.Diagnostics;
 using SkyWalking.Config;
+using SkyWalking.Context;
 using SkyWalking.Diagnostics;
 using SkyWalking.Diagnostics.EntityFrameworkCore;
 using SkyWalking.Diagnostics.HttpClient;
@@ -44,6 +45,7 @@ namespace SkyWalking.AspNetCore
                 throw new ArgumentNullException(nameof(services));
             }
 
+            services.AddSingleton<IContextCarrierFactory, ContextCarrierFactory>();
             services.AddSingleton<ITraceDispatcher, AsyncQueueTraceDispatcher>();
             services.AddSingleton<IExecutionService, TraceSegmentTransportService>();
             services.AddSingleton<IExecutionService, ServiceDiscoveryService>();

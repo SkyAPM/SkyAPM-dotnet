@@ -34,16 +34,18 @@ namespace SkyWalking.AspNetCore.Diagnostics
     {
         public string ListenerName { get; } = "Microsoft.AspNetCore";
         private readonly InstrumentationConfig _config;
+        private readonly IContextCarrierFactory _contextCarrierFactory;
 
-        public HostingTracingDiagnosticProcessor(IConfigAccessor configAccessor)
+        public HostingTracingDiagnosticProcessor(IConfigAccessor configAccessor,IContextCarrierFactory contextCarrierFactory)
         {
             _config = configAccessor.Get<InstrumentationConfig>();
+            _contextCarrierFactory = contextCarrierFactory;
         }
 
         [DiagnosticName("Microsoft.AspNetCore.Hosting.BeginRequest")]
         public void BeginRequest([Property] HttpContext httpContext)
         {
-            var carrier = new ContextCarrier();
+            var carrier = _contextCarrierFactory.Create();
             foreach (var item in carrier.Items)
                 item.HeadValue = httpContext.Request.Headers[item.HeadKey];
             var httpRequestSpan = ContextManager.CreateEntrySpan($"{_config.ApplicationCode} {httpContext.Request.Path}", carrier);

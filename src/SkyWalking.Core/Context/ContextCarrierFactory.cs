@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Licensed to the OpenSkywalking under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -16,25 +16,22 @@
  *
  */
 
-using System;
+using SkyWalking.Config;
 
 namespace SkyWalking.Context
 {
-    public class SW3CarrierItem : CarrierItem
+    public class ContextCarrierFactory : IContextCarrierFactory
     {
-        private const string HEADER_NAME = "sw3";
-        private readonly IContextCarrier _carrier;
+        private readonly InstrumentationConfig _config;
 
-        public SW3CarrierItem(IContextCarrier carrier, CarrierItem next, string @namespace)
-            : base(HEADER_NAME, carrier.Serialize(), next, @namespace)
+        public ContextCarrierFactory(IConfigAccessor configAccessor)
         {
-            _carrier = carrier;
+            _config = configAccessor.Get<InstrumentationConfig>();
         }
 
-        public override string HeadValue
+        public IContextCarrier Create()
         {
-            get => base.HeadValue;
-            set => _carrier.Deserialize(value);
+            return new ContextCarrier(_config.Namespace);
         }
     }
 }
