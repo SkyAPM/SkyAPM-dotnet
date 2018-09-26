@@ -51,6 +51,7 @@ namespace SkyWalking.Transport.Grpc
 
             ReadStringOrIntValue(spanObject, request.Component, ComponentReader, ComponentIdReader);
             ReadStringOrIntValue(spanObject, request.OperationName, OperationNameReader, OperationNameIdReader);
+            ReadStringOrIntValue(spanObject, request.Peer, PeerReader, PeerIdReader);
 
             spanObject.Tags.Add(request.Tags.Select(x => new KeyWithStringValue {Key = x.Key, Value = x.Value}));
             spanObject.Refs.AddRange(request.References.Select(MapToSegmentReference).ToArray());
@@ -69,7 +70,7 @@ namespace SkyWalking.Transport.Grpc
                 RefType = (RefType) referenceRequest.RefType,
                 ParentTraceSegmentId = MapToUniqueId(referenceRequest.ParentTraceSegmentId)
             };
-            
+
             ReadStringOrIntValue(reference, referenceRequest.NetworkAddress, NetworkAddressReader, NetworkAddressIdReader);
             ReadStringOrIntValue(reference, referenceRequest.EntryServiceName, EntryServiceReader, EntryServiceIdReader);
             ReadStringOrIntValue(reference, referenceRequest.ParentServiceName, ParentServiceReader, ParentServiceIdReader);
@@ -100,6 +101,8 @@ namespace SkyWalking.Transport.Grpc
         private static readonly Action<SpanObject, int> ComponentIdReader = (s, val) => s.ComponentId = val;
         private static readonly Action<SpanObject, string> OperationNameReader = (s, val) => s.OperationName = val;
         private static readonly Action<SpanObject, int> OperationNameIdReader = (s, val) => s.OperationNameId = val;
+        private static readonly Action<SpanObject, string> PeerReader = (s, val) => s.Peer = val;
+        private static readonly Action<SpanObject, int> PeerIdReader = (s, val) => s.PeerId = val;
         private static readonly Action<TraceSegmentReference, string> NetworkAddressReader = (s, val) => s.NetworkAddress = val;
         private static readonly Action<TraceSegmentReference, int> NetworkAddressIdReader = (s, val) => s.NetworkAddressId = val;
         private static readonly Action<TraceSegmentReference, string> EntryServiceReader = (s, val) => s.EntryServiceName = val;
