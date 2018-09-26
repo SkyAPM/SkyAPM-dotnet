@@ -77,6 +77,7 @@ public class BuildParameters
 		var suffix = versionQuality;
 		if (!IsTagged)
 		{
+			var buildSystem = Context.BuildSystem();
 			if (buildSystem.IsRunningOnAppVeyor && buildSystem.AppVeyor.Environment.Repository.Branch == "master")
 			{
 				suffix += "prerelease-" + Util.CreateStamp();
