@@ -29,21 +29,29 @@ namespace SkyWalking.AspNet
 {
     public class HttpTracingHandler : DelegatingHandler
     {
+        private readonly IContextCarrierFactory _contextCarrierFactory;
+
         public HttpTracingHandler()
             : this(new HttpClientHandler())
         {
         }
 
         public HttpTracingHandler(HttpMessageHandler innerHandler)
+            : this(innerHandler, CommonServiceLocator.ServiceLocator.Current.GetInstance<IContextCarrierFactory>())
+        {
+        }
+
+        private HttpTracingHandler(HttpMessageHandler innerHandler, IContextCarrierFactory contextCarrierFactory)
         {
             InnerHandler = innerHandler;
+            _contextCarrierFactory = contextCarrierFactory;
         }
 
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,
             CancellationToken cancellationToken)
         {
             var peer = $"{request.RequestUri.Host}:{request.RequestUri.Port}";
-            var contextCarrier = new ContextCarrier();
+            var contextCarrier = _contextCarrierFactory.Create();
             var span = ContextManager.CreateExitSpan(request.RequestUri.ToString(), contextCarrier, peer);
             try
             {

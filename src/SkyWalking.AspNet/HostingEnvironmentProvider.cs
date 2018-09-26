@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Licensed to the OpenSkywalking under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -17,21 +17,18 @@
  */
 
 using System;
-using System.Diagnostics;
-using SkyWalking.Logging;
 
-namespace SkyWalking.AspNet.Logging
+namespace SkyWalking.AspNet
 {
-    internal class DebugLoggerFactoryAdapter : ILoggerFactory
+    internal class HostingEnvironmentProvider : IEnvironmentProvider
     {
-        public DebugLoggerFactoryAdapter()
-        {
-            Debug.Listeners.Add(new TextWriterTraceListener(Console.Out));
-        }
+        private const string ENVIRONMENT_KEY = "ASPNET__ENVIRONMENT";
+        
+        public string EnvironmentName { get; }
 
-        public ILogger CreateLogger(Type type)
+        public HostingEnvironmentProvider()
         {
-            return new DebugLoggerAdapter(type);
+            EnvironmentName = Environment.GetEnvironmentVariable(ENVIRONMENT_KEY) ?? "Production";
         }
     }
 }
