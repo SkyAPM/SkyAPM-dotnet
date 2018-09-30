@@ -1,8 +1,13 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using System.Data.SqlClient;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Data.Sqlite;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SkyWalking.AspNetCore;
+using SkyWalking.Diagnostics.EntityFrameworkCore;
+using SkyWalking.Sample.Backend.Models;
 
 namespace SkyWalking.Sample.Backend
 {
@@ -19,12 +24,11 @@ namespace SkyWalking.Sample.Backend
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
-
-            services.AddSkyWalking(option =>
-            {
-                option.DirectServers = "localhost:11800";
-                option.ApplicationCode = "asp-net-core-backend";
-            });
+            
+            var sqliteConnection = new SqliteConnection("DataSource=:memory:");
+            sqliteConnection.Open();
+            
+            services.AddEntityFrameworkSqlite().AddDbContext<SampleDbContext>(c => c.UseSqlite(sqliteConnection));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -33,6 +37,14 @@ namespace SkyWalking.Sample.Backend
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+            }
+
+            using (var scope = app.ApplicationServices.CreateScope())
+            {
+                using (var sampleDbContext = scope.ServiceProvider.GetService<SampleDbContext>())
+                {
+                    sampleDbContext.Database.EnsureCreated();
+                } 
             }
 
             app.UseMvc();

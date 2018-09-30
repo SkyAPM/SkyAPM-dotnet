@@ -18,8 +18,6 @@
 
 using System;
 using System.Threading;
-using SkyWalking.Config;
-using SkyWalking.Dictionarys;
 
 namespace SkyWalking.Context.Ids
 {
@@ -29,7 +27,7 @@ namespace SkyWalking.Context.Ids
 
         public static ID Generate()
         {
-            if (RemoteDownstreamConfig.Agent.ApplicationId == DictionaryUtil.NullValue)
+            if (!RuntimeEnvironment.Instance.ApplicationInstanceId.HasValue)
             {
                 throw new InvalidOperationException();
             }
@@ -37,7 +35,7 @@ namespace SkyWalking.Context.Ids
             IDContext context = threadIdSequence.Value;
 
             return new ID(
-                RemoteDownstreamConfig.Agent.ApplicationInstanceId,
+                RuntimeEnvironment.Instance.ApplicationInstanceId.Value,
                 Thread.CurrentThread.ManagedThreadId,
                 context.NextSeq()
             );
@@ -77,6 +75,7 @@ namespace SkyWalking.Context.Ids
                         _lastRandomValue = _random.Next();
                         _runRandomTimestamp = currentTimeMillis;
                     }
+
                     return _lastRandomValue;
                 }
                 else
@@ -92,6 +91,7 @@ namespace SkyWalking.Context.Ids
                 {
                     _threadSeq = 0;
                 }
+
                 return _threadSeq++;
             }
         }
