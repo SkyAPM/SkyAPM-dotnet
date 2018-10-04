@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Hosting;
 using SkyWalking.AspNetCore;
 
-[assembly: HostingStartup(typeof(SkyWalkingHostingStartup))]
+//[assembly: HostingStartup(typeof(SkyWalkingHostingStartup))]
 
 namespace SkyWalking.AspNetCore
 {

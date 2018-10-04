@@ -3,7 +3,6 @@
   <PropertyGroup>
     <Description>SkyWalking ASP.NET Core Agent.</Description>
     <AssemblyTitle>SkyWalking.AspNetCore</AssemblyTitle>
-    <AssemblyName>SkyWalking_AspNetCore</AssemblyName>
     <PackageId>SkyWalking.AspNetCore</PackageId>
     <PackageTags>SkyWalking;APM</PackageTags>
     <PackageReleaseNotes>

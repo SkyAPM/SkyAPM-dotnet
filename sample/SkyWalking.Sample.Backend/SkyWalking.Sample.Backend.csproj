@@ -22,7 +22,4 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="logs" />
-  </ItemGroup>
 </Project>
