@@ -12,6 +12,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "solution items", "solution 
 		generate_protos.bat = generate_protos.bat
 		generate_protos_linux.sh = generate_protos_linux.sh
 		generate_protos_macos.sh = generate_protos_macos.sh
+		appveyor.yml = appveyor.yml
+		NuGet.config = NuGet.config
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SkyWalking.Abstractions", "src\SkyWalking.Abstractions\SkyWalking.Abstractions.csproj", "{C3860B5F-21D0-429F-8A00-B0C0F4573DF7}"
@@ -67,6 +69,15 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SkyWalking.Utilities.DependencyInjection", "src\SkyWalking.Utilities.DependencyInjection\SkyWalking.Utilities.DependencyInjection.csproj", "{1812A19C-729C-410B-A90D-D5AF1404DD60}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SkyWalking.Utilities.Logging", "src\SkyWalking.Utilities.Logging\SkyWalking.Utilities.Logging.csproj", "{AEB61F19-3DBB-411E-A67E-93007B96E160}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{F0B43114-3BA9-4098-952D-0FB2241691A9}"
+ProjectSection(SolutionItems) = preProject
+	build\common.props = build\common.props
+	build\index.cake = build\index.cake
+	build\util.cake = build\util.cake
+	build\version.cake = build\version.cake
+	build\version.props = build\version.props
+EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -189,6 +200,7 @@ Global
 		{0B87C4B8-3F4F-456A-B588-28D8E9E3395A} = {4BD917BC-D579-4C75-9939-41BF012A4EE2}
 		{1812A19C-729C-410B-A90D-D5AF1404DD60} = {4BD917BC-D579-4C75-9939-41BF012A4EE2}
 		{AEB61F19-3DBB-411E-A67E-93007B96E160} = {4BD917BC-D579-4C75-9939-41BF012A4EE2}
+		{F0B43114-3BA9-4098-952D-0FB2241691A9} = {E38F0F6E-6E10-491D-8786-650F6A4B6698}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {94C0DA2C-CCCB-4314-93A2-9809B5DD0583}
