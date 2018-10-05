@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <Import Project="..\..\build\common.props" />
+
+    <PropertyGroup>
+        <Description>SkyWalking dotnet global tool.</Description>
+        <AssemblyTitle>SkyWalking.DotNet.CLI</AssemblyTitle>
+        <AssemblyName>SkyWalking.DotNet.CLI</AssemblyName>
+        <PackageId>SkyWalking.DotNet.CLI</PackageId>
+        <PackageTags>SkyWalking;APM;CLI</PackageTags>
+        <RootNamespace>SkyWalking.DotNet.CLI</RootNamespace>
+        <OutputType>Exe</OutputType>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <IsPackable>true</IsPackable>
+        <PackAsTool>true</PackAsTool>
+        <ToolCommandName>dotnet-sw</ToolCommandName>
+        <TargetFrameworks>netcoreapp2.0;netcoreapp2.1</TargetFrameworks>
+    </PropertyGroup>
+
+</Project>
