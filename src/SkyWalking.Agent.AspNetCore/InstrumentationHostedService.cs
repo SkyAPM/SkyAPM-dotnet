@@ -20,9 +20,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 
-namespace SkyWalking.AspNetCore
+namespace SkyWalking.Agent.AspNetCore
 {
-    public class InstrumentationHostedService : IHostedService
+    internal class InstrumentationHostedService : IHostedService
     {
         private readonly ISkyWalkingAgentStartup _startup;
 

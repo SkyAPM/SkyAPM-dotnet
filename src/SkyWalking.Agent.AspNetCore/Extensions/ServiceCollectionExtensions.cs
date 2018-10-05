@@ -34,9 +34,7 @@ using SkyWalking.Service;
 using SkyWalking.Transport;
 using SkyWalking.Transport.Grpc;
 
-[assembly:System.Runtime.CompilerServices.InternalsVisibleTo("SkyWalking_HostingStartup")]
-
-namespace SkyWalking.AspNetCore
+namespace SkyWalking.Agent.AspNetCore
 {
     internal static class ServiceCollectionExtensions
     {
