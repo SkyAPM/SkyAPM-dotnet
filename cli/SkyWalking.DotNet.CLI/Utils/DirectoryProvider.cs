@@ -41,9 +41,13 @@ namespace SkyWalking.DotNet.CLI.Utils
 
         public string DotnetDirectory => Path.Combine(UserDirectory, ".dotnet");
 
-        public string AdditonalDepsRootDirectory => Path.Combine(DotnetDirectory, "x64", "additionalDeps");
+        public string AgentPath => "skywalking.agent.aspnetcore";
         
-        public string AgentPath => "SkyWalking.Agent.AspNetCore";
+        public string AdditonalDepsRootDirectory => _platformInformation.GetValue(
+            () => Environment.GetEnvironmentVariable("PROGRAMFILES"),
+            () => "/usr/local/share",
+            () => "/usr/local/share",
+            () => "/usr/local/share");
 
         public DirectoryProvider(PlatformInformationArbiter platformInformation)
         {

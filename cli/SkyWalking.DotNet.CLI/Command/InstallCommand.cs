@@ -21,15 +21,12 @@ using System.Collections.Generic;
 using System.IO;
 using Microsoft.Extensions.CommandLineUtils;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using SkyWalking.DotNet.CLI.Extensions;
 using SkyWalking.DotNet.CLI.Utils;
+
 // ReSharper disable CommentTypo
-
 // ReSharper disable IdentifierTypo
-
 // ReSharper disable StringLiteralTypo
-
 namespace SkyWalking.DotNet.CLI.Command
 {
     public class InstallCommand : IAppCommand
@@ -108,17 +105,20 @@ namespace SkyWalking.DotNet.CLI.Command
                 var depsContent = File.ReadAllText(depsJsonFilePath);
 
                 var depsObject = JsonConvert.DeserializeObject<DepsObject>(depsContent);
-                
+
                 foreach (var target in depsObject.Targets)
                     target.Value?.Remove(invalid_node_name);
                 depsObject.Libraries.Remove(invalid_node_name);
-                
+
                 var depsFile = new FileInfo(Path.Combine(additonalDepsPath, $"{_directoryProvider.AgentPath}.deps.json"));
                 using (var writer = depsFile.CreateText())
-                    writer.WriteLine(JsonConvert.SerializeObject(depsObject));
+                    writer.Write(JsonConvert.SerializeObject(depsObject, Formatting.Indented));
+
+                Console.WriteLine("Create deps config to {0}", depsFile.FullName);
+                
+                workDirInfo.Delete(true);
 
                 Console.WriteLine();
-                Console.WriteLine("You can enable SkyWalking .NET Core Agent using the following command: dotnet sw enable");
                 Console.WriteLine("SkyWalking .NET Core Agent was successfully installed.");
 
                 return 0;

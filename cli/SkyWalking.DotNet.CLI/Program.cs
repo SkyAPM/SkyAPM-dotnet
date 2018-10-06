@@ -62,6 +62,7 @@ namespace SkyWalking.DotNet.CLI
             services.AddSingleton<DirectoryProvider>();
             services.AddSingleton<ShellProcessFactory>();
             services.AddSingleton<IAppCommand, InstallCommand>();
+            services.AddSingleton<IAppCommand, ConfigCommand>();
             return services.BuildServiceProvider();
         }
     }
