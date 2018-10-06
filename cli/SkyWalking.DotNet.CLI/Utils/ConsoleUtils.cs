@@ -29,5 +29,14 @@ namespace SkyWalking.DotNet.CLI.Utils
             Console.WriteLine(message);
             Console.ForegroundColor = currentForegroundColor;
         }
+
+        public static void WriteWelcome()
+        {
+            Console.WriteLine("*********************************************************************");
+            Console.WriteLine("*                                                                   *");
+            Console.WriteLine("*                   Welcome to Apache SkyWalking                    *");
+            Console.WriteLine("*                                                                   *");
+            Console.WriteLine("*********************************************************************");
+        }
     }
 }

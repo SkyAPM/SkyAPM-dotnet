@@ -17,11 +17,14 @@
  */
 
 using System;
-using System.Diagnostics;
+using System.Collections.Generic;
 using System.IO;
 using Microsoft.Extensions.CommandLineUtils;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using SkyWalking.DotNet.CLI.Extensions;
 using SkyWalking.DotNet.CLI.Utils;
+// ReSharper disable CommentTypo
 
 // ReSharper disable IdentifierTypo
 
@@ -33,6 +36,7 @@ namespace SkyWalking.DotNet.CLI.Command
     {
         private const string git_hosting_startup = "https://github.com/OpenSkywalking/skywalking-netcore-hosting-startup.git";
         private const string manifest_proj = "SkyWalking.Runtime.Store.csproj";
+        private const string invalid_node_name = "SkyWalking.Runtime.Store/1.0.0";
 
         private readonly DirectoryProvider _directoryProvider;
         private readonly ShellProcessFactory _processFactory;
@@ -56,14 +60,9 @@ namespace SkyWalking.DotNet.CLI.Command
 
             command.OnExecute(() =>
             {
-                if (upgradeOption.HasValue())
-                {
-                    ConsoleUtils.WriteLine("Upgrading SkyWalking .NET Core Agent.", ConsoleColor.Green);
-                }
-                else
-                {
-                    ConsoleUtils.WriteLine("Installing SkyWalking .NET Core Agent.", ConsoleColor.Green);
-                }
+                ConsoleUtils.WriteWelcome();
+
+                Console.WriteLine(upgradeOption.HasValue() ? "Upgrading SkyWalking .NET Core Agent ..." : "Installing SkyWalking .NET Core Agent ...");
 
                 Console.WriteLine();
 
@@ -96,7 +95,8 @@ namespace SkyWalking.DotNet.CLI.Command
                     return code;
                 }
 
-                var additonalDepsPath = _directoryProvider.GetAdditonalDepsPath(_directoryProvider.AgentPath, "2.1");
+                //add dotnet additonalDeps
+                var additonalDepsPath = _directoryProvider.GetAdditonalDepsPath(_directoryProvider.AgentPath, "2.1.0");
                 var additonalDepsDirInfo = new DirectoryInfo(additonalDepsPath);
                 if (!additonalDepsDirInfo.Exists)
                 {
@@ -104,9 +104,22 @@ namespace SkyWalking.DotNet.CLI.Command
                     Console.WriteLine("Create dotnet additonalDeps directory '{0}'", additonalDepsPath);
                 }
 
+                var depsJsonFilePath = Path.Combine(hostingStartupDir, "manifest", "bin", "Release", "netcoreapp2.1", "SkyWalking.Runtime.Store.deps.json");
+                var depsContent = File.ReadAllText(depsJsonFilePath);
+
+                var depsObject = JsonConvert.DeserializeObject<DepsObject>(depsContent);
+                
+                foreach (var target in depsObject.Targets)
+                    target.Value?.Remove(invalid_node_name);
+                depsObject.Libraries.Remove(invalid_node_name);
+                
+                var depsFile = new FileInfo(Path.Combine(additonalDepsPath, $"{_directoryProvider.AgentPath}.deps.json"));
+                using (var writer = depsFile.CreateText())
+                    writer.WriteLine(JsonConvert.SerializeObject(depsObject));
+
                 Console.WriteLine();
-                ConsoleUtils.WriteLine("You can enable SkyWalking .NET Core Agent using the following command: dotnet sw enable", ConsoleColor.Green);
-                ConsoleUtils.WriteLine("SkyWalking .NET Core Agent was successfully installed.", ConsoleColor.Green);
+                Console.WriteLine("You can enable SkyWalking .NET Core Agent using the following command: dotnet sw enable");
+                Console.WriteLine("SkyWalking .NET Core Agent was successfully installed.");
 
                 return 0;
             });
@@ -115,5 +128,20 @@ namespace SkyWalking.DotNet.CLI.Command
         private string Shell => _platformInformation.GetValue(() => "cmd.exe", () => "sh", () => "bash", () => "sh");
 
         private string Runtime => _platformInformation.GetValue(() => "win-x64", () => "linux-x64", () => "osx-x64", () => "linux-x64");
+    }
+
+    public class DepsObject
+    {
+        [JsonProperty(PropertyName = "runtimeTarget")]
+        public dynamic RuntimeTarget { get; set; }
+
+        [JsonProperty(PropertyName = "compilationOptions")]
+        public dynamic CompilationOptions { get; set; }
+
+        [JsonProperty(PropertyName = "targets")]
+        public Dictionary<string, Dictionary<string, dynamic>> Targets { get; set; } = new Dictionary<string, Dictionary<string, dynamic>>();
+
+        [JsonProperty(PropertyName = "libraries")]
+        public Dictionary<string, dynamic> Libraries { get; set; } = new Dictionary<string, dynamic>();
     }
 }
