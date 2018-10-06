@@ -28,7 +28,7 @@ namespace SkyWalking.DotNet.CLI.Utils
         private readonly PlatformInformationArbiter _platformInformation;
 
         public string TmpDirectory => _platformInformation.GetValue(
-            () => "C:\\tmp",
+            () => Path.Combine(Environment.GetEnvironmentVariable("USERPROFILE"), "AppData\\Local\\Temp"),
             () => "/tmp",
             () => "/tmp",
             () => "/tmp");

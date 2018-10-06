@@ -71,10 +71,11 @@ namespace SkyWalking.DotNet.CLI.Command
                     workDirInfo.Delete(true);
 
                 workDirInfo.Create();
+                var hostingStartupDirInfo = workDirInfo.CreateSubdirectory("hosting_startup");
 
                 Console.WriteLine("Create tmp directory : {0}", workDir);
 
-                var hostingStartupDir = Path.Combine(workDir, "hosting_startup");
+                var hostingStartupDir = hostingStartupDirInfo.FullName;
 
                 var shell = _processFactory.Create(Shell);
 
@@ -115,7 +116,7 @@ namespace SkyWalking.DotNet.CLI.Command
                     writer.Write(JsonConvert.SerializeObject(depsObject, Formatting.Indented));
 
                 Console.WriteLine("Create deps config to {0}", depsFile.FullName);
-                
+
                 workDirInfo.Delete(true);
 
                 Console.WriteLine();
