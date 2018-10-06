@@ -16,14 +16,18 @@
  *
  */
 
-using Microsoft.Extensions.CommandLineUtils;
+using System;
 
-namespace SkyWalking.DotNet.CLI.Command
+namespace SkyWalking.DotNet.CLI.Utils
 {
-    public interface IAppCommand
+    public static class ConsoleUtils
     {
-        string Name { get; }
-
-        void Execute(CommandLineApplication command);
+        public static void WriteLine(string message, ConsoleColor foregroundColor)
+        {
+            var currentForegroundColor = Console.ForegroundColor;
+            Console.ForegroundColor = foregroundColor;
+            Console.WriteLine(message);
+            Console.ForegroundColor = currentForegroundColor;
+        }
     }
 }

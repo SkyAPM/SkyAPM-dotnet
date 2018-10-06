@@ -18,7 +18,7 @@
 
 using Microsoft.Extensions.CommandLineUtils;
 
-namespace SkyWalking.DotNet.CLI.Command
+namespace SkyWalking.DotNet.CLI
 {
     public interface IAppCommandResolver
     {

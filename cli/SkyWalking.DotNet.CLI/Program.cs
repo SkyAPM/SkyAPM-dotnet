@@ -17,12 +17,10 @@
  */
 
 using System;
-using System.IO;
-using System.Reflection;
 using Microsoft.Extensions.CommandLineUtils;
 using Microsoft.Extensions.DependencyInjection;
 using SkyWalking.DotNet.CLI.Command;
-using SkyWalking.DotNet.CLI.Extensions;
+using SkyWalking.DotNet.CLI.Utils;
 
 namespace SkyWalking.DotNet.CLI
 {
@@ -60,7 +58,10 @@ namespace SkyWalking.DotNet.CLI
             services.AddSingleton<CommandLineApplicationFactory>();
             services.AddSingleton(p => p.GetRequiredService<CommandLineApplicationFactory>().Create());
             services.AddSingleton<IAppCommandResolver, AppCommandResolver>();
-
+            services.AddSingleton<PlatformInformationArbiter>();
+            services.AddSingleton<DirectoryProvider>();
+            services.AddSingleton<ShellProcessFactory>();
+            services.AddSingleton<IAppCommand, InstallCommand>();
             return services.BuildServiceProvider();
         }
     }

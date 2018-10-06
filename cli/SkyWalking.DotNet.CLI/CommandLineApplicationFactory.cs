@@ -17,7 +17,6 @@
  */
 
 using Microsoft.Extensions.CommandLineUtils;
-using SkyWalking.DotNet.CLI.Command;
 using SkyWalking.DotNet.CLI.Extensions;
 
 namespace SkyWalking.DotNet.CLI
