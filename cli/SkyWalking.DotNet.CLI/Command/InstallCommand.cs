@@ -67,7 +67,7 @@ namespace SkyWalking.DotNet.CLI.Command
                     workDirInfo.Delete(true);
                 workDirInfo.Create();
 
-                Console.WriteLine("Create tmp directory : {0}", workDir);
+                Console.WriteLine("Create tmp directory '{0}'", workDir);
 
                 var hostingStartupDir = Path.Combine(workDir, "repo");
 
@@ -104,7 +104,7 @@ namespace SkyWalking.DotNet.CLI.Command
                 Console.WriteLine("Create deps config to {0}", depsFile.FullName);
 
                 _platformInformation.Invoke(rmWorkDir_Win, rmWorkDir, rmWorkDir, rmWorkDir);
-                Console.WriteLine("Clean tmp directory : {0}", workDir);
+                Console.WriteLine("Clean tmp directory '{0}'", workDir);
 
                 Console.WriteLine();
                 Console.WriteLine("SkyWalking .NET Core Agent was successfully installed.");
