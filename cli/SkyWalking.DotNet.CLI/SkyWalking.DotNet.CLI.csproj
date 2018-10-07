@@ -10,10 +10,10 @@
         <PackageTags>SkyWalking;APM;CLI</PackageTags>
         <RootNamespace>SkyWalking.DotNet.CLI</RootNamespace>
         <OutputType>Exe</OutputType>
-        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
         <IsPackable>true</IsPackable>
         <PackAsTool>true</PackAsTool>
-        <ToolCommandName>dotnet-sw</ToolCommandName>
+        <ToolCommandName>dotnet-skywalking</ToolCommandName>
         <TargetFramework>netcoreapp2.1</TargetFramework>
     </PropertyGroup>
 
