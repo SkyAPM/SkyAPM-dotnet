@@ -92,7 +92,7 @@ namespace SkyWalking.DotNet.CLI.Command
 
             var loggingConfig = new Dictionary<string, dynamic>
             {
-                {"Level", "Info"},
+                {"Level", "Information"},
                 {"FilePath", Path.Combine("logs", "SkyWalking-{Date}.log")}
             };
 
