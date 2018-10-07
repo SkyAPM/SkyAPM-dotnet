@@ -28,7 +28,7 @@ namespace SkyWalking.DotNet.CLI.Utils
         private readonly PlatformInformationArbiter _platformInformation;
 
         public string TmpDirectory => _platformInformation.GetValue(
-            () => Path.Combine(Environment.GetEnvironmentVariable("USERPROFILE"), "AppData\\Local\\Temp"),
+            () =>  Path.Combine(Environment.GetEnvironmentVariable("USERPROFILE"), "AppData\\Local\\Temp"),
             () => "/tmp",
             () => "/tmp",
             () => "/tmp");
@@ -42,7 +42,7 @@ namespace SkyWalking.DotNet.CLI.Utils
         public string DotnetDirectory => Path.Combine(UserDirectory, ".dotnet");
 
         public string AgentPath => "skywalking.agent.aspnetcore";
-        
+
         public string AdditonalDepsRootDirectory => _platformInformation.GetValue(
             () => Environment.GetEnvironmentVariable("PROGRAMFILES"),
             () => "/usr/local/share",
@@ -58,7 +58,7 @@ namespace SkyWalking.DotNet.CLI.Utils
         {
             return Path.Combine(GetAdditonalDepsDirectory(additonalName), "shared", "Microsoft.NETCore.App", frameworkVersion);
         }
-        
+
         public string GetAdditonalDepsDirectory(string additonalName)
         {
             return Path.Combine(AdditonalDepsRootDirectory, additonalName);

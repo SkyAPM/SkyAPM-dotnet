@@ -58,35 +58,24 @@ namespace SkyWalking.DotNet.CLI.Command
             command.OnExecute(() =>
             {
                 ConsoleUtils.WriteWelcome();
-
                 Console.WriteLine(upgradeOption.HasValue() ? "Upgrading SkyWalking .NET Core Agent ..." : "Installing SkyWalking .NET Core Agent ...");
-
                 Console.WriteLine();
 
                 var workDir = Path.Combine(_directoryProvider.TmpDirectory, _directoryProvider.AgentPath);
-
                 var workDirInfo = new DirectoryInfo(workDir);
-
                 if (workDirInfo.Exists)
                     workDirInfo.Delete(true);
-
                 workDirInfo.Create();
-                var hostingStartupDirInfo = workDirInfo.CreateSubdirectory("hosting_startup");
 
                 Console.WriteLine("Create tmp directory : {0}", workDir);
 
-                var hostingStartupDir = hostingStartupDirInfo.FullName;
+                var hostingStartupDir = Path.Combine(workDir, "repo");
 
                 var shell = _processFactory.Create(Shell);
-
                 shell.Exec($"git clone {git_hosting_startup} {hostingStartupDir}");
-
                 shell.Exec($"cd {Path.Combine(hostingStartupDir, "manifest")}");
-
                 shell.Exec("dotnet build --configuration Release -nowarn:NU1701");
-
                 shell.Exec($"dotnet store --manifest {manifest_proj} --framework netcoreapp2.1 --runtime {Runtime} -nowarn:NU1701");
-
                 var code = _processFactory.Release(shell);
                 if (code != 0)
                 {
@@ -104,25 +93,31 @@ namespace SkyWalking.DotNet.CLI.Command
 
                 var depsJsonFilePath = Path.Combine(hostingStartupDir, "manifest", "bin", "Release", "netcoreapp2.1", "SkyWalking.Runtime.Store.deps.json");
                 var depsContent = File.ReadAllText(depsJsonFilePath);
-
                 var depsObject = JsonConvert.DeserializeObject<DepsObject>(depsContent);
-
                 foreach (var target in depsObject.Targets)
                     target.Value?.Remove(invalid_node_name);
                 depsObject.Libraries.Remove(invalid_node_name);
-
                 var depsFile = new FileInfo(Path.Combine(additonalDepsPath, $"{_directoryProvider.AgentPath}.deps.json"));
                 using (var writer = depsFile.CreateText())
                     writer.Write(JsonConvert.SerializeObject(depsObject, Formatting.Indented));
 
                 Console.WriteLine("Create deps config to {0}", depsFile.FullName);
 
-                workDirInfo.Delete(true);
+                _platformInformation.Invoke(rmWorkDir_Win, rmWorkDir, rmWorkDir, rmWorkDir);
+                Console.WriteLine("Clean tmp directory : {0}", workDir);
 
                 Console.WriteLine();
                 Console.WriteLine("SkyWalking .NET Core Agent was successfully installed.");
 
                 return 0;
+                
+                void rmWorkDir_Win()
+                {
+                    var cmd = _processFactory.Create("cmd.exe");
+                    cmd.Exec($"rmdir /s/q {workDir}");
+                    _processFactory.Release(cmd);
+                }
+                void rmWorkDir() => workDirInfo.Delete(true);
             });
         }
 
