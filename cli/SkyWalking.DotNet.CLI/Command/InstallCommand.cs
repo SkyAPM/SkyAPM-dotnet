@@ -76,6 +76,7 @@ namespace SkyWalking.DotNet.CLI.Command
                 shell.Exec($"cd {Path.Combine(hostingStartupDir, "manifest")}");
                 shell.Exec("dotnet build --configuration Release --verbosity q -nowarn:NU1701");
                 shell.Exec($"dotnet store --manifest {manifest_proj} --framework netcoreapp2.1 --output {_directoryProvider.StoreDirectory} --runtime {Runtime} --skip-symbols --verbosity q -nowarn:NU1701");
+
                 var code = _processFactory.Release(shell);
                 if (code != 0)
                 {
