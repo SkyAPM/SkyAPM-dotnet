@@ -18,6 +18,7 @@
 
 using System;
 using System.IO;
+
 // ReSharper disable IdentifierTypo
 // ReSharper disable MemberCanBePrivate.Global
 
@@ -28,26 +29,22 @@ namespace SkyWalking.DotNet.CLI.Utils
         private readonly PlatformInformationArbiter _platformInformation;
 
         public string TmpDirectory => _platformInformation.GetValue(
-            () =>  Path.Combine(Environment.GetEnvironmentVariable("USERPROFILE"), "AppData\\Local\\Temp"),
+            () => Path.Combine(Environment.GetEnvironmentVariable("USERPROFILE"), "AppData\\Local\\Temp"),
             () => "/tmp",
             () => "/tmp",
             () => "/tmp");
 
-        public string UserDirectory => _platformInformation.GetValue(
-            () => Environment.GetEnvironmentVariable("USERPROFILE"),
-            () => Environment.GetEnvironmentVariable("HOME"),
-            () => Environment.GetEnvironmentVariable("HOME"),
-            () => "~");
-
-        public string DotnetDirectory => Path.Combine(UserDirectory, ".dotnet");
+        public string DotnetDirectory => _platformInformation.GetValue(
+            () => Path.Combine(Environment.GetEnvironmentVariable("PROGRAMFILES"), "dotnet"),
+            () => Path.Combine("/usr/local/share", "dotnet"),
+            () => Path.Combine("/usr/local/share", "dotnet"),
+            () => Path.Combine("/usr/local/share", "dotnet"));
 
         public string AgentPath => "skywalking.agent.aspnetcore";
 
-        public string AdditonalDepsRootDirectory => _platformInformation.GetValue(
-            () => Environment.GetEnvironmentVariable("PROGRAMFILES"),
-            () => "/usr/local/share",
-            () => "/usr/local/share",
-            () => "/usr/local/share");
+        public string AdditonalDepsRootDirectory => Path.Combine(DotnetDirectory, "x64", "additionalDeps");
+
+        public string StoreDirectory => Path.Combine(DotnetDirectory, "store");
 
         public DirectoryProvider(PlatformInformationArbiter platformInformation)
         {

@@ -35,16 +35,22 @@ You can run the following command to install the SkyWalking .NET Core Agent in y
 ```
 // install SkyWalking DotNet CLI
 dotnet install tool -g SkyWalking.DotNet.CLI
-
-// install SkyWalking .NET Core Agent
+```
+On windows, run as Administorator
+```
 dotnet skywalking install
+```
+
+On macOS/Linux
+```
+sudo dotnet skywalking install
 ```
 
 ## How to use
 Set the `ASPNETCORE_HOSTINGSTARTUPASSEMBLIES` and `DOTNET_ADDITIONAL_DEPS` environment variables to support the activation of the SkyWalking .NET Core Agent. 
 
 - Add the assembly name of `SkyWalking.Agent.AspNetCore` to the `ASPNETCORE_HOSTINGSTARTUPASSEMBLIES` environment variable.
-- On Windows, set the `DOTNET_ADDITIONAL_DEPS` environment variable to `C:\Program Files\skywalking.agent.aspnetcore/`. On macOS/Linux, set the `DOTNET_ADDITIONAL_DEPS` environment variable to `/usr/local/share/skywalking.agent.aspnetcore/`.
+- On Windows, set the `DOTNET_ADDITIONAL_DEPS` environment variable to `%PROGRAMFILES%\dotnet\additionalDeps\skywalking.agent.aspnetcore`. On macOS/Linux, set the `DOTNET_ADDITIONAL_DEPS` environment variable to `/usr/local/share/dotnet/x64/additionalDeps/skywalking.agent.aspnetcore`.
 
 ### Examples
 - On windows
@@ -55,7 +61,7 @@ cd sampleapp
 
 // enable SkyWalking.Agent.AspNetCore
 set ASPNETCORE_HOSTINGSTARTUPASSEMBLIES=SkyWalking.Agent.AspNetCore
-set DOTNET_ADDITIONAL_DEPS=/usr/local/share/skywalking.agent.aspnetcore/
+set DOTNET_ADDITIONAL_DEPS=%PROGRAMFILES%\dotnet\additionalDeps\skywalking.agent.aspnetcore
 
 // set Application_Code
 set SKYWALKING__APPLICATIONCODE=sample_app
@@ -71,7 +77,7 @@ cd sampleapp
 
 // enable SkyWalking.Agent.AspNetCore
 export ASPNETCORE_HOSTINGSTARTUPASSEMBLIES=SkyWalking.Agent.AspNetCore
-export DOTNET_ADDITIONAL_DEPS=/usr/local/share/skywalking.agent.aspnetcore/
+export DOTNET_ADDITIONAL_DEPS=/usr/local/share/dotnet/x64/additionalDeps/skywalking.agent.aspnetcore
 
 // set Application_Code
 export SKYWALKING__APPLICATIONCODE=sample_app

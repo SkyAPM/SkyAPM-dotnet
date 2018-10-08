@@ -75,7 +75,7 @@ namespace SkyWalking.DotNet.CLI.Command
                 shell.Exec($"git clone {git_hosting_startup} {hostingStartupDir}");
                 shell.Exec($"cd {Path.Combine(hostingStartupDir, "manifest")}");
                 shell.Exec("dotnet build --configuration Release -nowarn:NU1701");
-                shell.Exec($"dotnet store --manifest {manifest_proj} --framework netcoreapp2.1 --runtime {Runtime} -nowarn:NU1701");
+                shell.Exec($"dotnet store --manifest {manifest_proj} --framework netcoreapp2.1 --output {_directoryProvider.StoreDirectory} --runtime {Runtime} -nowarn:NU1701");
                 var code = _processFactory.Release(shell);
                 if (code != 0)
                 {

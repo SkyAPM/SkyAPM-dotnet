@@ -34,7 +34,7 @@ namespace SkyWalking.DotNet.CLI
         {
             var app = new CommandLineApplication
             {
-                Name = "dotnet sw",
+                Name = "dotnet skywalking",
                 FullName = "Apache SkyWalking .NET Core Agent Command Line Tool",
                 Description =
                     "Install SkyWalking .NET Core Agent and generate config file."
