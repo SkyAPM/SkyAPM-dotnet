@@ -36,7 +36,7 @@ You can run the following command to install the SkyWalking .NET Core Agent in y
 // install SkyWalking DotNet CLI
 dotnet tool install -g SkyWalking.DotNet.CLI
 ```
-On windows, run as Administorator
+On windows, run as Administrator
 ```
 dotnet skywalking install
 ```
