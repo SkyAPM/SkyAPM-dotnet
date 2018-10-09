@@ -22,7 +22,6 @@ HRESULT STDMETHODCALLTYPE CorProfiler::AssemblyLoadStarted(AssemblyID assemblyId
 
     WCHAR assemblyName[256];
     HRESULT hr = info->GetAssemblyInfo(assemblyId, 256, nullptr, assemblyName, nullptr, nullptr);
-
     if(hr == S_OK){
         wstring_convert<std::codecvt_utf8<char16_t>, char16_t> convert;
         cout<< convert.to_bytes(assemblyName) <<endl;

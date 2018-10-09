@@ -5,11 +5,11 @@
 
 // {bc160b08-ba38-4401-8c26-85d11ff07fa7}
 const CLSID CLSID_DemoProfiler = {
-        0xbc160b08, 0xba38, 0x4401, { 0x8c, 0x26, 0x85, 0xd1, 0x1f, 0xf0, 0x7f, 0xa7 }};
+        0xb62bd191, 0x587d, 0x4924, { 0x99, 0x8f,  0x92, 0xdd, 0x56, 0xf2, 0x58, 0x4c }};
 
 extern "C" {
     HRESULT STDMETHODCALLTYPE DllGetClassObject(REFCLSID rclsid, REFIID riid, void **ppv) {
-        if (ppv == NULL || rclsid != CLSID_DemoProfiler)
+        if (rclsid != CLSID_DemoProfiler)
             return E_FAIL;
 
         *ppv = new CorProfilerFactory();

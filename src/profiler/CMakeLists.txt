@@ -29,17 +29,28 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE ${PROJECT_SOURCE_DIR}/../../dist/${PR
 set(CMAKE_CXX_FLAGS_DEBUG "$ENV{CXXFLAGS} -O0 -Wall -g -ggdb ")
 set(CMAKE_CXX_FLAGS_RELEASE "$ENV{CXXFLAGS} -O3 -Wall")
 
+
+
 include_directories(${PROJECT_SOURCE_DIR}/../coreclr/src/pal/inc/rt)
 include_directories(${PROJECT_SOURCE_DIR}/../coreclr/src/pal/prebuilt/inc)
 include_directories(${PROJECT_SOURCE_DIR}/../coreclr/src/pal/inc)
 include_directories(${PROJECT_SOURCE_DIR}/../coreclr/src/inc)
 include_directories(${PROJECT_SOURCE_DIR}/../coreclr/bin/Product/${PROFILER_CMAKE_BUILD_PLATFORM}.${PROFILER_CMAKE_BUILD_ARCH}.${PROFILER_CMALE_BUILD_TYPE}/inc)
 
-add_compile_options(-fPIC -lexpat -fms-extensions -DPLATFORM_UNIX -DPAL_STDCPP_COMPAT -DBIT64 -std=c++11)
+add_compile_options(-fPIC -lexpat -fms-extensions -DPLATFORM_UNIX -DBIT64 -std=c++11)
+
+
+
+#add_definitions(-DPAL_STDCPP_COMPAT=0)
+#set(CLR_CMAKE_PLATFORM_UNIX 1)
+#
+#set(CLR_CMAKE_PLATFORM_UNIX_AMD64 1)
+#set(CLR_CMAKE_PLATFORM_DARWIN 1)
 
 add_library(profiler SHARED
         core/CorProfilerCallbackImpl.cpp core/CorProfilerCallbackImpl.h
         core/CorProfilerFactory.cpp core/CorProfilerFactory.h
         core/GuidDefine.h
         core/CorProfiler.cpp core/CorProfiler.h
-        Main.cpp)
+        Main.cpp
+        function/FunctionInfo.cpp function/FunctionInfo.h CorProfilerStd.h CorProfilerStd.cpp)
