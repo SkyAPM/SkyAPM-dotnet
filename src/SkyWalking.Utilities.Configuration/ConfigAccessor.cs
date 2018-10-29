@@ -30,11 +30,13 @@ namespace SkyWalking.Utilities.Configuration
         private const string CONFIG_FILE_PATH = "SKYWALKING__CONFIG__PATH";
         private readonly IConfiguration _configuration;
 
-        public ConfigAccessor(IEnvironmentProvider environmentProvider)
+        public ConfigAccessor(IEnvironmentProvider environmentProvider, IConfiguration configuration)
         {
             var builder = new ConfigurationBuilder();
 
             builder.AddSkyWalkingDefaultConfig();
+
+            builder.AddConfiguration(configuration);
 
             builder.AddJsonFile("appsettings.json", true).AddJsonFile($"appsettings.{environmentProvider.EnvironmentName}.json", true);
 
