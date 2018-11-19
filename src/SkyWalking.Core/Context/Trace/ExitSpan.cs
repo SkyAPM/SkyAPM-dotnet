@@ -70,7 +70,7 @@ namespace SkyWalking.Context.Trace
                 base.Start();
             }
 
-            return base.Start();
+            return this;
         }
 
         public override ISpan Tag(string key, string value)
