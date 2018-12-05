@@ -11,9 +11,12 @@
     </PackageReleaseNotes>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Google.Protobuf" Version="3.5.1" />
-    <PackageReference Include="Google.Protobuf.Tools" Version="3.5.1" />
-    <PackageReference Include="Grpc" Version="1.9.0" />
-    <PackageReference Include="Grpc.Tools" Version="1.9.0" />
+    <PackageReference Include="Google.Protobuf" Version="3.6.1" />
+    <PackageReference Include="Google.Protobuf.Tools" Version="3.6.1" />
+    <PackageReference Include="Grpc" Version="1.17.0" />
+    <PackageReference Include="Grpc.Tools" Version="1.17.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 </Project>
