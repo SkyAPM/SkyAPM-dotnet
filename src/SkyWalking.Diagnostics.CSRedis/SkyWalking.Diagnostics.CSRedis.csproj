@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+     <TargetFrameworks>netstandard2.0</TargetFrameworks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Diagnostics\**" />
+    <Compile Remove="Models\**" />
+    <EmbeddedResource Remove="Diagnostics\**" />
+    <EmbeddedResource Remove="Models\**" />
+    <None Remove="Diagnostics\**" />
+    <None Remove="Models\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CSRedis.NetCore" Version="1.1.0" />
+    <PackageReference Include="SkyWalking.AspNetCore" Version="0.3.0" />
+  </ItemGroup>
+
+</Project>
