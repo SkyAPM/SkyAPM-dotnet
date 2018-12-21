@@ -1,43 +1,43 @@
-# SkyWalking Config 配置说明
+# SkyWalking Configuration
 
 # ApplicationCode
 
-应用名称
+App name displayed.
 
 # SpanLimitPerSegment
 
-每段限制
+"Span" Limit Per Segment Max.
 
 ## Sampling 
 
-采样配置节点
+Sample Configuration Section
 
-1. SamplePer3Secs 每3秒采样数
+1. SamplePer3Secs, Sample Per 3 Seconds
 
 ## Logging
 
-SkyWalking日志配置节点
+SkyWalking Logging Configuration Section
 
-1. Level  日志级别
-2. FilePath 日志保存路径
+1. Level, defalut:Information
+2. FilePath, defalut:logs\\SkyWalking-{Date}.log
 
-## Transport
+## Transport Section
 
-传输配置节点
+Transport Configuration Section
 
-1. Interval 每多少毫秒刷新
-2. PendingSegmentLimit  排队限制
-3. PendingSegmentTimeout 排队超时毫秒，超时时排队的数据会被丢弃
+1. Interval, Flush Interval Millisecond,(unit:Millisecond)
+2. PendingSegmentLimit,  PendingSegmentLimit Count
+3. PendingSegmentTimeout, Data queued beyond this time will be discarded,(unit:Millisecond)
 
-### gRPC
+### gRPC 
 
-gRPC配置节点
+gRPC Configuration Section
 
-1. Servers gRPC地址，多个用逗号","
-2. Timeout 创建gRPC链接的超时时间，毫秒
-3. ConnectTimeout gRPC最长链接时间，毫秒
+1. Servers, gRPC Service address,Multiple addresses separated by commas (",")
+2. Timeout, Timeout for creating a link,(unit:Millisecond)
+3. ConnectTimeout, gRPC Connectioning timed out,(unit:Millisecond)
 
-# skywalking.json 示例
+# skywalking.json sample
 ```
 {
   "SkyWalking": {
