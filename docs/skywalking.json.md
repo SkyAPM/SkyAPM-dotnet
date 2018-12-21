@@ -1,4 +1,4 @@
-# SkyWalking Config
+# SkyWalking Config 配置说明
 
 # ApplicationCode
 
@@ -37,7 +37,7 @@ gRPC配置节点
 2. Timeout 创建gRPC链接的超时时间，毫秒
 3. ConnectTimeout gRPC最长链接时间，毫秒
 
-# skywalking.json
+# skywalking.json 示例
 ```
 {
   "SkyWalking": {
