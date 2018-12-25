@@ -96,6 +96,15 @@ namespace SkyWalking.Context
         }
 
         public static IContextSnapshot Capture => _context.Value?.Capture;
+        public static int _code = 0;
+        public static int Code {
+            set {
+                _code = value;
+            }
+            get {
+                return _code;
+            }
+        }
 
         public static IDictionary<string, object> ContextProperties => _context.Value?.Properties;
 

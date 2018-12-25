@@ -63,6 +63,8 @@ namespace SkyWalking.AspNet
                     {"event", "AspNet BeginRequest"},
                     {"message", $"Request starting {httpContext.Request.Url.Scheme} {httpContext.Request.HttpMethod} {httpContext.Request.Url.OriginalString}"}
                 });
+
+            ContextManager.Code = 10086;
         }
 
         public void ApplicationOnEndRequest(object sender, EventArgs e)
@@ -77,6 +79,7 @@ namespace SkyWalking.AspNet
             }
 
             var httpRequestSpan = ContextManager.ActiveSpan;
+            var code = ContextManager.Code;
             if (httpRequestSpan == null)
             {
                 return;
