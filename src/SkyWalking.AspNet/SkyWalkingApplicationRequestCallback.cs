@@ -64,13 +64,15 @@ namespace SkyWalking.AspNet
                     {"message", $"Request starting {httpContext.Request.Url.Scheme} {httpContext.Request.HttpMethod} {httpContext.Request.Url.OriginalString}"}
                 });
 
-            ContextManager.Code = 10086;
+            httpContext.Items.Add("span", httpRequestSpan);
+            httpContext.Items.Add("span_Context", ContextManager.ActiveContext);
         }
 
         public void ApplicationOnEndRequest(object sender, EventArgs e)
         {
             var httpApplication = sender as HttpApplication;
             var httpContext = httpApplication.Context;
+            ITracerContext context=null;
 
             if (httpContext.Request.HttpMethod == "OPTIONS")
             {
@@ -79,10 +81,22 @@ namespace SkyWalking.AspNet
             }
 
             var httpRequestSpan = ContextManager.ActiveSpan;
-            var code = ContextManager.Code;
             if (httpRequestSpan == null)
             {
-                return;
+                // ContextManager.ActiveSpan is null, from httpContext.Items
+                if (!httpContext.Items.Contains("span"))
+                    return;
+
+                httpRequestSpan= httpContext.Items["span"] as ISpan;
+                if (httpRequestSpan == null)
+                    return;
+
+                if(!httpContext.Items.Contains("span_Context"))
+                    return;
+
+                context = httpContext.Items["span_Context"] as ITracerContext;
+                if (context == null)
+                    return;
             }
 
             var statusCode = httpContext.Response.StatusCode;
@@ -105,7 +119,7 @@ namespace SkyWalking.AspNet
                     {"event", "AspNet EndRequest"},
                     {"message", $"Request finished {httpContext.Response.StatusCode} {httpContext.Response.ContentType}"}
                 });
-            ContextManager.StopSpan(httpRequestSpan);
+            ContextManager.StopSpan(httpRequestSpan, context);
         }
     }
 }
