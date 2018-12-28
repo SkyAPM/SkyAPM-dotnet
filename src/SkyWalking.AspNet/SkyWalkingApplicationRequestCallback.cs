@@ -69,7 +69,6 @@ namespace SkyWalking.AspNet
             SetBodyData(httpContext.Request, dictLog);
             httpRequestSpan.Log(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(), dictLog);
 
-            httpContext.Items.Add("span", httpRequestSpan);
             httpContext.Items.Add("span_Context", ContextManager.ActiveContext);
         }
 
@@ -89,18 +88,15 @@ namespace SkyWalking.AspNet
             if (httpRequestSpan == null)
             {
                 // ContextManager.ActiveSpan is null, from httpContext.Items
-                if (!httpContext.Items.Contains("span"))
-                    return;
-
-                httpRequestSpan= httpContext.Items["span"] as ISpan;
-                if (httpRequestSpan == null)
-                    return;
-
                 if(!httpContext.Items.Contains("span_Context"))
                     return;
 
                 context = httpContext.Items["span_Context"] as ITracerContext;
                 if (context == null)
+                    return;
+
+                httpRequestSpan = context.ActiveSpan;
+                if (httpRequestSpan == null)
                     return;
             }
 
@@ -124,7 +120,7 @@ namespace SkyWalking.AspNet
                     {"event", "AspNet EndRequest"},
                     {"message", $"Request finished {httpContext.Response.StatusCode} {httpContext.Response.ContentType}"}
                 });
-
+            
             ContextManager.StopSpan(httpRequestSpan, context);
         }
 
