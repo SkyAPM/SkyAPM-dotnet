@@ -18,6 +18,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Web;
 using SkyWalking.Components;
 using SkyWalking.Config;
@@ -120,6 +121,27 @@ namespace SkyWalking.AspNet
                     {"message", $"Request finished {httpContext.Response.StatusCode} {httpContext.Response.ContentType}"}
                 });
             ContextManager.StopSpan(httpRequestSpan, context);
+        }
+
+        /// <summary>
+        /// record request body data
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="dict"></param>
+        private void SetBodyData(HttpRequest request, Dictionary<string, object> dict)
+        {
+            if (request.HttpMethod != "GET")
+            {
+                if (dict == null)
+                    dict = new Dictionary<string, object>();
+
+                var stearm = request.GetBufferedInputStream();
+                using (StreamReader sr = new StreamReader(stearm))
+                {
+                    var str = sr.ReadToEnd();
+                    dict.Add("Body", str);
+                }
+            }
         }
     }
 }
