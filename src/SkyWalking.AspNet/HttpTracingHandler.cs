@@ -66,8 +66,11 @@ namespace SkyWalking.AspNet
                 if (request.Method.Method != "GET")
                 {
                     // record request body data
-                    string bodyStr = await request.Content.ReadAsStringAsync();
-                    span.Log(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(), new Dictionary<string, object> { { "Body", bodyStr } });
+                    if (!request.Content.Headers.ContentType?.MediaType.ToLower().Contains("multipart/form-data")??false)
+                    {
+                        string bodyStr = await request.Content.ReadAsStringAsync();
+                        span.Log(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(), new Dictionary<string, object> { { "Body", bodyStr } });
+                    }
                 }
 
                 var response = await base.SendAsync(request, cancellationToken);

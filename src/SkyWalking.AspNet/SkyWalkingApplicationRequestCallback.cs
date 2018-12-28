@@ -131,17 +131,25 @@ namespace SkyWalking.AspNet
         /// <param name="dict"></param>
         private void SetBodyData(HttpRequest request, Dictionary<string, object> dict)
         {
-            if (request.HttpMethod != "GET")
+            if (request.HttpMethod == "GET")
             {
-                if (dict == null)
-                    dict = new Dictionary<string, object>();
+                return;
+            }
 
-                var stearm = request.GetBufferedInputStream();
-                using (StreamReader sr = new StreamReader(stearm))
-                {
-                    var bodyStr = sr.ReadToEnd();
-                    dict.Add("Body", bodyStr);
-                }
+            if (dict == null)
+                dict = new Dictionary<string, object>();
+
+            if (request.ContentType?.ToLower().Contains("multipart/form-data")??false)
+            {
+                dict.Add("ContentLength", request.ContentLength);
+                return;
+            }
+
+            var stearm = request.GetBufferedInputStream();
+            using (StreamReader sr = new StreamReader(stearm))
+            {
+                var bodyStr = sr.ReadToEnd();
+                dict.Add("Body", bodyStr);
             }
         }
     }
