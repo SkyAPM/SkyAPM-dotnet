@@ -124,6 +124,7 @@ namespace SkyWalking.AspNet
                     {"event", "AspNet EndRequest"},
                     {"message", $"Request finished {httpContext.Response.StatusCode} {httpContext.Response.ContentType}"}
                 });
+
             ContextManager.StopSpan(httpRequestSpan, context);
         }
 
