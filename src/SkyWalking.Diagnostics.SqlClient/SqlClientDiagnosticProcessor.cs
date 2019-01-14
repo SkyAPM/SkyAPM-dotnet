@@ -40,9 +40,12 @@ namespace SkyWalking.Diagnostics.SqlClient
         [DiagnosticName(SqlClientDiagnosticStrings.SqlBeforeExecuteCommand)]
         public void BeforeExecuteCommand([Property(Name = "Command")] SqlCommand sqlCommand)
         {
-            if (ContextManager.ContextProperties.ContainsKey(TRACE_ORM))
+            if (ContextManager.ContextProperties != null)
             {
-                return;
+                if (ContextManager.ContextProperties.ContainsKey(TRACE_ORM))
+                {
+                    return;
+                }
             }
             var peer = sqlCommand.Connection.DataSource;
             var span = ContextManager.CreateExitSpan(ResolveOperationName(sqlCommand), peer);
@@ -57,9 +60,12 @@ namespace SkyWalking.Diagnostics.SqlClient
         [DiagnosticName(SqlClientDiagnosticStrings.SqlAfterExecuteCommand)]
         public void AfterExecuteCommand()
         {
-            if (ContextManager.ContextProperties.ContainsKey(TRACE_ORM))
+            if (ContextManager.ContextProperties != null)
             {
-                return;
+                if (ContextManager.ContextProperties.ContainsKey(TRACE_ORM))
+                {
+                    return;
+                }
             }
             ContextManager.StopSpan();
         }
@@ -67,9 +73,12 @@ namespace SkyWalking.Diagnostics.SqlClient
         [DiagnosticName(SqlClientDiagnosticStrings.SqlErrorExecuteCommand)]
         public void ErrorExecuteCommand([Property(Name = "Exception")] Exception ex)
         {
-            if (ContextManager.ContextProperties.ContainsKey(TRACE_ORM))
+            if (ContextManager.ContextProperties != null)
             {
-                return;
+                if (ContextManager.ContextProperties.ContainsKey(TRACE_ORM))
+                {
+                    return;
+                }
             }
             var span = ContextManager.ActiveSpan;
             span?.ErrorOccurred();
