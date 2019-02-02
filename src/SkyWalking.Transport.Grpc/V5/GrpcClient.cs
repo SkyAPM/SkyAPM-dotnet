@@ -24,7 +24,7 @@ using SkyWalking.Config;
 using SkyWalking.Logging;
 using SkyWalking.NetworkProtocol;
 
-namespace SkyWalking.Transport.Grpc
+namespace SkyWalking.Transport.Grpc.V5
 {
     public class GrpcClient : ISkyWalkingClient
     {

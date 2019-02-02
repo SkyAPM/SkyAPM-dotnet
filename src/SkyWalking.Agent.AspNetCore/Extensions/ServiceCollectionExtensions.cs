@@ -33,6 +33,7 @@ using SkyWalking.Logging;
 using SkyWalking.Service;
 using SkyWalking.Transport;
 using SkyWalking.Transport.Grpc;
+using SkyWalking.Transport.Grpc.V5;
 
 namespace SkyWalking.Agent.AspNetCore
 {

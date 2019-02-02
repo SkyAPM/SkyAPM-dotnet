@@ -24,6 +24,7 @@ using SkyWalking.Logging;
 using SkyWalking.Service;
 using SkyWalking.Transport;
 using SkyWalking.Transport.Grpc;
+using SkyWalking.Transport.Grpc.V5;
 using SkyWalking.Utilities.Configuration;
 using SkyWalking.Utilities.Logging;
 

@@ -21,7 +21,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using SkyWalking.Logging;
 
-namespace SkyWalking.Transport.Grpc
+namespace SkyWalking.Transport.Grpc.V5
 {
     public class GrpcStateCheckService : ExecutionService
     {
