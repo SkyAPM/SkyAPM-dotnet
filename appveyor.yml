@@ -10,6 +10,8 @@ environment:
 skip_commits:
   files:
     - LICENSE
+install:
+- git submodule update --init
 build_script:
 - ps: ./scripts/build.ps1
 artifacts:
