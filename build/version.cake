@@ -62,7 +62,7 @@ public class BuildParameters
 
 	private void InitializeVersion()
 	{
-		var versionFile = Context.File("./build/version.props");
+		var versionFile = Context.File("./version.props");
 		var content = System.IO.File.ReadAllText(versionFile.Path.FullPath);
 
 		XmlDocument doc = new XmlDocument();
