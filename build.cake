@@ -1,6 +1,6 @@
 #addin "nuget:https://www.nuget.org/api/v2?package=Newtonsoft.Json&version=9.0.1"
 
-#load "./index.cake"
+#load "./build/index.cake"
 
 var target = Argument("target", "Default");
 
