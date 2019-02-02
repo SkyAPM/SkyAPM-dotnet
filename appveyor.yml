@@ -11,8 +11,7 @@ skip_commits:
   files:
     - LICENSE
 build_script:
-- ps: ./build.ps1
-test: off
+- ps: ./scripts/build.ps1
 artifacts:
 - path: artifacts/packages/*.nupkg
 deploy:
