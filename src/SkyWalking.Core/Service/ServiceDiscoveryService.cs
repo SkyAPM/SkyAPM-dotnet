@@ -30,6 +30,7 @@ namespace SkyWalking.Service
     public class ServiceDiscoveryService : ExecutionService
     {
         private readonly InstrumentationConfig _config;
+        private readonly ISkyWalkingClient _client;
 
         protected override TimeSpan DueTime { get; } = TimeSpan.Zero;
 
@@ -37,9 +38,10 @@ namespace SkyWalking.Service
 
         public ServiceDiscoveryService(IConfigAccessor configAccessor, ISkyWalkingClient client,
             IRuntimeEnvironment runtimeEnvironment, ILoggerFactory loggerFactory)
-            : base(client, runtimeEnvironment, loggerFactory)
+            : base(runtimeEnvironment, loggerFactory)
         {
             _config = configAccessor.Get<InstrumentationConfig>();
+            _client = client;
         }
 
         protected override async Task ExecuteAsync(CancellationToken cancellationToken)
@@ -53,20 +55,20 @@ namespace SkyWalking.Service
 
         private async Task RegisterApplication(CancellationToken cancellationToken)
         {
-            if (!RuntimeEnvironment.ApplicationId.HasValue)
+            if (!RuntimeEnvironment.ServiceId.HasValue)
             {
-                var value = await Polling(3, () => SkyWalking.RegisterApplicationAsync(_config.ApplicationCode, cancellationToken), cancellationToken);
+                var value = await Polling(3, () => _client.RegisterApplicationAsync(_config.ApplicationCode, cancellationToken), cancellationToken);
                 if (value.HasValue && RuntimeEnvironment is RuntimeEnvironment environment)
                 {
-                    environment.ApplicationId = value;
-                    Logger.Information($"Registered Application[Id={environment.ApplicationId.Value}].");
+                    environment.ServiceId = value;
+                    Logger.Information($"Registered Application[Id={environment.ServiceId.Value}].");
                 }
             }
         }
 
         private async Task RegisterApplicationInstance(CancellationToken cancellationToken)
         {
-            if (RuntimeEnvironment.ApplicationId.HasValue && !RuntimeEnvironment.ApplicationInstanceId.HasValue)
+            if (RuntimeEnvironment.ServiceId.HasValue && !RuntimeEnvironment.ServiceInstanceId.HasValue)
             {
                 var osInfoRequest = new AgentOsInfoRequest
                 {
@@ -76,12 +78,12 @@ namespace SkyWalking.Service
                     ProcessNo = Process.GetCurrentProcess().Id
                 };
                 var value = await Polling(3,
-                    () => SkyWalking.RegisterApplicationInstanceAsync(RuntimeEnvironment.ApplicationId.Value, RuntimeEnvironment.AgentUUID,
+                    () => _client.RegisterApplicationInstanceAsync(RuntimeEnvironment.ServiceId.Value, RuntimeEnvironment.InstanceId,
                         DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(), osInfoRequest, cancellationToken), cancellationToken);
                 if (value.HasValue && RuntimeEnvironment is RuntimeEnvironment environment)
                 {
-                    environment.ApplicationInstanceId = value;
-                    Logger.Information($"Registered Application Instance[Id={environment.ApplicationInstanceId.Value}].");
+                    environment.ServiceInstanceId = value;
+                    Logger.Information($"Registered Application Instance[Id={environment.ServiceInstanceId.Value}].");
                 }
             }
         }
@@ -109,7 +111,7 @@ namespace SkyWalking.Service
             {
                 try
                 {
-                    await SkyWalking.HeartbeatAsync(RuntimeEnvironment.ApplicationInstanceId.Value, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(), cancellationToken);
+                    await _client.HeartbeatAsync(RuntimeEnvironment.ServiceInstanceId.Value, DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(), cancellationToken);
                     Logger.Debug($"Heartbeat at {DateTimeOffset.UtcNow}.");
                 }
                 catch (Exception e)

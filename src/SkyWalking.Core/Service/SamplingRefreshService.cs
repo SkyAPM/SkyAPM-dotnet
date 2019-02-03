@@ -30,7 +30,7 @@ namespace SkyWalking.Service
 
         public SamplingRefreshService(IConfigAccessor configAccessor, ISkyWalkingClient skyWalking,
             IRuntimeEnvironment runtimeEnvironment, ILoggerFactory loggerFactory)
-            : base(skyWalking, runtimeEnvironment, loggerFactory)
+            : base(runtimeEnvironment, loggerFactory)
         {
             _config = configAccessor.Get<SamplingConfig>();
             DefaultSampler.Instance.SetSamplePer3Secs(_config.SamplePer3Secs);

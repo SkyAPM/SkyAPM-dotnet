@@ -49,7 +49,8 @@ namespace SkyWalking.AspNet.Extensions
             services.AddSingleton<ConnectionManager>();
             services.AddSingleton<IExecutionService, GrpcStateCheckService>();
             services.AddSingleton<ISampler>(DefaultSampler.Instance);
-            services.AddSingleton(RuntimeEnvironment.Instance);
+            services.AddSingleton<RuntimeEnvironment>();
+            services.AddSingleton<IRuntimeEnvironment>(p => p.GetService<RuntimeEnvironment>());
             return services;
         }
     }

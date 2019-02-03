@@ -21,13 +21,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using SkyWalking.Logging;
 
-namespace SkyWalking.Transport.Grpc.V5
+namespace SkyWalking.Transport.Grpc.V6
 {
-    public class GrpcStateCheckService : ExecutionService
+    public class ConnectService: ExecutionService
     {
         private readonly ConnectionManager _connectionManager;
 
-        public GrpcStateCheckService(ConnectionManager connectionManager,
+        public ConnectService(ConnectionManager connectionManager,
             IRuntimeEnvironment runtimeEnvironment,
             ILoggerFactory loggerFactory) : base(runtimeEnvironment, loggerFactory)
         {

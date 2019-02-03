@@ -16,9 +16,5 @@
       <ProjectReference Include="..\SkyWalking.Abstractions\SkyWalking.Abstractions.csproj" />
       <ProjectReference Include="..\SkyWalking.Transport.Grpc.Protocol\SkyWalking.Transport.Grpc.Protocol.csproj" />
     </ItemGroup>
-    
-    <ItemGroup>
-      <Folder Include="V6" />
-    </ItemGroup>
 
 </Project>

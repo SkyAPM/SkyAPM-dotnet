@@ -34,7 +34,7 @@ namespace SkyWalking.Service
 
         public TraceSegmentTransportService(IConfigAccessor configAccessor, ITraceDispatcher dispatcher,
             ISkyWalkingClient skyWalking, IRuntimeEnvironment runtimeEnvironment, ILoggerFactory loggerFactory)
-            : base(skyWalking, runtimeEnvironment, loggerFactory)
+            : base(runtimeEnvironment, loggerFactory)
         {
             _dispatcher = dispatcher;
             _config = configAccessor.Get<TransportConfig>();

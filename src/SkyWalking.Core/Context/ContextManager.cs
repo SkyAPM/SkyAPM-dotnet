@@ -50,7 +50,9 @@ namespace SkyWalking.Context
                 }
                 else
                 {
-                    if (RuntimeEnvironment.Instance.Initialized)
+                    // todo 
+                    // if (RuntimeEnvironment.Instance.Initialized)
+                    if(false)
                     {
 //                        var suffixIdx = operationName.LastIndexOf('.');
 //                        if (suffixIdx > -1 && AgentConfig.IgnoreSuffix.Contains(operationName.Substring(suffixIdx)))

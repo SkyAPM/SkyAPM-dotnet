@@ -16,20 +16,16 @@
  *
  */
 
-using System;
+using System.Collections.Generic;
 
 namespace SkyWalking.Transport
 {
-    public class AgentOsInfoRequest
+    public class ServiceRequest
     {
-        public string OsName { get; set; }
+        public string ServiceName { get; set; }
 
-        public string HostName { get; set; }
-
-        public int ProcessNo { get; set; }
-
-        public string[] IpAddress { get; set; }
-
-        public string Language { get; set; }
+        public Dictionary<string, string> Tags { get; set; }
+        
+        public Dictionary<string,string> Properties { get; set; }
     }
 }

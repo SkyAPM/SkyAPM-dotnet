@@ -17,34 +17,47 @@
  */
 
 using System;
-using System.Threading;
 using System.Threading.Tasks;
 using SkyWalking.Logging;
 
-namespace SkyWalking.Transport.Grpc.V5
+namespace SkyWalking.Transport.Grpc
 {
-    public class GrpcStateCheckService : ExecutionService
+    internal class Call
     {
+        private readonly ILogger _logger;
         private readonly ConnectionManager _connectionManager;
 
-        public GrpcStateCheckService(ConnectionManager connectionManager,
-            IRuntimeEnvironment runtimeEnvironment,
-            ILoggerFactory loggerFactory) : base(runtimeEnvironment, loggerFactory)
+        public Call(ILogger logger, ConnectionManager connectionManager)
         {
+            _logger = logger;
             _connectionManager = connectionManager;
         }
 
-        protected override TimeSpan DueTime { get; } = TimeSpan.Zero;
-        protected override TimeSpan Period { get; } = TimeSpan.FromSeconds(15);
-
-        protected override async Task ExecuteAsync(CancellationToken cancellationToken)
+        public async Task Execute(Func<Task> task, Func<string> errMessage)
         {
-            if (!_connectionManager.Ready)
+            try
             {
-                await _connectionManager.ConnectAsync();
+                await task();
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(errMessage(), ex);
+                _connectionManager.Failure(ex);
             }
         }
 
-        protected override bool CanExecute() => !_connectionManager.Ready;
+        public async Task<T> Execute<T>(Func<Task<T>> task, Func<T> errCallback, Func<string> errMessage)
+        {
+            try
+            {
+                return await task();
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(errMessage(), ex);
+                _connectionManager.Failure(ex);
+                return errCallback();
+            }
+        }
     }
 }
