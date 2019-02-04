@@ -50,8 +50,8 @@ namespace SkyWalking.Agent.AspNetCore
             services.AddSingleton<IContextCarrierFactory, ContextCarrierFactory>();
             services.AddSingleton<ITraceDispatcher, AsyncQueueTraceDispatcher>();
             services.AddSingleton<IExecutionService, TraceSegmentTransportService>();
-            //services.AddSingleton<IExecutionService, ServiceDiscoveryService>();
             services.AddSingleton<IExecutionService, RegisterService>();
+            services.AddSingleton<IExecutionService, PingService>();
             services.AddSingleton<IExecutionService, SamplingRefreshService>();
             services.AddSingleton<ISkyWalkingAgentStartup, SkyWalkingAgentStartup>();
             services.AddSingleton<ISampler>(DefaultSampler.Instance);
@@ -62,7 +62,8 @@ namespace SkyWalking.Agent.AspNetCore
             services.AddSingleton<IHostedService, InstrumentationHostedService>();
             services.AddSingleton<IEnvironmentProvider, HostingEnvironmentProvider>();
             services.AddGrpcTransport().AddLogging();
-            services.AddSkyWalkingExtensions().AddAspNetCoreHosting().AddHttpClient().AddSqlClient().AddEntityFrameworkCore(c => c.AddPomeloMysql().AddNpgsql().AddSqlite());
+            services.AddSkyWalkingExtensions().AddAspNetCoreHosting().AddHttpClient().AddSqlClient()
+                .AddEntityFrameworkCore(c => c.AddPomeloMysql().AddNpgsql().AddSqlite());
             return services;
         }
 
@@ -70,12 +71,12 @@ namespace SkyWalking.Agent.AspNetCore
         {
             services.AddSingleton<ISkyWalkingClient, GrpcClient>();
             services.AddSingleton<ConnectionManager>();
-            //services.AddSingleton<IExecutionService, GrpcStateCheckService>();
+            services.AddSingleton<IPingCaller, PingCaller>();
             services.AddSingleton<IServiceRegister, ServiceRegister>();
             services.AddSingleton<IExecutionService, ConnectService>();
             return services;
         }
-        
+
         private static IServiceCollection AddLogging(this IServiceCollection services)
         {
             services.AddSingleton<ILoggerFactory, DefaultLoggerFactory>();

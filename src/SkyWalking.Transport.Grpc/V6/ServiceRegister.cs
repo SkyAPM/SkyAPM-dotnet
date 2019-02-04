@@ -71,7 +71,7 @@ namespace SkyWalking.Transport.Grpc.V6
                     return NullableValue.Null;
                 },
                 () => NullableValue.Null,
-                () => ExceptionHelpers.RegisterApplicationError);
+                () => ExceptionHelpers.RegisterServiceError);
         }
 
         public async Task<NullableValue> RegisterServiceInstanceAsync(ServiceInstanceRequest serviceInstanceRequest,
@@ -115,7 +115,7 @@ namespace SkyWalking.Transport.Grpc.V6
                     return NullableValue.Null;
                 },
                 () => NullableValue.Null,
-                () => ExceptionHelpers.RegisterApplicationError);
+                () => ExceptionHelpers.RegisterServiceInstanceError);
         }
     }
 }

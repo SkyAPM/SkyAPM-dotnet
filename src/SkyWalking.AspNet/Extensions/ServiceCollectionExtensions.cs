@@ -25,6 +25,7 @@ using SkyWalking.Service;
 using SkyWalking.Transport;
 using SkyWalking.Transport.Grpc;
 using SkyWalking.Transport.Grpc.V5;
+using SkyWalking.Transport.Grpc.V6;
 using SkyWalking.Utilities.Configuration;
 using SkyWalking.Utilities.Logging;
 
@@ -38,7 +39,8 @@ namespace SkyWalking.AspNet.Extensions
             services.AddSingleton<IContextCarrierFactory, ContextCarrierFactory>();
             services.AddSingleton<ITraceDispatcher, AsyncQueueTraceDispatcher>();
             services.AddSingleton<IExecutionService, TraceSegmentTransportService>();
-            services.AddSingleton<IExecutionService, ServiceDiscoveryService>();
+            services.AddSingleton<IExecutionService, RegisterService>();
+            services.AddSingleton<IExecutionService, PingService>();
             services.AddSingleton<IExecutionService, SamplingRefreshService>();
             services.AddSingleton<ISkyWalkingAgentStartup, SkyWalkingAgentStartup>();
             services.AddSingleton<TracingDiagnosticProcessorObserver>();
@@ -47,7 +49,7 @@ namespace SkyWalking.AspNet.Extensions
             services.AddSingleton<ILoggerFactory, DefaultLoggerFactory>();
             services.AddSingleton<ISkyWalkingClient, GrpcClient>();
             services.AddSingleton<ConnectionManager>();
-            services.AddSingleton<IExecutionService, GrpcStateCheckService>();
+            services.AddSingleton<IExecutionService, ConnectService>();
             services.AddSingleton<ISampler>(DefaultSampler.Instance);
             services.AddSingleton<RuntimeEnvironment>();
             services.AddSingleton<IRuntimeEnvironment>(p => p.GetService<RuntimeEnvironment>());
