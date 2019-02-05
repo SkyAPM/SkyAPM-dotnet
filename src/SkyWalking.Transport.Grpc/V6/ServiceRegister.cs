@@ -2,7 +2,7 @@
  * Licensed to the OpenSkywalking under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
+ * The OpenSkywalking licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
  *
@@ -22,7 +22,6 @@ using System.Threading.Tasks;
 using SkyWalking.Config;
 using SkyWalking.Logging;
 using SkyWalking.NetworkProtocol;
-using SkyWalking.Transport.Grpc.V5;
 
 namespace SkyWalking.Transport.Grpc.V6
 {
@@ -43,7 +42,7 @@ namespace SkyWalking.Transport.Grpc.V6
         {
             _connectionManager = connectionManager;
             _config = configAccessor.Get<GrpcConfig>();
-            _logger = loggerFactory.CreateLogger(typeof(GrpcClient));
+            _logger = loggerFactory.CreateLogger(typeof(ServiceRegister));
         }
 
         public async Task<NullableValue> RegisterServiceAsync(ServiceRequest serviceRequest,

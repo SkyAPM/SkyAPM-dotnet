@@ -24,7 +24,6 @@ using SkyWalking.Logging;
 using SkyWalking.Service;
 using SkyWalking.Transport;
 using SkyWalking.Transport.Grpc;
-using SkyWalking.Transport.Grpc.V5;
 using SkyWalking.Transport.Grpc.V6;
 using SkyWalking.Utilities.Configuration;
 using SkyWalking.Utilities.Logging;
@@ -35,7 +34,6 @@ namespace SkyWalking.AspNet.Extensions
     {
         public static IServiceCollection AddSkyWalkingCore(this IServiceCollection services)
         {
-            services.AddSingleton<SkyWalkingApplicationRequestCallback>();
             services.AddSingleton<IContextCarrierFactory, ContextCarrierFactory>();
             services.AddSingleton<ITraceDispatcher, AsyncQueueTraceDispatcher>();
             services.AddSingleton<IExecutionService, TraceSegmentTransportService>();
@@ -43,16 +41,17 @@ namespace SkyWalking.AspNet.Extensions
             services.AddSingleton<IExecutionService, PingService>();
             services.AddSingleton<IExecutionService, SamplingRefreshService>();
             services.AddSingleton<ISkyWalkingAgentStartup, SkyWalkingAgentStartup>();
+            services.AddSingleton<ISampler>(DefaultSampler.Instance);
+            services.AddSingleton<IRuntimeEnvironment>(RuntimeEnvironment.Instance);
             services.AddSingleton<TracingDiagnosticProcessorObserver>();
             services.AddSingleton<IConfigAccessor, ConfigAccessor>();
             services.AddSingleton<IEnvironmentProvider, HostingEnvironmentProvider>();
-            services.AddSingleton<ILoggerFactory, DefaultLoggerFactory>();
-            services.AddSingleton<ISkyWalkingClient, GrpcClient>();
+            services.AddSingleton<ITraceReporter, TraceReporter>();
             services.AddSingleton<ConnectionManager>();
+            services.AddSingleton<IPingCaller, PingCaller>();
+            services.AddSingleton<IServiceRegister, ServiceRegister>();
             services.AddSingleton<IExecutionService, ConnectService>();
-            services.AddSingleton<ISampler>(DefaultSampler.Instance);
-            services.AddSingleton<RuntimeEnvironment>();
-            services.AddSingleton<IRuntimeEnvironment>(p => p.GetService<RuntimeEnvironment>());
+            services.AddSingleton<ILoggerFactory, DefaultLoggerFactory>();
             return services;
         }
     }

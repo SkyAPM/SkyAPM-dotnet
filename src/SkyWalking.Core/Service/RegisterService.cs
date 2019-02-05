@@ -15,7 +15,7 @@ namespace SkyWalking.Service
         private readonly IServiceRegister _serviceRegister;
 
         public RegisterService(IConfigAccessor configAccessor, IServiceRegister serviceRegister,
-            RuntimeEnvironment runtimeEnvironment, ILoggerFactory loggerFactory) : base(runtimeEnvironment,
+            IRuntimeEnvironment runtimeEnvironment, ILoggerFactory loggerFactory) : base(runtimeEnvironment,
             loggerFactory)
         {
             _serviceRegister = serviceRegister;

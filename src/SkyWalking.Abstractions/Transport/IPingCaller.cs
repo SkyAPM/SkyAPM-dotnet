@@ -20,7 +20,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using SkyWalking.Transport;
 
-namespace SkyWalking
+namespace SkyWalking.Transport
 {
     public interface IPingCaller
     {

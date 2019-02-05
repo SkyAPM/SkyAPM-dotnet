@@ -36,7 +36,7 @@ namespace SkyWalking.Service
         }
 
         protected override TimeSpan DueTime { get; } = TimeSpan.FromSeconds(30);
-        protected override TimeSpan Period { get; } = TimeSpan.FromSeconds(30);
+        protected override TimeSpan Period { get; } = TimeSpan.FromSeconds(60);
 
         protected override async Task ExecuteAsync(CancellationToken cancellationToken)
         {
