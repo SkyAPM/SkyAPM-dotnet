@@ -30,9 +30,9 @@ namespace SkyWalking.Service
     public class TraceSegmentTransportService : ExecutionService, ITracingContextListener
     {
         private readonly TransportConfig _config;
-        private readonly ITraceDispatcher _dispatcher;
+        private readonly ISegmentDispatcher _dispatcher;
 
-        public TraceSegmentTransportService(IConfigAccessor configAccessor, ITraceDispatcher dispatcher,
+        public TraceSegmentTransportService(IConfigAccessor configAccessor, ISegmentDispatcher dispatcher,
             IRuntimeEnvironment runtimeEnvironment, ILoggerFactory loggerFactory)
             : base(runtimeEnvironment, loggerFactory)
         {

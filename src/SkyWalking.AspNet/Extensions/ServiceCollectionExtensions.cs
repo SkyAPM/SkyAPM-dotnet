@@ -35,7 +35,7 @@ namespace SkyWalking.AspNet.Extensions
         public static IServiceCollection AddSkyWalkingCore(this IServiceCollection services)
         {
             services.AddSingleton<IContextCarrierFactory, ContextCarrierFactory>();
-            services.AddSingleton<ITraceDispatcher, AsyncQueueTraceDispatcher>();
+            services.AddSingleton<ISegmentDispatcher, AsyncQueueSegmentDispatcher>();
             services.AddSingleton<IExecutionService, TraceSegmentTransportService>();
             services.AddSingleton<IExecutionService, RegisterService>();
             services.AddSingleton<IExecutionService, PingService>();
@@ -46,7 +46,7 @@ namespace SkyWalking.AspNet.Extensions
             services.AddSingleton<TracingDiagnosticProcessorObserver>();
             services.AddSingleton<IConfigAccessor, ConfigAccessor>();
             services.AddSingleton<IEnvironmentProvider, HostingEnvironmentProvider>();
-            services.AddSingleton<ITraceReporter, TraceReporter>();
+            services.AddSingleton<ISegmentReporter, SegmentReporter>();
             services.AddSingleton<ConnectionManager>();
             services.AddSingleton<IPingCaller, PingCaller>();
             services.AddSingleton<IServiceRegister, ServiceRegister>();

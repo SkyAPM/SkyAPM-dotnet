@@ -47,7 +47,7 @@ namespace SkyWalking.Agent.AspNetCore
             }
 
             services.AddSingleton<IContextCarrierFactory, ContextCarrierFactory>();
-            services.AddSingleton<ITraceDispatcher, AsyncQueueTraceDispatcher>();
+            services.AddSingleton<ISegmentDispatcher, AsyncQueueSegmentDispatcher>();
             services.AddSingleton<IExecutionService, TraceSegmentTransportService>();
             services.AddSingleton<IExecutionService, RegisterService>();
             services.AddSingleton<IExecutionService, PingService>();
@@ -67,7 +67,7 @@ namespace SkyWalking.Agent.AspNetCore
 
         private static IServiceCollection AddGrpcTransport(this IServiceCollection services)
         {
-            services.AddSingleton<ITraceReporter, TraceReporter>();
+            services.AddSingleton<ISegmentReporter, SegmentReporter>();
             services.AddSingleton<ConnectionManager>();
             services.AddSingleton<IPingCaller, PingCaller>();
             services.AddSingleton<IServiceRegister, ServiceRegister>();

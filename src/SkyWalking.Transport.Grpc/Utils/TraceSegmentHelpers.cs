@@ -7,17 +7,17 @@ namespace SkyWalking.Transport.Grpc
 {
     internal static class TraceSegmentHelpers
     {
-        public static UpstreamSegment Map(TraceSegmentRequest request)
+        public static UpstreamSegment Map(SegmentRequest request)
         {
             var upstreamSegment = new UpstreamSegment();
 
             upstreamSegment.GlobalTraceIds.AddRange(request.UniqueIds.Select(MapToUniqueId).ToArray());
 
-            var traceSegment = new TraceSegmentObject
+            var traceSegment = new SegmentObject
             {
                 TraceSegmentId = MapToUniqueId(request.Segment.SegmentId),
-                ApplicationId = request.Segment.ApplicationId,
-                ApplicationInstanceId = request.Segment.ApplicationInstanceId,
+                ServiceId = request.Segment.ServiceId,
+                ServiceInstanceId = request.Segment.ServiceInstanceId,
                 IsSizeLimited = false
             };
 
@@ -36,9 +36,9 @@ namespace SkyWalking.Transport.Grpc
             return uniqueId;
         }
 
-        private static SpanObject MapToSpan(SpanRequest request)
+        private static SpanObjectV2 MapToSpan(SpanRequest request)
         {
-            var spanObject = new SpanObject
+            var spanObject = new SpanObjectV2
             {
                 SpanId = request.SpanId,
                 ParentSpanId = request.ParentSpanId,
@@ -53,39 +53,43 @@ namespace SkyWalking.Transport.Grpc
             ReadStringOrIntValue(spanObject, request.OperationName, OperationNameReader, OperationNameIdReader);
             ReadStringOrIntValue(spanObject, request.Peer, PeerReader, PeerIdReader);
 
-            spanObject.Tags.Add(request.Tags.Select(x => new KeyWithStringValue {Key = x.Key, Value = x.Value}));
+            spanObject.Tags.Add(request.Tags.Select(x => new KeyStringValuePair {Key = x.Key, Value = x.Value}));
             spanObject.Refs.AddRange(request.References.Select(MapToSegmentReference).ToArray());
             spanObject.Logs.AddRange(request.Logs.Select(MapToLogMessage).ToArray());
 
             return spanObject;
         }
 
-        private static TraceSegmentReference MapToSegmentReference(TraceSegmentReferenceRequest referenceRequest)
+        private static SegmentReference MapToSegmentReference(SegmentReferenceRequest referenceRequest)
         {
-            var reference = new TraceSegmentReference
+            var reference = new SegmentReference
             {
-                ParentApplicationInstanceId = referenceRequest.ParentApplicationInstanceId,
-                EntryApplicationInstanceId = referenceRequest.EntryApplicationInstanceId,
+                ParentServiceInstanceId = referenceRequest.ParentServiceInstanceId,
+                EntryServiceInstanceId = referenceRequest.EntryServiceInstanceId,
                 ParentSpanId = referenceRequest.ParentSpanId,
                 RefType = (RefType) referenceRequest.RefType,
                 ParentTraceSegmentId = MapToUniqueId(referenceRequest.ParentTraceSegmentId)
             };
 
-            ReadStringOrIntValue(reference, referenceRequest.NetworkAddress, NetworkAddressReader, NetworkAddressIdReader);
-            ReadStringOrIntValue(reference, referenceRequest.EntryServiceName, EntryServiceReader, EntryServiceIdReader);
-            ReadStringOrIntValue(reference, referenceRequest.ParentServiceName, ParentServiceReader, ParentServiceIdReader);
+            ReadStringOrIntValue(reference, referenceRequest.NetworkAddress, NetworkAddressReader,
+                NetworkAddressIdReader);
+            ReadStringOrIntValue(reference, referenceRequest.EntryEndpointName, EntryEndpointReader,
+                EntryEndpointIdReader);
+            ReadStringOrIntValue(reference, referenceRequest.ParentEndpointName, ParentEndpointReader,
+                ParentEndpointIdReader);
 
             return reference;
         }
 
-        private static LogMessage MapToLogMessage(LogDataRequest request)
+        private static Log MapToLogMessage(LogDataRequest request)
         {
-            var logMessage = new LogMessage {Time = request.Timestamp};
-            logMessage.Data.AddRange(request.Data.Select(x => new KeyWithStringValue {Key = x.Key, Value = x.Value}).ToArray());
+            var logMessage = new Log {Time = request.Timestamp};
+            logMessage.Data.AddRange(request.Data.Select(x => new KeyStringValuePair {Key = x.Key, Value = x.Value}).ToArray());
             return logMessage;
         }
 
-        private static void ReadStringOrIntValue<T>(T instance, StringOrIntValue stringOrIntValue, Action<T, string> stringValueReader, Action<T, int> intValueReader)
+        private static void ReadStringOrIntValue<T>(T instance, StringOrIntValue stringOrIntValue,
+            Action<T, string> stringValueReader, Action<T, int> intValueReader)
         {
             if (stringOrIntValue.HasStringValue)
             {
@@ -97,17 +101,29 @@ namespace SkyWalking.Transport.Grpc
             }
         }
 
-        private static readonly Action<SpanObject, string> ComponentReader = (s, val) => s.Component = val;
-        private static readonly Action<SpanObject, int> ComponentIdReader = (s, val) => s.ComponentId = val;
-        private static readonly Action<SpanObject, string> OperationNameReader = (s, val) => s.OperationName = val;
-        private static readonly Action<SpanObject, int> OperationNameIdReader = (s, val) => s.OperationNameId = val;
-        private static readonly Action<SpanObject, string> PeerReader = (s, val) => s.Peer = val;
-        private static readonly Action<SpanObject, int> PeerIdReader = (s, val) => s.PeerId = val;
-        private static readonly Action<TraceSegmentReference, string> NetworkAddressReader = (s, val) => s.NetworkAddress = val;
-        private static readonly Action<TraceSegmentReference, int> NetworkAddressIdReader = (s, val) => s.NetworkAddressId = val;
-        private static readonly Action<TraceSegmentReference, string> EntryServiceReader = (s, val) => s.EntryServiceName = val;
-        private static readonly Action<TraceSegmentReference, int> EntryServiceIdReader = (s, val) => s.EntryServiceId = val;
-        private static readonly Action<TraceSegmentReference, string> ParentServiceReader = (s, val) => s.ParentServiceName = val;
-        private static readonly Action<TraceSegmentReference, int> ParentServiceIdReader = (s, val) => s.ParentServiceId = val;
+        private static readonly Action<SpanObjectV2, string> ComponentReader = (s, val) => s.Component = val;
+        private static readonly Action<SpanObjectV2, int> ComponentIdReader = (s, val) => s.ComponentId = val;
+        private static readonly Action<SpanObjectV2, string> OperationNameReader = (s, val) => s.OperationName = val;
+        private static readonly Action<SpanObjectV2, int> OperationNameIdReader = (s, val) => s.OperationNameId = val;
+        private static readonly Action<SpanObjectV2, string> PeerReader = (s, val) => s.Peer = val;
+        private static readonly Action<SpanObjectV2, int> PeerIdReader = (s, val) => s.PeerId = val;
+
+        private static readonly Action<SegmentReference, string> NetworkAddressReader =
+            (s, val) => s.NetworkAddress = val;
+
+        private static readonly Action<SegmentReference, int> NetworkAddressIdReader =
+            (s, val) => s.NetworkAddressId = val;
+
+        private static readonly Action<SegmentReference, string>
+            EntryEndpointReader = (s, val) => s.EntryEndpoint = val;
+
+        private static readonly Action<SegmentReference, int> EntryEndpointIdReader =
+            (s, val) => s.EntryEndpointId = val;
+
+        private static readonly Action<SegmentReference, string> ParentEndpointReader =
+            (s, val) => s.ParentEndpoint = val;
+
+        private static readonly Action<SegmentReference, int> ParentEndpointIdReader =
+            (s, val) => s.ParentEndpointId = val;
     }
 }

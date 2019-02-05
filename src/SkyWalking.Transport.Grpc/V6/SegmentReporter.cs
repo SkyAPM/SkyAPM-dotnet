@@ -28,21 +28,21 @@ using SkyWalking.NetworkProtocol;
 
 namespace SkyWalking.Transport.Grpc.V6
 {
-    public class TraceReporter : ITraceReporter
+    public class SegmentReporter : ISegmentReporter
     {
         private readonly ConnectionManager _connectionManager;
         private readonly ILogger _logger;
         private readonly GrpcConfig _config;
 
-        public TraceReporter(ConnectionManager connectionManager, IConfigAccessor configAccessor,
+        public SegmentReporter(ConnectionManager connectionManager, IConfigAccessor configAccessor,
             ILoggerFactory loggerFactory)
         {
             _connectionManager = connectionManager;
             _config = configAccessor.Get<GrpcConfig>();
-            _logger = loggerFactory.CreateLogger(typeof(TraceReporter));
+            _logger = loggerFactory.CreateLogger(typeof(SegmentReporter));
         }
 
-        public async Task ReportAsync(IReadOnlyCollection<TraceSegmentRequest> segmentRequests,
+        public async Task ReportAsync(IReadOnlyCollection<SegmentRequest> segmentRequests,
             CancellationToken cancellationToken = default(CancellationToken))
         {
             if (!_connectionManager.Ready)
