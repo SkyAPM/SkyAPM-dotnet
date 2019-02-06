@@ -25,7 +25,7 @@ using SkyWalking.Config;
 using SkyWalking.Logging;
 using SkyWalking.NetworkProtocol;
 
-namespace SkyWalking.Transport.Grpc.V6
+namespace SkyWalking.Transport.Grpc.V5
 {
     internal class SegmentReporter : ISegmentReporter
     {
@@ -54,12 +54,12 @@ namespace SkyWalking.Transport.Grpc.V6
             try
             {
                 var stopwatch = Stopwatch.StartNew();
-                var client = new TraceSegmentReportService.TraceSegmentReportServiceClient(connection);
+                var client = new TraceSegmentService.TraceSegmentServiceClient(connection);
                 using (var asyncClientStreamingCall =
                     client.collect(null, _config.GetReportTimeout(), cancellationToken))
                 {
                     foreach (var segment in segmentRequests)
-                        await asyncClientStreamingCall.RequestStream.WriteAsync(SegmentV6Helpers.Map(segment));
+                        await asyncClientStreamingCall.RequestStream.WriteAsync(SegmentV5Helpers.Map(segment));
                     await asyncClientStreamingCall.RequestStream.CompleteAsync();
                     await asyncClientStreamingCall.ResponseAsync;
                 }

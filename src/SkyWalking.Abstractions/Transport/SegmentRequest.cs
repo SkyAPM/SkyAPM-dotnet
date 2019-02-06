@@ -83,7 +83,7 @@ namespace SkyWalking.Transport
 
     public class SegmentReferenceRequest
     {
-        public UniqueIdRequest ParentTraceSegmentId { get; set; }
+        public UniqueIdRequest ParentSegmentId { get; set; }
 
         public int ParentServiceInstanceId { get; set; }
 

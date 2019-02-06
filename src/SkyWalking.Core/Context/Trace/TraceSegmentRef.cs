@@ -163,7 +163,7 @@ namespace SkyWalking.Context.Trace
 
             segmentReference.ParentServiceInstanceId = _parentApplicationInstanceId;
             segmentReference.EntryServiceInstanceId = _entryApplicationInstanceId;
-            segmentReference.ParentTraceSegmentId = _traceSegmentId.Transform();
+            segmentReference.ParentSegmentId = _traceSegmentId.Transform();
             segmentReference.ParentSpanId = _spanId;
 
             segmentReference.EntryEndpointName = new StringOrIntValue(_entryOperationId, _entryOperationName);
