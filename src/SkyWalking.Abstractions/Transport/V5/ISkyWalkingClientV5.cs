@@ -1,8 +1,8 @@
-﻿/*
+/*
  * Licensed to the OpenSkywalking under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
+ * The OpenSkywalking licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
  *
@@ -17,18 +17,18 @@
  */
 
 using System;
-using SkyWalking.Transport;
+using System.Threading;
+using System.Threading.Tasks;
 
-namespace SkyWalking.Context.Trace
+namespace SkyWalking.Transport
 {
-    public interface ITraceSegmentRef : IEquatable<ITraceSegmentRef>
+    public interface ISkyWalkingClientV5
     {
-        string EntryOperationName { get; }
-        
-        int EntryOperationId { get; }
-        
-        int EntryApplicationInstanceId { get; }
+        Task<NullableValue> RegisterApplicationAsync(string applicationCode, CancellationToken cancellationToken = default(CancellationToken));
 
-        SegmentReferenceRequest Transform();
+        Task<NullableValue> RegisterApplicationInstanceAsync(int applicationId, Guid agentUUID, long registerTime, AgentOsInfoRequest osInfoRequest,
+            CancellationToken cancellationToken = default(CancellationToken));
+
+        Task HeartbeatAsync(int applicationInstance, long heartbeatTime, CancellationToken cancellationToken = default(CancellationToken));
     }
 }

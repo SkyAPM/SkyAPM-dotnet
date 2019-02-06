@@ -30,9 +30,9 @@ namespace SkyWalking.Service
     public class SegmentReportService : ExecutionService, ITracingContextListener
     {
         private readonly TransportConfig _config;
-        private readonly ITraceDispatcher _dispatcher;
+        private readonly ISegmentDispatcher _dispatcher;
 
-        public SegmentReportService(IConfigAccessor configAccessor, ITraceDispatcher dispatcher,
+        public SegmentReportService(IConfigAccessor configAccessor, ISegmentDispatcher dispatcher,
             IRuntimeEnvironment runtimeEnvironment, ILoggerFactory loggerFactory)
             : base(runtimeEnvironment, loggerFactory)
         {
