@@ -48,7 +48,7 @@ namespace SkyWalking.Agent.AspNetCore
 
             services.AddSingleton<IContextCarrierFactory, ContextCarrierFactory>();
             services.AddSingleton<ITraceDispatcher, AsyncQueueTraceDispatcher>();
-            services.AddSingleton<IExecutionService, TraceSegmentTransportService>();
+            services.AddSingleton<IExecutionService, SegmentReportService>();
             services.AddSingleton<IExecutionService, RegisterService>();
             services.AddSingleton<IExecutionService, PingService>();
             services.AddSingleton<IExecutionService, SamplingRefreshService>();
