@@ -36,6 +36,7 @@ namespace SkyWalking.Utilities.Configuration
                 {"SkyWalking:Logging:Level", "Information"},
                 {"SkyWalking:Logging:FilePath", defaultLogFile},
                 {"SkyWalking:Transport:Interval", "3000"},
+                {"SkyWalking:Transport:ProtocolVersion", "v6"},
                 {"SkyWalking:Transport:PendingSegmentLimit", "30000"},
                 {"SkyWalking:Transport:PendingSegmentTimeout", "1000"},
                 {"SkyWalking:Transport:gRPC:Servers", "localhost:11800"},
