@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Licensed to the OpenSkywalking under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -16,34 +16,15 @@
  *
  */
 
-using System.Collections.Generic;
+using System;
 
 namespace SkyWalking.Utils
 {
-    public static class StackExtensions
+    public static class StringOrIntValueHelpers
     {
-        public static bool TryPeek<T>(this Stack<T> stack, out T value)
+        public static StringOrIntValue ParseStringOrIntValue(string value)
         {
-            if (stack == null || stack.Count == 0)
-            {
-                value = default(T);
-                return false;
-            }
-
-            value = stack.Peek();
-            return true;
-        }
-
-        public static bool TryPop<T>(this Stack<T> stack, out T value)
-        {
-            if (stack == null || stack.Count == 0)
-            {
-                value = default(T);
-                return false;
-            }
-
-            value = stack.Pop();
-            return true;
+            return value.StartsWith("#") ? new StringOrIntValue(new string(value.AsSpan().Slice(1, value.Length - 1).ToArray())) : new StringOrIntValue(int.Parse(value));
         }
     }
 }

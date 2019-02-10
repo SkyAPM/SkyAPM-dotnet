@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Licensed to the OpenSkywalking under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -16,34 +16,28 @@
  *
  */
 
-using System.Collections.Generic;
-
-namespace SkyWalking.Utils
+namespace SkyWalking.Tracing
 {
-    public static class StackExtensions
+    public class NullableCarrier : ICarrier
     {
-        public static bool TryPeek<T>(this Stack<T> stack, out T value)
-        {
-            if (stack == null || stack.Count == 0)
-            {
-                value = default(T);
-                return false;
-            }
-
-            value = stack.Peek();
-            return true;
-        }
-
-        public static bool TryPop<T>(this Stack<T> stack, out T value)
-        {
-            if (stack == null || stack.Count == 0)
-            {
-                value = default(T);
-                return false;
-            }
-
-            value = stack.Pop();
-            return true;
-        }
+        public bool HasValue { get; } = false;
+        
+        public bool? Sampled { get; }
+        
+        public UniqueId TraceId { get; }
+        
+        public UniqueId ParentSegmentId { get; }
+        
+        public int ParentSpanId { get; }
+        
+        public int ParentServiceInstanceId { get; }
+        
+        public int EntryServiceInstanceId { get; }
+        
+        public StringOrIntValue NetworkAddress { get; }
+        
+        public StringOrIntValue EntryEndpoint { get; }
+        
+        public StringOrIntValue ParentEndpoint { get; }
     }
 }
