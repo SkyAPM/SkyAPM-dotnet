@@ -16,29 +16,14 @@
  *
  */
 
-using System.Collections.Generic;
+using SkyWalking.Tracing.Segments;
 
-namespace SkyWalking.Tracing.Segments
+namespace SkyWalking.Tracing
 {
-    public class SegmentContext
+    public interface ICarrierPropagator
     {
-        public UniqueId SegmentId { get; }
+        ICarrier Inject(SegmentContext segmentContext);
 
-        public SegmentSpan Span { get; } = new SegmentSpan();
-
-        public int ServiceId { get; }
-
-        public int ServiceInstanceId { get; }
-
-        public bool IsSizeLimited { get; } = false;
-        
-        public SegmentReferenceCollection References { get; } = new SegmentReferenceCollection();
-
-        public SegmentContext(UniqueId segmentId, int serviceId, int serviceInstanceId)
-        {
-            SegmentId = segmentId;
-            ServiceId = serviceId;
-            ServiceInstanceId = serviceInstanceId;
-        }
+        SegmentContext Extract(ICarrier carrier);
     }
 }

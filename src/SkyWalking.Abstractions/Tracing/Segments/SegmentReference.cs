@@ -16,6 +16,9 @@
  *
  */
 
+using System.Collections;
+using System.Collections.Generic;
+
 namespace SkyWalking.Tracing.Segments
 {
     public class SegmentReference
@@ -41,5 +44,27 @@ namespace SkyWalking.Tracing.Segments
     {
         CrossProcess = 0,
         CrossThread = 1
+    }
+
+    public class SegmentReferenceCollection : IEnumerable<SegmentReference>
+    {
+        private readonly HashSet<SegmentReference> _references = new HashSet<SegmentReference>();
+
+        public bool Add(SegmentReference reference)
+        {
+            return _references.Add(reference);
+        }
+        
+        public IEnumerator<SegmentReference> GetEnumerator()
+        {
+            return _references.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return _references.GetEnumerator();
+        }
+
+        public int Count => _references.Count;
     }
 }
