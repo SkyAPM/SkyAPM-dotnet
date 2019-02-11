@@ -53,5 +53,11 @@ namespace SkyWalking
         {
             return (_stringValue, _intValue);
         }
+
+        public override string ToString()
+        {
+            if (HasIntValue) return _intValue.ToString();
+            return _stringValue;
+        }
     }
 }

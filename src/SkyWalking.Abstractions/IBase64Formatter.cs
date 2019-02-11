@@ -16,30 +16,12 @@
  *
  */
 
-namespace SkyWalking.Tracing
+namespace SkyWalking
 {
-    public class NullableCarrier : ICarrier
+    public interface IBase64Formatter
     {
-        public static NullableCarrier Instance { get; } = new NullableCarrier();
-        
-        public bool HasValue { get; } = false;
-        
-        public bool? Sampled { get; }
-        
-        public UniqueId TraceId { get; }
-        
-        public UniqueId ParentSegmentId { get; }
-        
-        public int ParentSpanId { get; }
-        
-        public int ParentServiceInstanceId { get; }
-        
-        public int EntryServiceInstanceId { get; }
-        
-        public StringOrIntValue NetworkAddress { get; }
-        
-        public StringOrIntValue EntryEndpoint { get; }
-        
-        public StringOrIntValue ParentEndpoint { get; }
+        string Decode(string value);
+
+        string Encode(string value);
     }
 }

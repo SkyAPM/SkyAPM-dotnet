@@ -25,19 +25,23 @@ namespace SkyWalking.Tracing.Segments
         public UniqueId SegmentId { get; }
 
         public UniqueId TraceId { get; }
+        
         public SegmentSpan Span { get; } = new SegmentSpan();
 
         public int ServiceId { get; }
 
         public int ServiceInstanceId { get; }
 
+        public bool Sampled { get; }
+
         public bool IsSizeLimited { get; } = false;
 
         public SegmentReferenceCollection References { get; } = new SegmentReferenceCollection();
 
-        public SegmentContext(UniqueId traceId, UniqueId segmentId, int serviceId, int serviceInstanceId)
+        public SegmentContext(UniqueId traceId, UniqueId segmentId, bool sampled, int serviceId, int serviceInstanceId)
         {
             TraceId = traceId;
+            Sampled = sampled;
             SegmentId = segmentId;
             ServiceId = serviceId;
             ServiceInstanceId = serviceInstanceId;

@@ -29,7 +29,16 @@ namespace SkyWalking.Config
         public string ApplicationCode { get; set; }
         
         public string ServiceName { get; set; }
+        
+        public string[] HeaderVersions { get; set; }
 
         public int SpanLimitPerSegment { get; set; } = 300;
+    }
+
+    public class HeaderVersions
+    {
+        public static string SW3 { get; } = "sw3";
+        
+        public static string SW6 { get; } = "sw6";
     }
 }

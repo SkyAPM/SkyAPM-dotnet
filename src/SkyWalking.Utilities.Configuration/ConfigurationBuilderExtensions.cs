@@ -33,6 +33,7 @@ namespace SkyWalking.Utilities.Configuration
                 {"SkyWalking:Namespace", string.Empty},
                 {"SkyWalking:ApplicationCode", "My_Service"},
                 {"SkyWalking:SpanLimitPerSegment", "300"},
+                {"SkyWalking:HeaderVersions:0", HeaderVersions.SW6},
                 {"SkyWalking:Sampling:SamplePer3Secs", "-1"},
                 {"SkyWalking:Logging:Level", "Information"},
                 {"SkyWalking:Logging:FilePath", defaultLogFile},

@@ -16,30 +16,16 @@
  *
  */
 
+using SkyWalking.Tracing.Segments;
+
 namespace SkyWalking.Tracing
 {
-    public class NullableCarrier : ICarrier
+    public interface ISegmentContextFactory
     {
-        public static NullableCarrier Instance { get; } = new NullableCarrier();
-        
-        public bool HasValue { get; } = false;
-        
-        public bool? Sampled { get; }
-        
-        public UniqueId TraceId { get; }
-        
-        public UniqueId ParentSegmentId { get; }
-        
-        public int ParentSpanId { get; }
-        
-        public int ParentServiceInstanceId { get; }
-        
-        public int EntryServiceInstanceId { get; }
-        
-        public StringOrIntValue NetworkAddress { get; }
-        
-        public StringOrIntValue EntryEndpoint { get; }
-        
-        public StringOrIntValue ParentEndpoint { get; }
+        SegmentContext CreateEntrySegment(string operationName, ICarrier carrier);
+
+        SegmentContext CreateLocalSegment(string operationName);
+
+        SegmentContext CreateExitSegment(string operationName, StringOrIntValue networkAddress);
     }
 }

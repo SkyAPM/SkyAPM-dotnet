@@ -16,30 +16,21 @@
  *
  */
 
-namespace SkyWalking.Tracing
+using System;
+using System.Text;
+
+namespace SkyWalking
 {
-    public class NullableCarrier : ICarrier
+    public class Base64Formatter : IBase64Formatter
     {
-        public static NullableCarrier Instance { get; } = new NullableCarrier();
-        
-        public bool HasValue { get; } = false;
-        
-        public bool? Sampled { get; }
-        
-        public UniqueId TraceId { get; }
-        
-        public UniqueId ParentSegmentId { get; }
-        
-        public int ParentSpanId { get; }
-        
-        public int ParentServiceInstanceId { get; }
-        
-        public int EntryServiceInstanceId { get; }
-        
-        public StringOrIntValue NetworkAddress { get; }
-        
-        public StringOrIntValue EntryEndpoint { get; }
-        
-        public StringOrIntValue ParentEndpoint { get; }
+        public string Decode(string value)
+        {
+            return value == null ? value : Encoding.UTF8.GetString(Convert.FromBase64String(value));
+        }
+
+        public string Encode(string value)
+        {
+            return value == null ? value : Convert.ToBase64String(Encoding.UTF8.GetBytes(value));
+        }
     }
 }

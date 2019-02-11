@@ -17,81 +17,78 @@
  */
 
 using System.Linq;
-using SkyWalking.Tracing.Segments;
+using SkyWalking.Config;
 using SkyWalking.Utils;
 
 namespace SkyWalking.Tracing
 {
-    public class SW3CarrierParser : ICarrierParser
+    public class Sw3CarrierFormatter : ICarrierFormatter
     {
-        private const string HEADER = "sw3";
         private readonly IUniqueIdParser _uniqueIdParser;
 
-        public SW3CarrierParser(IUniqueIdParser uniqueIdParser)
+        public Sw3CarrierFormatter(IUniqueIdParser uniqueIdParser, IConfigAccessor configAccessor)
         {
             _uniqueIdParser = uniqueIdParser;
+            var config = configAccessor.Get<InstrumentationConfig>();
+            Key = string.IsNullOrEmpty(config.Namespace)
+                ? HeaderVersions.SW3
+                : $"{config.Namespace}-{HeaderVersions.SW3}";
+            Enable = config.HeaderVersions != null && config.HeaderVersions.Contains(HeaderVersions.SW3);
         }
 
-        public bool TryParse(string key, string content, out ICarrier carrier)
+        public string Key { get; }
+
+        public bool Enable { get; }
+
+        public ICarrier Decode(string content)
         {
-            bool defer(out ICarrier c)
+            NullableCarrier Defer()
             {
-                c = new NullableCarrier();
-                return false;
+                return NullableCarrier.Instance;
             }
 
-            if (HEADER != key || string.IsNullOrEmpty(content))
-                return defer(out carrier);
+            if (string.IsNullOrEmpty(content))
+                return Defer();
 
-            var parts = content.Split("|".ToCharArray(), 8);
+            var parts = content.Split('|');
             if (parts.Length < 8)
-                return defer(out carrier);
+                return Defer();
 
             if (!_uniqueIdParser.TryParse(parts[0], out var segmentId))
-                return defer(out carrier);
+                return Defer();
 
             if (!int.TryParse(parts[1], out var parentSpanId))
-                return defer(out carrier);
+                return Defer();
 
             if (!int.TryParse(parts[2], out var parentServiceInstanceId))
-                return defer(out carrier);
+                return Defer();
 
             if (!int.TryParse(parts[3], out var entryServiceInstanceId))
-                return defer(out carrier);
+                return Defer();
 
             if (!_uniqueIdParser.TryParse(parts[7], out var traceId))
-                return defer(out carrier);
+                return Defer();
 
-            carrier = new Carrier(traceId, segmentId, parentSpanId, parentServiceInstanceId,
+            return new Carrier(traceId, segmentId, parentSpanId, parentServiceInstanceId,
                 entryServiceInstanceId)
             {
                 NetworkAddress = StringOrIntValueHelpers.ParseStringOrIntValue(parts[4]),
                 EntryEndpoint = StringOrIntValueHelpers.ParseStringOrIntValue(parts[5]),
                 ParentEndpoint = StringOrIntValueHelpers.ParseStringOrIntValue(parts[6])
             };
-
-            return true;
         }
 
-        public bool TryParse(string key, SegmentContext segmentContext, out ICarrier carrier)
+        public string Encode(ICarrier carrier)
         {
-            if (HEADER != key)
-            {
-                carrier = new NullableCarrier();
-                return false;
-            }
-
-            var reference = segmentContext.References.FirstOrDefault();
-
-            carrier = new Carrier(segmentContext.TraceId, segmentContext.SegmentId, segmentContext.Span.SpanId,
-                segmentContext.ServiceInstanceId, reference?.EntryServiceInstanceId ?? segmentContext.ServiceInstanceId)
-            {
-                NetworkAddress = segmentContext.Span.Peer,
-                EntryEndpoint = reference?.EntryEndpoint ?? segmentContext.Span.OperationName,
-                ParentEndpoint = segmentContext.Span.OperationName
-            };
-
-            return true;
+            return string.Join("|",
+                carrier.ParentSegmentId.ToString(),
+                carrier.ParentSpanId.ToString(),
+                carrier.ParentServiceInstanceId.ToString(),
+                carrier.EntryServiceInstanceId.ToString(),
+                carrier.NetworkAddress.ToString(),
+                carrier.EntryEndpoint.ToString(),
+                carrier.ParentEndpoint.ToString(),
+                carrier.TraceId.ToString());
         }
     }
 }

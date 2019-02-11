@@ -20,10 +20,8 @@ using SkyWalking.Tracing.Segments;
 
 namespace SkyWalking.Tracing
 {
-    public interface ICarrierParser
+    public interface IExitSegmentContextAccessor
     {
-        bool TryParse(string key, string content, out ICarrier carrier);
-
-        bool TryParse(string key, SegmentContext segmentContext, out ICarrier carrier);
+        SegmentContext Context { get; set; }
     }
 }

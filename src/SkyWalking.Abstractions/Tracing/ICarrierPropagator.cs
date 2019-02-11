@@ -22,8 +22,8 @@ namespace SkyWalking.Tracing
 {
     public interface ICarrierPropagator
     {
-        ICarrier Inject(SegmentContext segmentContext);
+        void Inject(SegmentContext segmentContext, ICarrierHeaderCollection carrier);
 
-        SegmentContext Extract(ICarrier carrier);
+        ICarrier Extract(ICarrierHeaderCollection carrier);
     }
 }
