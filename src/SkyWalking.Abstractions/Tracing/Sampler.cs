@@ -20,5 +20,5 @@ using SkyWalking.Tracing.Segments;
 
 namespace SkyWalking.Tracing
 {
-    public delegate bool SampledDelegate(SegmentContext segmentContext);
+    public delegate bool Sampler(SegmentContext segmentContext);
 }

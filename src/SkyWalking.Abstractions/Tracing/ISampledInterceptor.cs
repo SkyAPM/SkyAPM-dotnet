@@ -22,6 +22,15 @@ namespace SkyWalking.Tracing
 {
     public interface ISampledInterceptor
     {
-        bool Invoke(SegmentContext segmentContext, SampledDelegate next);
+        SamplerPriority Priority { get; }
+        
+        bool Invoke(SegmentContext segmentContext, Sampler next);
+    }
+
+    public enum SamplerPriority
+    {
+        Lowest,
+        Normal,
+        Highest
     }
 }
