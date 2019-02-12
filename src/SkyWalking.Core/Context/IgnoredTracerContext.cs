@@ -19,8 +19,8 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using SkyWalking.Common;
 using SkyWalking.Context.Trace;
-using SkyWalking.Utils;
 
 namespace SkyWalking.Context
 {

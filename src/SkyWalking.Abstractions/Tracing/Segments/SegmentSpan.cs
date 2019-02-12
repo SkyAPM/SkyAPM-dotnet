@@ -19,6 +19,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using SkyWalking.Common;
 
 namespace SkyWalking.Tracing.Segments
 {
@@ -71,11 +73,10 @@ namespace SkyWalking.Tracing.Segments
             return this;
         }
 
-        public SpanLog AddLog(string @event, string message)
+        public void AddLog(params LogEvent[] events)
         {
-            var log = new SpanLog(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
+            var log = new SpanLog(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(), events);
             Logs.AddLog(log);
-            return log;
         }
 
         public void Finish()
@@ -142,14 +143,48 @@ namespace SkyWalking.Tracing.Segments
 
     public class SpanLog
     {
+        private static readonly Dictionary<string, string> Empty = new Dictionary<string, string>();
         public long Timestamp { get; }
 
-        public Dictionary<string, string> Data { get; }
+        public IReadOnlyDictionary<string, string> Data { get; }
 
-        public SpanLog(long timestamp)
+        public SpanLog(long timestamp, params LogEvent[] events)
         {
             Timestamp = timestamp;
-            Data = new Dictionary<string, string>();
+            Data = events?.ToDictionary(x => x.Key, x => x.Value) ?? Empty;
+        }
+    }
+
+    public class LogEvent
+    {
+        public string Key { get; }
+
+        public string Value { get; }
+
+        public LogEvent(string key, string value)
+        {
+            Key = key;
+            Value = value;
+        }
+
+        public static LogEvent Event(string value)
+        {
+            return new LogEvent("event", value);
+        }
+
+        public static LogEvent Message(string value)
+        {
+            return new LogEvent("message", value);
+        }
+
+        public static LogEvent ErrorKind(string value)
+        {
+            return new LogEvent("error.kind", value);
+        }
+
+        public static LogEvent ErrorStack(string value)
+        {
+            return new LogEvent("stack", value);
         }
     }
 }

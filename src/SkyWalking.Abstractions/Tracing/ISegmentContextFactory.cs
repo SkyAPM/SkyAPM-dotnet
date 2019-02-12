@@ -16,6 +16,7 @@
  *
  */
 
+using SkyWalking.Common;
 using SkyWalking.Tracing.Segments;
 
 namespace SkyWalking.Tracing

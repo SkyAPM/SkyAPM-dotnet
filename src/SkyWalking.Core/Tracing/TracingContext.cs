@@ -17,6 +17,7 @@
  */
 
 using System;
+using SkyWalking.Common;
 using SkyWalking.Tracing.Segments;
 using SkyWalking.Transport;
 

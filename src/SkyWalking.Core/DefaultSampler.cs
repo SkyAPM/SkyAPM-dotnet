@@ -17,7 +17,7 @@
  */
 
 using System.Runtime.CompilerServices;
-using SkyWalking.Utils;
+using SkyWalking.Common;
 
 namespace SkyWalking
 {

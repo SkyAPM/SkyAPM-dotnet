@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Licensed to the OpenSkywalking under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -16,30 +16,34 @@
  *
  */
 
-namespace SkyWalking.Config
+using System.Collections.Generic;
+
+namespace SkyWalking.Common
 {
-    [Config("SkyWalking", "Transport")]
-    public class TransportConfig
+    public static class StackExtensions
     {
-        public int QueueSize { get; set; } = 30000;
+        public static bool TryPeek<T>(this Stack<T> stack, out T value)
+        {
+            if (stack == null || stack.Count == 0)
+            {
+                value = default(T);
+                return false;
+            }
 
-        /// <summary>
-        /// Flush Interval Millisecond
-        /// </summary>
-        public int Interval { get; set; } = 3000;
+            value = stack.Peek();
+            return true;
+        }
 
-        /// <summary>
-        /// Data queued beyond this time will be discarded.
-        /// </summary>
-        public int BatchSize { get; set; } = 3000;
+        public static bool TryPop<T>(this Stack<T> stack, out T value)
+        {
+            if (stack == null || stack.Count == 0)
+            {
+                value = default(T);
+                return false;
+            }
 
-        public string ProtocolVersion { get; set; } = ProtocolVersions.V6;
-    }
-
-    public static class ProtocolVersions
-    {
-        public static string V5 { get; } = "v5";
-        
-        public static string V6 { get; } = "v6";
+            value = stack.Pop();
+            return true;
+        }
     }
 }

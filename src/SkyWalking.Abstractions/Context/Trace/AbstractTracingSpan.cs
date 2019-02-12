@@ -18,8 +18,9 @@
 
 using System;
 using System.Collections.Generic;
-using SkyWalking.Transport;
+using SkyWalking.Common;
 using SkyWalking.Components;
+using SkyWalking.Transport;
 
 namespace SkyWalking.Context.Trace
 {

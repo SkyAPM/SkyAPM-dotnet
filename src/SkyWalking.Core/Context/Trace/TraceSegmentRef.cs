@@ -17,6 +17,7 @@
  */
 
 using System.Linq;
+using SkyWalking.Common;
 using SkyWalking.Transport;
 using SkyWalking.Config;
 using SkyWalking.Context.Ids;

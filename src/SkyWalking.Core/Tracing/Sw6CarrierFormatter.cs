@@ -17,8 +17,8 @@
  */
 
 using System.Linq;
+using SkyWalking.Common;
 using SkyWalking.Config;
-using SkyWalking.Utils;
 
 namespace SkyWalking.Tracing
 {

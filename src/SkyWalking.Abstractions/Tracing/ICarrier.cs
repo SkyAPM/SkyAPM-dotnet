@@ -16,6 +16,8 @@
  *
  */
 
+using SkyWalking.Common;
+
 namespace SkyWalking.Tracing
 {
     public interface ICarrier

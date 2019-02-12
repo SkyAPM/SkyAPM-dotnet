@@ -16,36 +16,36 @@
  *
  */
 
-using System;
-using System.Threading;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using Microsoft.AspNetCore.Http;
+using SkyWalking.Tracing;
 
-namespace SkyWalking.Tracing
+namespace SkyWalking.AspNetCore.Diagnostics
 {
-    public class UniqueIdGenerator : IUniqueIdGenerator
+    public class HttpRequestCarrierHeaderCollection : ICarrierHeaderCollection
     {
-        private readonly ThreadLocal<long> sequence = new ThreadLocal<long>(() => 0);
-        private readonly IRuntimeEnvironment _runtimeEnvironment;
+        private readonly IEnumerable<KeyValuePair<string, string>> _headers;
 
-        public UniqueIdGenerator(IRuntimeEnvironment runtimeEnvironment)
+        public HttpRequestCarrierHeaderCollection(HttpRequest httpRequest)
         {
-            _runtimeEnvironment = runtimeEnvironment;
+            _headers = httpRequest.Headers.Select(x => new KeyValuePair<string, string>(x.Key, x.Value)).ToArray();
         }
 
-        public UniqueId Generate()
+        public IEnumerator<KeyValuePair<string, string>> GetEnumerator()
         {
-            return new UniqueId(_runtimeEnvironment.ServiceInstanceId.Value,
-                Thread.CurrentThread.ManagedThreadId,
-                DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() * 10000 + GetSequence());
+            return _headers.GetEnumerator();
         }
 
-        private long GetSequence()
+        IEnumerator IEnumerable.GetEnumerator()
         {
-            if (sequence.Value++ >= 9999)
-            {
-                sequence.Value = 0;
-            }
-
-            return sequence.Value;
+            return _headers.GetEnumerator();
+        }
+        
+        public void Add(string key, string value)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

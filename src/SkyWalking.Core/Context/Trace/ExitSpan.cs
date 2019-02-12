@@ -17,6 +17,7 @@
  */
 
 using System;
+using SkyWalking.Common;
 using SkyWalking.Transport;
 using SkyWalking.Components;
 

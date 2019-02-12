@@ -16,8 +16,6 @@
  *
  */
 
-using System.Collections.Generic;
-
 namespace SkyWalking.Tracing.Segments
 {
     public class SegmentContext

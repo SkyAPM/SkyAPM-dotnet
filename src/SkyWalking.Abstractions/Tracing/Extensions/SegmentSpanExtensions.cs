@@ -16,30 +16,28 @@
  *
  */
 
-namespace SkyWalking.Config
+using System;
+using SkyWalking.Tracing.Segments;
+
+namespace SkyWalking.Tracing
 {
-    [Config("SkyWalking", "Transport")]
-    public class TransportConfig
+    public static class SegmentSpanExtensions
     {
-        public int QueueSize { get; set; } = 30000;
+        public static void ErrorOccurred(this SegmentSpan span, Exception exception = null)
+        {
+            if (span == null)
+            {
+                return;
+            }
 
-        /// <summary>
-        /// Flush Interval Millisecond
-        /// </summary>
-        public int Interval { get; set; } = 3000;
-
-        /// <summary>
-        /// Data queued beyond this time will be discarded.
-        /// </summary>
-        public int BatchSize { get; set; } = 3000;
-
-        public string ProtocolVersion { get; set; } = ProtocolVersions.V6;
-    }
-
-    public static class ProtocolVersions
-    {
-        public static string V5 { get; } = "v5";
-        
-        public static string V6 { get; } = "v6";
+            span.IsError = true;
+            if (exception != null)
+            {
+                span.AddLog(LogEvent.Event("error"), 
+                    LogEvent.ErrorKind(exception.GetType().FullName),
+                    LogEvent.Message(exception.Message), 
+                    LogEvent.ErrorStack(exception.StackTrace));
+            }
+        }
     }
 }

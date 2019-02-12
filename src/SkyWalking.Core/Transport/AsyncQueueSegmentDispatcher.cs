@@ -49,7 +49,7 @@ namespace SkyWalking.Transport
         public bool Dispatch(SegmentContext segmentContext)
         {
             // todo performance optimization for ConcurrentQueue
-            if (_config.PendingSegmentLimit < _segmentQueue.Count || _cancellation.IsCancellationRequested)
+            if (_config.QueueSize < _segmentQueue.Count || _cancellation.IsCancellationRequested)
                 return false;
 
             var segment = _segmentContextMapper.Map(segmentContext);
@@ -68,7 +68,7 @@ namespace SkyWalking.Transport
             // todo performance optimization for ConcurrentQueue
             //var queued = _segmentQueue.Count;
             //var limit = queued <= _config.PendingSegmentLimit ? queued : _config.PendingSegmentLimit;
-            var limit = _config.PendingSegmentLimit;
+            var limit = _config.BatchSize;
             var index = 0;
             var segments = new List<SegmentRequest>(limit);
             while (index++ < limit && _segmentQueue.TryDequeue(out var request))

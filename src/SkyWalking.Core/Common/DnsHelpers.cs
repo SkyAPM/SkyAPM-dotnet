@@ -16,30 +16,30 @@
  *
  */
 
-namespace SkyWalking.Config
+using System.Linq;
+using System.Net;
+using System.Net.Sockets;
+
+namespace SkyWalking.Common
 {
-    [Config("SkyWalking", "Transport")]
-    public class TransportConfig
+    public static class DnsHelpers
     {
-        public int QueueSize { get; set; } = 30000;
+        public static string GetHostName()
+        {
+            return Dns.GetHostName();
+        }
 
-        /// <summary>
-        /// Flush Interval Millisecond
-        /// </summary>
-        public int Interval { get; set; } = 3000;
-
-        /// <summary>
-        /// Data queued beyond this time will be discarded.
-        /// </summary>
-        public int BatchSize { get; set; } = 3000;
-
-        public string ProtocolVersion { get; set; } = ProtocolVersions.V6;
-    }
-
-    public static class ProtocolVersions
-    {
-        public static string V5 { get; } = "v5";
-        
-        public static string V6 { get; } = "v6";
+        public static string[] GetIpV4s()
+        {
+            try
+            {
+                var ipAddresses = Dns.GetHostAddresses(Dns.GetHostName());
+                return ipAddresses.Where(x => x.AddressFamily == AddressFamily.InterNetwork).Select(ipAddress => ipAddress.ToString()).ToArray();
+            }
+            catch
+            {
+                return new string[0];
+            }
+        }
     }
 }

@@ -18,6 +18,7 @@
 
 using System;
 using System.Linq;
+using SkyWalking.Common;
 using SkyWalking.Tracing.Segments;
 
 namespace SkyWalking.Tracing
@@ -178,27 +179,27 @@ namespace SkyWalking.Tracing
                 return carrier.Sampled.Value;
             }
 
-            SampledContext sampledContext;
+            SamplingContext samplingContext;
             if (carrier.HasValue)
             {
-                sampledContext = new SampledContext(operationName, carrier.NetworkAddress, carrier.EntryEndpoint,
+                samplingContext = new SamplingContext(operationName, carrier.NetworkAddress, carrier.EntryEndpoint,
                     carrier.ParentEndpoint);
             }
             else
             {
-                sampledContext = new SampledContext(operationName, default(StringOrIntValue), default(StringOrIntValue),
+                samplingContext = new SamplingContext(operationName, default(StringOrIntValue), default(StringOrIntValue),
                     default(StringOrIntValue));
             }
 
             var sampler = _samplerChainBuilder.Build();
-            return sampler(sampledContext);
+            return sampler(samplingContext);
         }
 
         private bool GetSampled(SegmentContext parentSegmentContext, string operationName,
             StringOrIntValue peer = default(StringOrIntValue))
         {
             if (parentSegmentContext != null) return parentSegmentContext.Sampled;
-            var sampledContext = new SampledContext(operationName, peer, new StringOrIntValue(operationName),
+            var sampledContext = new SamplingContext(operationName, peer, new StringOrIntValue(operationName),
                 default(StringOrIntValue));
             var sampler = _samplerChainBuilder.Build();
             return sampler(sampledContext);

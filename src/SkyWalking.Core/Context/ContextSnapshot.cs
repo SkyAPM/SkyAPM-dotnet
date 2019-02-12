@@ -18,6 +18,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using SkyWalking.Common;
 using SkyWalking.Context.Ids;
 
 namespace SkyWalking.Context

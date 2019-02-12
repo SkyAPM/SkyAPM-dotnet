@@ -20,10 +20,10 @@ using System;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
+using SkyWalking.Common;
 using SkyWalking.Config;
 using SkyWalking.Logging;
 using SkyWalking.Transport;
-using SkyWalking.Utils;
 
 namespace SkyWalking.Service
 {

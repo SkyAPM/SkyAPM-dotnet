@@ -16,7 +16,7 @@
  *
  */
 
-namespace SkyWalking
+namespace SkyWalking.Common
 {
     public struct NullableValue
     {

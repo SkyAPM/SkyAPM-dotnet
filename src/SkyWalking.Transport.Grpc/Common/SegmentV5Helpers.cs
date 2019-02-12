@@ -19,6 +19,7 @@
 using System;
 using System.Linq;
 using Google.Protobuf;
+using SkyWalking.Common;
 using SkyWalking.NetworkProtocol;
 
 namespace SkyWalking.Transport.Grpc.Common

@@ -30,7 +30,9 @@ using SkyWalking.Utilities.Configuration;
 using SkyWalking.Utilities.DependencyInjection;
 using SkyWalking.Utilities.Logging;
 using SkyWalking.Logging;
+using SkyWalking.Sampling;
 using SkyWalking.Service;
+using SkyWalking.Tracing;
 using SkyWalking.Transport;
 using SkyWalking.Transport.Grpc;
 using SkyWalking.Transport.Grpc.V5;
@@ -47,6 +49,7 @@ namespace SkyWalking.Agent.AspNetCore
                 throw new ArgumentNullException(nameof(services));
             }
 
+
             services.AddSingleton<IContextCarrierFactory, ContextCarrierFactory>();
             services.AddSingleton<ISegmentDispatcher, AsyncQueueSegmentDispatcher>();
             services.AddSingleton<IExecutionService, SegmentReportService>();
@@ -61,9 +64,36 @@ namespace SkyWalking.Agent.AspNetCore
             services.AddSingleton<IConfigAccessor, ConfigAccessor>();
             services.AddSingleton<IHostedService, InstrumentationHostedService>();
             services.AddSingleton<IEnvironmentProvider, HostingEnvironmentProvider>();
-            services.AddGrpcTransport().AddLogging();
+            services.AddTracing().AddSampling().AddGrpcTransport().AddLogging();
             services.AddSkyWalkingExtensions().AddAspNetCoreHosting().AddHttpClient().AddSqlClient()
                 .AddEntityFrameworkCore(c => c.AddPomeloMysql().AddNpgsql().AddSqlite());
+            return services;
+        }
+
+        private static IServiceCollection AddTracing(this IServiceCollection services)
+        {
+            services.AddSingleton<Tracing.ITracingContext, Tracing.TracingContext>();
+            services.AddSingleton<Tracing.ICarrierPropagator, Tracing.CarrierPropagator>();
+            services.AddSingleton<Tracing.ICarrierFormatter, Tracing.Sw3CarrierFormatter>();
+            services.AddSingleton<Tracing.ICarrierFormatter, Tracing.Sw6CarrierFormatter>();
+            services.AddSingleton<Tracing.ISegmentContextFactory, Tracing.SegmentContextFactory>();
+            services.AddSingleton<Tracing.IEntrySegmentContextAccessor, Tracing.EntrySegmentContextAccessor>();
+            services.AddSingleton<Tracing.ILocalSegmentContextAccessor, Tracing.LocalSegmentContextAccessor>();
+            services.AddSingleton<Tracing.IExitSegmentContextAccessor, Tracing.ExitSegmentContextAccessor>();
+            services.AddSingleton<Tracing.ISamplerChainBuilder, Tracing.SamplerChainBuilder>();
+            services.AddSingleton<Tracing.IUniqueIdGenerator, Tracing.UniqueIdGenerator>();
+            services.AddSingleton<Tracing.IUniqueIdParser, Tracing.UniqueIdParser>();
+            services.AddSingleton<ISegmentContextMapper, SegmentContextMapper>();
+            services.AddSingleton<IBase64Formatter, Base64Formatter>();
+            return services;
+        }
+
+        private static IServiceCollection AddSampling(this IServiceCollection services)
+        {
+            services.AddSingleton<SimpleCountSamplingInterceptor>();
+            services.AddSingleton<ISamplingInterceptor>(p => p.GetService<SimpleCountSamplingInterceptor>());
+            services.AddSingleton<IExecutionService>(p => p.GetService<SimpleCountSamplingInterceptor>());
+            services.AddSingleton<ISamplingInterceptor, RandomSamplingInterceptor>();
             return services;
         }
 

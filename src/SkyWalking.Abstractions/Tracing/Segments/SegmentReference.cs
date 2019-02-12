@@ -18,6 +18,7 @@
 
 using System.Collections;
 using System.Collections.Generic;
+using SkyWalking.Common;
 
 namespace SkyWalking.Tracing.Segments
 {

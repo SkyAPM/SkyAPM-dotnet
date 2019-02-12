@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Licensed to the OpenSkywalking under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -16,14 +16,32 @@
  *
  */
 
-using SkyWalking.Common;
+using System.Runtime.InteropServices;
 
-namespace SkyWalking.Config
+namespace SkyWalking.Common
 {
-    public class RuntimeConfig
+    internal static class PlatformInformation
     {
-        public NullableValue ApplicationId { get; set; }
+        private const string OSX = "Mac OS X";
+        private const string LINUX = "Linux";
+        private const string WINDOWS = "Windows";
 
-        public NullableValue ApplicationInstance { get; set; }
+        public static string GetOSName()
+        {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                return WINDOWS;
+            }
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                return LINUX;
+            }
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            {
+                return OSX;
+            }
+
+            return "Unknown";
+        }
     }
 }

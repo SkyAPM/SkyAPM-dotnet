@@ -16,30 +16,14 @@
  *
  */
 
-namespace SkyWalking.Config
+namespace SkyWalking.Common
 {
-    [Config("SkyWalking", "Transport")]
-    public class TransportConfig
+    public static class Tags
     {
-        public int QueueSize { get; set; } = 30000;
+        public static readonly string URL = "url";
 
-        /// <summary>
-        /// Flush Interval Millisecond
-        /// </summary>
-        public int Interval { get; set; } = 3000;
+        public static readonly string HTTP_METHOD = "http.method";
 
-        /// <summary>
-        /// Data queued beyond this time will be discarded.
-        /// </summary>
-        public int BatchSize { get; set; } = 3000;
-
-        public string ProtocolVersion { get; set; } = ProtocolVersions.V6;
-    }
-
-    public static class ProtocolVersions
-    {
-        public static string V5 { get; } = "v5";
-        
-        public static string V6 { get; } = "v6";
+        public static readonly string STATUS_CODE = "status_code";
     }
 }

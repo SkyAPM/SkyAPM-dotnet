@@ -16,30 +16,21 @@
  *
  */
 
-namespace SkyWalking.Config
+namespace SkyWalking.Tracing
 {
-    [Config("SkyWalking", "Transport")]
-    public class TransportConfig
+    public class UniqueIdParser : IUniqueIdParser
     {
-        public int QueueSize { get; set; } = 30000;
-
-        /// <summary>
-        /// Flush Interval Millisecond
-        /// </summary>
-        public int Interval { get; set; } = 3000;
-
-        /// <summary>
-        /// Data queued beyond this time will be discarded.
-        /// </summary>
-        public int BatchSize { get; set; } = 3000;
-
-        public string ProtocolVersion { get; set; } = ProtocolVersions.V6;
-    }
-
-    public static class ProtocolVersions
-    {
-        public static string V5 { get; } = "v5";
-        
-        public static string V6 { get; } = "v6";
+        public bool TryParse(string text, out UniqueId uniqueId)
+        {
+            uniqueId = null;
+            if (text == null) return false;
+            var parts = text.Split("\\.".ToCharArray(), 3);
+            if (parts.Length < 3) return false;
+            if (!int.TryParse(parts[0], out var part0)) return false;
+            if (!int.TryParse(parts[1], out var part1)) return false;
+            if (!int.TryParse(parts[2], out var part2)) return false;
+            uniqueId = new UniqueId(part0, part1, part2);
+            return true;
+        }
     }
 }
