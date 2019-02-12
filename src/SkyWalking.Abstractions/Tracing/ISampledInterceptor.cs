@@ -24,7 +24,7 @@ namespace SkyWalking.Tracing
     {
         SamplerPriority Priority { get; }
         
-        bool Invoke(SegmentContext segmentContext, Sampler next);
+        bool Invoke(SampledContext sampledContext, Sampler next);
     }
 
     public enum SamplerPriority

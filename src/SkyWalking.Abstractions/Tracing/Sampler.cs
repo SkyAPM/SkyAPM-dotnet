@@ -20,5 +20,25 @@ using SkyWalking.Tracing.Segments;
 
 namespace SkyWalking.Tracing
 {
-    public delegate bool Sampler(SegmentContext segmentContext);
+    public delegate bool Sampler(SampledContext segmentContext);
+
+    public class SampledContext
+    {
+        public string OperationName { get; }
+
+        public StringOrIntValue Peer { get; }
+
+        public StringOrIntValue EntryEndpoint { get; }
+
+        public StringOrIntValue ParentEndpoint { get; }
+
+        public SampledContext(string operationName, StringOrIntValue peer, StringOrIntValue entryEndpoint,
+            StringOrIntValue parentEndpoint)
+        {
+            OperationName = operationName;
+            Peer = peer;
+            EntryEndpoint = entryEndpoint;
+            ParentEndpoint = parentEndpoint;
+        }
+    }
 }

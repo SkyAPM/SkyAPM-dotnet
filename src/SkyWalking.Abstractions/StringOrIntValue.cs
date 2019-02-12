@@ -29,6 +29,8 @@ namespace SkyWalking
             _stringValue = null;
         }
 
+        public bool HasValue => HasIntValue || HasStringValue;
+
         public bool HasIntValue => _intValue != 0;
         
         public bool HasStringValue => _stringValue != null;

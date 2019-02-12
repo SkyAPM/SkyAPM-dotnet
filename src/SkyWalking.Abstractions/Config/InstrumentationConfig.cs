@@ -31,8 +31,6 @@ namespace SkyWalking.Config
         public string ServiceName { get; set; }
         
         public string[] HeaderVersions { get; set; }
-
-        public int SpanLimitPerSegment { get; set; } = 300;
     }
 
     public class HeaderVersions

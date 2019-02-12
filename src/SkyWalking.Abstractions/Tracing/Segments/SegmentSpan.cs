@@ -32,7 +32,7 @@ namespace SkyWalking.Tracing.Segments
 
         public long EndTime { get; private set; }
 
-        public StringOrIntValue OperationName { get; set; }
+        public StringOrIntValue OperationName { get; }
 
         public StringOrIntValue Peer { get; set; }
 
@@ -46,6 +46,12 @@ namespace SkyWalking.Tracing.Segments
         public TagCollection Tags { get; } = new TagCollection();
 
         public LogCollection Logs { get; } = new LogCollection();
+
+        public SegmentSpan(string operationName, SpanType spanType)
+        {
+            OperationName = new StringOrIntValue(operationName);
+            SpanType = spanType;
+        }
 
         public SegmentSpan AddTag(string key, string value)
         {
