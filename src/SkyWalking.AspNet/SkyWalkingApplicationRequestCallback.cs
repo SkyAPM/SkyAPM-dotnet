@@ -31,11 +31,11 @@ namespace SkyWalking.AspNet
     internal class SkyWalkingApplicationRequestCallback
     {
         private readonly IContextCarrierFactory _contextCarrierFactory;
-        private readonly InstrumentationConfig _config;
+        private readonly InstrumentConfig _config;
 
         public SkyWalkingApplicationRequestCallback(IConfigAccessor configAccessor, IContextCarrierFactory carrierFactory)
         {
-            _config = configAccessor.Get<InstrumentationConfig>();
+            _config = configAccessor.Get<InstrumentConfig>();
             _contextCarrierFactory = carrierFactory;
         }
 

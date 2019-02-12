@@ -29,7 +29,7 @@ namespace SkyWalking.Service
 {
     public class RegisterService : ExecutionService
     {
-        private readonly InstrumentationConfig _config;
+        private readonly InstrumentConfig _config;
         private readonly IServiceRegister _serviceRegister;
         private readonly TransportConfig _transportConfig;
 
@@ -38,7 +38,7 @@ namespace SkyWalking.Service
             loggerFactory)
         {
             _serviceRegister = serviceRegister;
-            _config = configAccessor.Get<InstrumentationConfig>();
+            _config = configAccessor.Get<InstrumentConfig>();
             _transportConfig = configAccessor.Get<TransportConfig>();
         }
 

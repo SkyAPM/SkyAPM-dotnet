@@ -16,22 +16,12 @@
  *
  */
 
-using SkyWalking.Config;
+using SkyWalking.Tracing.Segments;
 
-namespace SkyWalking.Context
+namespace SkyWalking.Transport
 {
-    public class ContextCarrierFactory : IContextCarrierFactory
+    public interface ISegmentContextMapper
     {
-        private readonly InstrumentConfig _config;
-
-        public ContextCarrierFactory(IConfigAccessor configAccessor)
-        {
-            _config = configAccessor.Get<InstrumentConfig>();
-        }
-
-        public IContextCarrier Create()
-        {
-            return new ContextCarrier(_config.Namespace);
-        }
+        SegmentRequest Map(SegmentContext segmentContext);
     }
 }

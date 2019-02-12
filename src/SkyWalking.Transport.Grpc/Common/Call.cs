@@ -20,7 +20,7 @@ using System;
 using System.Threading.Tasks;
 using SkyWalking.Logging;
 
-namespace SkyWalking.Transport.Grpc
+namespace SkyWalking.Transport.Grpc.Common
 {
     internal class Call
     {

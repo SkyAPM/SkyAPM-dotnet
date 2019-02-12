@@ -32,7 +32,7 @@ namespace SkyWalking.Tracing
         {
             _uniqueIdParser = uniqueIdParser;
             _base64Formatter = base64Formatter;
-            var config = configAccessor.Get<InstrumentationConfig>();
+            var config = configAccessor.Get<InstrumentConfig>();
             Key = string.IsNullOrEmpty(config.Namespace)
                 ? HeaderVersions.SW6
                 : $"{config.Namespace}-{HeaderVersions.SW6}";

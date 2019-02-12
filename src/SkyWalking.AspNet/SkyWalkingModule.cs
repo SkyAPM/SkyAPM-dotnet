@@ -34,7 +34,7 @@ namespace SkyWalking.AspNet
 
         public void Init(HttpApplication application)
         {
-            var startup = ServiceLocator.Current.GetInstance<ISkyWalkingAgentStartup>();
+            var startup = ServiceLocator.Current.GetInstance<IInstrumentStartup>();
             AsyncContext.Run(() => startup.StartAsync());
             var requestCallback = ServiceLocator.Current.GetInstance<SkyWalkingApplicationRequestCallback>();
             application.BeginRequest += requestCallback.ApplicationOnBeginRequest;

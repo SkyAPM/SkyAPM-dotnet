@@ -54,7 +54,7 @@ namespace SkyWalking.Agent.AspNetCore
             services.AddSingleton<IExecutionService, PingService>();
             services.AddSingleton<IExecutionService, SamplingRefreshService>();
             services.AddSingleton<IExecutionService, ServiceDiscoveryV5Service>();
-            services.AddSingleton<ISkyWalkingAgentStartup, SkyWalkingAgentStartup>();
+            services.AddSingleton<IInstrumentStartup, InstrumentStartup>();
             services.AddSingleton<ISampler>(DefaultSampler.Instance);
             services.AddSingleton<IRuntimeEnvironment>(RuntimeEnvironment.Instance);
             services.AddSingleton<TracingDiagnosticProcessorObserver>();

@@ -29,7 +29,7 @@ namespace SkyWalking.Tracing
         public Sw3CarrierFormatter(IUniqueIdParser uniqueIdParser, IConfigAccessor configAccessor)
         {
             _uniqueIdParser = uniqueIdParser;
-            var config = configAccessor.Get<InstrumentationConfig>();
+            var config = configAccessor.Get<InstrumentConfig>();
             Key = string.IsNullOrEmpty(config.Namespace)
                 ? HeaderVersions.SW3
                 : $"{config.Namespace}-{HeaderVersions.SW3}";

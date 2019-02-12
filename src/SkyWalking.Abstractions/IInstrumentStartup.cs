@@ -16,27 +16,15 @@
  *
  */
 
-using System;
+using System.Threading;
+using System.Threading.Tasks;
 
-namespace SkyWalking.Config
+namespace SkyWalking
 {
-    [Config("SkyWalking")]
-    public class InstrumentationConfig
+    public interface IInstrumentStartup
     {
-        public string Namespace { get; set; }
+        Task StartAsync(CancellationToken cancellationToken = default(CancellationToken));
 
-        [Obsolete("Use ServiceName.")]
-        public string ApplicationCode { get; set; }
-        
-        public string ServiceName { get; set; }
-        
-        public string[] HeaderVersions { get; set; }
-    }
-
-    public class HeaderVersions
-    {
-        public static string SW3 { get; } = "sw3";
-        
-        public static string SW6 { get; } = "sw6";
+        Task StopAsync(CancellationToken cancellationToken = default(CancellationToken));
     }
 }

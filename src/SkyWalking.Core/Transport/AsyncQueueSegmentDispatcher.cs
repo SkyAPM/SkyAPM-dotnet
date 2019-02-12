@@ -22,6 +22,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using SkyWalking.Config;
 using SkyWalking.Logging;
+using SkyWalking.Tracing.Segments;
 
 namespace SkyWalking.Transport
 {
@@ -30,30 +31,35 @@ namespace SkyWalking.Transport
         private readonly ILogger _logger;
         private readonly TransportConfig _config;
         private readonly ISegmentReporter _segmentReporter;
+        private readonly ISegmentContextMapper _segmentContextMapper;
         private readonly ConcurrentQueue<SegmentRequest> _segmentQueue;
         private readonly CancellationTokenSource _cancellation;
 
         public AsyncQueueSegmentDispatcher(IConfigAccessor configAccessor, ISegmentReporter segmentReporter,
-            ILoggerFactory loggerFactory)
+            ISegmentContextMapper segmentContextMapper, ILoggerFactory loggerFactory)
         {
             _segmentReporter = segmentReporter;
+            _segmentContextMapper = segmentContextMapper;
             _logger = loggerFactory.CreateLogger(typeof(AsyncQueueSegmentDispatcher));
             _config = configAccessor.Get<TransportConfig>();
             _segmentQueue = new ConcurrentQueue<SegmentRequest>();
             _cancellation = new CancellationTokenSource();
         }
 
-        public bool Dispatch(SegmentRequest segment)
+        public bool Dispatch(SegmentContext segmentContext)
         {
             // todo performance optimization for ConcurrentQueue
             if (_config.PendingSegmentLimit < _segmentQueue.Count || _cancellation.IsCancellationRequested)
-            {
                 return false;
-            }
+
+            var segment = _segmentContextMapper.Map(segmentContext);
+
+            if (segment == null)
+                return false;
 
             _segmentQueue.Enqueue(segment);
 
-            _logger.Debug($"Dispatch trace segment. [SegmentId]={segment.Segment.SegmentId}.");
+            _logger.Debug($"Dispatch trace segment. [SegmentId]={segmentContext.SegmentId}.");
             return true;
         }
 

@@ -21,7 +21,7 @@ using System.Linq;
 using Google.Protobuf;
 using SkyWalking.NetworkProtocol;
 
-namespace SkyWalking.Transport.Grpc
+namespace SkyWalking.Transport.Grpc.Common
 {
     internal static class SegmentV6Helpers
     {

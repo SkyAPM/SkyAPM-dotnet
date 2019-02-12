@@ -36,7 +36,7 @@ namespace SkyWalking.Tracing.Segments
 
         public StringOrIntValue Peer { get; set; }
 
-        public SpanType SpanType { get; set; }
+        public SpanType SpanType { get; }
 
         public SpanLayer SpanLayer { get; set; }
 

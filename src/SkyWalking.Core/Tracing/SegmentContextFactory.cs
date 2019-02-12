@@ -53,7 +53,7 @@ namespace SkyWalking.Tracing
             var sampled = GetSampled(carrier, operationName);
             var segmentContext = new SegmentContext(traceId, segmentId, sampled, _runtimeEnvironment.ServiceId.Value,
                 _runtimeEnvironment.ServiceInstanceId.Value, operationName, SpanType.Entry);
-            
+
             if (carrier.HasValue)
             {
                 var segmentReference = new SegmentReference
@@ -82,7 +82,7 @@ namespace SkyWalking.Tracing
             var sampled = GetSampled(parentSegmentContext, operationName);
             var segmentContext = new SegmentContext(traceId, segmentId, sampled, _runtimeEnvironment.ServiceId.Value,
                 _runtimeEnvironment.ServiceInstanceId.Value, operationName, SpanType.Local);
-            
+
             if (parentSegmentContext != null)
             {
                 var parentReference = parentSegmentContext.References.FirstOrDefault();
@@ -113,7 +113,7 @@ namespace SkyWalking.Tracing
             var sampled = GetSampled(parentSegmentContext, operationName, networkAddress);
             var segmentContext = new SegmentContext(traceId, segmentId, sampled, _runtimeEnvironment.ServiceId.Value,
                 _runtimeEnvironment.ServiceInstanceId.Value, operationName, SpanType.Exit);
-            
+
             if (parentSegmentContext != null)
             {
                 var parentReference = parentSegmentContext.References.FirstOrDefault();
@@ -135,6 +135,25 @@ namespace SkyWalking.Tracing
             segmentContext.Span.Peer = networkAddress;
             _exitSegmentContextAccessor.Context = segmentContext;
             return segmentContext;
+        }
+
+        public void Release(SegmentContext segmentContext)
+        {
+            segmentContext.Span.Finish();
+            switch (segmentContext.Span.SpanType)
+            {
+                case SpanType.Entry:
+                     _entrySegmentContextAccessor.Context = null;
+                    break;
+                case SpanType.Local:
+                    _localSegmentContextAccessor.Context = null;
+                    break;
+                case SpanType.Exit:
+                    _exitSegmentContextAccessor.Context = null;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(SpanType), segmentContext.Span.SpanType, "Invalid SpanType.");
+            }
         }
 
         private UniqueId GetTraceId(ICarrier carrier)

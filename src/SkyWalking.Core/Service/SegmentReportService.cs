@@ -60,8 +60,8 @@ namespace SkyWalking.Service
 
         public void AfterFinished(ITraceSegment traceSegment)
         {
-            if (!traceSegment.IsIgnore)
-                _dispatcher.Dispatch(traceSegment.Transform());
+//            if (!traceSegment.IsIgnore)
+//                _dispatcher.Dispatch(traceSegment.Transform());
         }
     }
 }

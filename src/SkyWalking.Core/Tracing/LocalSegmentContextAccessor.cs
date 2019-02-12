@@ -16,6 +16,7 @@
  *
  */
 
+using System.Collections.Concurrent;
 using System.Threading;
 using SkyWalking.Tracing.Segments;
 
@@ -23,12 +24,47 @@ namespace SkyWalking.Tracing
 {
     public class LocalSegmentContextAccessor : ILocalSegmentContextAccessor
     {
-        private readonly AsyncLocal<SegmentContext> _segmentContext = new AsyncLocal<SegmentContext>();
+        private readonly AsyncLocal<ConcurrentStack<SegmentContext>> _segmentContextStack =
+            new AsyncLocal<ConcurrentStack<SegmentContext>>();
 
         public SegmentContext Context
         {
-            get => _segmentContext.Value;
-            set => _segmentContext.Value = value;
+            get
+            {
+                var stack = _segmentContextStack.Value;
+                if (stack == null)
+                {
+                    return null;
+                }
+                stack.TryPeek(out var context);
+                return context;
+            }
+            set
+            {
+                var stack = _segmentContextStack.Value;
+                if (stack == null)
+                {
+                    if (value == null) return;
+                    stack = new ConcurrentStack<SegmentContext>();
+                    stack.Push(value);
+                    _segmentContextStack.Value = stack;
+                }
+                else
+                {
+                    if (value == null)
+                    {
+                        stack.TryPop(out _);
+                        if (stack.IsEmpty)
+                        {
+                            _segmentContextStack.Value = null;
+                        }
+                    }
+                    else
+                    {
+                        stack.Push(value);
+                    }
+                }
+            }
         }
     }
 }

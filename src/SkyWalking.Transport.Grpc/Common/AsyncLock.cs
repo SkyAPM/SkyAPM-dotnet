@@ -20,7 +20,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SkyWalking.Transport.Grpc
+namespace SkyWalking.Transport.Grpc.Common
 {
     internal class AsyncLock
     {

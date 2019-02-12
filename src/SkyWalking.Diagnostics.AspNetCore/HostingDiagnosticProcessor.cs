@@ -33,13 +33,13 @@ namespace SkyWalking.AspNetCore.Diagnostics
     public class HostingTracingDiagnosticProcessor : ITracingDiagnosticProcessor
     {
         public string ListenerName { get; } = "Microsoft.AspNetCore";
-        private readonly InstrumentationConfig _config;
+        private readonly InstrumentConfig _config;
         private readonly IContextCarrierFactory _contextCarrierFactory;
 
         public HostingTracingDiagnosticProcessor(IConfigAccessor configAccessor,
             IContextCarrierFactory contextCarrierFactory)
         {
-            _config = configAccessor.Get<InstrumentationConfig>();
+            _config = configAccessor.Get<InstrumentConfig>();
             _contextCarrierFactory = contextCarrierFactory;
         }
 
