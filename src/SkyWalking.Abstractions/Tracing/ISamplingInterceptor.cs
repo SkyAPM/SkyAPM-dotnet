@@ -20,17 +20,10 @@ using SkyWalking.Tracing.Segments;
 
 namespace SkyWalking.Tracing
 {
-    public interface ISampledInterceptor
+    public interface ISamplingInterceptor
     {
-        SamplerPriority Priority { get; }
+        int Priority { get; }
         
-        bool Invoke(SampledContext sampledContext, Sampler next);
-    }
-
-    public enum SamplerPriority
-    {
-        Lowest,
-        Normal,
-        Highest
+        bool Invoke(SamplingContext samplingContext, Sampler next);
     }
 }

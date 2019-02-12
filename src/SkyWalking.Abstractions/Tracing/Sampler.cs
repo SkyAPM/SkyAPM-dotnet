@@ -16,13 +16,14 @@
  *
  */
 
+using SkyWalking.Common;
 using SkyWalking.Tracing.Segments;
 
 namespace SkyWalking.Tracing
 {
-    public delegate bool Sampler(SampledContext segmentContext);
+    public delegate bool Sampler(SamplingContext samplingContext);
 
-    public class SampledContext
+    public class SamplingContext
     {
         public string OperationName { get; }
 
@@ -32,7 +33,7 @@ namespace SkyWalking.Tracing
 
         public StringOrIntValue ParentEndpoint { get; }
 
-        public SampledContext(string operationName, StringOrIntValue peer, StringOrIntValue entryEndpoint,
+        public SamplingContext(string operationName, StringOrIntValue peer, StringOrIntValue entryEndpoint,
             StringOrIntValue parentEndpoint)
         {
             OperationName = operationName;

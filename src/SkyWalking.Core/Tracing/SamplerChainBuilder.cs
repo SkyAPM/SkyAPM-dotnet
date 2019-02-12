@@ -26,10 +26,10 @@ namespace SkyWalking.Tracing
     public class SamplerChainBuilder : ISamplerChainBuilder
     {
         private volatile int state = 0;
-        private readonly IEnumerable<ISampledInterceptor> _sampledInterceptors;
+        private readonly IEnumerable<ISamplingInterceptor> _sampledInterceptors;
         private Sampler _sampler;
 
-        public SamplerChainBuilder(IEnumerable<ISampledInterceptor> sampledInterceptors)
+        public SamplerChainBuilder(IEnumerable<ISamplingInterceptor> sampledInterceptors)
         {
             _sampledInterceptors = sampledInterceptors;
         }
