@@ -21,6 +21,9 @@ namespace SkyWalking.Common
     public static class Tags
     {
         public static readonly string URL = "url";
+        
+        public static readonly string PATH = "path";
+
 
         public static readonly string HTTP_METHOD = "http.method";
 

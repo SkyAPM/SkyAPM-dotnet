@@ -72,17 +72,17 @@ namespace SkyWalking.Agent.AspNetCore
 
         private static IServiceCollection AddTracing(this IServiceCollection services)
         {
-            services.AddSingleton<Tracing.ITracingContext, Tracing.TracingContext>();
-            services.AddSingleton<Tracing.ICarrierPropagator, Tracing.CarrierPropagator>();
-            services.AddSingleton<Tracing.ICarrierFormatter, Tracing.Sw3CarrierFormatter>();
-            services.AddSingleton<Tracing.ICarrierFormatter, Tracing.Sw6CarrierFormatter>();
-            services.AddSingleton<Tracing.ISegmentContextFactory, Tracing.SegmentContextFactory>();
-            services.AddSingleton<Tracing.IEntrySegmentContextAccessor, Tracing.EntrySegmentContextAccessor>();
-            services.AddSingleton<Tracing.ILocalSegmentContextAccessor, Tracing.LocalSegmentContextAccessor>();
-            services.AddSingleton<Tracing.IExitSegmentContextAccessor, Tracing.ExitSegmentContextAccessor>();
-            services.AddSingleton<Tracing.ISamplerChainBuilder, Tracing.SamplerChainBuilder>();
-            services.AddSingleton<Tracing.IUniqueIdGenerator, Tracing.UniqueIdGenerator>();
-            services.AddSingleton<Tracing.IUniqueIdParser, Tracing.UniqueIdParser>();
+            services.AddSingleton<ITracingContext, Tracing.TracingContext>();
+            services.AddSingleton<ICarrierPropagator, CarrierPropagator>();
+            services.AddSingleton<ICarrierFormatter, Sw3CarrierFormatter>();
+            services.AddSingleton<ICarrierFormatter, Sw6CarrierFormatter>();
+            services.AddSingleton<ISegmentContextFactory, SegmentContextFactory>();
+            services.AddSingleton<IEntrySegmentContextAccessor, EntrySegmentContextAccessor>();
+            services.AddSingleton<ILocalSegmentContextAccessor, LocalSegmentContextAccessor>();
+            services.AddSingleton<IExitSegmentContextAccessor, ExitSegmentContextAccessor>();
+            services.AddSingleton<ISamplerChainBuilder, SamplerChainBuilder>();
+            services.AddSingleton<IUniqueIdGenerator, UniqueIdGenerator>();
+            services.AddSingleton<IUniqueIdParser, UniqueIdParser>();
             services.AddSingleton<ISegmentContextMapper, SegmentContextMapper>();
             services.AddSingleton<IBase64Formatter, Base64Formatter>();
             return services;

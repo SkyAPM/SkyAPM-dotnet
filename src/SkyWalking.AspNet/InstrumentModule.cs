@@ -19,13 +19,14 @@
 using CommonServiceLocator;
 using Microsoft.Extensions.DependencyInjection;
 using System.Web;
+using Nito.AsyncEx;
 using SkyWalking.AspNet.Extensions;
 
 namespace SkyWalking.AspNet
 {
-    public class SkyWalkingModule : IHttpModule
+    public class InstrumentModule : IHttpModule
     {
-        public SkyWalkingModule()
+        public InstrumentModule()
         {
             var serviceProvider = new ServiceCollection().AddSkyWalkingCore().BuildServiceProvider();
             var serviceLocatorProvider = new ServiceProviderLocator(serviceProvider);
@@ -36,13 +37,15 @@ namespace SkyWalking.AspNet
         {
             var startup = ServiceLocator.Current.GetInstance<IInstrumentStartup>();
             AsyncContext.Run(() => startup.StartAsync());
-            var requestCallback = ServiceLocator.Current.GetInstance<SkyWalkingApplicationRequestCallback>();
+            var requestCallback = ServiceLocator.Current.GetInstance<InstrumentRequestCallback>();
             application.BeginRequest += requestCallback.ApplicationOnBeginRequest;
             application.EndRequest += requestCallback.ApplicationOnEndRequest;
         }
 
         public void Dispose()
         {
+            var startup = ServiceLocator.Current.GetInstance<IInstrumentStartup>();
+            AsyncContext.Run(() => startup.StopAsync());
         }
     }
 }

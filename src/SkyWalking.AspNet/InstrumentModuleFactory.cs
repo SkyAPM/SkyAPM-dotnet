@@ -20,15 +20,15 @@ using Microsoft.Web.Infrastructure.DynamicModuleHelper;
 using System.Web;
 using SkyWalking.AspNet;
 
-[assembly:PreApplicationStartMethod(typeof(SkyWalkingModuleRegister), "Register")]
+[assembly:PreApplicationStartMethod(typeof(InstrumentModuleFactory), nameof(InstrumentModuleFactory.Create))]
 
 namespace SkyWalking.AspNet
 {
-    public class SkyWalkingModuleRegister
+    public class InstrumentModuleFactory
     {
-        public static void Register()
+        public static void Create()
         {
-            DynamicModuleUtility.RegisterModule(typeof(SkyWalkingModule));
+            DynamicModuleUtility.RegisterModule(typeof(InstrumentModule));
         }
     }
 }

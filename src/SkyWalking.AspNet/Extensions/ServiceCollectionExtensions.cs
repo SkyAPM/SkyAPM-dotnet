@@ -21,7 +21,9 @@ using SkyWalking.Config;
 using SkyWalking.Context;
 using SkyWalking.Diagnostics;
 using SkyWalking.Logging;
+using SkyWalking.Sampling;
 using SkyWalking.Service;
+using SkyWalking.Tracing;
 using SkyWalking.Transport;
 using SkyWalking.Transport.Grpc;
 using SkyWalking.Transport.Grpc.V5;
@@ -48,13 +50,35 @@ namespace SkyWalking.AspNet.Extensions
             services.AddSingleton<TracingDiagnosticProcessorObserver>();
             services.AddSingleton<IConfigAccessor, ConfigAccessor>();
             services.AddSingleton<IEnvironmentProvider, HostingEnvironmentProvider>();
+            services.AddSingleton<InstrumentRequestCallback>();
+            
+            services.AddSingleton<ITracingContext, Tracing.TracingContext>();
+            services.AddSingleton<ICarrierPropagator, CarrierPropagator>();
+            services.AddSingleton<ICarrierFormatter, Sw3CarrierFormatter>();
+            services.AddSingleton<ICarrierFormatter, Sw6CarrierFormatter>();
+            services.AddSingleton<ISegmentContextFactory, SegmentContextFactory>();
+            services.AddSingleton<IEntrySegmentContextAccessor, EntrySegmentContextAccessor>();
+            services.AddSingleton<ILocalSegmentContextAccessor, LocalSegmentContextAccessor>();
+            services.AddSingleton<IExitSegmentContextAccessor, ExitSegmentContextAccessor>();
+            services.AddSingleton<ISamplerChainBuilder, SamplerChainBuilder>();
+            services.AddSingleton<IUniqueIdGenerator, UniqueIdGenerator>();
+            services.AddSingleton<IUniqueIdParser, UniqueIdParser>();
+            services.AddSingleton<ISegmentContextMapper, SegmentContextMapper>();
+            services.AddSingleton<IBase64Formatter, Base64Formatter>();
+            
+            services.AddSingleton<SimpleCountSamplingInterceptor>();
+            services.AddSingleton<ISamplingInterceptor>(p => p.GetService<SimpleCountSamplingInterceptor>());
+            services.AddSingleton<IExecutionService>(p => p.GetService<SimpleCountSamplingInterceptor>());
+            services.AddSingleton<ISamplingInterceptor, RandomSamplingInterceptor>();
+            
+            services.AddSingleton<ISkyWalkingClientV5, SkyWalkingClientV5>();
             services.AddSingleton<ISegmentReporter, SegmentReporter>();
             services.AddSingleton<ConnectionManager>();
             services.AddSingleton<IPingCaller, PingCaller>();
             services.AddSingleton<IServiceRegister, ServiceRegister>();
             services.AddSingleton<IExecutionService, ConnectService>();
+            
             services.AddSingleton<ILoggerFactory, DefaultLoggerFactory>();
-            services.AddSingleton<ISkyWalkingClientV5, SkyWalkingClientV5>();
             return services;
         }
     }

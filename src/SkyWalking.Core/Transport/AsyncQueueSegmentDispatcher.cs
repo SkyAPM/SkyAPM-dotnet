@@ -33,13 +33,16 @@ namespace SkyWalking.Transport
         private readonly ISegmentReporter _segmentReporter;
         private readonly ISegmentContextMapper _segmentContextMapper;
         private readonly ConcurrentQueue<SegmentRequest> _segmentQueue;
+        private readonly IRuntimeEnvironment _runtimeEnvironment;
         private readonly CancellationTokenSource _cancellation;
 
-        public AsyncQueueSegmentDispatcher(IConfigAccessor configAccessor, ISegmentReporter segmentReporter,
+        public AsyncQueueSegmentDispatcher(IConfigAccessor configAccessor,
+            ISegmentReporter segmentReporter, IRuntimeEnvironment runtimeEnvironment,
             ISegmentContextMapper segmentContextMapper, ILoggerFactory loggerFactory)
         {
             _segmentReporter = segmentReporter;
             _segmentContextMapper = segmentContextMapper;
+            _runtimeEnvironment = runtimeEnvironment;
             _logger = loggerFactory.CreateLogger(typeof(AsyncQueueSegmentDispatcher));
             _config = configAccessor.Get<TransportConfig>();
             _segmentQueue = new ConcurrentQueue<SegmentRequest>();
@@ -48,6 +51,9 @@ namespace SkyWalking.Transport
 
         public bool Dispatch(SegmentContext segmentContext)
         {
+            if (!_runtimeEnvironment.Initialized || segmentContext == null || !segmentContext.Sampled)
+                return false;
+
             // todo performance optimization for ConcurrentQueue
             if (_config.QueueSize < _segmentQueue.Count || _cancellation.IsCancellationRequested)
                 return false;

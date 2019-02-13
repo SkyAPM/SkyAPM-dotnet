@@ -52,7 +52,8 @@ namespace SkyWalking.AspNetCore.Diagnostics
             context.Span.SpanLayer = SpanLayer.HTTP;
             context.Span.Component = Common.Components.ASPNETCORE;
             context.Span.Peer = new StringOrIntValue(httpContext.Connection.RemoteIpAddress.ToString());
-            context.Span.AddTag(Tags.URL, httpContext.Request.Path);
+            context.Span.AddTag(Tags.URL, httpContext.Request.GetDisplayUrl());
+            context.Span.AddTag(Tags.PATH, httpContext.Request.Path);
             context.Span.AddTag(Tags.HTTP_METHOD, httpContext.Request.Method);
             context.Span.AddLog(
                 LogEvent.Event("AspNetCore Hosting BeginRequest"),

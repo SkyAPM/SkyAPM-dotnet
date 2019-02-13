@@ -26,11 +26,6 @@ namespace SkyWalking.Transport
     {
         public SegmentRequest Map(SegmentContext segmentContext)
         {
-            if (!segmentContext.Sampled)
-            {
-                return null;
-            }
-
             var segmentRequest = new SegmentRequest
             {
                 UniqueIds = new[]
