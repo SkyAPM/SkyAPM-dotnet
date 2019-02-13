@@ -20,8 +20,9 @@ namespace SkyWalking.Sample.Frontend.Controllers
         public async Task<string> Get(int id)
         {
             var client = new HttpClient();
-            client.GetAsync("http://localhost:5002/api/delay/2000");
-            await client.GetAsync("http://localhost:5002/api/delay/200");
+            Task.WhenAll(client.GetAsync("http://localhost:5002/api/delay/2000"),
+                client.GetAsync("http://localhost:5002/api/values"),
+                client.GetAsync("http://localhost:5002/api/delay/200"));
             return await client.GetStringAsync("http://localhost:5002/api/delay/100");
         }
     }
