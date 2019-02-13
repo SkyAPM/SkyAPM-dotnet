@@ -34,8 +34,6 @@ namespace SkyWalking.AspNetCore.Diagnostics
     {
         public string ListenerName { get; } = "Microsoft.AspNetCore";
 
-//        private readonly InstrumentConfig _config;
-//        private readonly IContextCarrierFactory _contextCarrierFactory;
         private readonly ITracingContext _tracingContext;
         private readonly IEntrySegmentContextAccessor _segmentContextAccessor;
 

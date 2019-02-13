@@ -16,12 +16,36 @@
  *
  */
 
-namespace SkyWalking.Common
-{
-    public static class Components
-    {
-        public static readonly StringOrIntValue ASPNETCORE= new StringOrIntValue("AspNetCore");
 
-        public static readonly StringOrIntValue HTTPCLIENT = new StringOrIntValue("HttpClient");
+using System.Collections;
+using System.Collections.Generic;
+using System.Net.Http;
+using SkyWalking.Tracing;
+
+namespace SkyWalking.Diagnostics.HttpClient
+{
+    public class HttpClientICarrierHeaderCollection : ICarrierHeaderCollection
+    {
+        private readonly HttpRequestMessage _request;
+
+        public HttpClientICarrierHeaderCollection(HttpRequestMessage request)
+        {
+            _request = request;
+        }
+
+        public void Add(string key, string value)
+        {
+            _request.Headers.Add(key, value);
+        }
+
+        public IEnumerator<KeyValuePair<string, string>> GetEnumerator()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
     }
 }
