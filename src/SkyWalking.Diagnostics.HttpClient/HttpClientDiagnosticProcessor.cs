@@ -19,13 +19,8 @@
 using System;
 using System.Net.Http;
 using SkyWalking.Common;
-using SkyWalking.Components;
 using SkyWalking.Tracing;
 using SkyWalking.Tracing.Segments;
-
-//using SkyWalking.Context;
-//using SkyWalking.Context.Tag;
-//using SkyWalking.Context.Trace;
 
 namespace SkyWalking.Diagnostics.HttpClient
 {

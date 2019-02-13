@@ -17,13 +17,10 @@
  */
 
 using System;
-using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using SkyWalking.Common;
-using SkyWalking.Components;
-using SkyWalking.Config;
 using SkyWalking.Diagnostics;
 using SkyWalking.Tracing;
 using SkyWalking.Tracing.Segments;

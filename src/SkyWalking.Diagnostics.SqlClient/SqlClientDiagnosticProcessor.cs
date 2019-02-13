@@ -27,6 +27,13 @@ namespace SkyWalking.Diagnostics.SqlClient
     {
         private readonly ITracingContext _tracingContext;
         private readonly IExitSegmentContextAccessor _contextAccessor;
+
+        public SqlClientTracingDiagnosticProcessor(ITracingContext tracingContext,
+            IExitSegmentContextAccessor contextAccessor)
+        {
+            _tracingContext = tracingContext;
+            _contextAccessor = contextAccessor;
+        }
         
         public string ListenerName { get; } = SqlClientDiagnosticStrings.DiagnosticListenerName;
 

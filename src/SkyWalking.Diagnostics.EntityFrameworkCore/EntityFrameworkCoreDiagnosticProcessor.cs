@@ -22,7 +22,6 @@ using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Storage.Internal;
-using SkyWalking.Context;
 using SkyWalking.Tracing;
 
 namespace SkyWalking.Diagnostics.EntityFrameworkCore

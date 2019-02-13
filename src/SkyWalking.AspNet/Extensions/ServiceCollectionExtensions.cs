@@ -18,7 +18,6 @@
 
 using Microsoft.Extensions.DependencyInjection;
 using SkyWalking.Config;
-using SkyWalking.Context;
 using SkyWalking.Diagnostics;
 using SkyWalking.Logging;
 using SkyWalking.Sampling;
@@ -37,15 +36,12 @@ namespace SkyWalking.AspNet.Extensions
     {
         public static IServiceCollection AddSkyWalkingCore(this IServiceCollection services)
         {
-            services.AddSingleton<IContextCarrierFactory, ContextCarrierFactory>();
             services.AddSingleton<ISegmentDispatcher, AsyncQueueSegmentDispatcher>();
-            services.AddSingleton<IExecutionService, SegmentReportService>();
             services.AddSingleton<IExecutionService, RegisterService>();
             services.AddSingleton<IExecutionService, PingService>();
-            services.AddSingleton<IExecutionService, SamplingRefreshService>();
             services.AddSingleton<IExecutionService, ServiceDiscoveryV5Service>();
+            services.AddSingleton<IExecutionService, SegmentReportService>();
             services.AddSingleton<IInstrumentStartup, InstrumentStartup>();
-            services.AddSingleton<ISampler>(DefaultSampler.Instance);
             services.AddSingleton<IRuntimeEnvironment>(RuntimeEnvironment.Instance);
             services.AddSingleton<TracingDiagnosticProcessorObserver>();
             services.AddSingleton<IConfigAccessor, ConfigAccessor>();
