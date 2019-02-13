@@ -27,7 +27,7 @@ namespace SkyWalking.Tracing
         SegmentContext CreateLocalSegmentContext(string operationName);
 
         SegmentContext CreateExitSegmentContext(string operationName, string networkAddress,
-            ICarrierHeaderCollection carrierHeader);
+            ICarrierHeaderCollection carrierHeader = default(ICarrierHeaderCollection));
 
         void Release(SegmentContext segmentContext);
     }

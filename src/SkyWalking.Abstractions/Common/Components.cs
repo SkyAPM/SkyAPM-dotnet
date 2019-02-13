@@ -23,5 +23,19 @@ namespace SkyWalking.Common
         public static readonly StringOrIntValue ASPNETCORE= new StringOrIntValue("AspNetCore");
 
         public static readonly StringOrIntValue HTTPCLIENT = new StringOrIntValue("HttpClient");
+        
+        public static readonly StringOrIntValue ENTITYFRAMEWORKCORE = new StringOrIntValue("EntityFrameworkCore");
+        
+        public static readonly StringOrIntValue SQLCLIENT = new StringOrIntValue("SqlClient");
+        
+        public static readonly StringOrIntValue CAP = new StringOrIntValue("CAP");
+        
+        public static readonly StringOrIntValue ENTITYFRAMEWORKCORE_SQLITE = new StringOrIntValue("EntityFrameworkCore.Sqlite");
+        
+        public static readonly StringOrIntValue POMELO_ENTITYFRAMEWORKCORE_MYSQL = new StringOrIntValue("Pomelo.EntityFrameworkCore.MySql");
+        
+        public static readonly StringOrIntValue NPGSQL_ENTITYFRAMEWORKCORE_POSTGRESQL = new StringOrIntValue("Npgsql.EntityFrameworkCore.PostgreSQL");
+        
+        public static readonly StringOrIntValue ASPNET = new StringOrIntValue("AspNet");
     }
 }

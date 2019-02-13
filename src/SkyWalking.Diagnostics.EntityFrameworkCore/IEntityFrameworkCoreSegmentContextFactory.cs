@@ -16,13 +16,17 @@
  *
  */
 
-using Microsoft.EntityFrameworkCore.Diagnostics;
-using SkyWalking.Context.Trace;
+using System.Data.Common;
+using SkyWalking.Tracing.Segments;
 
 namespace SkyWalking.Diagnostics.EntityFrameworkCore
 {
-    public interface IEfCoreSpanFactory
+    public interface IEntityFrameworkCoreSegmentContextFactory
     {
-        ISpan Create(string operationName, CommandEventData eventData);
+        SegmentContext GetCurrentContext(DbCommand dbCommand);
+
+        SegmentContext Create(string operationName, DbCommand dbCommand);
+
+        void Release(SegmentContext segmentContext);
     }
 }

@@ -17,34 +17,15 @@
  */
 
 using System.Data.Common;
-using Microsoft.Data.Sqlite;
-using SkyWalking.Components;
 
 namespace SkyWalking.Diagnostics.EntityFrameworkCore
 {
-    public class SqliteEFCoreSpanMetadataProvider : IEfCoreSpanMetadataProvider
+    public interface IEntityFrameworkCoreSpanMetadataProvider
     {
-        public IComponent Component { get; } = ComponentsDefine.EntityFrameworkCore_Sqlite;
+        string Component { get; }
 
-        public bool Match(DbConnection connection)
-        {
-            return connection.GetType().FullName == "Microsoft.Data.Sqlite.SqliteConnection";
-        }
+        bool Match(DbConnection connection);
 
-        public string GetPeer(DbConnection connection)
-        {
-            string dataSource;
-            switch (connection.DataSource)
-            {
-                case "":
-                    dataSource = "sqlite:memory:db";
-                    break;
-                default:
-                    dataSource = connection.DataSource;
-                    break;
-            }
-
-            return $"{dataSource}";
-        }
+        string GetPeer(DbConnection connection);
     }
 }

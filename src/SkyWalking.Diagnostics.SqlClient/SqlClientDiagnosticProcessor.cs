@@ -40,6 +40,7 @@ namespace SkyWalking.Diagnostics.SqlClient
         {
             return ContextManager.ContextProperties != null && ContextManager.ContextProperties.ContainsKey(TRACE_ORM);
         }
+        
         [DiagnosticName(SqlClientDiagnosticStrings.SqlBeforeExecuteCommand)]
         public void BeforeExecuteCommand([Property(Name = "Command")] SqlCommand sqlCommand)
         {

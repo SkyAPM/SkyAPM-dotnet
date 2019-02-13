@@ -51,11 +51,12 @@ namespace SkyWalking.Tracing
         }
 
         public SegmentContext CreateExitSegmentContext(string operationName, string networkAddress,
-            ICarrierHeaderCollection carrierHeader)
+            ICarrierHeaderCollection carrierHeader = default(ICarrierHeaderCollection))
         {
             var segmentContext =
                 _segmentContextFactory.CreateExitSegment(operationName, new StringOrIntValue(networkAddress));
-            _carrierPropagator.Inject(segmentContext, carrierHeader);
+            if (carrierHeader != null)
+                _carrierPropagator.Inject(segmentContext, carrierHeader);
             return segmentContext;
         }
 

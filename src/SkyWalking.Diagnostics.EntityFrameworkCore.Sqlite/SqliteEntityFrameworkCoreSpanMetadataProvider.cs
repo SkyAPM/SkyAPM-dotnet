@@ -17,23 +17,32 @@
  */
 
 using System.Data.Common;
-using Npgsql;
-using SkyWalking.Components;
 
 namespace SkyWalking.Diagnostics.EntityFrameworkCore
 {
-    public class NpgsqlEFCoreSpanMetadataProvider : IEfCoreSpanMetadataProvider
+    public class SqliteEntityFrameworkCoreSpanMetadataProvider : IEntityFrameworkCoreSpanMetadataProvider
     {
-        public IComponent Component { get; } = ComponentsDefine.Npgsql_EntityFrameworkCore_PostgreSQL;
+        public string Component { get; } = Common.Components.ENTITYFRAMEWORKCORE_SQLITE.GetStringValue();
 
         public bool Match(DbConnection connection)
         {
-            return connection.GetType().FullName == "Npgsql.NpgsqlConnection";
+            return connection.GetType().FullName == "Microsoft.Data.Sqlite.SqliteConnection";
         }
 
         public string GetPeer(DbConnection connection)
         {
-            return connection.DataSource;
+            string dataSource;
+            switch (connection.DataSource)
+            {
+                case "":
+                    dataSource = "sqlite:memory:db";
+                    break;
+                default:
+                    dataSource = connection.DataSource;
+                    break;
+            }
+
+            return $"{dataSource}";
         }
     }
 }

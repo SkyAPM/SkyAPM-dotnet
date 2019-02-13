@@ -17,18 +17,16 @@
  */
 
 using System.Data.Common;
-using MySql.Data.MySqlClient;
-using SkyWalking.Components;
 
 namespace SkyWalking.Diagnostics.EntityFrameworkCore
 {
-    public class MySqlEFCoreSpanMetadataProvider : IEfCoreSpanMetadataProvider
+    public class NpgsqlEntityFrameworkCoreSpanMetadataProvider : IEntityFrameworkCoreSpanMetadataProvider
     {
-        public IComponent Component { get; } = ComponentsDefine.Pomelo_EntityFrameworkCore_MySql;
-        
+        public string Component { get; } = Common.Components.NPGSQL_ENTITYFRAMEWORKCORE_POSTGRESQL.GetStringValue();
+
         public bool Match(DbConnection connection)
         {
-            return connection.GetType().FullName == "MySql.Data.MySqlClient.MySqlConnection";
+            return connection.GetType().FullName == "Npgsql.NpgsqlConnection";
         }
 
         public string GetPeer(DbConnection connection)

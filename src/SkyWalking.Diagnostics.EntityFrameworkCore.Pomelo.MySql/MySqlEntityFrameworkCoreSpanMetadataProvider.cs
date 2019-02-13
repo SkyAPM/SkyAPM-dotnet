@@ -17,16 +17,21 @@
  */
 
 using System.Data.Common;
-using SkyWalking.Components;
 
 namespace SkyWalking.Diagnostics.EntityFrameworkCore
 {
-    public interface IEfCoreSpanMetadataProvider
+    public class MySqlEntityFrameworkCoreSpanMetadataProvider : IEntityFrameworkCoreSpanMetadataProvider
     {
-        IComponent Component { get; }
+        public string Component { get; } = Common.Components.POMELO_ENTITYFRAMEWORKCORE_MYSQL.GetStringValue();
+        
+        public bool Match(DbConnection connection)
+        {
+            return connection.GetType().FullName == "MySql.Data.MySqlClient.MySqlConnection";
+        }
 
-        bool Match(DbConnection connection);
-
-        string GetPeer(DbConnection connection);
+        public string GetPeer(DbConnection connection)
+        {
+            return connection.DataSource;
+        }
     }
 }
