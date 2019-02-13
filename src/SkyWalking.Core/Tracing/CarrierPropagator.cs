@@ -57,6 +57,10 @@ namespace SkyWalking.Tracing
         public ICarrier Extract(ICarrierHeaderCollection headerCollection)
         {
             ICarrier carrier = NullableCarrier.Instance;
+            if (headerCollection == null)
+            {
+                return carrier;
+            }
             foreach (var formatter in _carrierFormatters.OrderByDescending(x => x.Key))
             {
                 if (!formatter.Enable)

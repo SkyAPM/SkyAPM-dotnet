@@ -62,6 +62,11 @@ namespace SkyWalking.Tracing
 
         public void Release(SegmentContext segmentContext)
         {
+            if (segmentContext == null)
+            {
+                return;
+            }
+            
             _segmentContextFactory.Release(segmentContext);
             if (segmentContext.Sampled)
                 _segmentDispatcher.Dispatch(segmentContext);

@@ -16,24 +16,35 @@
  *
  */
 
-namespace SkyWalking.Common
+using System.Collections;
+using System.Collections.Generic;
+using DotNetCore.CAP.Diagnostics;
+using SkyWalking.Tracing;
+
+namespace SkyWalking.Diagnostics.CAP
 {
-    public static class Tags
+    public class CapCarrierHeaderCollection : ICarrierHeaderCollection
     {
-        public static readonly string URL = "url";
+        private readonly TracingHeaders _tracingHeaders;
 
-        public static readonly string HTTP_METHOD = "http.method";
-
-        public static readonly string STATUS_CODE = "status_code";
-
-        public static readonly string DB_TYPE = "db.type";
-
-        public static readonly string DB_INSTANCE = "db.instance";
+        public CapCarrierHeaderCollection(TracingHeaders tracingHeaders)
+        {
+            _tracingHeaders = tracingHeaders;
+        }
         
-        public static readonly string DB_STATEMENT = "db.statement";
-        
-        public static readonly string DB_BIND_VARIABLES = "db.bind_vars";
+        public IEnumerator<KeyValuePair<string, string>> GetEnumerator()
+        {
+            return _tracingHeaders.GetEnumerator();
+        }
 
-        public static readonly string MQ_TOPIC = "mq.topic";
+        public void Add(string key, string value)
+        {
+            _tracingHeaders.Add(key, value);
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return _tracingHeaders.GetEnumerator();
+        }
     }
 }
