@@ -66,13 +66,16 @@ namespace SkyWalking.Diagnostics.HttpClient
                 return;
             }
 
-            var statusCode = (int)response.StatusCode;
-            if (statusCode >= 400)
+            if (response != null)
             {
-                context.Span.ErrorOccurred();
-            }
+                var statusCode = (int) response.StatusCode;
+                if (statusCode >= 400)
+                {
+                    context.Span.ErrorOccurred();
+                }
 
-            context.Span.AddTag(Tags.STATUS_CODE, statusCode);
+                context.Span.AddTag(Tags.STATUS_CODE, statusCode);
+            }
 
             _tracingContext.Release(context);
         }

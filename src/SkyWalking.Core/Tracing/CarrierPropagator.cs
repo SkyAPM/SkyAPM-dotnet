@@ -49,7 +49,8 @@ namespace SkyWalking.Tracing
 
             foreach (var formatter in _carrierFormatters)
             {
-                headerCollection.Add(formatter.Key, formatter.Encode(carrier));
+                if (formatter.Enable){}
+                    headerCollection.Add(formatter.Key, formatter.Encode(carrier));
             }
         }
 
@@ -58,6 +59,11 @@ namespace SkyWalking.Tracing
             ICarrier carrier = NullableCarrier.Instance;
             foreach (var formatter in _carrierFormatters.OrderByDescending(x => x.Key))
             {
+                if (!formatter.Enable)
+                {
+                    continue;
+                }
+                
                 foreach (var header in headerCollection)
                 {
                     if (formatter.Key == header.Key)
@@ -70,7 +76,7 @@ namespace SkyWalking.Tracing
                                 c.Sampled = true;
                             }
 
-                            break;
+                            return carrier;
                         }
                     }
                 }

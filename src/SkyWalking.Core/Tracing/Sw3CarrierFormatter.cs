@@ -80,15 +80,27 @@ namespace SkyWalking.Tracing
 
         public string Encode(ICarrier carrier)
         {
+            if (!carrier.HasValue)
+                return string.Empty;
             return string.Join("|",
                 carrier.ParentSegmentId.ToString(),
                 carrier.ParentSpanId.ToString(),
                 carrier.ParentServiceInstanceId.ToString(),
                 carrier.EntryServiceInstanceId.ToString(),
-                carrier.NetworkAddress.ToString(),
-                carrier.EntryEndpoint.ToString(),
-                carrier.ParentEndpoint.ToString(),
+                ConvertStringOrIntValue(carrier.NetworkAddress),
+                ConvertStringOrIntValue(carrier.EntryEndpoint),
+                ConvertStringOrIntValue(carrier.ParentEndpoint),
                 carrier.TraceId.ToString());
+        }
+
+        private static string ConvertStringOrIntValue(StringOrIntValue value)
+        {
+            if (value.HasIntValue)
+            {
+                return value.GetIntValue().ToString();
+            }
+
+            return "#" + value.GetStringValue();
         }
     }
 }

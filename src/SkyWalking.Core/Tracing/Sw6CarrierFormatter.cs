@@ -57,12 +57,12 @@ namespace SkyWalking.Tracing
             if (parts.Length < 7)
                 return Defer();
 
-            if (int.TryParse(parts[0], out var sampled))
+            if (!int.TryParse(parts[0], out var sampled))
                 return Defer();
 
             if (!_uniqueIdParser.TryParse(_base64Formatter.Decode(parts[1]), out var traceId))
                 return Defer();
-
+            
             if (!_uniqueIdParser.TryParse(_base64Formatter.Decode(parts[2]), out var segmentId))
                 return Defer();
 
@@ -95,6 +95,8 @@ namespace SkyWalking.Tracing
 
         public string Encode(ICarrier carrier)
         {
+            if (!carrier.HasValue)
+                return string.Empty;
             return string.Join("-",
                 carrier.Sampled != null && carrier.Sampled.Value ? "1" : "0",
                 _base64Formatter.Encode(carrier.TraceId.ToString()),
@@ -102,9 +104,19 @@ namespace SkyWalking.Tracing
                 carrier.ParentSpanId.ToString(),
                 carrier.ParentServiceInstanceId.ToString(),
                 carrier.EntryServiceInstanceId.ToString(),
-                _base64Formatter.Encode(carrier.NetworkAddress.ToString()),
-                _base64Formatter.Encode(carrier.ParentEndpoint.ToString()),
-                _base64Formatter.Encode(carrier.EntryEndpoint.ToString()));
+                _base64Formatter.Encode(ConvertStringOrIntValue(carrier.NetworkAddress)),
+                _base64Formatter.Encode(ConvertStringOrIntValue(carrier.ParentEndpoint)),
+                _base64Formatter.Encode(ConvertStringOrIntValue(carrier.EntryEndpoint)));
+        }
+        
+        private static string ConvertStringOrIntValue(StringOrIntValue value)
+        {
+            if (value.HasIntValue)
+            {
+                return value.GetIntValue().ToString();
+            }
+
+            return "#" + value.GetStringValue();
         }
     }
 }

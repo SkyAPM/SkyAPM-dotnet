@@ -26,9 +26,9 @@ namespace SkyWalking.Tracing
             if (text == null) return false;
             var parts = text.Split("\\.".ToCharArray(), 3);
             if (parts.Length < 3) return false;
-            if (!int.TryParse(parts[0], out var part0)) return false;
-            if (!int.TryParse(parts[1], out var part1)) return false;
-            if (!int.TryParse(parts[2], out var part2)) return false;
+            if (!long.TryParse(parts[0], out var part0)) return false;
+            if (!long.TryParse(parts[1], out var part1)) return false;
+            if (!long.TryParse(parts[2], out var part2)) return false;
             uniqueId = new UniqueId(part0, part1, part2);
             return true;
         }
