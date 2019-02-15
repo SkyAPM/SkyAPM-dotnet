@@ -1,8 +1,8 @@
 /*
- * Licensed to the OpenSkywalking under one or more
+ * Licensed to the SkyAPM under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
- * The OpenSkywalking licenses this file to You under the Apache License, Version 2.0
+ * The SkyAPM licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
  *
@@ -31,7 +31,7 @@ namespace SkyApm.DotNet.CLI.Command
 {
     public class InstallCommand : IAppCommand
     {
-        private const string git_hosting_startup = "https://github.com/OpenSkywalking/skywalking-netcore-hosting-startup.git";
+        private const string git_hosting_startup = "https://github.com/SkyAPM/skywalking-netcore-hosting-startup.git";
         private const string manifest_proj = "SkyWalking.Runtime.Store.csproj";
         private const string invalid_node_name = "SkyWalking.Runtime.Store/1.0.0";
 
