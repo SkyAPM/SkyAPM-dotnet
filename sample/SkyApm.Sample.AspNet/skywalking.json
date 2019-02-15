@@ -3,7 +3,7 @@
     "ServiceName": "aspnet-sample",
     "Logging": {
       "Level": "Debug",
-      "FilePath": "/tmp/logs/SkyWalking-{Date}.log"
+      "FilePath": "logs//SkyWalking-{Date}.log"
     },
     "Transport": {
       "Interval": 3000,
