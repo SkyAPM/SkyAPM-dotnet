@@ -18,7 +18,7 @@
 
 using Microsoft.AspNetCore.Hosting;
 
-namespace SkyWalking.Agent.AspNetCore
+namespace SkyApm.Agent.AspNetCore
 {
     internal class HostingEnvironmentProvider : IEnvironmentProvider
     {

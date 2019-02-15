@@ -16,7 +16,7 @@
  *
  */
 
-namespace SkyWalking.DotNet.CLI.Utils
+namespace SkyApm.DotNet.CLI.Utils
 {
     public class ShellProcessFactory
     {

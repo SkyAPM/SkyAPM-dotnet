@@ -16,7 +16,7 @@
  *
  */
 
-namespace SkyWalking.Tracing.Segments
+namespace SkyApm.Tracing.Segments
 {
     public class SegmentContext
     {

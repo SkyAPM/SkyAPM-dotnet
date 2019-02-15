@@ -17,9 +17,9 @@
  */
 
 using System.Collections.Generic;
-using SkyWalking.Common;
+using SkyApm.Common;
 
-namespace SkyWalking.Transport
+namespace SkyApm.Transport
 {
     public class SegmentRequest
     {

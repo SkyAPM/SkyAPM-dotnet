@@ -16,7 +16,7 @@
  *
  */
 
-namespace SkyWalking.Common
+namespace SkyApm.Common
 {
     public struct StringOrIntValue
     {

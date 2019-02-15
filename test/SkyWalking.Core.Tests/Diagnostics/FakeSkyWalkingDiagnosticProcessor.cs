@@ -1,8 +1,8 @@
 ﻿using System;
-using SkyWalking.Diagnostics;
+using SkyApm.Diagnostics;
 using Xunit;
     
-namespace SkyWalking.Core.Tests.Diagnostics
+namespace SkyApm.Core.Tests.Diagnostics
 {
     public class FakeTracingDiagnosticProcessor : ITracingDiagnosticProcessor
     {
@@ -12,7 +12,7 @@ namespace SkyWalking.Core.Tests.Diagnostics
 
         [DiagnosticName(FakeDiagnosticListener.Executing)]
         public void Executing(
-            [PropertyAttribute(Name = "Name")] string eventName, 
+            [Property(Name = "Name")] string eventName, 
             [Property] DateTime Timestamp)
         {
             Assert.Equal("Executing", eventName);

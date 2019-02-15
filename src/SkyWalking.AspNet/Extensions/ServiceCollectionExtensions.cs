@@ -17,20 +17,20 @@
  */
 
 using Microsoft.Extensions.DependencyInjection;
-using SkyWalking.Config;
-using SkyWalking.Diagnostics;
-using SkyWalking.Logging;
-using SkyWalking.Sampling;
-using SkyWalking.Service;
-using SkyWalking.Tracing;
-using SkyWalking.Transport;
-using SkyWalking.Transport.Grpc;
-using SkyWalking.Transport.Grpc.V5;
-using SkyWalking.Transport.Grpc.V6;
-using SkyWalking.Utilities.Configuration;
-using SkyWalking.Utilities.Logging;
+using SkyApm.Config;
+using SkyApm.Diagnostics;
+using SkyApm.Logging;
+using SkyApm.Sampling;
+using SkyApm.Service;
+using SkyApm.Tracing;
+using SkyApm.Transport;
+using SkyApm.Transport.Grpc;
+using SkyApm.Transport.Grpc.V5;
+using SkyApm.Transport.Grpc.V6;
+using SkyApm.Utilities.Configuration;
+using SkyApm.Utilities.Logging;
 
-namespace SkyWalking.AspNet.Extensions
+namespace SkyApm.AspNet.Extensions
 {
     internal static class ServiceCollectionExtensions
     {
@@ -67,7 +67,7 @@ namespace SkyWalking.AspNet.Extensions
             services.AddSingleton<IExecutionService>(p => p.GetService<SimpleCountSamplingInterceptor>());
             services.AddSingleton<ISamplingInterceptor, RandomSamplingInterceptor>();
             
-            services.AddSingleton<ISkyWalkingClientV5, SkyWalkingClientV5>();
+            services.AddSingleton<ISkyApmClientV5, SkyApmClientV5>();
             services.AddSingleton<ISegmentReporter, SegmentReporter>();
             services.AddSingleton<ConnectionManager>();
             services.AddSingleton<IPingCaller, PingCaller>();

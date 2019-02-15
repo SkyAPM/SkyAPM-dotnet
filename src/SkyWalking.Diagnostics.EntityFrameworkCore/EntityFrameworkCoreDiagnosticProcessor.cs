@@ -22,9 +22,9 @@ using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Storage.Internal;
-using SkyWalking.Tracing;
+using SkyApm.Tracing;
 
-namespace SkyWalking.Diagnostics.EntityFrameworkCore
+namespace SkyApm.Diagnostics.EntityFrameworkCore
 {
     public class EntityFrameworkCoreTracingDiagnosticProcessor : ITracingDiagnosticProcessor
     {

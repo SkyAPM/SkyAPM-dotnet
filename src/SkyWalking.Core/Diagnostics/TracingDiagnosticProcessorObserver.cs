@@ -19,10 +19,10 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using SkyWalking.Common;
-using SkyWalking.Logging;
+using SkyApm.Logging;
+using SkyApm.Common;
 
-namespace SkyWalking.Diagnostics
+namespace SkyApm.Diagnostics
 {
     public class TracingDiagnosticProcessorObserver : IObserver<DiagnosticListener>
     {

@@ -20,12 +20,12 @@ using System;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
-using SkyWalking.Common;
-using SkyWalking.Config;
-using SkyWalking.Logging;
-using SkyWalking.Transport;
+using SkyApm.Common;
+using SkyApm.Config;
+using SkyApm.Logging;
+using SkyApm.Transport;
 
-namespace SkyWalking.Service
+namespace SkyApm.Service
 {
     public class RegisterService : ExecutionService
     {

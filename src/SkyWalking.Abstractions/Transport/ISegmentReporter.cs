@@ -20,7 +20,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SkyWalking.Transport
+namespace SkyApm.Transport
 {
     public interface ISegmentReporter
     {

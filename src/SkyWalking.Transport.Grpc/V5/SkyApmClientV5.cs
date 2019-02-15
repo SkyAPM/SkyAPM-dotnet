@@ -19,26 +19,26 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using SkyWalking.Common;
-using SkyWalking.Config;
-using SkyWalking.Logging;
+using SkyApm.Common;
+using SkyApm.Config;
+using SkyApm.Logging;
 using SkyWalking.NetworkProtocol;
-using SkyWalking.Transport.Grpc.Common;
+using SkyApm.Transport.Grpc.Common;
 
-namespace SkyWalking.Transport.Grpc.V5
+namespace SkyApm.Transport.Grpc.V5
 {
-    public class SkyWalkingClientV5 : ISkyWalkingClientV5
+    public class SkyApmClientV5 : ISkyApmClientV5
     {
         private readonly ConnectionManager _connectionManager;
         private readonly ILogger _logger;
         private readonly GrpcConfig _config;
 
-        public SkyWalkingClientV5(ConnectionManager connectionManager, IConfigAccessor configAccessor,
+        public SkyApmClientV5(ConnectionManager connectionManager, IConfigAccessor configAccessor,
             ILoggerFactory loggerFactory)
         {
             _connectionManager = connectionManager;
             _config = configAccessor.Get<GrpcConfig>();
-            _logger = loggerFactory.CreateLogger(typeof(SkyWalkingClientV5));
+            _logger = loggerFactory.CreateLogger(typeof(SkyApmClientV5));
         }
 
         public async Task<NullableValue> RegisterApplicationAsync(string applicationCode,

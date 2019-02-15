@@ -19,10 +19,10 @@
 using System;
 using System.Linq;
 using Google.Protobuf;
-using SkyWalking.Common;
+using SkyApm.Common;
 using SkyWalking.NetworkProtocol;
 
-namespace SkyWalking.Transport.Grpc.Common
+namespace SkyApm.Transport.Grpc.Common
 {
     internal static class SegmentV6Helpers
     {

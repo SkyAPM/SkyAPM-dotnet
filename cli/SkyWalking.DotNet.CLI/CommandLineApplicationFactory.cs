@@ -17,9 +17,9 @@
  */
 
 using Microsoft.Extensions.CommandLineUtils;
-using SkyWalking.DotNet.CLI.Extensions;
+using SkyApm.DotNet.CLI.Extensions;
 
-namespace SkyWalking.DotNet.CLI
+namespace SkyApm.DotNet.CLI
 {
     public class CommandLineApplicationFactory
     {

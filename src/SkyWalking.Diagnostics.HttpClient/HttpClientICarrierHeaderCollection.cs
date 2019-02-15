@@ -20,9 +20,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Net.Http;
-using SkyWalking.Tracing;
+using SkyApm.Tracing;
 
-namespace SkyWalking.Diagnostics.HttpClient
+namespace SkyApm.Diagnostics.HttpClient
 {
     public class HttpClientICarrierHeaderCollection : ICarrierHeaderCollection
     {

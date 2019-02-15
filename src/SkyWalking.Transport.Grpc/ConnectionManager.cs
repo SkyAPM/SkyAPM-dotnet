@@ -20,11 +20,11 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Grpc.Core;
-using SkyWalking.Config;
-using SkyWalking.Logging;
-using SkyWalking.Transport.Grpc.Common;
+using SkyApm.Config;
+using SkyApm.Logging;
+using SkyApm.Transport.Grpc.Common;
 
-namespace SkyWalking.Transport.Grpc
+namespace SkyApm.Transport.Grpc
 {
     public class ConnectionManager
     {

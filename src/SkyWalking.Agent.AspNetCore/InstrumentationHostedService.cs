@@ -20,7 +20,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 
-namespace SkyWalking.Agent.AspNetCore
+namespace SkyApm.Agent.AspNetCore
 {
     internal class InstrumentationHostedService : IHostedService
     {

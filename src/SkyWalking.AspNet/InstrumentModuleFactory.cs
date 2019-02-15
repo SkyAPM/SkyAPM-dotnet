@@ -18,11 +18,11 @@
 
 using Microsoft.Web.Infrastructure.DynamicModuleHelper;
 using System.Web;
-using SkyWalking.AspNet;
+using SkyApm.AspNet;
 
 [assembly:PreApplicationStartMethod(typeof(InstrumentModuleFactory), nameof(InstrumentModuleFactory.Create))]
 
-namespace SkyWalking.AspNet
+namespace SkyApm.AspNet
 {
     public class InstrumentModuleFactory
     {

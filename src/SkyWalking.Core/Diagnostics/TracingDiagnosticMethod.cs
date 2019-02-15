@@ -20,7 +20,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace SkyWalking.Diagnostics
+namespace SkyApm.Diagnostics
 {
     internal class TracingDiagnosticMethod
     {

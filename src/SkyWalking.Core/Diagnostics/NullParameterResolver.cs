@@ -16,7 +16,7 @@
  *
  */
 
-namespace SkyWalking.Diagnostics
+namespace SkyApm.Diagnostics
 {
     public class NullParameterResolver : IParameterResolver
     {

@@ -16,9 +16,9 @@
  *
  */
 
-using SkyWalking.Config;
+using SkyApm.Config;
 
-namespace SkyWalking.Utilities.Logging
+namespace SkyApm.Utilities.Logging
 {
     [Config("SkyWalking", "Logging")]
     public class LoggingConfig

@@ -18,9 +18,9 @@
 
 using System;
 using Microsoft.Extensions.DependencyInjection;
-using SkyWalking.Utilities.DependencyInjection;
+using SkyApm.Utilities.DependencyInjection;
 
-namespace SkyWalking.Diagnostics.EntityFrameworkCore
+namespace SkyApm.Diagnostics.EntityFrameworkCore
 {
     public static class SkyWalkingBuilderExtensions
     {

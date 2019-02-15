@@ -16,7 +16,7 @@
  *
  */
 
-namespace SkyWalking.Diagnostics
+namespace SkyApm.Diagnostics
 {
     public interface IParameterResolver
     {

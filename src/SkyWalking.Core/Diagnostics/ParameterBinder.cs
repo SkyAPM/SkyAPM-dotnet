@@ -18,7 +18,7 @@
 
 using System;
 
-namespace SkyWalking.Diagnostics
+namespace SkyApm.Diagnostics
 {
     public abstract class ParameterBinder : Attribute, IParameterResolver
     {

@@ -19,15 +19,15 @@
 using System;
 using Serilog;
 using Serilog.Events;
-using SkyWalking.Config;
 using Microsoft.Extensions.Logging;
-using ILogger = SkyWalking.Logging.ILogger;
-using ILoggerFactory = SkyWalking.Logging.ILoggerFactory;
+using SkyApm.Config;
+using ILogger = SkyApm.Logging.ILogger;
+using ILoggerFactory = SkyApm.Logging.ILoggerFactory;
 using MSLoggerFactory = Microsoft.Extensions.Logging.LoggerFactory;
 
-namespace SkyWalking.Utilities.Logging
+namespace SkyApm.Utilities.Logging
 {
-    public class DefaultLoggerFactory : ILoggerFactory
+    public class DefaultLoggerFactory : SkyApm.Logging.ILoggerFactory
     {
         private const string outputTemplate =
             @"{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{ServiceName}] [{Level}] {SourceContext} : {Message}{NewLine}{Exception}";
@@ -51,7 +51,7 @@ namespace SkyWalking.Utilities.Logging
                     31, null, false, false, TimeSpan.FromMilliseconds(500)).CreateLogger());
         }
 
-        public ILogger CreateLogger(Type type)
+        public SkyApm.Logging.ILogger CreateLogger(Type type)
         {
             return new DefaultLogger(_loggerFactory.CreateLogger(type));
         }

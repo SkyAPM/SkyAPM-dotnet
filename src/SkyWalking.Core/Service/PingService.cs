@@ -19,11 +19,11 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using SkyWalking.Config;
-using SkyWalking.Logging;
-using SkyWalking.Transport;
+using SkyApm.Config;
+using SkyApm.Logging;
+using SkyApm.Transport;
 
-namespace SkyWalking.Service
+namespace SkyApm.Service
 {
     public class PingService : ExecutionService
     {

@@ -21,12 +21,12 @@ using System.Collections.Generic;
 using System.IO;
 using Microsoft.Extensions.CommandLineUtils;
 using Newtonsoft.Json;
-using SkyWalking.DotNet.CLI.Extensions;
+using SkyApm.DotNet.CLI.Extensions;
 
 // ReSharper disable ConvertToLocalFunction
 
 // ReSharper disable StringLiteralTypo
-namespace SkyWalking.DotNet.CLI.Command
+namespace SkyApm.DotNet.CLI.Command
 {
     public class ConfigCommand : IAppCommand
     {

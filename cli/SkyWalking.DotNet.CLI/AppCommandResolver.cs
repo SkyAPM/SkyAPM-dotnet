@@ -19,7 +19,7 @@
 using System.Collections.Generic;
 using Microsoft.Extensions.CommandLineUtils;
 
-namespace SkyWalking.DotNet.CLI
+namespace SkyApm.DotNet.CLI
 {
     public class AppCommandResolver: IAppCommandResolver
     {

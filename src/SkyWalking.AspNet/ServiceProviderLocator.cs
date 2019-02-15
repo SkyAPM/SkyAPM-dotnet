@@ -21,7 +21,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace SkyWalking.AspNet
+namespace SkyApm.AspNet
 {
     internal class ServiceProviderLocator : IServiceLocator
     {

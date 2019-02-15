@@ -19,11 +19,11 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using SkyWalking.Common;
+using SkyApm.Common;
 
-namespace SkyWalking.Transport
+namespace SkyApm.Transport
 {
-    public interface ISkyWalkingClientV5
+    public interface ISkyApmClientV5
     {
         Task<NullableValue> RegisterApplicationAsync(string applicationCode, CancellationToken cancellationToken = default(CancellationToken));
 

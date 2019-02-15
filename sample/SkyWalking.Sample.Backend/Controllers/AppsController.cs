@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
-using SkyWalking.Sample.Backend.Models;
+using SkyApm.Sample.Backend.Models;
 
-namespace SkyWalking.Sample.Backend.Controllers
+namespace SkyApm.Sample.Backend.Controllers
 {
     [Route("api/[controller]")]
     public class AppsController: Controller

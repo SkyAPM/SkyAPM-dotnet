@@ -18,7 +18,7 @@
 
 using Microsoft.Extensions.DependencyInjection;
 
-namespace SkyWalking.Diagnostics.EntityFrameworkCore
+namespace SkyApm.Diagnostics.EntityFrameworkCore
 {
     public class DatabaseProviderBuilder
     {

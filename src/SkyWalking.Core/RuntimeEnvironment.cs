@@ -17,9 +17,9 @@
  */
 
 using System;
-using SkyWalking.Common;
+using SkyApm.Common;
 
-namespace SkyWalking
+namespace SkyApm
 {
     public class RuntimeEnvironment : IRuntimeEnvironment
     {

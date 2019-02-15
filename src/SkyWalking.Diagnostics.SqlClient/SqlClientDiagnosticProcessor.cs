@@ -19,9 +19,9 @@
 using System;
 using System.Data.SqlClient;
 using System.Linq;
-using SkyWalking.Tracing;
+using SkyApm.Tracing;
 
-namespace SkyWalking.Diagnostics.SqlClient
+namespace SkyApm.Diagnostics.SqlClient
 {
     public class SqlClientTracingDiagnosticProcessor : ITracingDiagnosticProcessor
     {

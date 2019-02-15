@@ -16,9 +16,9 @@
  *
  */
 
-using SkyWalking.Common;
+using SkyApm.Common;
 
-namespace SkyWalking.Tracing
+namespace SkyApm.Tracing
 {
     public class Carrier : ICarrier
     {

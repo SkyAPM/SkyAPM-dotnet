@@ -17,9 +17,9 @@
  */
 
 using System;
-using SkyWalking.Tracing.Segments;
+using SkyApm.Tracing.Segments;
 
-namespace SkyWalking.Tracing
+namespace SkyApm.Tracing
 {
     public static class SegmentSpanExtensions
     {

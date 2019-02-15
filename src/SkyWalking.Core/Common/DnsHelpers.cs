@@ -20,7 +20,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 
-namespace SkyWalking.Common
+namespace SkyApm.Common
 {
     public static class DnsHelpers
     {

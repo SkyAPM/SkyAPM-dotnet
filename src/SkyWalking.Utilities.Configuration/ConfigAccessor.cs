@@ -20,10 +20,10 @@ using System;
 using System.Linq.Expressions;
 using System.Reflection;
 using Microsoft.Extensions.Configuration;
-using SkyWalking.Config;
+using SkyApm.Config;
 
 // ReSharper disable StringLiteralTypo
-namespace SkyWalking.Utilities.Configuration
+namespace SkyApm.Utilities.Configuration
 {
     public class ConfigAccessor : IConfigAccessor
     {

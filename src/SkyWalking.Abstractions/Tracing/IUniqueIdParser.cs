@@ -16,7 +16,7 @@
  *
  */
 
-namespace SkyWalking.Tracing
+namespace SkyApm.Tracing
 {
     public interface IUniqueIdParser
     {

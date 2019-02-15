@@ -19,7 +19,7 @@
 using System;
 using System.Text;
 
-namespace SkyWalking
+namespace SkyApm
 {
     public class Base64Formatter : IBase64Formatter
     {

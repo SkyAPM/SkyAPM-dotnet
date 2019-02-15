@@ -1,6 +1,6 @@
 ﻿using System.Web.Http;
 
-namespace SkyWalking.Sample.AspNet
+namespace SkyApm.Sample.AspNet
 {
     public static class WebApiConfig
     {

@@ -17,9 +17,9 @@
  */
 
 using System.Data.Common;
-using SkyWalking.Tracing.Segments;
+using SkyApm.Tracing.Segments;
 
-namespace SkyWalking.Diagnostics.EntityFrameworkCore
+namespace SkyApm.Diagnostics.EntityFrameworkCore
 {
     public interface IEntityFrameworkCoreSegmentContextFactory
     {

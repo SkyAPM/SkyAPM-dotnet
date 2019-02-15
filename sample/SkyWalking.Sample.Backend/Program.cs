@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
-namespace SkyWalking.Sample.Backend
+namespace SkyApm.Sample.Backend
 {
     public class Program
     {

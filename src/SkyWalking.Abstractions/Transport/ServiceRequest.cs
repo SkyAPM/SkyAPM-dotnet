@@ -18,7 +18,7 @@
 
 using System.Collections.Generic;
 
-namespace SkyWalking.Transport
+namespace SkyApm.Transport
 {
     public class ServiceRequest
     {

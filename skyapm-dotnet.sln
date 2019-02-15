@@ -8,9 +8,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "solution items", "solution items", "{E38F0F6E-6E10-491D-8786-650F6A4B6698}"
 	ProjectSection(SolutionItems) = preProject
 		appveyor.yml = appveyor.yml
-		generate_protos.bat = generate_protos.bat
-		generate_protos_linux.sh = generate_protos_linux.sh
-		generate_protos_macos.sh = generate_protos_macos.sh
 		NuGet.config = NuGet.config
 	EndProjectSection
 EndProject

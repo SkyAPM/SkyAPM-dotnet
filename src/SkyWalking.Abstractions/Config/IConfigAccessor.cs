@@ -16,7 +16,7 @@
  *
  */
 
-namespace SkyWalking.Config
+namespace SkyApm.Config
 {
     public interface IConfigAccessor
     {

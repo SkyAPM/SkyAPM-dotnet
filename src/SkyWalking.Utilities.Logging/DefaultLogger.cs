@@ -18,12 +18,12 @@
 
 using System;
 using Microsoft.Extensions.Logging;
-using ILogger = SkyWalking.Logging.ILogger;
+using ILogger = SkyApm.Logging.ILogger;
 using MSLogger = Microsoft.Extensions.Logging.ILogger;
 
-namespace SkyWalking.Utilities.Logging
+namespace SkyApm.Utilities.Logging
 {
-    internal class DefaultLogger : ILogger
+    internal class DefaultLogger : SkyApm.Logging.ILogger
     {
         private readonly MSLogger _readLogger;
 

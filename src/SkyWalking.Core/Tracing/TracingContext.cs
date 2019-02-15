@@ -17,11 +17,11 @@
  */
 
 using System;
-using SkyWalking.Common;
-using SkyWalking.Tracing.Segments;
-using SkyWalking.Transport;
+using SkyApm.Common;
+using SkyApm.Tracing.Segments;
+using SkyApm.Transport;
 
-namespace SkyWalking.Tracing
+namespace SkyApm.Tracing
 {
     public class TracingContext : ITracingContext
     {

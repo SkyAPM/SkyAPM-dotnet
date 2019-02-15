@@ -19,7 +19,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace SkyWalking.Common
+namespace SkyApm.Common
 {
     internal static class EnumerableExtensions
     {

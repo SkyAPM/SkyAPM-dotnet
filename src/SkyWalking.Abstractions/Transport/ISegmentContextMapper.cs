@@ -16,9 +16,9 @@
  *
  */
 
-using SkyWalking.Tracing.Segments;
+using SkyApm.Tracing.Segments;
 
-namespace SkyWalking.Transport
+namespace SkyApm.Transport
 {
     public interface ISegmentContextMapper
     {

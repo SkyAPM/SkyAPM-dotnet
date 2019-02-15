@@ -18,7 +18,7 @@
 
 using Microsoft.Extensions.CommandLineUtils;
 
-namespace SkyWalking.DotNet
+namespace SkyApm.DotNet
 {
     public interface IAppCommand
     {

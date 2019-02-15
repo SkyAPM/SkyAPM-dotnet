@@ -19,12 +19,12 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using SkyWalking.Common;
-using SkyWalking.Config;
-using SkyWalking.Logging;
-using SkyWalking.Tracing;
+using SkyApm.Common;
+using SkyApm.Config;
+using SkyApm.Logging;
+using SkyApm.Tracing;
 
-namespace SkyWalking.Sampling
+namespace SkyApm.Sampling
 {
     public class SimpleCountSamplingInterceptor : ExecutionService, ISamplingInterceptor
     {

@@ -18,9 +18,9 @@
 
 using System;
 using System.Threading.Tasks;
-using SkyWalking.Logging;
+using SkyApm.Logging;
 
-namespace SkyWalking.Transport.Grpc.Common
+namespace SkyApm.Transport.Grpc.Common
 {
     internal class Call
     {

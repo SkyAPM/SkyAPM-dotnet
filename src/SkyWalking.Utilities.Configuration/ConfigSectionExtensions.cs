@@ -17,9 +17,9 @@
  */
 
 using System.Linq;
-using SkyWalking.Config;
+using SkyApm.Config;
 
-namespace SkyWalking.Utilities.Configuration
+namespace SkyApm.Utilities.Configuration
 {
     public static class ConfigSectionExtensions
     {

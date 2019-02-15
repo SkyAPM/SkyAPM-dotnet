@@ -18,7 +18,7 @@
 
 using System.Runtime.InteropServices;
 
-namespace SkyWalking.Common
+namespace SkyApm.Common
 {
     internal static class PlatformInformation
     {

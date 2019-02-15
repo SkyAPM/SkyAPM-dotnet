@@ -1,8 +1,8 @@
 ﻿using System;
-using SkyWalking.Common;
+using SkyApm.Common;
 using Xunit;
 
-namespace SkyWalking.Core.Tests.Utils
+namespace SkyApm.Core.Tests.Utils
 {
     public class AtomicIntegerTests
     {

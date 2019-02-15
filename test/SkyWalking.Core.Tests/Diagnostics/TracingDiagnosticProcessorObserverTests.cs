@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Diagnostics;
-using SkyWalking.Diagnostics;
-using SkyWalking.Logging;
+using SkyApm.Diagnostics;
+using SkyApm.Logging;
 using Xunit;
 
-namespace SkyWalking.Core.Tests.Diagnostics
+namespace SkyApm.Core.Tests.Diagnostics
 {
     public class TracingDiagnosticProcessorObserverTests
     {

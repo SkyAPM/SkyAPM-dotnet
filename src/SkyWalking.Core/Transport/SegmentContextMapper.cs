@@ -17,10 +17,10 @@
  */
 
 using System.Collections.Generic;
-using SkyWalking.Tracing;
-using SkyWalking.Tracing.Segments;
+using SkyApm.Tracing;
+using SkyApm.Tracing.Segments;
 
-namespace SkyWalking.Transport
+namespace SkyApm.Transport
 {
     public class SegmentContextMapper : ISegmentContextMapper
     {

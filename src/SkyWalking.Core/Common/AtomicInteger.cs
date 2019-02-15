@@ -18,7 +18,7 @@
 
 using System.Threading;
 
-namespace SkyWalking.Common
+namespace SkyApm.Common
 {
     public class AtomicInteger
     {

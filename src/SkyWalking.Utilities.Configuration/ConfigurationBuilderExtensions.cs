@@ -19,9 +19,9 @@
 using System.Collections.Generic;
 using System.IO;
 using Microsoft.Extensions.Configuration;
-using SkyWalking.Config;
+using SkyApm.Config;
 
-namespace SkyWalking.Utilities.Configuration
+namespace SkyApm.Utilities.Configuration
 {
     internal static class ConfigurationBuilderExtensions
     {

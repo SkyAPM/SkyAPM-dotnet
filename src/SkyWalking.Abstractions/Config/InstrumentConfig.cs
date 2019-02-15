@@ -18,7 +18,7 @@
 
 using System;
 
-namespace SkyWalking.Config
+namespace SkyApm.Config
 {
     [Config("SkyWalking")]
     public class InstrumentConfig

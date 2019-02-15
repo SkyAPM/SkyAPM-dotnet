@@ -1,9 +1,9 @@
 ﻿using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
-using SkyWalking.AspNet;
+using SkyApm.AspNet;
 
-namespace SkyWalking.Sample.AspNet.Controllers
+namespace SkyApm.Sample.AspNet.Controllers
 {
     public class ValuesController : ApiController
     {

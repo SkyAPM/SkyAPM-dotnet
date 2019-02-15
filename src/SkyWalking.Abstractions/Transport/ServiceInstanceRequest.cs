@@ -16,7 +16,7 @@
  *
  */
 
-namespace SkyWalking.Transport
+namespace SkyApm.Transport
 {
     public class ServiceInstanceRequest
     {

@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 
-namespace SkyWalking.Sample.Backend.Controllers
+namespace SkyApm.Sample.Backend.Controllers
 {
     [Route("api/[controller]")]
     public class DelayController : Controller

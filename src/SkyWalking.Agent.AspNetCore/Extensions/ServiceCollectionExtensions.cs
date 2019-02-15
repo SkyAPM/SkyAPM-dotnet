@@ -19,25 +19,25 @@
 using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using SkyWalking.AspNetCore.Diagnostics;
-using SkyWalking.Config;
-using SkyWalking.Diagnostics;
-using SkyWalking.Diagnostics.EntityFrameworkCore;
-using SkyWalking.Diagnostics.HttpClient;
-using SkyWalking.Diagnostics.SqlClient;
-using SkyWalking.Utilities.Configuration;
-using SkyWalking.Utilities.DependencyInjection;
-using SkyWalking.Utilities.Logging;
-using SkyWalking.Logging;
-using SkyWalking.Sampling;
-using SkyWalking.Service;
-using SkyWalking.Tracing;
-using SkyWalking.Transport;
-using SkyWalking.Transport.Grpc;
-using SkyWalking.Transport.Grpc.V5;
-using SkyWalking.Transport.Grpc.V6;
+using SkyApm.Config;
+using SkyApm.Diagnostics;
+using SkyApm.Logging;
+using SkyApm.Sampling;
+using SkyApm.Service;
+using SkyApm.Tracing;
+using SkyApm.Transport;
+using SkyApm.Transport.Grpc;
+using SkyApm.Transport.Grpc.V5;
+using SkyApm.Transport.Grpc.V6;
+using SkyApm.Utilities.Configuration;
+using SkyApm.Utilities.Logging;
+using SkyApm.AspNetCore.Diagnostics;
+using SkyApm.Diagnostics.EntityFrameworkCore;
+using SkyApm.Diagnostics.HttpClient;
+using SkyApm.Diagnostics.SqlClient;
+using SkyApm.Utilities.DependencyInjection;
 
-namespace SkyWalking.Agent.AspNetCore
+namespace SkyApm.Agent.AspNetCore
 {
     public static class ServiceCollectionExtensions
     {
@@ -94,7 +94,7 @@ namespace SkyWalking.Agent.AspNetCore
 
         private static IServiceCollection AddGrpcTransport(this IServiceCollection services)
         {
-            services.AddSingleton<ISkyWalkingClientV5, SkyWalkingClientV5>();
+            services.AddSingleton<ISkyApmClientV5, SkyApmClientV5>();
             services.AddSingleton<ISegmentReporter, SegmentReporter>();
             services.AddSingleton<ConnectionManager>();
             services.AddSingleton<IPingCaller, PingCaller>();

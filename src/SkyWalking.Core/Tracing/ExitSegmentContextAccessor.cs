@@ -17,9 +17,9 @@
  */
 
 using System.Threading;
-using SkyWalking.Tracing.Segments;
+using SkyApm.Tracing.Segments;
 
-namespace SkyWalking.Tracing
+namespace SkyApm.Tracing
 {
     public class ExitSegmentContextAccessor : IExitSegmentContextAccessor
     {

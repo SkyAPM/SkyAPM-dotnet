@@ -16,7 +16,7 @@
  *
  */
 
-namespace SkyWalking
+namespace SkyApm
 {
     public interface IEnvironmentProvider
     {

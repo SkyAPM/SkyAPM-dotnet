@@ -20,30 +20,30 @@ using System;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
-using SkyWalking.Common;
-using SkyWalking.Config;
-using SkyWalking.Logging;
-using SkyWalking.Transport;
+using SkyApm.Common;
+using SkyApm.Config;
+using SkyApm.Logging;
+using SkyApm.Transport;
 
-namespace SkyWalking.Service
+namespace SkyApm.Service
 {
     public class ServiceDiscoveryV5Service : ExecutionService
     {
         private readonly InstrumentConfig _config;
         private readonly TransportConfig _transportConfig;
-        private readonly ISkyWalkingClientV5 _skyWalkingClient;
+        private readonly ISkyApmClientV5 skyApmClient;
 
         protected override TimeSpan DueTime { get; } = TimeSpan.Zero;
 
         protected override TimeSpan Period { get; } = TimeSpan.FromSeconds(30);
 
-        public ServiceDiscoveryV5Service(IConfigAccessor configAccessor, ISkyWalkingClientV5 skyWalkingClient,
+        public ServiceDiscoveryV5Service(IConfigAccessor configAccessor, ISkyApmClientV5 skyApmClient,
             IRuntimeEnvironment runtimeEnvironment, ILoggerFactory loggerFactory)
             : base(runtimeEnvironment, loggerFactory)
         {
             _config = configAccessor.Get<InstrumentConfig>();
             _transportConfig = configAccessor.Get<TransportConfig>();
-            _skyWalkingClient = skyWalkingClient;
+            this.skyApmClient = skyApmClient;
         }
 
         protected override async Task ExecuteAsync(CancellationToken cancellationToken)
@@ -61,7 +61,7 @@ namespace SkyWalking.Service
             if (!RuntimeEnvironment.ServiceId.HasValue)
             {
                 var value = await Polling(3,
-                    () => _skyWalkingClient.RegisterApplicationAsync(_config.ServiceName ?? _config.ApplicationCode, cancellationToken),
+                    () => skyApmClient.RegisterApplicationAsync(_config.ServiceName ?? _config.ApplicationCode, cancellationToken),
                     cancellationToken);
                 if (value.HasValue && RuntimeEnvironment is RuntimeEnvironment environment)
                 {
@@ -83,7 +83,7 @@ namespace SkyWalking.Service
                     ProcessNo = Process.GetCurrentProcess().Id
                 };
                 var value = await Polling(3,
-                    () => _skyWalkingClient.RegisterApplicationInstanceAsync(RuntimeEnvironment.ServiceId.Value,
+                    () => skyApmClient.RegisterApplicationInstanceAsync(RuntimeEnvironment.ServiceId.Value,
                         RuntimeEnvironment.InstanceId,
                         DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(), osInfoRequest, cancellationToken),
                     cancellationToken);
@@ -120,7 +120,7 @@ namespace SkyWalking.Service
             {
                 try
                 {
-                    await _skyWalkingClient.HeartbeatAsync(RuntimeEnvironment.ServiceInstanceId.Value,
+                    await skyApmClient.HeartbeatAsync(RuntimeEnvironment.ServiceInstanceId.Value,
                         DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(), cancellationToken);
                     Logger.Debug($"Heartbeat at {DateTimeOffset.UtcNow}.");
                 }

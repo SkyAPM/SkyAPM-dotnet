@@ -24,10 +24,11 @@ using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
 using CommonServiceLocator;
-using SkyWalking.Tracing;
-using SpanLayer = SkyWalking.Tracing.Segments.SpanLayer;
+using SkyApm.Tracing;
+using SkyApm.Tracing.Segments;
+using SpanLayer = SkyApm.Tracing.Segments.SpanLayer;
 
-namespace SkyWalking.AspNet
+namespace SkyApm.AspNet
 {
     public class HttpTracingHandler : DelegatingHandler
     {

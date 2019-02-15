@@ -17,10 +17,10 @@
  */
 
 using System.Linq;
-using SkyWalking.Common;
-using SkyWalking.Config;
+using SkyApm.Common;
+using SkyApm.Config;
 
-namespace SkyWalking.Tracing
+namespace SkyApm.Tracing
 {
     public class Sw3CarrierFormatter : ICarrierFormatter
     {

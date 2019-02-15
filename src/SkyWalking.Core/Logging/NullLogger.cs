@@ -18,7 +18,7 @@
 
 using System;
 
-namespace SkyWalking.Logging
+namespace SkyApm.Logging
 {
     internal class NullLogger : ILogger
     {

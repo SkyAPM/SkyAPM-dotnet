@@ -18,9 +18,9 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using SkyWalking.Tracing.Segments;
+using SkyApm.Tracing.Segments;
 
-namespace SkyWalking.Tracing
+namespace SkyApm.Tracing
 {
     public class CarrierPropagator : ICarrierPropagator
     {

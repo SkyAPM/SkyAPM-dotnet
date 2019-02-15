@@ -19,12 +19,12 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using SkyWalking.Config;
-using SkyWalking.Logging;
-using SegmentReporterV5 = SkyWalking.Transport.Grpc.V5.SegmentReporter;
-using SegmentReporterV6 = SkyWalking.Transport.Grpc.V6.SegmentReporter;
+using SkyApm.Config;
+using SkyApm.Logging;
+using SegmentReporterV5 = SkyApm.Transport.Grpc.V5.SegmentReporter;
+using SegmentReporterV6 = SkyApm.Transport.Grpc.V6.SegmentReporter;
 
-namespace SkyWalking.Transport.Grpc
+namespace SkyApm.Transport.Grpc
 {
     public class SegmentReporter : ISegmentReporter
     {
@@ -36,8 +36,8 @@ namespace SkyWalking.Transport.Grpc
             ILoggerFactory loggerFactory)
         {
             _transportConfig = configAccessor.Get<TransportConfig>();
-            _segmentReporterV5 = new SegmentReporterV5(connectionManager, configAccessor, loggerFactory);
-            _segmentReporterV6 = new SegmentReporterV6(connectionManager, configAccessor, loggerFactory);
+            _segmentReporterV5 = new V5.SegmentReporter(connectionManager, configAccessor, loggerFactory);
+            _segmentReporterV6 = new V6.SegmentReporter(connectionManager, configAccessor, loggerFactory);
         }
 
         public async Task ReportAsync(IReadOnlyCollection<SegmentRequest> segmentRequests,

@@ -18,7 +18,7 @@
 
 using System.Diagnostics;
 
-namespace SkyWalking.DotNet.CLI.Extensions
+namespace SkyApm.DotNet.CLI.Extensions
 {
     public static class ProcessExtensions
     {

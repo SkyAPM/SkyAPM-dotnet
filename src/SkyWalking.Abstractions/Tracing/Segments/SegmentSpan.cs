@@ -20,9 +20,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using SkyWalking.Common;
+using SkyApm.Common;
 
-namespace SkyWalking.Tracing.Segments
+namespace SkyApm.Tracing.Segments
 {
     public class SegmentSpan
     {

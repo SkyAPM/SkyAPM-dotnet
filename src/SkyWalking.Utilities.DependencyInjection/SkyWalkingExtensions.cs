@@ -18,7 +18,7 @@
 
 using Microsoft.Extensions.DependencyInjection;
 
-namespace SkyWalking.Utilities.DependencyInjection
+namespace SkyApm.Utilities.DependencyInjection
 {
     public class SkyWalkingExtensions
     {

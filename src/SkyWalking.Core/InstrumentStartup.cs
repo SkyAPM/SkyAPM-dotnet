@@ -22,10 +22,10 @@ using System.Diagnostics;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using SkyWalking.Diagnostics;
-using SkyWalking.Logging;
+using SkyApm.Diagnostics;
+using SkyApm.Logging;
 
-namespace SkyWalking
+namespace SkyApm
 {
     public class InstrumentStartup : IInstrumentStartup
     {

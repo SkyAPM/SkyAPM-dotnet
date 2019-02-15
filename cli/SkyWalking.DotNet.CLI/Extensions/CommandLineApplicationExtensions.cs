@@ -20,7 +20,7 @@ using System;
 using System.Reflection;
 using Microsoft.Extensions.CommandLineUtils;
 
-namespace SkyWalking.DotNet.CLI.Extensions
+namespace SkyApm.DotNet.CLI.Extensions
 {
     internal static class CommandLineApplicationExtensions
     {

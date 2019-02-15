@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace SkyWalking.Sample.Frontend
+namespace SkyApm.Sample.Frontend
 {
     public class Startup
     {

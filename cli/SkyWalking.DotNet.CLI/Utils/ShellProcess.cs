@@ -19,7 +19,7 @@
 using System;
 using System.Diagnostics;
 
-namespace SkyWalking.DotNet.CLI.Utils
+namespace SkyApm.DotNet.CLI.Utils
 {
     public class ShellProcess
     {

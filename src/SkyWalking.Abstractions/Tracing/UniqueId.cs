@@ -18,7 +18,7 @@
 
 using System;
 
-namespace SkyWalking.Tracing
+namespace SkyApm.Tracing
 {
     public class UniqueId : IEquatable<UniqueId>
     {

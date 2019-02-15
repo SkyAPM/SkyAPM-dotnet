@@ -19,7 +19,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace SkyWalking.Tracing
+namespace SkyApm.Tracing
 {
     public class TextCarrierHeaderCollection : ICarrierHeaderCollection
     {

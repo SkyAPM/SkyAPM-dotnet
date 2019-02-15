@@ -18,9 +18,9 @@
 
 using System;
 using System.Collections.Generic;
-using SkyWalking.Logging;
+using SkyApm.Logging;
 
-namespace SkyWalking.Diagnostics
+namespace SkyApm.Diagnostics
 {
     internal class TracingDiagnosticObserver : IObserver<KeyValuePair<string, object>>
     {

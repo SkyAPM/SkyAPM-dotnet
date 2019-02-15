@@ -18,7 +18,7 @@
 
 using System.Data.Common;
 
-namespace SkyWalking.Diagnostics.EntityFrameworkCore
+namespace SkyApm.Diagnostics.EntityFrameworkCore
 {
     public class SqliteEntityFrameworkCoreSpanMetadataProvider : IEntityFrameworkCoreSpanMetadataProvider
     {

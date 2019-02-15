@@ -19,9 +19,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Web;
-using SkyWalking.Tracing;
+using SkyApm.Tracing;
 
-namespace SkyWalking.AspNet
+namespace SkyApm.AspNet
 {
     public class HttpRequestCarrierHeaderCollection : ICarrierHeaderCollection
     {

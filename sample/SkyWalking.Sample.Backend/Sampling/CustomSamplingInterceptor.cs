@@ -1,6 +1,6 @@
-using SkyWalking.Tracing;
+using SkyApm.Tracing;
 
-namespace SkyWalking.Sample.Backend.Sampling
+namespace SkyApm.Sample.Backend.Sampling
 {
     public class CustomSamplingInterceptor : ISamplingInterceptor
     {

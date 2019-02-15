@@ -17,9 +17,9 @@
  */
 
 using System;
-using SkyWalking.Config;
+using SkyApm.Config;
 
-namespace SkyWalking.Transport.Grpc
+namespace SkyApm.Transport.Grpc
 {
     [Config("SkyWalking", "Transport", "gRPC")]
     public class GrpcConfig

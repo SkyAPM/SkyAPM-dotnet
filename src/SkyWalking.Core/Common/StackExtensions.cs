@@ -18,7 +18,7 @@
 
 using System.Collections.Generic;
 
-namespace SkyWalking.Common
+namespace SkyApm.Common
 {
     public static class StackExtensions
     {

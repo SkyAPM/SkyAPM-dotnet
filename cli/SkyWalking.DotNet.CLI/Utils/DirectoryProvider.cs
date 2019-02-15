@@ -22,7 +22,7 @@ using System.IO;
 // ReSharper disable IdentifierTypo
 // ReSharper disable MemberCanBePrivate.Global
 
-namespace SkyWalking.DotNet.CLI.Utils
+namespace SkyApm.DotNet.CLI.Utils
 {
     public class DirectoryProvider
     {

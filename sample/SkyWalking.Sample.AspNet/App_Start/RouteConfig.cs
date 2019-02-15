@@ -1,7 +1,7 @@
 ﻿using System.Web.Mvc;
 using System.Web.Routing;
 
-namespace SkyWalking.Sample.AspNet
+namespace SkyApm.Sample.AspNet
 {
     public class RouteConfig
     {

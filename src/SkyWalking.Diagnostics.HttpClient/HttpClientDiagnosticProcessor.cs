@@ -18,11 +18,11 @@
 
 using System;
 using System.Net.Http;
-using SkyWalking.Common;
-using SkyWalking.Tracing;
-using SkyWalking.Tracing.Segments;
+using SkyApm.Common;
+using SkyApm.Tracing;
+using SkyApm.Tracing.Segments;
 
-namespace SkyWalking.Diagnostics.HttpClient
+namespace SkyApm.Diagnostics.HttpClient
 {
     public class HttpClientTracingDiagnosticProcessor : ITracingDiagnosticProcessor
     {

@@ -19,10 +19,10 @@
 using System;
 using DotNetCore.CAP.Diagnostics;
 using DotNetCore.CAP.Infrastructure;
-using SkyWalking.Tracing;
+using SkyApm.Tracing;
 using CapEvents = DotNetCore.CAP.Diagnostics.CapDiagnosticListenerExtensions;
 
-namespace SkyWalking.Diagnostics.CAP
+namespace SkyApm.Diagnostics.CAP
 {
     /// <summary>
     ///  Diagnostics processor for listen and process releted events of CAP.

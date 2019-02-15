@@ -4,11 +4,11 @@ using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using SkyWalking.Sample.Backend.Models;
-using SkyWalking.Sample.Backend.Sampling;
-using SkyWalking.Tracing;
+using SkyApm.Sample.Backend.Models;
+using SkyApm.Sample.Backend.Sampling;
+using SkyApm.Tracing;
 
-namespace SkyWalking.Sample.Backend
+namespace SkyApm.Sample.Backend
 {
     public class Startup
     {

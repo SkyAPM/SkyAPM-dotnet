@@ -18,7 +18,7 @@
 
 using System;
 
-namespace SkyWalking.AspNet
+namespace SkyApm.AspNet
 {
     internal class HostingEnvironmentProvider : IEnvironmentProvider
     {

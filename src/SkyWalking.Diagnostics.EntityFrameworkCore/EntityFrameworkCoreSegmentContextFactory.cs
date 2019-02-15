@@ -18,11 +18,11 @@
 
 using System.Collections.Generic;
 using System.Data.Common;
-using SkyWalking.Common;
-using SkyWalking.Tracing;
-using SkyWalking.Tracing.Segments;
+using SkyApm.Common;
+using SkyApm.Tracing;
+using SkyApm.Tracing.Segments;
 
-namespace SkyWalking.Diagnostics.EntityFrameworkCore
+namespace SkyApm.Diagnostics.EntityFrameworkCore
 {
     public class EntityFrameworkCoreSegmentContextFactory : IEntityFrameworkCoreSegmentContextFactory
     {

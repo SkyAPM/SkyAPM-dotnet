@@ -8,7 +8,7 @@
     <PackageTags>SkyWalking;APM</PackageTags>
     <PackageReleaseNotes>
     </PackageReleaseNotes>
-    <RootNamespace>SkyWalking</RootNamespace>
+    <RootNamespace>SkyApm</RootNamespace>
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
 </Project>

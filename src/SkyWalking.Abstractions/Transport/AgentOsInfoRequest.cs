@@ -18,7 +18,7 @@
 
 using System;
 
-namespace SkyWalking.Transport
+namespace SkyApm.Transport
 {
     public class AgentOsInfoRequest
     {

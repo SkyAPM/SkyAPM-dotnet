@@ -20,12 +20,12 @@ using System;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc.Abstractions;
-using SkyWalking.Common;
-using SkyWalking.Diagnostics;
-using SkyWalking.Tracing;
-using SkyWalking.Tracing.Segments;
+using SkyApm.Common;
+using SkyApm.Diagnostics;
+using SkyApm.Tracing;
+using SkyApm.Tracing.Segments;
 
-namespace SkyWalking.AspNetCore.Diagnostics
+namespace SkyApm.AspNetCore.Diagnostics
 {
     public class HostingTracingDiagnosticProcessor : ITracingDiagnosticProcessor
     {

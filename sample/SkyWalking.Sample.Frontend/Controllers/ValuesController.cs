@@ -3,7 +3,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 
-namespace SkyWalking.Sample.Frontend.Controllers
+namespace SkyApm.Sample.Frontend.Controllers
 {
     [Route("api/[controller]")]
     public class ValuesController : Controller

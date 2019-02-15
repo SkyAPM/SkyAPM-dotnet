@@ -19,9 +19,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using DotNetCore.CAP.Diagnostics;
-using SkyWalking.Tracing;
+using SkyApm.Tracing;
 
-namespace SkyWalking.Diagnostics.CAP
+namespace SkyApm.Diagnostics.CAP
 {
     public class CapCarrierHeaderCollection : ICarrierHeaderCollection
     {

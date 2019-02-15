@@ -16,7 +16,7 @@
  *
  */
 
-namespace SkyWalking.Transport.Grpc.Common
+namespace SkyApm.Transport.Grpc.Common
 {
     internal static class ExceptionHelpers
     {

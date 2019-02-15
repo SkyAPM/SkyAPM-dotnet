@@ -20,9 +20,9 @@ using CommonServiceLocator;
 using Microsoft.Extensions.DependencyInjection;
 using System.Web;
 using Nito.AsyncEx;
-using SkyWalking.AspNet.Extensions;
+using SkyApm.AspNet.Extensions;
 
-namespace SkyWalking.AspNet
+namespace SkyApm.AspNet
 {
     public class InstrumentModule : IHttpModule
     {

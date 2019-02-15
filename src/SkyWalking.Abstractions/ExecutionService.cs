@@ -19,9 +19,9 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using SkyWalking.Logging;
+using SkyApm.Logging;
 
-namespace SkyWalking
+namespace SkyApm
 {
     public abstract class ExecutionService : IExecutionService, IDisposable
     {

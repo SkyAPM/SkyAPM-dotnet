@@ -16,10 +16,10 @@
  *
  */
 
-using SkyWalking.Common;
-using SkyWalking.Tracing.Segments;
+using SkyApm.Common;
+using SkyApm.Tracing.Segments;
 
-namespace SkyWalking.Tracing
+namespace SkyApm.Tracing
 {
     public interface ISegmentContextFactory
     {

@@ -19,10 +19,10 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using SkyWalking.Common;
-using SkyWalking.Transport;
+using SkyApm.Common;
+using SkyApm.Transport;
 
-namespace SkyWalking.Transport
+namespace SkyApm.Transport
 {
     public interface IServiceRegister
     {

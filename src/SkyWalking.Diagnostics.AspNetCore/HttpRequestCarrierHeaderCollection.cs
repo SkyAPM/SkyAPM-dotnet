@@ -20,9 +20,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Http;
-using SkyWalking.Tracing;
+using SkyApm.Tracing;
 
-namespace SkyWalking.AspNetCore.Diagnostics
+namespace SkyApm.AspNetCore.Diagnostics
 {
     public class HttpRequestCarrierHeaderCollection : ICarrierHeaderCollection
     {

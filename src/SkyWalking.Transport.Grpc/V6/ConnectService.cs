@@ -19,9 +19,9 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using SkyWalking.Logging;
+using SkyApm.Logging;
 
-namespace SkyWalking.Transport.Grpc.V6
+namespace SkyApm.Transport.Grpc.V6
 {
     public class ConnectService: ExecutionService
     {

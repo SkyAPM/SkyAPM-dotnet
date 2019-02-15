@@ -17,10 +17,10 @@
  */
 
 using System;
-using SkyWalking.Config;
-using SkyWalking.Tracing;
+using SkyApm.Config;
+using SkyApm.Tracing;
 
-namespace SkyWalking.Sampling
+namespace SkyApm.Sampling
 {
     public class RandomSamplingInterceptor : ISamplingInterceptor
     {

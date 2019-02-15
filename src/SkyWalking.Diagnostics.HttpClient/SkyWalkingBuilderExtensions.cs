@@ -18,9 +18,9 @@
 
 using System;
 using Microsoft.Extensions.DependencyInjection;
-using SkyWalking.Utilities.DependencyInjection;
+using SkyApm.Utilities.DependencyInjection;
 
-namespace SkyWalking.Diagnostics.HttpClient
+namespace SkyApm.Diagnostics.HttpClient
 {
     public static class SkyWalkingBuilderExtensions
     {

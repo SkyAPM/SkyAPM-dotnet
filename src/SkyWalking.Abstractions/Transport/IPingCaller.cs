@@ -18,9 +18,9 @@
 
 using System.Threading;
 using System.Threading.Tasks;
-using SkyWalking.Transport;
+using SkyApm.Transport;
 
-namespace SkyWalking.Transport
+namespace SkyApm.Transport
 {
     public interface IPingCaller
     {

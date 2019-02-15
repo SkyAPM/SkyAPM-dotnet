@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace SkyWalking.Sample.Backend.Models
+namespace SkyApm.Sample.Backend.Models
 {
     public class SampleDbContext :DbContext
     {

@@ -19,10 +19,10 @@
 using System;
 using Microsoft.Extensions.CommandLineUtils;
 using Microsoft.Extensions.DependencyInjection;
-using SkyWalking.DotNet.CLI.Command;
-using SkyWalking.DotNet.CLI.Utils;
+using SkyApm.DotNet.CLI.Command;
+using SkyApm.DotNet.CLI.Utils;
 
-namespace SkyWalking.DotNet.CLI
+namespace SkyApm.DotNet.CLI
 {
     class Program
     {

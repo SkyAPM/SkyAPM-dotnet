@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace SkyWalking.Core.Tests.Diagnostics
+namespace SkyApm.Core.Tests.Diagnostics
 {
     public class FakeDiagnosticListener : DiagnosticListener
     {

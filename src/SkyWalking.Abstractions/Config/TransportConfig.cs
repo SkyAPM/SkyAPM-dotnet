@@ -16,7 +16,7 @@
  *
  */
 
-namespace SkyWalking.Config
+namespace SkyApm.Config
 {
     [Config("SkyWalking", "Transport")]
     public class TransportConfig

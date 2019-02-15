@@ -17,11 +17,11 @@
  */
 
 using Microsoft.AspNetCore.Hosting;
-using SkyWalking.Agent.AspNetCore;
+using SkyApm.Agent.AspNetCore;
 
 [assembly: HostingStartup(typeof(SkyWalkingHostingStartup))]
 
-namespace SkyWalking.Agent.AspNetCore
+namespace SkyApm.Agent.AspNetCore
 {
     internal class SkyWalkingHostingStartup : IHostingStartup
     {

@@ -16,7 +16,7 @@
  *
  */
 
-namespace SkyWalking.Config
+namespace SkyApm.Config
 {
     [Config("SkyWalking", "Sampling")]
     public class SamplingConfig

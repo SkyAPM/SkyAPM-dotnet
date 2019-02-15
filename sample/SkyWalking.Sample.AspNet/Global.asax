@@ -1,1 +1,1 @@
-﻿<%@ Application Inherits="SkyWalking.Sample.AspNet.Global" %>
+﻿<%@ Application Inherits="SkyApm.Sample.AspNet.Global" %>

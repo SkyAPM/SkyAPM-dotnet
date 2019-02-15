@@ -19,7 +19,7 @@
 using System;
 using System.Threading;
 
-namespace SkyWalking.Tracing
+namespace SkyApm.Tracing
 {
     public class UniqueIdGenerator : IUniqueIdGenerator
     {

@@ -16,7 +16,7 @@
  *
  */
 
-namespace SkyWalking.Diagnostics.SqlClient
+namespace SkyApm.Diagnostics.SqlClient
 {
     internal static class SqlClientDiagnosticStrings
     {

@@ -19,13 +19,13 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using SkyWalking.Common;
-using SkyWalking.Config;
-using SkyWalking.Logging;
+using SkyApm.Common;
+using SkyApm.Config;
+using SkyApm.Logging;
 using SkyWalking.NetworkProtocol;
-using SkyWalking.Transport.Grpc.Common;
+using SkyApm.Transport.Grpc.Common;
 
-namespace SkyWalking.Transport.Grpc.V6
+namespace SkyApm.Transport.Grpc.V6
 {
     public class ServiceRegister : IServiceRegister
     {

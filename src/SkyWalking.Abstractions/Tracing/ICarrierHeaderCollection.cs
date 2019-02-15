@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace SkyWalking.Tracing
+namespace SkyApm.Tracing
 {
     public interface ICarrierHeaderCollection : IEnumerable<KeyValuePair<string, string>>
     {

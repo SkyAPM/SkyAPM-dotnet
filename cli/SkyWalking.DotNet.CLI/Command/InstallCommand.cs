@@ -21,13 +21,13 @@ using System.Collections.Generic;
 using System.IO;
 using Microsoft.Extensions.CommandLineUtils;
 using Newtonsoft.Json;
-using SkyWalking.DotNet.CLI.Extensions;
-using SkyWalking.DotNet.CLI.Utils;
+using SkyApm.DotNet.CLI.Utils;
+using SkyApm.DotNet.CLI.Extensions;
 
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable StringLiteralTypo
-namespace SkyWalking.DotNet.CLI.Command
+namespace SkyApm.DotNet.CLI.Command
 {
     public class InstallCommand : IAppCommand
     {

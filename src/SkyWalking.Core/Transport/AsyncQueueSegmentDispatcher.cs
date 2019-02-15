@@ -20,11 +20,11 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using SkyWalking.Config;
-using SkyWalking.Logging;
-using SkyWalking.Tracing.Segments;
+using SkyApm.Config;
+using SkyApm.Logging;
+using SkyApm.Tracing.Segments;
 
-namespace SkyWalking.Transport
+namespace SkyApm.Transport
 {
     public class AsyncQueueSegmentDispatcher : ISegmentDispatcher
     {

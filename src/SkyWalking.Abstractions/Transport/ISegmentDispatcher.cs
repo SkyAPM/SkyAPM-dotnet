@@ -18,9 +18,9 @@
 
 using System.Threading;
 using System.Threading.Tasks;
-using SkyWalking.Tracing.Segments;
+using SkyApm.Tracing.Segments;
 
-namespace SkyWalking.Transport
+namespace SkyApm.Transport
 {
     public interface ISegmentDispatcher
     {

@@ -18,13 +18,13 @@
 
 using System;
 using System.Web;
-using SkyWalking.Common;
-using SkyWalking.Config;
-using SkyWalking.Tracing;
-using SkyWalking.Tracing.Segments;
-using SpanLayer = SkyWalking.Tracing.Segments.SpanLayer;
+using SkyApm.Common;
+using SkyApm.Config;
+using SkyApm.Tracing;
+using SkyApm.Tracing.Segments;
+using SpanLayer = SkyApm.Tracing.Segments.SpanLayer;
 
-namespace SkyWalking.AspNet
+namespace SkyApm.AspNet
 {
     internal class InstrumentRequestCallback
     {
