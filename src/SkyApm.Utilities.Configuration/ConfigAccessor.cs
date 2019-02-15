@@ -27,7 +27,8 @@ namespace SkyApm.Utilities.Configuration
 {
     public class ConfigAccessor : IConfigAccessor
     {
-        private const string CONFIG_FILE_PATH = "SKYWALKING__CONFIG__PATH";
+        private const string CONFIG_FILE_PATH_COMPATIBLE = "SKYWALKING__CONFIG__PATH";
+        private const string CONFIG_FILE_PATH = "SKYAPM__CONFIG__PATH";
         private readonly IConfiguration _configuration;
 
         public ConfigAccessor(IEnvironmentProvider environmentProvider)
@@ -39,7 +40,14 @@ namespace SkyApm.Utilities.Configuration
             builder.AddJsonFile("appsettings.json", true).AddJsonFile($"appsettings.{environmentProvider.EnvironmentName}.json", true);
 
             builder.AddJsonFile("skywalking.json", true).AddJsonFile($"skywalking.{environmentProvider.EnvironmentName}.json", true);
+            
+            builder.AddJsonFile("skyapm.json", true).AddJsonFile($"skyapm.{environmentProvider.EnvironmentName}.json", true);
 
+            if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable(CONFIG_FILE_PATH_COMPATIBLE)))
+            {
+                builder.AddJsonFile(Environment.GetEnvironmentVariable(CONFIG_FILE_PATH_COMPATIBLE), false);
+            }
+            
             if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable(CONFIG_FILE_PATH)))
             {
                 builder.AddJsonFile(Environment.GetEnvironmentVariable(CONFIG_FILE_PATH), false);

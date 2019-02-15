@@ -27,7 +27,7 @@ namespace SkyApm.Utilities.Configuration
     {
         public static IConfigurationBuilder AddSkyWalkingDefaultConfig(this IConfigurationBuilder builder)
         {
-            var defaultLogFile = Path.Combine("logs", "SkyWalking-{Date}.log");
+            var defaultLogFile = Path.Combine("logs", "skyapm-{Date}.log");
             var defaultConfig = new Dictionary<string, string>
             {
                 {"SkyWalking:Namespace", string.Empty},
