@@ -174,7 +174,7 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="skywalking.json" />
+    <Content Include="skyapm.json" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\SkyApm.Agent.AspNet\SkyApm.Agent.AspNet.csproj">

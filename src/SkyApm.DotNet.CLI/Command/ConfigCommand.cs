@@ -34,34 +34,36 @@ namespace SkyApm.DotNet.CLI.Command
 
         public void Execute(CommandLineApplication command)
         {
-            command.Description = "Generate config file for SkyWalking .NET Core Agent";
+            command.Description = "Generate config file for SkyApm-dotnet Agent.";
             command.HelpOption();
 
-            var applicationCodeArgument = command.Argument(
-                "Application Code", "[Required]The application name in SkyWalking");
-            var gRPCServerArgument = command.Argument(
-                "gRPC collector", "[Optional]The gRPC collector address, default 'localhost:11800'");
+            var serviceNameArgument = command.Argument(
+                "service", "[Required] The ServiceName in SkyAPM");
+            var serversArgument = command.Argument(
+                "servers", "[Optional] The servers address, default 'localhost:11800'");
 
-            var environmentOption = command.Option("-e|--Environment", "Follow the app's environment.Framework-defined values include Development, Staging, and Production",
+            var environmentOption = command.Option("-e|--Environment",
+                "Follow the app's environment.Framework-defined values include Development, Staging, and Production",
                 CommandOptionType.SingleValue);
 
             command.OnExecute(() =>
             {
-                if (string.IsNullOrEmpty(applicationCodeArgument.Value))
+                if (string.IsNullOrEmpty(serviceNameArgument.Value))
                 {
-                    Console.WriteLine("Invalid ApplicationCode");
+                    Console.WriteLine("Invalid ServiceName.");
                     return 1;
                 }
 
-                Generate(applicationCodeArgument.Value, gRPCServerArgument.Value, environmentOption.Value());
+                Generate(serviceNameArgument.Value, serversArgument.Value, environmentOption.Value());
 
                 return 0;
             });
         }
 
-        private void Generate(string applicationCode, string gRPCServer, string environment)
+        private void Generate(string serviceName, string servers, string environment)
         {
-            Func<string, string> configFileName = env => string.IsNullOrEmpty(env) ? "skywalking.json" : $"skywalking.{env}.json";
+            Func<string, string> configFileName =
+                env => string.IsNullOrEmpty(env) ? "skyapm.json" : $"skyapm.{env}.json";
 
             var configFilePath = Path.Combine(Directory.GetCurrentDirectory(), configFileName(environment));
 
@@ -73,38 +75,47 @@ namespace SkyApm.DotNet.CLI.Command
                 return;
             }
 
-            gRPCServer = gRPCServer ?? "localhost:11800";
+            servers = servers ?? "localhost:11800";
 
             var gRPCConfig = new Dictionary<string, dynamic>
             {
-                {"Servers", gRPCServer},
-                {"Timeout", 2000},
-                {"ConnectTimeout", 10000}
+                {"Servers", servers},
+                {"Timeout", 10000},
+                {"ConnectTimeout", 10000},
+                {"ReportTimeout", 600000}
             };
 
             var transportConfig = new Dictionary<string, dynamic>
             {
                 {"Interval", 3000},
-                {"PendingSegmentLimit", 30000},
-                {"PendingSegmentTimeout", 1000},
+                {"ProtocolVersion", "v6"},
+                {"QueueSize", 30000},
+                {"BatchSize", 3000},
                 {"gRPC", gRPCConfig}
             };
 
             var loggingConfig = new Dictionary<string, dynamic>
             {
                 {"Level", "Information"},
-                {"FilePath", Path.Combine("logs", "SkyWalking-{Date}.log")}
+                {"FilePath", Path.Combine("logs", "skyapm-{Date}.log")}
             };
 
             var samplingConfig = new Dictionary<string, dynamic>
             {
-                {"SamplePer3Secs", -1}
+                {"SamplePer3Secs", -1},
+                {"Percentage", -1d}
             };
 
-            var swConfig = new Dictionary<string, dynamic>
+            var HeaderVersionsConfig = new string[]
             {
-                {"ApplicationCode", applicationCode},
-                {"SpanLimitPerSegment", 300},
+                "sw6"
+            };
+
+            var skyAPMConfig = new Dictionary<string, dynamic>
+            {
+                {"ServiceName", serviceName},
+                {"Namespace", string.Empty},
+                {"HeaderVersions", HeaderVersionsConfig},
                 {"Sampling", samplingConfig},
                 {"Logging", loggingConfig},
                 {"Transport", transportConfig}
@@ -112,7 +123,7 @@ namespace SkyApm.DotNet.CLI.Command
 
             var rootConfig = new Dictionary<string, dynamic>
             {
-                {"SkyWalking", swConfig}
+                {"SkyWalking", skyAPMConfig}
             };
 
             using (var writer = configFile.CreateText())

@@ -31,10 +31,10 @@ namespace SkyApm.Utilities.Configuration
             var defaultConfig = new Dictionary<string, string>
             {
                 {"SkyWalking:Namespace", string.Empty},
-                {"SkyWalking:ApplicationCode", "My_Service"},
-                {"SkyWalking:SpanLimitPerSegment", "300"},
+                {"SkyWalking:ServiceName", "My_Service"},
                 {"SkyWalking:HeaderVersions:0", HeaderVersions.SW6},
                 {"SkyWalking:Sampling:SamplePer3Secs", "-1"},
+                {"SkyWalking:Sampling:Percentage", "-1"},
                 {"SkyWalking:Logging:Level", "Information"},
                 {"SkyWalking:Logging:FilePath", defaultLogFile},
                 {"SkyWalking:Transport:Interval", "3000"},

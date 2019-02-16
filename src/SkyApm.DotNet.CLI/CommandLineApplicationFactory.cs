@@ -34,10 +34,10 @@ namespace SkyApm.DotNet.CLI
         {
             var app = new CommandLineApplication
             {
-                Name = "dotnet skywalking",
-                FullName = "Apache SkyWalking .NET Core Agent Command Line Tool",
+                Name = "skyapm",
+                FullName = "SkyAPM .NET Core Agent Command Line Tool",
                 Description =
-                    "Install SkyWalking .NET Core Agent and generate config file."
+                    "Generate SkyAPM config file."
             };
 
             app.HelpOption();
