@@ -28,7 +28,7 @@ namespace SkyApm.Agent.AspNet
     {
         public InstrumentModule()
         {
-            var serviceProvider = new ServiceCollection().AddSkyWalkingCore().BuildServiceProvider();
+            var serviceProvider = new ServiceCollection().AddSkyAPMCore().BuildServiceProvider();
             var serviceLocatorProvider = new ServiceProviderLocator(serviceProvider);
             ServiceLocator.SetLocatorProvider(() => serviceLocatorProvider);
         }

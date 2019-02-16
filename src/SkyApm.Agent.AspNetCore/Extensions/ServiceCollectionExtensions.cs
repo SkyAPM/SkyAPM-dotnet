@@ -39,9 +39,9 @@ using SkyApm.Utilities.DependencyInjection;
 
 namespace SkyApm.Agent.AspNetCore
 {
-    public static class ServiceCollectionExtensions
+    internal static class ServiceCollectionExtensions
     {
-        internal static IServiceCollection AddSkyWalkingCore(this IServiceCollection services)
+        internal static IServiceCollection AddSkyAPMCore(this IServiceCollection services)
         {
             if (services == null)
             {
@@ -60,7 +60,7 @@ namespace SkyApm.Agent.AspNetCore
             services.AddSingleton<IHostedService, InstrumentationHostedService>();
             services.AddSingleton<IEnvironmentProvider, HostingEnvironmentProvider>();
             services.AddTracing().AddSampling().AddGrpcTransport().AddLogging();
-            services.AddSkyWalkingExtensions().AddAspNetCoreHosting().AddHttpClient().AddSqlClient()
+            services.AddSkyApmExtensions().AddAspNetCoreHosting().AddHttpClient().AddSqlClient()
                 .AddEntityFrameworkCore(c => c.AddPomeloMysql().AddNpgsql().AddSqlite());
             return services;
         }

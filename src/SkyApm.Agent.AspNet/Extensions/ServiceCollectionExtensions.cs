@@ -34,7 +34,7 @@ namespace SkyApm.Agent.AspNet.Extensions
 {
     internal static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddSkyWalkingCore(this IServiceCollection services)
+        public static IServiceCollection AddSkyAPMCore(this IServiceCollection services)
         {
             services.AddSingleton<ISegmentDispatcher, AsyncQueueSegmentDispatcher>();
             services.AddSingleton<IExecutionService, RegisterService>();

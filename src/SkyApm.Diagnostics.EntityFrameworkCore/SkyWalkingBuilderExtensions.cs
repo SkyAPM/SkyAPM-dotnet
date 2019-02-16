@@ -24,7 +24,7 @@ namespace SkyApm.Diagnostics.EntityFrameworkCore
 {
     public static class SkyWalkingBuilderExtensions
     {
-        public static SkyWalkingExtensions AddEntityFrameworkCore(this SkyWalkingExtensions extensions, Action<DatabaseProviderBuilder> optionAction)
+        public static SkyApmExtensions AddEntityFrameworkCore(this SkyApmExtensions extensions, Action<DatabaseProviderBuilder> optionAction)
         {
             if (extensions == null)
             {

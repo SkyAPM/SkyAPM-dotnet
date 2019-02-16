@@ -20,11 +20,11 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace SkyApm.Utilities.DependencyInjection
 {
-    public class SkyWalkingExtensions
+    public class SkyApmExtensions
     {
         public IServiceCollection Services { get; }
 
-        public SkyWalkingExtensions(IServiceCollection services)
+        public SkyApmExtensions(IServiceCollection services)
         {
             Services = services;
         }

@@ -23,7 +23,7 @@ namespace SkyApm.AspNetCore.Diagnostics
 {
     public static class SkyWalkingBuilderExtensions
     {
-        public static SkyWalkingExtensions AddAspNetCoreHosting(this SkyWalkingExtensions extensions)
+        public static SkyApmExtensions AddAspNetCoreHosting(this SkyApmExtensions extensions)
         {
             extensions.Services.AddSingleton<ITracingDiagnosticProcessor, HostingTracingDiagnosticProcessor>();
             return extensions;

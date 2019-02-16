@@ -24,7 +24,7 @@ namespace SkyApm.Diagnostics.CAP
 {
     public static class SkyWalkingBuilderExtensions
     {
-        public static SkyWalkingExtensions AddCap(this SkyWalkingExtensions extensions)
+        public static SkyApmExtensions AddCap(this SkyApmExtensions extensions)
         {
             if (extensions == null)
             {

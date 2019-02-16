@@ -32,11 +32,6 @@ namespace SkyApm.DotNet.CLI.Utils
 
         public static void WriteWelcome()
         {
-            Console.WriteLine("*********************************************************************");
-            Console.WriteLine("*                                                                   *");
-            Console.WriteLine("*                   Welcome to Apache SkyWalking                    *");
-            Console.WriteLine("*                                                                   *");
-            Console.WriteLine("*********************************************************************");
         }
     }
 }

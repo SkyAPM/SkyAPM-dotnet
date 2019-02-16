@@ -22,9 +22,9 @@ namespace SkyApm.Utilities.DependencyInjection
 {
     public static class ServiceCollectionExtensions
     {
-        public static SkyWalkingExtensions AddSkyWalkingExtensions(this IServiceCollection services)
+        public static SkyApmExtensions AddSkyApmExtensions(this IServiceCollection services)
         {
-            return new SkyWalkingExtensions(services);
+            return new SkyApmExtensions(services);
         }
     }
 }

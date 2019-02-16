@@ -24,7 +24,7 @@ namespace SkyApm.Diagnostics.SqlClient
 {
     public static class SkyWalkingBuilderExtensions
     {
-        public static SkyWalkingExtensions AddSqlClient(this SkyWalkingExtensions extensions)
+        public static SkyApmExtensions AddSqlClient(this SkyApmExtensions extensions)
         {
             if (extensions == null)
             {

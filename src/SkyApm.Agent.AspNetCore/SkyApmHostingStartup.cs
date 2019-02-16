@@ -27,7 +27,7 @@ namespace SkyApm.Agent.AspNetCore
     {
         public void Configure(IWebHostBuilder builder)
         {
-            builder.ConfigureServices(services => services.AddSkyWalkingCore());
+            builder.ConfigureServices(services => services.AddSkyAPMCore());
         }
     }
 }

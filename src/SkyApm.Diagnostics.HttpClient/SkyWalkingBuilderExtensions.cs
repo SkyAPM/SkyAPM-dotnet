@@ -24,7 +24,7 @@ namespace SkyApm.Diagnostics.HttpClient
 {
     public static class SkyWalkingBuilderExtensions
     {
-        public static SkyWalkingExtensions AddHttpClient(this SkyWalkingExtensions extensions)
+        public static SkyApmExtensions AddHttpClient(this SkyApmExtensions extensions)
         {
             if (extensions == null)
             {
