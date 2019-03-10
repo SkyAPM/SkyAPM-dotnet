@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="SmartSql" Version="4.0.0-beta2" />
+    <PackageReference Include="SmartSql" Version="4.0.0-beta3" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SkyApm.Abstractions\SkyApm.Abstractions.csproj" />
