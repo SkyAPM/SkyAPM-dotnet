@@ -1,0 +1,5 @@
+LIBRARY "SkyApm.ClrProfiler.Dll"
+
+EXPORTS
+    DllCanUnloadNow PRIVATE
+    DllGetClassObject PRIVATE

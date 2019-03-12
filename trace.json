@@ -1,0 +1,148 @@
+{
+    "managedAssembly": {
+      "publicKey": "b2248d6c400b487d",
+      "version": "1.0.0.0"
+    },
+    "instrumentation": [
+        {
+            "assemblyName": "StackExchange.Redis",
+            "targetAssemblyName": "SkyApm.ClrProfiler.Trace.StackExchangeRedis",
+            "className": "StackExchange.Redis.ConnectionMultiplexer",
+            "methods": [
+                {
+                    "methodName": "ExecuteSyncImpl"
+                },
+                {
+                    "methodName": "ExecuteAsyncImpl"
+                }
+            ]
+        },
+        {
+            "assemblyName": "StackExchange.Redis.StrongName",
+            "targetAssemblyName": "SkyApm.ClrProfiler.Trace.StackExchangeRedis",
+            "className": "StackExchange.Redis.ConnectionMultiplexer",
+            "methods": [
+                {
+                    "methodName": "ExecuteSyncImpl"
+                },
+                {
+                    "methodName": "ExecuteAsyncImpl"
+                }
+            ]
+        },
+        {
+            "assemblyName": "System.Net.Http",
+            "targetAssemblyName": "SkyApm.ClrProfiler.Trace.HttpClient",
+            "className": "System.Net.Http.HttpClient",
+            "methods": [
+                {
+                    "methodName": "SendAsync",
+                    "paramsName": "System.Net.Http.HttpRequestMessage,System.Net.Http.HttpCompletionOption,System.Threading.CancellationToken"
+                }
+            ]
+        },
+        {
+            "assemblyName": "System.Data.SqlClient",
+            "targetAssemblyName": "SkyApm.ClrProfiler.Trace.SystemDataSqlClient",
+            "className": "System.Data.SqlClient.SqlCommand",
+            "methods": [
+                {
+                    "methodName": "ExecuteNonQueryAsync",
+                    "paramsName": "System.Threading.CancellationToken"
+                },
+                {
+                    "methodName": "ExecuteReaderAsync",
+                    "paramsName": "System.Data.CommandBehavior,System.Threading.CancellationToken"
+                },
+                {
+                    "methodName": "ExecuteScalarAsync",
+                    "paramsName": "System.Threading.CancellationToken"
+                },
+                {
+                    "methodName": "ExecuteXmlReaderAsync",
+                    "paramsName": "System.Threading.CancellationToken"
+                }
+            ]
+        },
+        {
+            "assemblyName": "System.Data",
+            "targetAssemblyName": "SkyApm.ClrProfiler.Trace.SystemDataSqlClient",
+            "className": "System.Data.SqlClient.SqlCommand",
+            "methods": [
+                {
+                    "methodName": "ExecuteNonQueryAsync",
+                    "paramsName": "System.Threading.CancellationToken"
+                },
+                {
+                    "methodName": "ExecuteReaderAsync",
+                    "paramsName": "System.Data.CommandBehavior,System.Threading.CancellationToken"
+                },
+                {
+                    "methodName": "ExecuteScalarAsync",
+                    "paramsName": "System.Threading.CancellationToken"
+                },
+                {
+                    "methodName": "ExecuteXmlReaderAsync",
+                    "paramsName": "System.Threading.CancellationToken"
+                }
+            ]
+        },
+        {
+            "assemblyName": "MySql.Data",
+            "targetAssemblyName": "SkyApm.ClrProfiler.Trace.MySqlData",
+            "className": "MySql.Data.MySqlClient.MySqlCommand",
+            "methods": [
+                {
+                    "methodName": "ExecuteNonQuery"
+                },
+                {
+                    "methodName": "ExecuteReader",
+                    "paramsName": "System.Data.CommandBehavior"
+                },
+                {
+                    "methodName": "ExecuteScalar"
+                }
+            ]
+        },
+        {
+            "assemblyName": "Microsoft.AspNetCore.Hosting",
+            "targetAssemblyName": "SkyApm.ClrProfiler.Trace.AspNetCore",
+            "className": "Microsoft.AspNetCore.Hosting.WebHostBuilder",
+            "methods": [
+                {
+                    "methodName": "BuildCommonServices"
+                }
+            ]
+        },
+        {
+            "assemblyName": "System.Web",
+            "targetAssemblyName": "SkyApm.ClrProfiler.Trace.AspNet",
+            "className": "System.Web.HttpApplication",
+            "methods": [
+                {
+                    "methodName": "ExecuteStep"
+                }
+            ]
+        },
+        {
+            "assemblyName": "System.Web",
+            "targetAssemblyName": "SkyApm.ClrProfiler.Trace.AspNet",
+            "className": "System.Web.HttpContext",
+            "methods": [
+                {
+                    "methodName": "FinishPipelineRequest"
+                }
+            ]
+        },
+        {
+            "assemblyName": "System",
+            "targetAssemblyName": "SkyApm.ClrProfiler.Trace.HttpWebRequest",
+            "className": "System.Net.HttpWebRequest",
+            "methods": [
+                {
+                    "methodName": ".ctor"
+                }
+            ]
+        }
+    ]
+}

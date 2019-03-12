@@ -1,17 +1,32 @@
-﻿using System.Web;
-using System.Web.Mvc;
-using System.Web.Routing;
+﻿using System;
+using System.Web;
 using System.Web.Http;
 
 namespace SkyApm.Sample.AspNet
 {
     public class Global : HttpApplication
     {
-        protected void Application_Start()
+
+        protected void Application_Start(object sender, EventArgs e)
         {
-            AreaRegistration.RegisterAllAreas();
             GlobalConfiguration.Configure(WebApiConfig.Register);
-            RouteConfig.RegisterRoutes(RouteTable.Routes);
+        }
+
+        private static class WebApiConfig
+        {
+            public static void Register(HttpConfiguration config)
+            {
+                // Web API 配置和服务	
+
+                // Web API 路由	
+                config.MapHttpAttributeRoutes();
+
+                config.Routes.MapHttpRoute(
+                    name: "DefaultApi",
+                    routeTemplate: "api/{controller}/{id}",
+                    defaults: new { id = RouteParameter.Optional }
+                );
+            }
         }
     }
 }

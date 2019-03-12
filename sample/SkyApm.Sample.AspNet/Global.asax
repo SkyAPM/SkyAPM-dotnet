@@ -1,1 +1,1 @@
-﻿<%@ Application Inherits="SkyApm.Sample.AspNet.Global" %>
+﻿<%@ Application Codebehind="Global.asax.cs" Inherits="SkyApm.Sample.AspNet.Global" Language="C#" %>

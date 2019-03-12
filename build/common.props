@@ -14,6 +14,8 @@
     <GenerateAssemblyCompanyAttribute>True</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>True</GenerateAssemblyProductAttribute>
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
-    <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>  
+    <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>../../tools/skyapm.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 </Project>
