@@ -22,7 +22,7 @@
 #include "logging.h"
 #include <fstream>
 
-namespace trace
+namespace clrprofiler
 {
     using json = nlohmann::json;
 
@@ -30,8 +30,8 @@ namespace trace
         if (!src.is_object()) {
             return std::make_pair<TraceAssembly, bool>({}, false);
         }
-        const auto assemblyName = ToWSTRING(src.value("assemblyName", ""));
-        const auto className = ToWSTRING(src.value("className", ""));
+        const auto assemblyName = ToWString(src.value("assemblyName", ""));
+        const auto className = ToWString(src.value("className", ""));
 
         if(assemblyName.empty() || className.empty()){
             return std::make_pair<TraceAssembly, bool>({}, false);
@@ -41,8 +41,8 @@ namespace trace
         auto arr = src.value("methods", json::array());
         if (arr.is_array()) {
             for (auto& el : arr) {
-                const auto methodName = ToWSTRING(el.value("methodName", ""));
-                const auto paramsName = ToWSTRING(el.value("paramsName", ""));
+                const auto methodName = ToWString(el.value("methodName", ""));
+                const auto paramsName = ToWString(el.value("paramsName", ""));
                 if (methodName.empty()) {
                     continue;
                 }
@@ -59,10 +59,10 @@ namespace trace
     {
         ManagedAssembly managedAssembly;
         const auto publicKey = src.value("publicKey", "");
-        const auto version = ToWSTRING(src.value("version", "1.0.0.0"));
+        const auto version = ToWString(src.value("version", "1.0.0.0"));
         managedAssembly.publicKey = HexToBytes(publicKey);
 
-        const auto assembly_version = Version(Split(version, static_cast<wchar_t>('.')));
+        const auto assembly_version = Version(Split(version, static_cast<WCHAR>('.')));
 
         ASSEMBLYMETADATA assemblyMetaData;
         ZeroMemory(&assemblyMetaData, sizeof(assemblyMetaData));
@@ -115,7 +115,7 @@ namespace trace
 
     TraceConfig LoadTraceConfig(const WSTRING& traceHomePath)
     {
-        const auto traceJsonFilePath = traceHomePath + PathSeparator + "trace.json"_W;
+        const WSTRING traceJsonFilePath = traceHomePath + PathSeparator + W("trace.json");
         TraceConfig config;
         try {
             std::ifstream stream;

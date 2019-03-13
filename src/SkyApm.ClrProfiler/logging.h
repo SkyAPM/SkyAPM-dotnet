@@ -19,13 +19,14 @@
 #ifndef CLR_PROFILER_LOGGING_H_
 #define CLR_PROFILER_LOGGING_H_
 
+#include "singleton.h"
 #include "util.h"
 #include <memory>
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/rotating_file_sink.h>
 #include <iostream>
 
-namespace trace {
+namespace clrprofiler {
 
     class CLogger : public Singleton<CLogger>
     {
@@ -36,10 +37,10 @@ namespace trace {
             WSTRING log_path;
             auto home = GetEnvironmentValue(GetClrProfilerHome());
             if(!home.empty()) {
-                log_path = home + PathSeparator + "logs"_W;
+                log_path = home + PathSeparator + W("logs");
             }
             else {
-                log_path = "logs"_W;
+                log_path = W("logs");
             }
             return log_path;
         }
@@ -57,7 +58,7 @@ namespace trace {
 
             CheckDir(ToString(log_path).c_str());
 
-            const auto log_name = log_path + PathSeparator + "trace"_W + ToWSTRING(std::to_string(GetPID())) + ".log"_W;
+            const auto log_name = log_path + PathSeparator + W("trace") + ToWString(std::to_string(GetPID())) + W(".log");
             m_fileout = spdlog::rotating_logger_mt("Logger", ToString(log_name), 1024 * 1024 * 10, 3);
 
             m_fileout->set_level(spdlog::level::info);
@@ -90,6 +91,6 @@ namespace trace {
     {                                                 \
         CLogger::Instance()->m_fileout->error(__VA_ARGS__);   \
     }
-}  // namespace trace
+}  // namespace SkyApm.ClrProfiler
 
 #endif  // CLR_PROFILER_LOGGING_H_

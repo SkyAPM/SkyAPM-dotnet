@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<Include>
+  <?define BaseProductName = ".NET Tracer" ?>
+  <?define ArpManufacturer = "SkyApm" ?>
+  <?define Company = "SkyApm" ?>
+  <?define ManagedDllPath = "$(sys.CURRENTDIR)..\..\src\SkyApm.ClrProfiler.Trace\bin\$(var.Configuration)" ?>
+  <?define NativeDllPath = "$(sys.CURRENTDIR)..\..\src\SkyApm.ClrProfiler\x64\$(var.Configuration)" ?>
+  <?define ToolsPath = "$(sys.CURRENTDIR)..\..\tools" ?>
+  <?define RootPath = "$(sys.CURRENTDIR)..\..\" ?>
+  <?define ProductName = "SkyApm $(var.BaseProductName) 64-bit" ?>
+  <?define Win64 = "yes" ?>
+  <?define PlatformProgramFilesFolder = "ProgramFiles64Folder" ?>
+  <?define InstallerVersion = "1.0.0" ?>
+</Include>

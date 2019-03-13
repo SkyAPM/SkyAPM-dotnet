@@ -1,0 +1,332 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <?include $(sys.CURRENTDIR)\Config.wxi?>
+  <Product Id="*"
+           Name="$(var.ProductName)"
+           Language="1033"
+           Version="$(var.InstallerVersion)"
+           Manufacturer="$(var.ArpManufacturer)"
+           UpgradeCode="14385cff-be63-476d-b534-81adac63ca9b">
+    <Package InstallerVersion="200"
+                 Compressed="yes"
+                 InstallScope="perMachine"
+                 Description="$(var.ProductName)"/>
+
+    <Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER"/>
+
+    <Property Id="INSTALLFOLDER">
+      <RegistrySearch Id="RegistrySearch" Type="raw" Root="HKLM" Win64="$(var.Win64)" Key="Software\$(var.Company)\$(var.ProductName)" Name="InstallPath"/>
+    </Property>
+
+    <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed."/>
+    <MediaTemplate EmbedCab="yes"/>
+
+    <Feature Id="ProductFeature" Title="ClrProfiler" Level="1">
+      <ComponentGroupRef Id="Files.Root"/>
+      <ComponentGroupRef Id="Files.Managed.NET461"/>
+      <ComponentGroupRef Id="Files.Managed.NETCORE"/>
+      <ComponentGroupRef Id="Registry"/>
+      <ComponentGroupRef Id="EnvironmentVariables.Machine"/>
+      <ComponentGroupRef Id="EnvironmentVariables.User"/>
+    </Feature>
+
+    <UI Id="WixUI_InstallDir">
+      <TextStyle Id="WixUI_Font_Normal" FaceName="Tahoma" Size="8" />
+      <TextStyle Id="WixUI_Font_Bigger" FaceName="Tahoma" Size="12" />
+      <TextStyle Id="WixUI_Font_Title" FaceName="Tahoma" Size="9" Bold="yes" />
+
+      <Property Id="DefaultUIFont" Value="WixUI_Font_Normal" />
+      <Property Id="WixUI_Mode" Value="InstallDir" />
+
+      <DialogRef Id="BrowseDlg" />
+      <DialogRef Id="DiskCostDlg" />
+      <DialogRef Id="ErrorDlg" />
+      <DialogRef Id="FatalError" />
+      <DialogRef Id="FilesInUse" />
+      <DialogRef Id="MsiRMFilesInUse" />
+      <DialogRef Id="PrepareDlg" />
+      <DialogRef Id="ProgressDlg" />
+      <DialogRef Id="ResumeDlg" />
+      <DialogRef Id="UserExit" />
+
+      <Publish Dialog="BrowseDlg" Control="OK" Event="DoAction" Value="WixUIValidatePath" Order="3">1</Publish>
+      <Publish Dialog="BrowseDlg" Control="OK" Event="SpawnDialog" Value="InvalidDirDlg" Order="4"><![CDATA[NOT WIXUI_DONTVALIDATEPATH AND WIXUI_INSTALLDIR_VALID<>"1"]]></Publish>
+
+      <Publish Dialog="ExitDialog" Control="Finish" Event="EndDialog" Value="Return" Order="999">1</Publish>
+
+      <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="TextDlg">NOT Installed</Publish>
+      <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg">Installed AND PATCH</Publish>
+
+      <Publish Dialog="TextDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg">1</Publish>
+      <Publish Dialog="TextDlg" Control="Next" Event="NewDialog" Value="InstallDirDlg">1</Publish>
+      
+      <Publish Dialog="InstallDirDlg" Control="Back" Event="NewDialog" Value="TextDlg">1</Publish>
+      <Publish Dialog="InstallDirDlg" Control="Next" Event="SetTargetPath" Value="[WIXUI_INSTALLDIR]" Order="1">1</Publish>
+      <Publish Dialog="InstallDirDlg" Control="Next" Event="DoAction" Value="WixUIValidatePath" Order="2">NOT WIXUI_DONTVALIDATEPATH</Publish>
+      <Publish Dialog="InstallDirDlg" Control="Next" Event="SpawnDialog" Value="InvalidDirDlg" Order="3"><![CDATA[NOT WIXUI_DONTVALIDATEPATH AND WIXUI_INSTALLDIR_VALID<>"1"]]></Publish>
+      <Publish Dialog="InstallDirDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg" Order="4">WIXUI_DONTVALIDATEPATH OR WIXUI_INSTALLDIR_VALID="1"</Publish>
+      <Publish Dialog="InstallDirDlg" Control="ChangeFolder" Property="_BrowseProperty" Value="[WIXUI_INSTALLDIR]" Order="1">1</Publish>
+      <Publish Dialog="InstallDirDlg" Control="ChangeFolder" Event="SpawnDialog" Value="BrowseDlg" Order="2">1</Publish>
+
+      <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="InstallDirDlg" Order="1">NOT Installed</Publish>
+      <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg" Order="2">Installed AND NOT PATCH</Publish>
+      <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg" Order="2">Installed AND PATCH</Publish>
+
+      <Publish Dialog="MaintenanceWelcomeDlg" Control="Next" Event="NewDialog" Value="MaintenanceTypeDlg">1</Publish>
+
+      <Publish Dialog="MaintenanceTypeDlg" Control="RepairButton" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
+      <Publish Dialog="MaintenanceTypeDlg" Control="RemoveButton" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
+      <Publish Dialog="MaintenanceTypeDlg" Control="Back" Event="NewDialog" Value="MaintenanceWelcomeDlg">1</Publish>
+
+      <Property Id="ARPNOMODIFY" Value="1" />
+    </UI>
+
+    <UIRef Id="WixUI_Common" />
+
+    <CustomAction Id="IIS_RESTART" Directory="INSTALLFOLDER" Execute="commit" Impersonate="no" ExeCommand="cmd.exe /k &quot;iisrestart.cmd&quot;" Return="asyncNoWait" />
+
+    <InstallExecuteSequence>
+      <Custom Action="IIS_RESTART" After="InstallInitialize" >NOT Installed</Custom>
+    </InstallExecuteSequence>
+  </Product>
+
+  <Fragment>
+    <Property Id="GRPCSERVERS" Value="localhost:11800" Secure="yes" />
+    <UI>
+      <Dialog Id="TextDlg" Width="370" Height="270" Title="[ProductName] - Setup">
+        <Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes" Text="!(loc.WixUINext)" />
+        <Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="!(loc.WixUIBack)" />
+        <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Cancel="yes" Text="!(loc.WixUICancel)">
+          <Publish Event="SpawnDialog" Value="CancelDlg">1</Publish>
+        </Control>
+
+        <Control Id="Description" Type="Text" X="25" Y="23" Width="280" Height="15" Transparent="yes" NoPrefix="yes" Text="Please Enter GrpcServers" />
+        <Control Id="GrpcServersInput" Type="Edit" X="25" Y="60" Width="280" Height="15" Property="GRPCSERVERS" Indirect="no" />
+        <Control Id="Title" Type="Text" X="15" Y="6" Width="200" Height="15" Transparent="yes" NoPrefix="yes" Text="GrpcServers Configuration" />
+        <Control Id="BannerBitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="44" TabSkip="no" Text="!(loc.InstallDirDlgBannerBitmap)" />
+        <Control Id="BannerLine" Type="Line" X="0" Y="44" Width="370" Height="0" />
+        <Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="0" />
+
+      </Dialog>
+    </UI>
+  </Fragment>
+  
+  <Fragment>
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="$(var.PlatformProgramFilesFolder)">
+        <Directory Id="ProgramFilesFolder.ClrProfiler" Name="$(var.Company)">
+          <Directory Id="INSTALLFOLDER" Name="$(var.BaseProductName)">
+            <Directory Id="INSTALLFOLDER_NET461" Name="net461"/>
+            <Directory Id="INSTALLFOLDER_NETCORE" Name="netstandard2.0"/>
+          </Directory>
+        </Directory>
+      </Directory>
+    </Directory>
+  </Fragment>
+
+  <!-- Assembly=".net" add dll to GAC -->
+  <Fragment>
+    <ComponentGroup Id="Files.Managed.NET461" Directory="INSTALLFOLDER_NET461">
+      <Component Id="Permission.INSTALLFOLDER_NET461" Guid="{7C5234ED-EE92-468A-A765-27E5747705DB}">
+        <CreateFolder>
+          <Permission ChangePermission="yes" GenericAll="yes" User="Administrators"/>
+          <Permission User="Everyone" WriteExtendedAttributes="yes" WriteAttributes="yes" CreateFile="yes" CreateChild="yes" GenericWrite="yes" GenericRead="yes" GenericExecute="yes"/>
+        </CreateFolder>
+      </Component>
+      <Component Win64="$(var.Win64)">
+        <File Id="net461_trace.json"
+              Source="$(var.ManagedDllPath)\net461\trace.json"
+              KeyPath="yes" Checksum="yes"/>
+      </Component>
+      <Component Win64="$(var.Win64)">
+        <File Id="net461_grpc_csharp_ext.x64.dll"
+              Source="$(var.ManagedDllPath)\net461\runtimes\win\native\grpc_csharp_ext.x64.dll"
+              KeyPath="yes" Checksum="yes"/>
+      </Component>
+      <Component Win64="$(var.Win64)">
+        <File Id="net461_netstandard.dll"
+              Source="$(var.ManagedDllPath)\net461\netstandard.dll"
+              KeyPath="yes" Checksum="yes" Assembly=".net"/>
+      </Component>
+      <Component Win64="$(var.Win64)">
+        <File Id="net461_SkyApm.ClrProfiler.Trace.dll"
+              Source="$(var.ManagedDllPath)\net461\SkyApm.ClrProfiler.Trace.dll"
+              KeyPath="yes" Checksum="yes" Assembly=".net"/>
+      </Component>
+      <Component Win64="$(var.Win64)">
+        <File Id="net461_SkyAPM.Abstractions.dll"
+              Source="$(var.ManagedDllPath)\net461\SkyAPM.Abstractions.dll"
+              KeyPath="yes" Checksum="yes" Assembly=".net"/>
+      </Component>
+      <Component Win64="$(var.Win64)">
+        <File Id="net461_SkyAPM.Transport.Grpc"
+              Source="$(var.ManagedDllPath)\net461\SkyAPM.Transport.Grpc.dll"
+              KeyPath="yes" Checksum="yes"/>
+      </Component>
+      <Component Win64="$(var.Win64)">
+        <File Id="net461_SkyApm.ClrProfiler.Trace.AspNetCore.dll"
+              Source="$(var.ManagedDllPath)\net461\SkyApm.ClrProfiler.Trace.AspNetCore.dll"
+              KeyPath="yes" Checksum="yes" />
+      </Component>
+      <Component Win64="$(var.Win64)">
+        <File Id="net461_SkyApm.ClrProfiler.Trace.AspNet.dll"
+              Source="$(var.ManagedDllPath)\net461\SkyApm.ClrProfiler.Trace.AspNet.dll"
+              KeyPath="yes" Checksum="yes" />
+      </Component>
+      <Component Win64="$(var.Win64)">
+        <File Id="net461_SkyApm.ClrProfiler.Trace.HttpWebRequest.dll"
+              Source="$(var.ManagedDllPath)\net461\SkyApm.ClrProfiler.Trace.HttpWebRequest.dll"
+              KeyPath="yes" Checksum="yes" />
+      </Component>
+      <Component Win64="$(var.Win64)">
+        <File Id="net461_SkyApm.ClrProfiler.Trace.MySqlConnector.dll"
+              Source="$(var.ManagedDllPath)\net461\SkyApm.ClrProfiler.Trace.MySqlConnector.dll"
+              KeyPath="yes" Checksum="yes" />
+      </Component>
+      <Component Win64="$(var.Win64)">
+        <File Id="net461_SkyApm.ClrProfiler.Trace.MySqlData.dll"
+              Source="$(var.ManagedDllPath)\net461\SkyApm.ClrProfiler.Trace.MySqlData.dll"
+              KeyPath="yes" Checksum="yes" />
+      </Component>
+      <Component Win64="$(var.Win64)">
+        <File Id="net461_SkyApm.ClrProfiler.Trace.StackExchangeRedis.dll"
+              Source="$(var.ManagedDllPath)\net461\SkyApm.ClrProfiler.Trace.StackExchangeRedis.dll"
+              KeyPath="yes" Checksum="yes" />
+      </Component>
+      <Component Win64="$(var.Win64)">
+        <File Id="net461_SkyApm.ClrProfiler.Trace.SystemDataSqlClient.dll"
+              Source="$(var.ManagedDllPath)\net461\SkyApm.ClrProfiler.Trace.SystemDataSqlClient.dll"
+              KeyPath="yes" Checksum="yes" />
+      </Component>
+    </ComponentGroup>
+
+    <ComponentGroup Id="Files.Managed.NETCORE" Directory="INSTALLFOLDER_NETCORE">
+      <Component Id="Permission.INSTALLFOLDER_NETCORE" Guid="{8C5234ED-EE92-468A-A765-27E5747705DB}">
+        <CreateFolder>
+          <Permission ChangePermission="yes" GenericAll="yes" User="Administrators"/>
+          <Permission User="Everyone" WriteExtendedAttributes="yes" WriteAttributes="yes" CreateFile="yes" CreateChild="yes" GenericWrite="yes" GenericRead="yes" GenericExecute="yes"/>
+        </CreateFolder>
+      </Component>
+      <Component Win64="$(var.Win64)">
+        <File Id="netcore_trace.json"
+              Source="$(var.ManagedDllPath)\netstandard2.0\trace.json"
+              KeyPath="yes" Checksum="yes"/>
+      </Component>
+      <Component Win64="$(var.Win64)">
+        <File Id="netcore_grpc_csharp_ext.x64.dll"
+              Source="$(var.ManagedDllPath)\netstandard2.0\runtimes\win\native\grpc_csharp_ext.x64.dll"
+              KeyPath="yes" Checksum="yes"/>
+      </Component>
+      <Component Win64="$(var.Win64)">
+        <File Id="netcore_SkyApm.ClrProfiler.Trace.dll"
+              Source="$(var.ManagedDllPath)\netstandard2.0\SkyApm.ClrProfiler.Trace.dll"
+              KeyPath="yes" Checksum="yes"/>
+      </Component>
+      <Component Win64="$(var.Win64)">
+        <File Id="netcore_SkyAPM.Abstractions.dll"
+              Source="$(var.ManagedDllPath)\netstandard2.0\SkyAPM.Abstractions.dll"
+              KeyPath="yes" Checksum="yes"/>
+      </Component>
+      <Component Win64="$(var.Win64)">
+        <File Id="netcore_SkyAPM.Transport.Grpc"
+              Source="$(var.ManagedDllPath)\netstandard2.0\SkyAPM.Transport.Grpc.dll"
+              KeyPath="yes" Checksum="yes"/>
+      </Component>
+      <Component Win64="$(var.Win64)">
+        <File Id="netcore_SkyApm.ClrProfiler.Trace.AspNetCore.dll"
+              Source="$(var.ManagedDllPath)\netstandard2.0\SkyApm.ClrProfiler.Trace.AspNetCore.dll"
+              KeyPath="yes" Checksum="yes" />
+      </Component>
+      <Component Win64="$(var.Win64)">
+        <File Id="netcore_SkyApm.ClrProfiler.Trace.HttpClient.dll"
+              Source="$(var.ManagedDllPath)\netstandard2.0\SkyApm.ClrProfiler.Trace.HttpClient.dll"
+              KeyPath="yes" Checksum="yes" />
+      </Component>
+      <Component Win64="$(var.Win64)">
+        <File Id="netcore_SkyApm.ClrProfiler.Trace.MySqlConnector.dll"
+              Source="$(var.ManagedDllPath)\netstandard2.0\SkyApm.ClrProfiler.Trace.MySqlConnector.dll"
+              KeyPath="yes" Checksum="yes" />
+      </Component>
+      <Component Win64="$(var.Win64)">
+        <File Id="netcore_SkyApm.ClrProfiler.Trace.MySqlData.dll"
+              Source="$(var.ManagedDllPath)\netstandard2.0\SkyApm.ClrProfiler.Trace.MySqlData.dll"
+              KeyPath="yes" Checksum="yes" />
+      </Component>
+      <Component Win64="$(var.Win64)">
+        <File Id="netcore_SkyApm.ClrProfiler.Trace.StackExchangeRedis.dll"
+              Source="$(var.ManagedDllPath)\netstandard2.0\SkyApm.ClrProfiler.Trace.StackExchangeRedis.dll"
+              KeyPath="yes" Checksum="yes" />
+      </Component>
+      <Component Win64="$(var.Win64)">
+        <File Id="netcore_SkyApm.ClrProfiler.Trace.SystemDataSqlClient.dll"
+              Source="$(var.ManagedDllPath)\netstandard2.0\SkyApm.ClrProfiler.Trace.SystemDataSqlClient.dll"
+              KeyPath="yes" Checksum="yes" />
+      </Component>
+    </ComponentGroup>
+
+    <ComponentGroup Id="Files.Root" Directory="INSTALLFOLDER">
+      <Component Id="INSTALLFOLDER.Root" Guid="{8A5234ED-EE92-468A-A765-27E5747705DB}">
+        <CreateFolder />
+        <RemoveFile Id="PurgeClrProfiler" Name="SkyApm.ClrProfiler.dll" On="uninstall" />
+      </Component>
+      <Component Win64="$(var.Win64)">
+        <File Id="SkyApm.ClrProfiler.dll"
+              Source="$(var.NativeDllPath)\SkyApm.ClrProfiler.dll"
+              Checksum="yes">
+        </File>
+      </Component>
+      <Component Win64="$(var.Win64)">
+        <File Id="iisrestart.cmd"
+              Source="$(var.ToolsPath)\iisrestart.cmd"
+              Checksum="yes">
+        </File>
+      </Component>
+      <Component Win64="$(var.Win64)">
+        <File Id="skyapm.json"
+              Source="$(var.RootPath)skyapm.json"
+              Checksum="yes">
+        </File>
+      </Component>
+    </ComponentGroup>
+
+    <ComponentGroup Id="Registry" Directory="INSTALLFOLDER">
+      <Component Win64="$(var.Win64)">
+        <CreateFolder/>
+        <RegistryKey Root="HKLM" Key="Software\$(var.Company)\$(var.ProductName)">
+          <RegistryValue Type="string" Name="InstallPath" Value="[INSTALLFOLDER]" Action="write"/>
+        </RegistryKey>
+      </Component>
+    </ComponentGroup>
+
+    <ComponentGroup Id="EnvironmentVariables.Machine" Directory="INSTALLFOLDER">
+      <Component Id="EnvironmentVariablesShared" Guid="{4314A305-9C24-4E46-9ECF-E5EEA703BDE5}" Win64="$(var.Win64)">
+        <CreateFolder/>
+        <Environment Id="CORECLR_PROFILER" Name="CORECLR_PROFILER" Action="set" Permanent="no" System="yes" Value="{cf0d821e-299b-5307-a3d8-b283c03916dd}" Part="all" />
+        <Environment Id="CORECLR_ENABLE_PROFILING" Name="CORECLR_ENABLE_PROFILING" Action="set" Permanent="no" System="yes" Value="1" Part="all" />
+        <Environment Id="CORECLR_PROFILER_PATH" Name="CORECLR_PROFILER_PATH" Action="set" Permanent="no" System="yes" Value="[INSTALLFOLDER]SkyApm.ClrProfiler.dll" Part="all" />
+        <Environment Id="CORECLR_PROFILER_HOME" Name="CORECLR_PROFILER_HOME" Action="set" Permanent="no" System="yes" Value="[INSTALLFOLDER]netstandard2.0" Part="all" />
+        <Environment Id="SKYAPM__CONFIG__PATH" Name="SKYAPM__CONFIG__PATH" Action="set" Permanent="no" System="yes" Value="[INSTALLFOLDER]skyapm.json" Part="all" />
+        <Environment Id="SkyWalking_Transport_gRPC_Servers" Name="SkyWalking:Transport:gRPC:Servers" Action="set" Permanent="no" System="yes" Value="[GRPCSERVERS]" Part="all" />
+      </Component>
+    </ComponentGroup>
+
+    <ComponentGroup Id="EnvironmentVariables.User" Directory="INSTALLFOLDER">
+      <Component Id="Registry.EnvironmentVariables.W3SVC" Guid="{202DB265-F33E-47F4-A6B0-E21FA0FC21C2}" Win64="$(var.Win64)">
+        <CreateFolder/>
+        <RegistryKey Root="HKLM" Key="System\CurrentControlSet\Services\W3SVC" ForceCreateOnInstall="yes">
+          <RegistryValue Type="multiString" Name="Environment" Value="COR_ENABLE_PROFILING=1[~]COR_PROFILER={af0d821e-299b-5307-a3d8-b283c03916dd}[~]COR_PROFILER_PATH=[INSTALLFOLDER]SkyApm.ClrProfiler.dll[~]COR_PROFILER_HOME=[INSTALLFOLDER]net461" Action="append"/>
+        </RegistryKey>
+        <RegistryKey Root="HKLM" Key="System\CurrentControlSet\Services\W3SVC\Environment" ForceDeleteOnUninstall="yes">
+        </RegistryKey>
+      </Component>
+
+      <Component Id="Registry.EnvironmentVariables.WAS" Guid="{1CF8AB88-240E-4A0A-B630-43119C064AD2}" Win64="$(var.Win64)">
+        <RegistryKey Root="HKLM" Key="System\CurrentControlSet\Services\WAS" ForceCreateOnInstall="yes">
+          <RegistryValue Type="multiString" Name="Environment" Value="COR_ENABLE_PROFILING=1[~]COR_PROFILER={af0d821e-299b-5307-a3d8-b283c03916dd}[~]COR_PROFILER_PATH=[INSTALLFOLDER]SkyApm.ClrProfiler.dll[~]COR_PROFILER_HOME=[INSTALLFOLDER]net461" Action="append"/>
+        </RegistryKey>
+        <RegistryKey Root="HKLM" Key="System\CurrentControlSet\Services\WAS\Environment" ForceDeleteOnUninstall="yes">
+        </RegistryKey>
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+</Wix>

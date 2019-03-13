@@ -21,16 +21,18 @@
 
 #include <string>
 #include <vector>
-#include "string.h"   // NOLINT
+#include "util.h"
+#include <cor.h>
 
-namespace trace {
+namespace clrprofiler {
 
     struct TraceMethod
     {
-         WSTRING methodName;
+        WSTRING methodName;
         WSTRING paramsName;
-        TraceMethod() : methodName(""_W), paramsName(""_W) {}
-        TraceMethod(WSTRING methodName, WSTRING paramsName) : methodName(methodName), paramsName(paramsName) {}    };
+        TraceMethod() : methodName(W("")), paramsName(W("")) {}
+        TraceMethod(WSTRING methodName, WSTRING paramsName) : methodName(methodName), paramsName(paramsName) {}   
+    };
 
     struct TraceAssembly
     {

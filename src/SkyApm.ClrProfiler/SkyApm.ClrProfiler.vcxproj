@@ -90,31 +90,26 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="CComPtr.h" />
-    <ClInclude Include="ClassFactory.h" />
+    <ClInclude Include="ccom_ptr.h" />
+    <ClInclude Include="class_factory.h" />
     <ClInclude Include="clr_helpers.h" />
-    <ClInclude Include="CorProfiler.h" />
+    <ClInclude Include="config_loader.h" />
+    <ClInclude Include="profiler.h" />
     <ClInclude Include="il_rewriter.h" />
-    <ClInclude Include="il_rewriter_wrapper.h" />
+    <ClInclude Include="il_rewriter_helper.h" />
     <ClInclude Include="json.hpp" />
     <ClInclude Include="logging.h" />
-    <ClInclude Include="macros.h" />
-    <ClInclude Include="miniutf.hpp" />
-    <ClInclude Include="miniutfdata.h" />
-    <ClInclude Include="string.h" />
-    <ClInclude Include="config_loader.h" />
+    <ClInclude Include="singleton.h" />
     <ClInclude Include="util.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ClassFactory.cpp" />
+    <ClCompile Include="class_factory.cpp" />
     <ClCompile Include="clr_helpers.cpp" />
     <ClCompile Include="config_loader.cpp" />
     <ClCompile Include="dllmain.cpp" />
-    <ClCompile Include="CorProfiler.cpp" />
+    <ClCompile Include="profiler.cpp" />
     <ClCompile Include="il_rewriter.cpp" />
-    <ClCompile Include="il_rewriter_wrapper.cpp" />
-    <ClCompile Include="miniutf.cpp" />
-    <ClCompile Include="string.cpp" />
+    <ClCompile Include="il_rewriter_helper.cpp" />
     <ClCompile Include="util.cpp" />
   </ItemGroup>
   <ItemGroup>

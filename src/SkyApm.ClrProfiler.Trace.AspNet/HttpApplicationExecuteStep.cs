@@ -15,7 +15,8 @@
  * limitations under the License.
  *
  */
- 
+
+using System;
 using System.Web;
 using SkyApm.Common;
 using SkyApm.Tracing;
@@ -23,7 +24,7 @@ using SkyApm.Tracing.Segments;
 
 namespace SkyApm.ClrProfiler.Trace.AspNet
 {
-    public class HttpApplicationExecuteStep : IMethodWrapper
+    public class HttpApplicationExecuteStep : AbsMethodWrapper
     {
         private const string TypeName = "System.Web.HttpApplication";
         private const string AssemblyName = "System.Web";
@@ -31,12 +32,12 @@ namespace SkyApm.ClrProfiler.Trace.AspNet
 
         private readonly ITracingContext _tracingContext;
 
-        public HttpApplicationExecuteStep(ITracingContext tracer)
+        public HttpApplicationExecuteStep(IServiceProvider serviceProvider) : base(serviceProvider)
         {
-            _tracingContext = tracer;
+            _tracingContext = (ITracingContext)serviceProvider.GetService(typeof(ITracingContext));
         }
 
-        public EndMethodDelegate BeforeWrappedMethod(TraceMethodInfo traceMethodInfo)
+        public override EndMethodDelegate BeforeWrappedMethod(TraceMethodInfo traceMethodInfo)
         {
             if (HttpRuntime.UsingIntegratedPipeline)
             {
@@ -71,7 +72,7 @@ namespace SkyApm.ClrProfiler.Trace.AspNet
             return null;
         }
 
-        public bool CanWrap(TraceMethodInfo traceMethodInfo)
+        public override bool CanWrap(TraceMethodInfo traceMethodInfo)
         {
             var invocationTargetType = traceMethodInfo.Type;
             var assemblyName = invocationTargetType.Assembly.GetName().Name;

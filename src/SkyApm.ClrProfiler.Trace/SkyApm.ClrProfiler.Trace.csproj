@@ -3,12 +3,16 @@
   <PropertyGroup>
     <Description>$(Product) core components.</Description>
     <AssemblyTitle>$(PackagePrefix).ClrProfiler.Trace</AssemblyTitle>
-    <AssemblyName>$(PackagePrefix).ClrProfiler.Trace</AssemblyName>
+    <!--<AssemblyName>$(PackagePrefix).Trace</AssemblyName> linux case-sensitive (SkyApm vs SkyAPM)-->
     <PackageId>$(PackagePrefix).ClrProfiler.Trace</PackageId>
     <PackageTags>SkyWalking;APM</PackageTags>
     <PackageReleaseNotes>
     </PackageReleaseNotes>
     <TargetFrameworks>netstandard2.0;net461</TargetFrameworks>
+    <!-- when debug, it will copy nuget dll to output path ,
+         but can't copy grpc native dll in SkyApm.Transport.Grpc proj,
+         so you need dotnet publish dll to debug output path -->
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(OS)' != 'Windows_NT'">

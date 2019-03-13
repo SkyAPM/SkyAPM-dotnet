@@ -18,7 +18,7 @@
  
 namespace SkyApm.ClrProfiler.Trace.Constants
 {
-    public class TraceConstant
+    internal class TraceConstant
     {
 #if NET
         public const string PROFILER_HOME = "COR_PROFILER_HOME";

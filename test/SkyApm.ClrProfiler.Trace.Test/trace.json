@@ -1,0 +1,21 @@
+{
+    "managedAssembly": {
+      "publicKey": "b2248d6c400b487d",
+      "version": "1.0.0.0"
+    },
+    "instrumentation": [
+        {
+            "assemblyName": "SkyApm.ClrProfiler.Trace.Test",
+            "targetAssemblyName": "SkyApm.ClrProfiler.Trace.Test",
+            "className": "SkyApm.ClrProfiler.Trace.Test.TraceAgentTest",
+            "methods": [
+                {
+                    "methodName": "DataRead"
+                },
+				{
+                    "methodName": "DataWrite"
+                }
+            ]
+        }
+    ]
+}

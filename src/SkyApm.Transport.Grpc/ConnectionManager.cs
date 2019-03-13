@@ -87,8 +87,11 @@ namespace SkyApm.Transport.Grpc
         {
             try
             {
-                await _channel?.ShutdownAsync();
-                _logger.Information($"Shutdown connection[{_channel.Target}].");
+                if (_channel != null)
+                {
+                    await _channel.ShutdownAsync();
+                    _logger.Information($"Shutdown connection[{_channel.Target}].");
+                }
             }
             catch (Exception e)
             {

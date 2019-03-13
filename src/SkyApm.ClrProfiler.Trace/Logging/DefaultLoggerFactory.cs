@@ -26,7 +26,7 @@ using ILoggerFactory = SkyApm.Logging.ILoggerFactory;
 
 namespace SkyApm.ClrProfiler.Trace.Logging
 {
-    public class DefaultLoggerFactory : ILoggerFactory
+    internal class DefaultLoggerFactory : ILoggerFactory
     {
         private const string outputTemplate =
             @"{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{ServiceName}] [{Level}] {SourceContext} : {Message}{NewLine}{Exception}";
@@ -43,7 +43,8 @@ namespace SkyApm.ClrProfiler.Trace.Logging
              .Enrich
              .FromLogContext()
              .WriteTo
-             .RollingFile(Path.Combine(traceEnvironment.GetProfilerHome(), "logs"), LogEventLevel.Error,
+             .RollingFile(Path.Combine(traceEnvironment.GetProfilerHome(), "logs/skyapm-{Date}.log"), 
+                          LogEventLevel.Error,
                           outputTemplate, null, 1073741824, 31,
                           null, false, false, TimeSpan.FromMilliseconds(500)).CreateLogger();
 

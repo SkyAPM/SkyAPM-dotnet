@@ -23,8 +23,6 @@ using System.IO;
 using System.Reflection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using SkyApm.ClrProfiler.Trace.Constants;
-using SkyApm.Tracing;
 
 namespace SkyApm.ClrProfiler.Trace
 {
@@ -36,13 +34,13 @@ namespace SkyApm.ClrProfiler.Trace
         private readonly ConcurrentDictionary<string, AssemblyInfoCache> _assemblies = 
             new ConcurrentDictionary<string, AssemblyInfoCache>();
 
-        private readonly ITracingContext _tracer;
+        private readonly IServiceProvider _serviceProvider;
         private readonly TraceEnvironment _traceEnvironment;
 
-        public MethodFinderService(ITracingContext tracer,
+        public MethodFinderService(IServiceProvider serviceProvider,
             TraceEnvironment traceEnvironment)
         {
-            _tracer = tracer;
+            _serviceProvider = serviceProvider;
             _traceEnvironment = traceEnvironment;
 
             InitAssemblyConfig();
@@ -52,13 +50,13 @@ namespace SkyApm.ClrProfiler.Trace
         {
             try
             {
-                var home = _traceEnvironment.GetProfilerHome();
-                if (string.IsNullOrEmpty(home))
+                var profilerHome = _traceEnvironment.GetProfilerHome();
+                if (string.IsNullOrEmpty(profilerHome))
                 {
                     throw new ArgumentException("CLR PROFILER HOME IsNullOrEmpty");
                 }
 
-                var path = Path.Combine(home, "trace.json");
+                var path = Path.Combine(profilerHome, "trace.json");
                 if (File.Exists(path))
                 {
                     var text = File.ReadAllText(path);
@@ -124,19 +122,27 @@ namespace SkyApm.ClrProfiler.Trace
                         {
                             if (assemblyInfoCache.Assembly == null)
                             {
-                                var home = _traceEnvironment.GetProfilerHome();
-                                var path = Path.Combine(home, $"{assemblyInfoCache.AssemblyName}.dll");
-                                if (File.Exists(path))
+                                var assembly = Assembly.Load(assemblyInfoCache.AssemblyName);
+                                if (assembly != null)
                                 {
-                                    var assembly = Assembly.LoadFile(path);
-#if NET
-                                    AppDomain.CurrentDomain.Load(assembly.GetName());
-#endif
                                     assemblyInfoCache.Assembly = assembly;
                                 }
                                 else
                                 {
-                                    throw new FileNotFoundException($"FileNotFound Path:{path}");
+                                    var home = _traceEnvironment.GetProfilerHome();
+                                    var path = Path.Combine(home, $"{assemblyInfoCache.AssemblyName}.dll");
+                                    if (File.Exists(path))
+                                    {
+                                        assembly = Assembly.LoadFile(path);
+#if NET
+                                        AppDomain.CurrentDomain.Load(assembly.GetName());
+#endif
+                                        assemblyInfoCache.Assembly = assembly;
+                                    }
+                                    else
+                                    {
+                                        throw new FileNotFoundException($"FileNotFound Path:{path}");
+                                    }
                                 }
                             }
                         }
@@ -164,16 +170,16 @@ namespace SkyApm.ClrProfiler.Trace
                 }
                 if (functionInfo.MethodWrapper == null)
                 {
-                    functionInfo.MethodWrapper = new NoopMethodWrapper();
+                    functionInfo.MethodWrapper = new NoopMethodWrapper(_serviceProvider);
                 }
             }
             catch (BadImageFormatException)
             {
-                functionInfo.MethodWrapper = new NoopMethodWrapper();
+                functionInfo.MethodWrapper = new NoopMethodWrapper(_serviceProvider);
             }
             catch (FileNotFoundException)
             {
-                functionInfo.MethodWrapper = new NoopMethodWrapper();
+                functionInfo.MethodWrapper = new NoopMethodWrapper(_serviceProvider);
             }
         }
 
@@ -208,7 +214,7 @@ namespace SkyApm.ClrProfiler.Trace
             var methodWrapperTypes = GetMethodWrapperTypes(assembly);
             foreach (var methodWrapperType in methodWrapperTypes)
             {
-                var wrapper = (IMethodWrapper) Activator.CreateInstance(methodWrapperType, _tracer);
+                var wrapper = (IMethodWrapper) Activator.CreateInstance(methodWrapperType, _serviceProvider);
                 methodWrappers.Add(wrapper);
             }
             return methodWrappers;
@@ -227,7 +233,7 @@ namespace SkyApm.ClrProfiler.Trace
                 var types = assembly.GetTypes();
                 foreach (var type in types)
                 {
-                    if (typeof(IMethodWrapper).IsAssignableFrom(type) && type.IsClass && !type.IsAbstract)
+                    if (typeof(AbsMethodWrapper).IsAssignableFrom(type) && type.IsClass && !type.IsAbstract)
                     {
                         wrapperTypes.Add(type);
                     }

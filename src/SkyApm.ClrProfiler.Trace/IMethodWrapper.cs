@@ -20,21 +20,44 @@ using System;
 
 namespace SkyApm.ClrProfiler.Trace
 {
-    public interface IMethodWrapper
+    internal interface IMethodWrapper
     {
         EndMethodDelegate BeforeWrappedMethod(TraceMethodInfo traceMethodInfo);
 
         bool CanWrap(TraceMethodInfo traceMethodInfo);
     }
 
-    public class NoopMethodWrapper : IMethodWrapper
+    public abstract class AbsMethodWrapper : IMethodWrapper
     {
-        public EndMethodDelegate BeforeWrappedMethod(TraceMethodInfo traceMethodInfo)
+        protected AbsMethodWrapper(IServiceProvider serviceProvider)
+        {
+
+        }
+
+        public virtual EndMethodDelegate BeforeWrappedMethod(TraceMethodInfo traceMethodInfo)
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual bool CanWrap(TraceMethodInfo traceMethodInfo)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class NoopMethodWrapper : AbsMethodWrapper
+    {
+        public NoopMethodWrapper(IServiceProvider serviceProvider) : base(serviceProvider)
+        {
+
+        }
+
+        public override EndMethodDelegate BeforeWrappedMethod(TraceMethodInfo traceMethodInfo)
         {
             return null;
         }
 
-        public bool CanWrap(TraceMethodInfo traceMethodInfo)
+        public override bool CanWrap(TraceMethodInfo traceMethodInfo)
         {
             return true;
         }

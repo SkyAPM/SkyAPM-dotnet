@@ -19,254 +19,71 @@
 #ifndef CLR_PROFILER_CLRHELPER_H_
 #define CLR_PROFILER_CLRHELPER_H_
 
-#include <functional>
 #include <vector>
-#include "string.h"  // NOLINT
 #include "util.h"
-#include "CComPtr.h"
+#include "ccom_ptr.h"
 #include <corprof.h>
 #include "logging.h"
+#include <cor.h>
+#include <corhlpr.h>
+#include "config_loader.h"
 
-namespace trace {
+#define RETURN_FAIL_IF_FALSE(EXPR)      \
+  do {                                  \
+    if ((EXPR) == false) return E_FAIL; \
+  } while (0)
+
+#define RETURN_IF_FAILED(EXPR) \
+  do {                         \
+    hr = (EXPR);               \
+    if (FAILED(hr)) {          \
+      return (hr);             \
+    }                          \
+  } while (0)
+
+#define RETURN_OK_IF_FAILED(EXPR) \
+  do {                            \
+    hr = (EXPR);                  \
+    if (FAILED(hr)) {             \
+      return S_OK;                \
+    }                             \
+  } while (0)
+
+namespace clrprofiler {
 
     const size_t NameMaxSize = 1024;
-    const ULONG EnumeratorMax = 256;
 
-    const auto ProfilerAssemblyName = "SkyApm.ClrProfiler.Trace"_W;
-    const auto TraceAgentTypeName = "SkyApm.ClrProfiler.Trace.TraceAgent"_W;
-    const auto GetInstanceMethodName = "GetInstance"_W;
-    const auto BeforeMethodName = "BeforeMethod"_W;
-    const auto EndMethodName = "EndMethod"_W;
-    const auto MethodTraceTypeName = "SkyApm.ClrProfiler.Trace.MethodTrace"_W;
+    const WSTRING ProfilerAssemblyName = W("SkyApm.ClrProfiler.Trace");
+    const WSTRING TraceAgentTypeName = W("SkyApm.ClrProfiler.Trace.TraceAgent");
+    const WSTRING GetInstanceMethodName = W("GetInstance");
+    const WSTRING BeforeMethodName = W("BeforeMethod");
+    const WSTRING EndMethodName = W("EndMethod");
+    const WSTRING MethodTraceTypeName = W("SkyApm.ClrProfiler.Trace.MethodTrace");
 
-    const auto AssemblyTypeName = "System.Reflection.Assembly"_W;
-    const auto AssemblyLoadMethodName = "LoadFrom"_W;
+    const WSTRING AssemblyTypeName = W("System.Reflection.Assembly");
+    const WSTRING AssemblyLoadMethodName = W("LoadFrom");
 
-    const auto SystemTypeName = "System.Type"_W;
-    const auto GetTypeFromHandleMethodName = "GetTypeFromHandle"_W;
-    const auto RuntimeTypeHandleTypeName = "System.RuntimeTypeHandle"_W;
+    const WSTRING SystemTypeName = W("System.Type");
+    const WSTRING GetTypeFromHandleMethodName = W("GetTypeFromHandle");
+    const WSTRING RuntimeTypeHandleTypeName = W("System.RuntimeTypeHandle");
 
-    const auto SystemBoolean = "System.Boolean"_W;
-    const auto SystemChar = "System.Char"_W;
-    const auto SystemByte = "System.Byte"_W;
-    const auto SystemSByte = "System.SByte"_W;
-    const auto SystemUInt16 = "System.UInt16"_W;
-    const auto SystemInt16 = "System.Int16"_W;
-    const auto SystemInt32 = "System.Int32"_W;
-    const auto SystemUInt32 = "System.UInt32"_W;
-    const auto SystemInt64 = "System.Int64"_W;
-    const auto SystemUInt64 = "System.UInt64"_W;
-    const auto SystemSingle = "System.Single"_W;
-    const auto SystemDouble = "System.Double"_W;
-    const auto SystemIntPtr = "System.IntPtr"_W;
-    const auto SystemUIntPtr = "System.UIntPtr"_W;
-    const auto SystemString = "System.String"_W;
-    const auto SystemObject = "System.Object"_W;
-    const auto SystemException = "System.Exception"_W;
-
-    template <typename T>
-    class EnumeratorIterator;
-
-    template <typename T>
-    class Enumerator {
-    private:
-        const std::function<HRESULT(HCORENUM*, T[], ULONG, ULONG*)> callback_;
-        const std::function<void(HCORENUM)> close_;
-        mutable HCORENUM ptr_;
-
-    public:
-        Enumerator(std::function<HRESULT(HCORENUM*, T[], ULONG, ULONG*)> callback,
-            std::function<void(HCORENUM)> close)
-            : callback_(callback), close_(close), ptr_(nullptr) {}
-
-        Enumerator(const Enumerator& other) = default;
-
-        Enumerator& operator=(const Enumerator& other) = default;
-
-        ~Enumerator() { close_(ptr_); }
-
-        EnumeratorIterator<T> begin() const {
-            return EnumeratorIterator<T>(this, S_OK);
-        }
-
-        EnumeratorIterator<T> end() const {
-            return EnumeratorIterator<T>(this, S_FALSE);
-        }
-
-        HRESULT Next(T arr[], ULONG max, ULONG* cnt) const {
-            return callback_(&ptr_, arr, max, cnt);
-        }
-    };
-
-    template <typename T>
-    class EnumeratorIterator {
-    private:
-        const Enumerator<T>* enumerator_;
-        HRESULT status_ = S_FALSE;
-        T arr_[EnumeratorMax]{};
-        ULONG idx_ = 0;
-        ULONG sz_ = 0;
-
-    public:
-        EnumeratorIterator(const Enumerator<T>* enumerator, HRESULT status)
-            : enumerator_(enumerator) {
-            if (status == S_OK) {
-                status_ = enumerator_->Next(arr_, EnumeratorMax, &sz_);
-                if (status_ == S_OK && sz_ == 0) {
-                    status_ = S_FALSE;
-                }
-            }
-            else {
-                status_ = status;
-            }
-        }
-
-        bool operator!=(EnumeratorIterator const& other) const {
-            return enumerator_ != other.enumerator_ ||
-                (status_ == S_OK) != (other.status_ == S_OK);
-        }
-
-        T const& operator*() const { return arr_[idx_]; }
-
-        EnumeratorIterator<T>& operator++() {
-            if (idx_ < sz_ - 1) {
-                idx_++;
-            }
-            else {
-                idx_ = 0;
-                status_ = enumerator_->Next(arr_, EnumeratorMax, &sz_);
-                if (status_ == S_OK && sz_ == 0) {
-                    status_ = S_FALSE;
-                }
-            }
-            return *this;
-        }
-    };
-
-    static Enumerator<mdTypeDef> EnumTypeDefs(
-        const CComPtr<IMetaDataImport2>& metadata_import) {
-        return Enumerator<mdTypeDef>(
-            [metadata_import](HCORENUM* ptr, mdTypeDef arr[], ULONG max,
-                ULONG* cnt) -> HRESULT {
-            return metadata_import->EnumTypeDefs(ptr, arr, max, cnt);
-        },
-            [metadata_import](HCORENUM ptr) -> void {
-            metadata_import->CloseEnum(ptr);
-        });
-    }
-
-    static Enumerator<mdTypeRef> EnumTypeRefs(
-        const CComPtr<IMetaDataImport2>& metadata_import) {
-        return Enumerator<mdTypeRef>(
-            [metadata_import](HCORENUM* ptr, mdTypeRef arr[], ULONG max,
-                ULONG* cnt) -> HRESULT {
-            return metadata_import->EnumTypeRefs(ptr, arr, max, cnt);
-        },
-            [metadata_import](HCORENUM ptr) -> void {
-            metadata_import->CloseEnum(ptr);
-        });
-    }
-
-    static Enumerator<mdMethodDef> EnumMethods(
-        const CComPtr<IMetaDataImport2>& metadata_import,
-        const mdToken& parent_token) {
-        return Enumerator<mdMethodDef>(
-            [metadata_import, parent_token](HCORENUM* ptr, mdMethodDef arr[],
-                ULONG max, ULONG* cnt) -> HRESULT {
-            return metadata_import->EnumMethods(ptr, parent_token, arr, max, cnt);
-        },
-            [metadata_import](HCORENUM ptr) -> void {
-            metadata_import->CloseEnum(ptr);
-        });
-    }
-
-    static Enumerator<mdMemberRef> EnumMemberRefs(
-        const CComPtr<IMetaDataImport2>& metadata_import,
-        const mdToken& parent_token) {
-        return Enumerator<mdMemberRef>(
-            [metadata_import, parent_token](HCORENUM* ptr, mdMemberRef arr[],
-                ULONG max, ULONG* cnt) -> HRESULT {
-            return metadata_import->EnumMemberRefs(ptr, parent_token, arr, max,
-                cnt);
-        },
-            [metadata_import](HCORENUM ptr) -> void {
-            metadata_import->CloseEnum(ptr);
-        });
-    }
-
-    static Enumerator<mdModuleRef> EnumModuleRefs(
-        const CComPtr<IMetaDataImport2>& metadata_import) {
-        return Enumerator<mdModuleRef>(
-            [metadata_import](HCORENUM* ptr, mdModuleRef arr[], ULONG max,
-                ULONG* cnt) -> HRESULT {
-            return metadata_import->EnumModuleRefs(ptr, arr, max, cnt);
-        },
-            [metadata_import](HCORENUM ptr) -> void {
-            metadata_import->CloseEnum(ptr);
-        });
-    }
-
-    static Enumerator<mdAssemblyRef> EnumAssemblyRefs(
-        const CComPtr<IMetaDataAssemblyImport>& assembly_import) {
-        return Enumerator<mdAssemblyRef>(
-            [assembly_import](HCORENUM* ptr, mdAssemblyRef arr[], ULONG max,
-                ULONG* cnt) -> HRESULT {
-            return assembly_import->EnumAssemblyRefs(ptr, arr, max, cnt);
-        },
-            [assembly_import](HCORENUM ptr) -> void {
-            assembly_import->CloseEnum(ptr);
-        });
-    }
-
-    static Enumerator<mdParamDef> EnumParams(
-        const CComPtr<IMetaDataImport2>& metadata_import, const mdMethodDef& mb) {
-        return Enumerator<mdParamDef>(
-            [metadata_import, mb](HCORENUM* ptr, mdParamDef arr[], ULONG max,
-                ULONG* cnt) -> HRESULT {
-            return metadata_import->EnumParams(ptr,mb, arr, max, cnt);
-        },
-            [metadata_import](HCORENUM ptr) -> void {
-            metadata_import->CloseEnum(ptr);
-        });
-    }
-
-    static Enumerator<mdGenericParam> EnumGenericParams(
-        const CComPtr<IMetaDataImport2>& metadata_import, const mdMethodDef& mb) {
-        return Enumerator<mdGenericParam>(
-            [metadata_import, mb](HCORENUM* ptr, mdGenericParam arr[], ULONG max,
-                ULONG* cnt) -> HRESULT {
-            return metadata_import->EnumGenericParams(ptr, mb, arr, max, cnt);
-        },
-            [metadata_import](HCORENUM ptr) -> void {
-            metadata_import->CloseEnum(ptr);
-        });
-    }
-
-    static Enumerator<mdGenericParamConstraint> EnumGenericParamConstraints(
-        const CComPtr<IMetaDataImport2>& metadata_import, const mdGenericParam& mb) {
-        return Enumerator<mdGenericParamConstraint>(
-            [metadata_import, mb](HCORENUM* ptr, mdGenericParamConstraint arr[], ULONG max,
-                ULONG* cnt) -> HRESULT {
-            return metadata_import->EnumGenericParamConstraints(ptr, mb, arr, max, cnt);
-        },
-            [metadata_import](HCORENUM ptr) -> void {
-            metadata_import->CloseEnum(ptr);
-        });
-    }
-
-    static Enumerator<mdToken> EnumMembersWithName(
-        const CComPtr<IMetaDataImport2>& metadata_import,
-        const mdToken& parent_token,
-        LPCWSTR szName) {
-        return Enumerator<mdToken>(
-            [metadata_import, parent_token, szName](HCORENUM* ptr, mdMethodDef arr[],
-                ULONG max, ULONG* cnt) -> HRESULT {
-            return metadata_import->EnumMembersWithName(ptr, parent_token, szName, arr, max, cnt);
-        },
-            [metadata_import](HCORENUM ptr) -> void {
-            metadata_import->CloseEnum(ptr);
-        });
-    }
+    const WSTRING SystemBoolean = W("System.Boolean");
+    const WSTRING SystemChar = W("System.Char");
+    const WSTRING SystemByte = W("System.Byte");
+    const WSTRING SystemSByte = W("System.SByte");
+    const WSTRING SystemUInt16 = W("System.UInt16");
+    const WSTRING SystemInt16 = W("System.Int16");
+    const WSTRING SystemInt32 = W("System.Int32");
+    const WSTRING SystemUInt32 = W("System.UInt32");
+    const WSTRING SystemInt64 = W("System.Int64");
+    const WSTRING SystemUInt64 = W("System.UInt64");
+    const WSTRING SystemSingle = W("System.Single");
+    const WSTRING SystemDouble = W("System.Double");
+    const WSTRING SystemIntPtr = W("System.IntPtr");
+    const WSTRING SystemUIntPtr = W("System.UIntPtr");
+    const WSTRING SystemString = W("System.String");
+    const WSTRING SystemObject = W("System.Object");
+    const WSTRING SystemException = W("System.Exception");
 
     struct AssemblyProperty {
         const void  *ppbPublicKey;
@@ -276,7 +93,7 @@ namespace trace {
         WSTRING     szName;
         DWORD assemblyFlags = 0;
 
-        AssemblyProperty() : ppbPublicKey(nullptr), pcbPublicKey(0), pulHashAlgId(0), szName(""_W)
+        AssemblyProperty() : ppbPublicKey(nullptr), pcbPublicKey(0), pulHashAlgId(0), szName(W(""))
         {
         }
     };
@@ -285,10 +102,10 @@ namespace trace {
         const AssemblyID id;
         const WSTRING name;
 
-        AssemblyInfo() : id(0), name(""_W) {}
+        AssemblyInfo() : id(0), name(W("")) {}
         AssemblyInfo(AssemblyID id, WSTRING name) : id(id), name(name) {}
-
-        bool is_valid() const { return id != 0; }
+		
+        bool IsValid() const { return id != 0; }
     };
 
     class ModuleMetaInfo {
@@ -296,9 +113,11 @@ namespace trace {
     public:
         const mdToken entryPointToken;
         const WSTRING assemblyName;
-        ModuleMetaInfo(mdToken entry_point_token, WSTRING assembly_name)
+		const TraceAssembly trace_assembly;
+        ModuleMetaInfo(mdToken entry_point_token, WSTRING assembly_name, TraceAssembly trace_assembly)
             : entryPointToken(entry_point_token),
-              assemblyName(assembly_name){}
+              assemblyName(assembly_name),
+			  trace_assembly(trace_assembly){}
 
         mdToken getTypeFromHandleToken = 0;
     };
@@ -310,14 +129,14 @@ namespace trace {
         const DWORD flags;
         const LPCBYTE baseLoadAddress;
 
-        ModuleInfo() : id(0), path(""_W), assembly({}), flags(0), baseLoadAddress(nullptr){}
+        ModuleInfo() : id(0), path(W("")), assembly({}), flags(0), baseLoadAddress(nullptr){}
         ModuleInfo(ModuleID id, WSTRING path, AssemblyInfo assembly, DWORD flags, LPCBYTE baseLoadAddress)
             : id(id), path(path), assembly(assembly), flags(flags), baseLoadAddress(baseLoadAddress) {}
 
         bool IsValid() const { return id != 0; }
 
-        bool IsWindowsRuntime() const {
-            return ((flags & COR_PRF_MODULE_WINDOWS_RUNTIME) != 0);
+        bool CanILRewrite() const {
+            return !((flags & COR_PRF_MODULE_WINDOWS_RUNTIME) != 0);
         }
 
         mdToken GetEntryPointToken() const {
@@ -384,7 +203,7 @@ namespace trace {
         const mdToken id;
         const WSTRING name;
 
-        TypeInfo() : id(0), name(""_W) {}
+        TypeInfo() : id(0), name(W("")) {}
         TypeInfo(mdToken id, WSTRING name) : id(id), name(name) {}
 
         bool IsValid() const { return id != 0; }
@@ -422,7 +241,7 @@ namespace trace {
         };
         ULONG NumberOfTypeArguments() const { return numberOfTypeArguments; }
         ULONG NumberOfArguments() const { return numberOfArguments; }
-        WSTRING str() const { return HexStr(pbBase, len); }
+        WSTRING ToWString() const { return HexStr(pbBase, len); }
         MethodArgument GetRet() const { return  ret; }
         std::vector<MethodArgument> GetMethodArguments() const { return params; }
         HRESULT TryParse();
@@ -443,34 +262,23 @@ namespace trace {
         const TypeInfo type;
         MethodSignature signature;
 
-        FunctionInfo() : id(0), name(""_W), type({}), signature({}) {}
+        FunctionInfo() : id(0), name(W("")), type({}), signature({}) {}
         FunctionInfo(mdToken id, WSTRING name, TypeInfo type, MethodSignature signature) : id(id), name(name), type(type), signature(signature) {}
 
         bool IsValid() const { return id != 0; }
     };
 
-    WSTRING GetAssemblyName(const CComPtr<IMetaDataAssemblyImport>& assembly_import);
+    ModuleInfo GetModuleInfo(ICorProfilerInfo4* info,
+		const ModuleID& module_id);
 
-    WSTRING GetAssemblyName(const CComPtr<IMetaDataAssemblyImport>& assembly_import,
-        const mdAssemblyRef& assembly_ref);
+	TypeInfo GetTypeInfo(const CComPtr<IMetaDataImport2>& metadata_import,
+		const mdToken& token);
 
-    mdAssemblyRef FindAssemblyRef(
-        const CComPtr<IMetaDataAssemblyImport>& assembly_import,
-        const WSTRING& assembly_name);
+	FunctionInfo GetFunctionInfo(const CComPtr<IMetaDataImport2>& metadata_import,
+		const mdToken& token);
 
-    AssemblyInfo GetAssemblyInfo(ICorProfilerInfo3* info,
-        const AssemblyID& assembly_id);
-
-    ModuleInfo GetModuleInfo(ICorProfilerInfo3* info, const ModuleID& module_id);
-
-    TypeInfo GetTypeInfo(const CComPtr<IMetaDataImport2>& metadata_import,
-        const mdToken& token);
-
-    mdAssemblyRef GetCorLibAssemblyRef(CComPtr<IUnknown>& metadata_interfaces,
-        AssemblyProperty assemblyProperty);
-
-    FunctionInfo GetFunctionInfo(const CComPtr<IMetaDataImport2>& metadata_import,
-        const mdToken& token);
+    mdAssemblyRef GetCorLibAssemblyRef(CComPtr<IUnknown>& metadata_interfaces, 
+		AssemblyProperty assembly_property);
 
     mdAssemblyRef GetProfilerAssemblyRef(CComPtr<IUnknown>& metadata_interfaces,
         ASSEMBLYMETADATA assembly_metadata, 

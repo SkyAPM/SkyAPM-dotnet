@@ -22,15 +22,13 @@ include_directories("SkyApm.ClrProfiler"
 )
 
 add_library("SkyApm.ClrProfiler" SHARED
-    miniutf.cpp
-    string.cpp 
     util.cpp
     config_loader.cpp
     il_rewriter.cpp
-    il_rewriter_wrapper.cpp 
+    il_rewriter_helper.cpp 
     clr_helpers.cpp
-    CorProfiler.cpp 
-    ClassFactory.cpp
+    profiler.cpp 
+    class_factory.cpp
     dllmain.cpp
 )
 

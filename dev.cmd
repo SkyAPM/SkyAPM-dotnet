@@ -12,6 +12,9 @@ SET COR_ENABLE_PROFILING=1
 SET COR_PROFILER_PATH=%WorkDir%src\SkyApm.ClrProfiler\x64\Debug\SkyApm.ClrProfiler.dll
 SET COR_PROFILER_HOME=%WorkDir%src\SkyApm.ClrProfiler.Trace\bin\Debug\net461
 
+SET SKYAPM__CONFIG__PATH=%WorkDir%skyapm.json
+SET SkyWalking:Transport:gRPC:Servers=127.0.0.1:11800
+
 echo Starting Visual Studio...
 set _VSWHERE="%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe"
 if exist %_VSWHERE% (

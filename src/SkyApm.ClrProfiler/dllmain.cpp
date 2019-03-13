@@ -16,7 +16,7 @@
  *
  */
 
-#include "ClassFactory.h"
+#include "class_factory.h"
 #include "util.h"
 
 const IID IID_IUnknown      = { 0x00000000, 0x0000, 0x0000, { 0xC0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x46 } };
@@ -47,7 +47,7 @@ extern "C" HRESULT STDMETHODCALLTYPE DllGetClassObject(REFCLSID rclsid, REFIID r
         return E_FAIL;
     }
 
-    trace::SetClrProfilerFlag(rclsid == CLSID_CorProfiler);
+	clrprofiler::SetClrProfilerFlag(rclsid == CLSID_CorProfiler);
 
     return factory->QueryInterface(riid, ppv);
 }

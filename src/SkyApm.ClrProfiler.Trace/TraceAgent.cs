@@ -22,10 +22,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using SkyApm.ClrProfiler.Trace.DependencyInjection;
-using SkyApm.ClrProfiler.Trace.Logging;
-using SkyApm.Logging;
-using SkyApm.Transport;
-using SkyWalking.Extensions;
+using SkyApm.ClrProfiler.Trace.Extensions;
 
 namespace SkyApm.ClrProfiler.Trace
 {
@@ -41,6 +38,12 @@ namespace SkyApm.ClrProfiler.Trace
         {
             try
             {
+                var profilerHome = TraceEnvironment.Instance.GetProfilerHome();
+                if (string.IsNullOrEmpty(profilerHome))
+                {
+                    throw new ArgumentException("CLR PROFILER HOME IsNullOrEmpty");
+                }
+
                 AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
 
                 ServiceLocator.Instance.RegisterServices(RegisterServices);
@@ -74,8 +77,15 @@ namespace SkyApm.ClrProfiler.Trace
 
         private void CurrentDomain_ProcessExit(object sender, EventArgs e)
         {
-            var instrumentStartup = ServiceLocator.Instance.GetService<IInstrumentStartup>();
-            instrumentStartup?.StopAsync().GetAwaiter().GetResult();
+            try
+            {
+                var instrumentStartup = ServiceLocator.Instance.GetService<IInstrumentStartup>();
+                instrumentStartup?.StopAsync().GetAwaiter().GetResult();
+            }
+            catch
+            {
+                // ignored
+            }
         }
 
         private void RegisterServices(IServiceCollection services)
@@ -84,39 +94,6 @@ namespace SkyApm.ClrProfiler.Trace
             services.AddSingleton<MethodFinderService>();
 
             services.AddSkyAPMCore();
-
-            AddSkyAPMTransport(services);
-
-            services.AddSingleton<ILoggerFactory, DefaultLoggerFactory>();
-        }
-        
-        /// <summary>
-        /// Grpc native dll can't custom load path
-        /// when load from GAC will raise error 
-        /// so use reflect load SkyApm.Transport.Grpc.dll(packed) from profilerHome
-        /// </summary>
-        /// <param name="services"></param>
-        private void AddSkyAPMTransport(IServiceCollection services)
-        {
-            var profilerHome = TraceEnvironment.Instance.GetProfilerHome();
-            if (string.IsNullOrEmpty(profilerHome))
-            {
-                throw new ArgumentNullException(nameof(profilerHome));
-            }
-
-            var filepath = Path.Combine(profilerHome, "SkyApm.Transport.Grpc.dll");
-            if (!File.Exists(filepath))
-            {
-                throw new FileNotFoundException($"{filepath} not found");
-            }
-
-            var assembly = Assembly.LoadFrom(filepath);
-            services.AddSingleton(typeof(ISkyApmClientV5), assembly.GetType("SkyApm.Transport.Grpc.V5.SkyApmClientV5"));
-            services.AddSingleton(typeof(ISegmentReporter), assembly.GetType("SkyApm.Transport.Grpc.SegmentReporter"));
-            services.AddSingleton(typeof(IPingCaller), assembly.GetType("SkyApm.Transport.Grpc.V6.PingCaller"));
-            services.AddSingleton(typeof(IServiceRegister), assembly.GetType("SkyApm.Transport.Grpc.V6.ServiceRegister"));
-            services.AddSingleton(typeof(IExecutionService), assembly.GetType("SkyApm.Transport.Grpc.V6.ConnectService"));
-            services.AddSingleton(assembly.GetType("SkyApm.Transport.Grpc.ConnectionManager"));
         }
 
         public static object GetInstance()

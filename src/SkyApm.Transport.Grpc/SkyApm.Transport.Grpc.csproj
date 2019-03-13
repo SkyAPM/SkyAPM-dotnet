@@ -12,7 +12,19 @@
         <TargetFrameworks>netstandard2.0;net461</TargetFrameworks>
         <RootNamespace>SkyApm.Transport.Grpc</RootNamespace>
     </PropertyGroup>
-    
+
+    <PropertyGroup Condition="'$(OS)' != 'Windows_NT'">
+      <TargetFrameworks>netstandard2.0</TargetFrameworks>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(TargetFramework)' == 'net461'">
+      <DefineConstants>$(DefineConstants);NET</DefineConstants>
+    </PropertyGroup>
+
+    <PropertyGroup>
+      <OutputPath>../SkyApm.ClrProfiler.Trace/bin/$(Configuration)</OutputPath>
+    </PropertyGroup>
+  
     <ItemGroup>
       <ProjectReference Include="..\SkyApm.Abstractions\SkyApm.Abstractions.csproj" />
       <ProjectReference Include="..\SkyApm.Transport.Grpc.Protocol\SkyApm.Transport.Grpc.Protocol.csproj" />

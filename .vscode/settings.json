@@ -1,0 +1,12 @@
+{
+	"clang.cxxflags": [
+		"-Wno-invalid-noreturn -fPIC -fms-extensions -DBIT64 -DPAL_STDCPP_COMPAT -DPLATFORM_UNIX -std=c++11",
+		"-I ~/coreclr/src/pal/inc/rt -I ~/coreclr/src/pal/prebuilt/inc -I ~/coreclr/src/pal/inc -I ~/coreclr/src/inc -I ~/coreclr/bin/Product/Linux.x64.Debug/inc",
+    "-I ~/vcpkg/installed/x64-linux/include"
+  ],
+	"clang.executable": "/usr/bin/clang-3.9",
+	"files.associations": {
+		"typeinfo": "cpp"
+	},
+	"C_Cpp.errorSquiggles": "Disabled"
+}

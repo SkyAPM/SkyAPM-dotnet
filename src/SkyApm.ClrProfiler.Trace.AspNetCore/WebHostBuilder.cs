@@ -23,7 +23,7 @@ using SkyApm.Tracing;
 
 namespace SkyApm.ClrProfiler.Trace.AspNetCore
 {
-    public class WebHostBuilder : IMethodWrapper
+    public class WebHostBuilder : AbsMethodWrapper
     {
         private const string TypeName = "Microsoft.AspNetCore.Hosting.WebHostBuilder";
         private const string AssemblyName = "Microsoft.AspNetCore.Hosting";
@@ -31,12 +31,12 @@ namespace SkyApm.ClrProfiler.Trace.AspNetCore
 
         private readonly ITracingContext _tracer;
 
-        public WebHostBuilder(ITracingContext tracer)
+        public WebHostBuilder(IServiceProvider serviceProvider) : base(serviceProvider)
         {
-            _tracer = tracer;
+            _tracer = (ITracingContext)serviceProvider.GetService(typeof(ITracingContext));
         }
 
-        public EndMethodDelegate BeforeWrappedMethod(TraceMethodInfo traceMethodInfo)
+        public override EndMethodDelegate BeforeWrappedMethod(TraceMethodInfo traceMethodInfo)
         {
             return delegate (object returnValue, Exception ex)
             {
@@ -50,7 +50,7 @@ namespace SkyApm.ClrProfiler.Trace.AspNetCore
             serviceCollection.AddSingleton<IStartupFilter>(n => new ProfilerStartupFilter(_tracer));
         }
 
-        public bool CanWrap(TraceMethodInfo traceMethodInfo)
+        public override bool CanWrap(TraceMethodInfo traceMethodInfo)
         {
             var invocationTargetType = traceMethodInfo.Type;
             var assemblyName = invocationTargetType.Assembly.GetName().Name;

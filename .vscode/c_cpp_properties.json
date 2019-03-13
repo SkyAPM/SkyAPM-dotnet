@@ -1,0 +1,21 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "~/coreclr/src/pal/inc/rt",
+                "~/coreclr/src/pal/prebuilt/inc",
+                "~/coreclr/src/pal/inc",
+                "~/coreclr/src/inc",
+                "~/coreclr/bin/Product/Linux.x64.Debug/inc",
+                "~/vcpkg/installed/x64-linux/include"
+            ],
+            "defines": [],
+            "compilerPath": "/usr/bin/clang++-3.9",
+            "cStandard": "c11",
+            "cppStandard": "c++11",
+            "intelliSenseMode": "clang-x64"
+        }
+    ],
+    "version": 4
+}
