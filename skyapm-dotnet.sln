@@ -80,7 +80,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SkyApm.Diagnostics.EntityFr
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SkyApm.DotNet.CLI", "src\SkyApm.DotNet.CLI\SkyApm.DotNet.CLI.csproj", "{E909EEF5-5EBF-43F3-AB4A-6B2FB56EF89B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SkyApm.Diagnostics.SmartSql", "src\SkyApm.Diagnostics.SmartSql\SkyApm.Diagnostics.SmartSql.csproj", "{B43160C8-C9E3-43F6-83E9-A9A45B32F022}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SkyApm.Diagnostics.SmartSql", "src\SkyApm.Diagnostics.SmartSql\SkyApm.Diagnostics.SmartSql.csproj", "{B43160C8-C9E3-43F6-83E9-A9A45B32F022}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

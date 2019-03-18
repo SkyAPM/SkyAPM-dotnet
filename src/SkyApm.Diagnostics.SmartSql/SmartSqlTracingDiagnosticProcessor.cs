@@ -196,8 +196,8 @@ namespace SkyApm.Diagnostics.SmartSql
             if (context != null)
             {
                 context.Span.AddTag("from_cache", eventData.ExecutionContext.Result.FromCache);
-                context.Span.Peer = new Common.StringOrIntValue(eventData.ExecutionContext.DbSession.Connection?.DataSource);
-                context.Span.AddTag(Common.Tags.DB_INSTANCE, eventData.ExecutionContext.DbSession.Connection?.Database);
+                context.Span.Peer = new Common.StringOrIntValue(eventData.DbSession.Connection?.DataSource);
+                context.Span.AddTag(Common.Tags.DB_INSTANCE, eventData.DbSession.Connection?.Database);
                 context.Span.AddTag(Common.Tags.DB_STATEMENT, eventData.ExecutionContext.Request.RealSql);
                 _tracingContext.Release(context);
             }

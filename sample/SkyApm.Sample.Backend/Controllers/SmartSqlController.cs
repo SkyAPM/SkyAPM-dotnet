@@ -19,11 +19,19 @@ namespace SkyApm.Sample.Backend.Controllers
             _sqlMapper = sqlMapper;
         }
         [HttpGet]
-        public IEnumerable<dynamic> QueryError()
+        public Guid QueryError()
         {
-            return _sqlMapper.Query<dynamic>(new RequestContext
+            return _sqlMapper.QuerySingle<Guid>(new RequestContext
             {
                 RealSql = "Error Sql"
+            });
+        }
+        [HttpGet]
+        public async Task<IEnumerable<dynamic>> QueryAsync()
+        {
+            return await _sqlMapper.QueryAsync<dynamic>(new RequestContext
+            {
+                RealSql = "SELECT Top (1000) T.* From T_AllPrimitive T With(NoLock)"
             });
         }
         [HttpGet]
@@ -31,7 +39,7 @@ namespace SkyApm.Sample.Backend.Controllers
         {
             return _sqlMapper.Query<dynamic>(new RequestContext
             {
-                RealSql = "Select Top 8 * From T_AllPrimitive"
+                RealSql = "SELECT Top (1000) T.* From T_AllPrimitive T With(NoLock)"
             });
         }
         [HttpGet]
@@ -43,7 +51,7 @@ namespace SkyApm.Sample.Backend.Controllers
 
                 var list = _sqlMapper.Query<dynamic>(new RequestContext
                 {
-                    RealSql = "Select Top 8 * From T_AllPrimitive"
+                    RealSql = "SELECT Top (1000) T.* From T_AllPrimitive T With(NoLock)"
                 });
                 _sqlMapper.CommitTransaction();
                 return list;

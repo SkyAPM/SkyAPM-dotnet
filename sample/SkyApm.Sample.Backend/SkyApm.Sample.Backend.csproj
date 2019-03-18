@@ -6,6 +6,7 @@
     <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="2.0.3" />
   </ItemGroup>
   <ItemGroup>
+
     <ProjectReference Include="..\..\src\SkyApm.Agent.AspNetCore\SkyApm.Agent.AspNetCore.csproj" />
     <ProjectReference Include="..\..\src\SkyApm.Diagnostics.EntityFrameworkCore.Sqlite\SkyApm.Diagnostics.EntityFrameworkCore.Sqlite.csproj" />
   </ItemGroup>
@@ -16,6 +17,7 @@
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.0" />
     <PackageReference Include="SmartSql.DIExtension" Version="4.0.0-rc1" />
+
   </ItemGroup>
   <ItemGroup>
     <Content Update="appsettings.json">
@@ -33,5 +35,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="logs" />
+    <Folder Include="logs\" />
   </ItemGroup>
 </Project>
