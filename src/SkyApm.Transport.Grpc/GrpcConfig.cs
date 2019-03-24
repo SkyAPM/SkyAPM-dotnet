@@ -26,11 +26,11 @@ namespace SkyApm.Transport.Grpc
     {
         public string Servers { get; set; }
 
-        public int ConnectTimeout { get; set; }
+        public int ConnectTimeout { get; set; } = 10000;
 
-        public int Timeout { get; set; }
+        public int Timeout { get; set; } = 10000;
 
-        public int ReportTimeout { get; set; }
+        public int ReportTimeout { get; set; } = 600000;
     }
 
     public static class GrpcConfigExtensions

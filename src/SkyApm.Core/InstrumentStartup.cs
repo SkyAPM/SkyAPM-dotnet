@@ -22,20 +22,17 @@ using System.Diagnostics;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using SkyApm.Diagnostics;
 using SkyApm.Logging;
 
 namespace SkyApm
 {
     public class InstrumentStartup : IInstrumentStartup
     {
-        private readonly TracingDiagnosticProcessorObserver _observer;
         private readonly IEnumerable<IExecutionService> _services;
         private readonly ILogger _logger;
 
-        public InstrumentStartup(TracingDiagnosticProcessorObserver observer, IEnumerable<IExecutionService> services, ILoggerFactory loggerFactory)
+        public InstrumentStartup(IEnumerable<IExecutionService> services, ILoggerFactory loggerFactory)
         {
-            _observer = observer;
             _services = services;
             _logger = loggerFactory.CreateLogger(typeof(InstrumentStartup));
         }
@@ -45,7 +42,7 @@ namespace SkyApm
             _logger.Information("Initializing ...");
             foreach (var service in _services)
                 await service.StartAsync(cancellationToken);
-            DiagnosticListener.AllListeners.Subscribe(_observer);
+
             _logger.Information("Started SkyAPM .NET Core Agent.");
         }
 

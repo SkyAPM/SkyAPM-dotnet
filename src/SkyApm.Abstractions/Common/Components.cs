@@ -37,5 +37,11 @@ namespace SkyApm.Common
         public static readonly StringOrIntValue NPGSQL_ENTITYFRAMEWORKCORE_POSTGRESQL = new StringOrIntValue("Npgsql.EntityFrameworkCore.PostgreSQL");
         
         public static readonly StringOrIntValue ASPNET = new StringOrIntValue("AspNet");
+
+        public static readonly StringOrIntValue STACKEXCHANGEREDIS = new StringOrIntValue("StackExchange.Redis");
+
+        public static readonly StringOrIntValue MYSQL = new StringOrIntValue("Mysql");
+
+        public static readonly StringOrIntValue MYSQLCONNECTOR = new StringOrIntValue("MySqlConnector");
     }
 }

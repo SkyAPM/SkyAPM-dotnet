@@ -199,3 +199,24 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
+
+=======================================================================
+skyapm-dotnet LICENSE 3rdparty:
+
+The skyapm-dotnet project contains LICENSE 3rdparty with separate copyright
+notices and license terms. Your use of the source code for the these
+LICENSE is subject to the terms and conditions of the following
+licenses.
+
+========================================================================
+MIT licenses
+========================================================================
+
+The following components are provided under the MIT License. See project link for details.
+The text of each license is also included at licenses/LICENSE-[project].txt.
+     
+	 MicrosoftArchive/clrprofiler: https://github.com/MicrosoftArchive/clrprofiler MIT
+	 dotnet/coreclr: https://github.com/dotnet/coreclr MIT
+	 Microsoft/clr-samples: https://github.com/Microsoft/clr-samples MIT
+	 nlohmann/json: https://github.com/nlohmann/json  MIT
+	 gabime/spdlog: https://github.com/gabime/spdlog MIT
