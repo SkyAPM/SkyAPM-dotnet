@@ -1,0 +1,54 @@
+trigger:
+- coreclr_profiler
+
+pool:
+  vmImage: 'vs2017-win2016'
+
+steps:
+- script: |
+    git checkout coreclr_profiler
+    git submodule update --init -- "src/SkyApm.Transport.Grpc.Protocol/protocol" 
+    cd src/SkyApm.Transport.Grpc.Protocol
+    dotnet msbuild -restore:True
+  displayName: 'git checkout and submodule update'
+
+- script: |
+    %VCPKG_ROOT%/vcpkg.exe install fmt:x64-windows-static
+    %VCPKG_ROOT%/vcpkg.exe install spdlog:x64-windows-static
+  displayName: 'vcpkg install spdlog'
+
+- script: |
+    "C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\VC\Auxiliary\Build\vcvars64.bat" 
+    cd src\SkyAPM.ClrProfiler
+    SET BuildArch=x64
+    SET BuildType=Debug
+    build
+  displayName: 'build Debug SkyAPM.ClrProfiler dll'
+
+- script: |
+    "C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\VC\Auxiliary\Build\vcvars64.bat" 
+    cd src\SkyAPM.ClrProfiler
+    SET BuildArch=x64
+    SET BuildType=Release
+    build
+  displayName: 'build Release SkyAPM.ClrProfiler dll'
+
+- script: |
+    cd tools
+    Dll.Repack.cmd Debug
+  displayName: 'Dll.Repack.cmd Debug'
+
+- script: |
+    cd tools
+    Dll.Repack.cmd Release
+  displayName: 'Dll.Repack.cmd Release'
+
+- script: |
+    cd test\SkyApm.ClrProfiler.Trace.Test
+    dotnet test
+  displayName: 'dotnet test SkyApm.ClrProfiler.Trace.Test'
+
+- script: |
+    cd deploy\SkyApm.DotNet.Installer
+    powershell .\build.ps1
+  displayName: 'build SkyApm.DotNet.Installer'

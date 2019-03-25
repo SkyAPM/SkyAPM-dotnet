@@ -1,7 +1,6 @@
 cmake_minimum_required (VERSION 3.5)
 
-SET (CMAKE_TOOLCHAIN_FILE         "~/vcpkg/scripts/buildsystems/vcpkg.cmake")
-
+SET (CMAKE_TOOLCHAIN_FILE         "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake")
 SET (CMAKE_C_COMPILER             "/usr/bin/clang-3.9")
 SET (CMAKE_CXX_COMPILER           "/usr/bin/clang++-3.9")
 
@@ -14,11 +13,11 @@ add_compile_options(-Wno-invalid-noreturn -Wno-macro-redefined)
 find_package(spdlog CONFIG REQUIRED)
 
 include_directories("SkyApm.ClrProfiler"
-    ~/coreclr/src/pal/inc/rt
-    ~/coreclr/src/pal/prebuilt/inc
-    ~/coreclr/src/pal/inc
-    ~/coreclr/src/inc
-    ~/coreclr/src/bin/Product/Linux.x64.Debug/inc
+    ../../coreclr/src/pal/inc/rt
+    ../../coreclr/src/pal/prebuilt/inc
+    ../../coreclr/src/pal/inc
+    ../../coreclr/src/inc
+    ../../coreclr/built/inc
 )
 
 add_library("SkyApm.ClrProfiler" SHARED

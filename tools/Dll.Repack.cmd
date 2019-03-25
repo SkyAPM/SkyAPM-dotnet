@@ -59,7 +59,7 @@ if exist %_VSWHERE% (
 
 cd ../
 
-"%_VSPATH%\MSBuild\15.0\Bin\MSBuild.exe" /p:Configuration="%BuildType%"
+"%_VSPATH%\MSBuild\15.0\Bin\MSBuild.exe" /p:Configuration="%BuildType%" /restore:True
 
 cd src
 

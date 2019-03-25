@@ -23,6 +23,7 @@
     <Compile Include="Product.wxs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="build.ps1" />
     <Content Include="Config.wxi" />
     <Content Include="ReadMe.txt" />
   </ItemGroup>

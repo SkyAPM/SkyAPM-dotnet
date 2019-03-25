@@ -338,31 +338,37 @@ namespace clrprofiler {
         return S_OK;
     }
 
-    bool MethodParamsNameIsMatch(const WSTRING &paramsName, FunctionInfo &functionInfo, CComPtr<IMetaDataImport2> & pImport)
+    bool MethodParamsNameIsMatch(CComPtr<IMetaDataImport2> pImport, FunctionInfo functionInfo, TraceMethod method)
     {
-        auto paramIsMatch = true;
-        if (!paramsName.empty())
-        {
-            auto paramNames = Split(paramsName, static_cast<WCHAR>(','));
-            auto arguments = functionInfo.signature.GetMethodArguments();
-            if (!arguments.empty())
-            {
-                for (unsigned i = 0; i < arguments.size(); i++)
-                {
-                    auto typeTokName = arguments[i].GetTypeTokName(pImport);
-                    if (typeTokName != paramNames[i])
-                    {
-                        paramIsMatch = false;
-                        break;
-                    }
-                }
-            }
-            else
-            {
-                paramIsMatch = false;
-            }
-        }
-        return paramIsMatch;
+		auto trace_function = false;
+		auto paramIsMatch = true;
+		if (!method.paramsName.empty())
+		{
+			auto paramNames = Split(method.paramsName, static_cast<WCHAR>(','));
+			auto arguments = functionInfo.signature.GetMethodArguments();
+			if (!arguments.empty())
+			{
+				for (unsigned i = 0; i < arguments.size(); i++)
+				{
+					auto typeTokName = arguments[i].GetTypeTokName(pImport);
+					if (typeTokName != paramNames[i])
+					{
+						paramIsMatch = false;
+						break;
+					}
+				}
+			}
+			else
+			{
+				paramIsMatch = false;
+			}
+		}
+
+		if (paramIsMatch)
+		{
+			trace_function = true;
+		}
+		return trace_function;
     }
 
     HRESULT STDMETHODCALLTYPE CorProfiler::JITCompilationStarted(FunctionID functionId, BOOL fIsSafeToBlock)
@@ -480,29 +486,30 @@ namespace clrprofiler {
             return S_OK;
         }
 
-		auto trace_function = false;
 		auto assembly = moduleMetaInfo->trace_assembly;
-		if (assembly.className == functionInfo.type.name)
-		{
-			for (const auto& method : assembly.methods)
-			{
-				if (method.methodName == functionInfo.name)
-				{
-					if (MethodParamsNameIsMatch(method.paramsName, functionInfo, pImport))
-					{
-						trace_function = true;
-						break;
-					}
+		auto found_method = false;
+		TraceMethod trace_method;
+		if (assembly.className == functionInfo.type.name) {
+			for (const auto& method : assembly.methods) {
+				if (method.methodName == functionInfo.name) {
+					found_method = true;
+					trace_method = method;
+					break;
 				}
 			}
 		}
-		if (!trace_function)
-		{
+		if(!found_method) {
 			return S_OK;
 		}
 
-        hr = functionInfo.signature.TryParse();
-        RETURN_OK_IF_FAILED(hr);
+	    hr = functionInfo.signature.TryParse();
+		if (FAILED(hr)) {
+			return S_OK;
+		}
+
+		if (!MethodParamsNameIsMatch(pImport, functionInfo, trace_method)) {
+			return S_OK;
+		}
 
         if (!(functionInfo.signature.CallingConvention() & IMAGE_CEE_CS_CALLCONV_HASTHIS)) {
             return S_OK;
