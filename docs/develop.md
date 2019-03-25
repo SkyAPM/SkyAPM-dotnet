@@ -18,12 +18,11 @@
 
 ```batch
 
-git clone https://github.com/dotnet/coreclr.git
 git clone https://github.com/SkyAPM/SkyAPM-dotnet.git
 
 cd SkyAPM-dotnet
-git checkout clrprofiler
-powershell ./scripts/install-vcpkgs.ps1
+git checkout coreclr_profiler
+powershell ./tools/install-vcpkgs.ps1
 
 : if has no executionpolicy ,powershell(admin) run set-executionpolicy remotesigned
 : if no install vs english language pack vcpkgs will run error
@@ -42,7 +41,6 @@ build
 
 ```batch
 
-git clone https://github.com/dotnet/coreclr.git
 git clone https://github.com/SkyAPM/SkyAPM-dotnet.git
 
 git clone https://github.com/Microsoft/vcpkg.git
@@ -51,9 +49,10 @@ cd ~/vcpkg
 ./vcpkg install spdlog
 
 cd ~/SkyAPM-dotnet
-git checkout clrprofiler
+git checkout coreclr_profiler
 
-cd src/SkyAPM.ClrProfiler
+export VCPKG_ROOT=~/vcpkg
+cd src/SkyApm.ClrProfiler
 mkdir build
 cd build 
 cmake ..
@@ -65,7 +64,8 @@ make
 
 ```batch
 
-: first submodules update and nuget restore
+git submodule update --init -- "src/SkyApm.Transport.Grpc.Protocol/protocol" 
+dotnet msbuild -restore:True src/SkyApm.Transport.Grpc.Protocol/SkyApm.Transport.Grpc.Protocol.csproj
 
 SET CORECLR_PROFILER={cf0d821e-299b-5307-a3d8-b283c03916dd}
 SET CORECLR_ENABLE_PROFILING=1

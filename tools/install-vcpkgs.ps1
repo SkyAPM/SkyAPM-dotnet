@@ -40,6 +40,13 @@ if (Test-Path $vcpkgExe) {
     }
 }
 
+Write-Host "vcpkg integrate install"
+$p = Run $vcpkgExe "integrate install" $vcpkgRoot
+if ($p.ExitCode -ne 0) {
+    Write-Host "failed to vcpkg integrate install"
+    Exit 1
+}
+
 $packages = @("fmt", "spdlog")
 $platforms = @("x86", "x64")
 

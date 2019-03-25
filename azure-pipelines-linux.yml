@@ -1,0 +1,27 @@
+trigger:
+- coreclr_profiler
+
+pool:
+  vmImage: 'ubuntu-16.04'
+
+steps:
+- script: |
+    git checkout coreclr_profiler
+    git submodule update --init -- "src/SkyApm.Transport.Grpc.Protocol/protocol" 
+    cd src/SkyApm.Transport.Grpc.Protocol
+    dotnet msbuild -restore:True
+  displayName: 'git checkout and submodule update'
+
+- script: |
+    cd $VCPKG_ROOT
+    sudo ./vcpkg install spdlog
+  displayName: 'vcpkg install spdlog'
+
+- script: |
+    sudo apt-get install clang-3.9 -y
+    cd src/SkyApm.ClrProfiler
+    mkdir build
+    cd build
+    cmake -DCMAKE_BUILD_TYPE=Release ..
+    make
+  displayName: 'build SkyAPM.ClrProfiler so'

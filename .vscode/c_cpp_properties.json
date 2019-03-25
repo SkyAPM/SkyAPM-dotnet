@@ -3,11 +3,11 @@
         {
             "name": "Linux",
             "includePath": [
-                "~/coreclr/src/pal/inc/rt",
-                "~/coreclr/src/pal/prebuilt/inc",
-                "~/coreclr/src/pal/inc",
-                "~/coreclr/src/inc",
-                "~/coreclr/bin/Product/Linux.x64.Debug/inc",
+                "coreclr/src/pal/inc/rt",
+                "coreclr/src/pal/prebuilt/inc",
+                "coreclr/src/pal/inc",
+                "coreclr/src/inc",
+                "coreclr/built/inc",
                 "~/vcpkg/installed/x64-linux/include"
             ],
             "defines": [],
