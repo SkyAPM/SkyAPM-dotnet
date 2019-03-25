@@ -25,3 +25,18 @@ steps:
     cmake -DCMAKE_BUILD_TYPE=Release ..
     make
   displayName: 'build SkyAPM.ClrProfiler so'
+
+- script: |
+    cd tools
+    ./Dll.Repack.sh Debug
+  displayName: 'Dll.Repack.sh Debug'
+
+- script: |
+    cd tools
+    ./Dll.Repack.sh Release
+  displayName: 'Dll.Repack.sh Release'
+
+- script: |
+    cd test\SkyApm.ClrProfiler.Trace.Test
+    dotnet test
+  displayName: 'dotnet test SkyApm.ClrProfiler.Trace.Test'

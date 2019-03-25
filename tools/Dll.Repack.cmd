@@ -72,8 +72,12 @@ cd SkyApm.ClrProfiler.Trace
 
 dotnet publish -c %BuildType% -f net461 -o bin\%BuildType%\net461
 cd bin\%BuildType%\net461
-%WorkDir%ILRepack.exe /keyfile:%~dp0\skyapm.snk /ver:%BuildVersion% /copyattrs /xmldocs /ndebug /internalize /out:%OUTDLL% %DLLS%
-%WorkDir%ILRepack.exe /keyfile:%~dp0\skyapm.snk /ver:%BuildVersion% /copyattrs /xmldocs /ndebug /internalize /out:%TransportOUTDLL% %TransportDLLS%
+
+SET OUTDLL=%WorkDir%../src\SkyApm.ClrProfiler.Trace\bin\%BuildType%\net461\SkyApm.ClrProfiler.Trace.dll
+SET TransportOUTDLL=%WorkDir%../src\SkyApm.ClrProfiler.Trace\bin\%BuildType%\net461\SkyApm.Transport.Grpc.dll
+
+dotnet %WorkDir%ILRepack.Runner\ILRepack.Runner.exe\ILRepack.Runner.dll /keyfile:%WorkDir%skyapm.snk /ver:%BuildVersion% /copyattrs /xmldocs /internalize /out:%OUTDLL% %DLLS%
+dotnet %WorkDir%ILRepack.Runner\ILRepack.Runner.exe\ILRepack.Runner.dll /keyfile:%WorkDir%skyapm.snk /ver:%BuildVersion% /copyattrs /xmldocs /ndebug /internalize /out:%TransportOUTDLL% %TransportDLLS%
 
 %WorkDir%gacutil.exe /i SkyApm.ClrProfiler.Trace.dll
 %WorkDir%gacutil.exe /i SkyApm.Abstractions.dll
@@ -83,8 +87,12 @@ cd ../../../
 
 dotnet publish -c %BuildType% -f netstandard2.0 -o bin\%BuildType%\netstandard2.0
 cd bin\%BuildType%\netstandard2.0
-%WorkDir%ILRepack.exe /keyfile:%~dp0\skyapm.snk /ver:%BuildVersion% /copyattrs /xmldocs /ndebug /internalize /out:%OUTDLL% %DLLS%
-%WorkDir%ILRepack.exe /keyfile:%~dp0\skyapm.snk /ver:%BuildVersion% /copyattrs /xmldocs /ndebug /internalize /out:%TransportOUTDLL% %TransportDLLS%
+
+SET OUTDLL=%WorkDir%../src\SkyApm.ClrProfiler.Trace\bin\%BuildType%\netstandard2.0\SkyApm.ClrProfiler.Trace.dll
+SET TransportOUTDLL=%WorkDir%../src\SkyApm.ClrProfiler.Trace\bin\%BuildType%\netstandard2.0\SkyApm.Transport.Grpc.dll
+
+dotnet %WorkDir%ILRepack.Runner\ILRepack.Runner.exe\ILRepack.Runner.dll /keyfile:%WorkDir%skyapm.snk /ver:%BuildVersion% /copyattrs /xmldocs /internalize /out:%OUTDLL% %DLLS%
+dotnet %WorkDir%ILRepack.Runner\ILRepack.Runner.exe\ILRepack.Runner.dll /keyfile:%WorkDir%skyapm.snk /ver:%BuildVersion% /copyattrs /xmldocs /ndebug /internalize /out:%TransportOUTDLL% %TransportDLLS%
 
 
 cd /d %~dp0
