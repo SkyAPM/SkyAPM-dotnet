@@ -35,9 +35,9 @@ namespace SkyApm.Sample.Backend
             services.AddSingleton<ISamplingInterceptor, CustomSamplingInterceptor>();
             services.AddSmartSql(sp =>
             {
-                return SmartSqlBuilder
-                .AddDataSource(DbProvider.SQLSERVER, "Data Source=.;Initial Catalog=SmartSqlTestDB;Integrated Security=True")
+                return new SmartSqlBuilder()
                 .UseLoggerFactory(sp.GetService<ILoggerFactory>())
+                .UseDataSource(DbProvider.SQLSERVER, "Data Source=.;Initial Catalog=SmartSqlTestDB;Integrated Security=True")
                 .UseCache(false)
                 .Build();
             });
