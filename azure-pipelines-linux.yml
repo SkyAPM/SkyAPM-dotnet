@@ -28,15 +28,17 @@ steps:
 
 - script: |
     cd tools
+    chmod +x ./Dll.Repack.sh
     ./Dll.Repack.sh Debug
   displayName: 'Dll.Repack.sh Debug'
 
 - script: |
     cd tools
+    chmod +x ./Dll.Repack.sh
     ./Dll.Repack.sh Release
   displayName: 'Dll.Repack.sh Release'
 
 - script: |
-    cd test\SkyApm.ClrProfiler.Trace.Test
-    dotnet test
+    cd test/SkyApm.ClrProfiler.Trace.Test
+    dotnet test SkyApm.ClrProfiler.Trace.Test.csproj
   displayName: 'dotnet test SkyApm.ClrProfiler.Trace.Test'
