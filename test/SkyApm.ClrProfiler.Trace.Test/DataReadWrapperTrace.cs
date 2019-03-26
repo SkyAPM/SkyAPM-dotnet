@@ -8,7 +8,7 @@ namespace SkyApm.ClrProfiler.Trace.Test
     public class DataReadWrapperTrace : AbsMethodWrapper
     {
         private const string TypeName = "SkyApm.ClrProfiler.Trace.Test.TraceAgentTest";
-        private static readonly string[] AssemblyNames = new[] { "SkyApm.ClrProfiler.Trace.Test" };
+        private static readonly string[] AssemblyNames = { "SkyApm.ClrProfiler.Trace.Test" };
 
         private readonly ITracingContext _tracingContext;
 
@@ -36,7 +36,9 @@ namespace SkyApm.ClrProfiler.Trace.Test
             var assemblyName = invocationTargetType.Assembly.GetName().Name;
             if (AssemblyNames.Contains(assemblyName) && TypeName == invocationTargetType.FullName)
             {
-                if (traceMethodInfo.MethodBase.Name == "DataRead")
+                if (traceMethodInfo.MethodBase.Name == "DataRead" ||
+                    traceMethodInfo.MethodBase.Name == "Test1" ||
+                    traceMethodInfo.MethodBase.Name == "Test2")
                 {
                     return true;
                 }

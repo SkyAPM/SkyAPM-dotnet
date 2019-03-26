@@ -5,6 +5,20 @@
   },
   "instrumentation": [
     {
+      "assemblyName": "SkyApm.ClrProfiler.Trace.Test",
+      "targetAssemblyName": "SkyApm.ClrProfiler.Trace.Test",
+      "className": "SkyApm.ClrProfiler.Trace.Test.TraceAgentTest",
+      "methods": [
+        {
+          "methodName": "Test1",
+          "paramsName": "System.String,System.Int32"
+        },
+        {
+          "methodName": "Test2"
+        }
+      ]
+    },
+    {
       "assemblyName": "StackExchange.Redis",
       "targetAssemblyName": "SkyApm.ClrProfiler.Trace.StackExchangeRedis",
       "className": "StackExchange.Redis.ConnectionMultiplexer",
@@ -37,8 +51,7 @@
       "methods": [
         {
           "methodName": "SendAsync",
-          "paramsName":
-            "System.Net.Http.HttpRequestMessage,System.Net.Http.HttpCompletionOption,System.Threading.CancellationToken"
+          "paramsName": "System.Net.Http.HttpRequestMessage,System.Net.Http.HttpCompletionOption,System.Threading.CancellationToken"
         }
       ]
     },
