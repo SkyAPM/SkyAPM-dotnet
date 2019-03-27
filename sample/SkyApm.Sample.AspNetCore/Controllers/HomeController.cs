@@ -1,16 +1,16 @@
-﻿using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using System;
+﻿using System;
 using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
+using System.Threading.Tasks;
 using Dapper;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using MySql.Data.MySqlClient;
 using StackExchange.Redis;
 
-namespace Samples.WebApi.Controllers
+namespace SkyApm.Sample.AspNetCore.Controllers
 {
     [Route("home")]
     public class HomeController : Controller

@@ -16,10 +16,4 @@
     <ProjectReference Include="..\..\src\SkyApm.Transport.Grpc\SkyApm.Transport.Grpc.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Update="trace.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
 </Project>

@@ -1,0 +1,80 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v2.1",
+    "signature": "da39a3ee5e6b4b0d3255bfef95601890afd80709"
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v2.1": {
+      "ILRepack.Runner/1.0.0": {
+        "dependencies": {
+          "ILRepack.NETStandard": "1.0.0"
+        },
+        "runtime": {
+          "ILRepack.Runner.dll": {}
+        }
+      },
+      "ILRepack.NETStandard/1.0.0": {
+        "dependencies": {
+          "Mono.Cecil": "1.0.0.0",
+          "BamlParser": "1.0.0.0",
+          "Fasterflect.Netstandard": "1.0.0.0"
+        },
+        "runtime": {
+          "ILRepack.dll": {}
+        }
+      },
+      "Mono.Cecil.Reference/1.0.0.0": {
+        "runtime": {
+          "Mono.Cecil.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "BamlParser.Reference/1.0.0.0": {
+        "runtime": {
+          "BamlParser.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "Fasterflect.Netstandard.Reference/1.0.0.0": {
+        "runtime": {
+          "Fasterflect.Netstandard.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "ILRepack.Runner/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "ILRepack.NETStandard/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Mono.Cecil.Reference/1.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "BamlParser.Reference/1.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Fasterflect.Netstandard.Reference/1.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

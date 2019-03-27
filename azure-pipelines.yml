@@ -15,28 +15,42 @@ steps:
 - script: |
     %VCPKG_ROOT%/vcpkg.exe install fmt:x64-windows-static
     %VCPKG_ROOT%/vcpkg.exe install spdlog:x64-windows-static
+    %VCPKG_ROOT%/vcpkg.exe integrate install
   displayName: 'vcpkg install spdlog'
 
 - script: |
-    "C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\VC\Auxiliary\Build\vcvars64.bat" 
+    call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\VC\Auxiliary\Build\vcvars64.bat" 
     cd src\SkyAPM.ClrProfiler
     SET BuildArch=x64
     SET BuildType=Debug
     build
+    echo build success
   displayName: 'build Debug SkyAPM.ClrProfiler dll'
 
 - script: |
-    "C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\VC\Auxiliary\Build\vcvars64.bat" 
+    call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\VC\Auxiliary\Build\vcvars64.bat" 
     cd src\SkyAPM.ClrProfiler
     SET BuildArch=x64
     SET BuildType=Release
     build
+    echo build success
   displayName: 'build Release SkyAPM.ClrProfiler dll'
-
+  
 - script: |
     cd tools
     Dll.Repack.cmd Debug
   displayName: 'Dll.Repack.cmd Debug'
+
+- script: |
+    cd test\SkyApm.ClrProfiler.Trace.Test
+    SET CORECLR_PROFILER={cf0d821e-299b-5307-a3d8-b283c03916dd}
+    SET CORECLR_ENABLE_PROFILING=1
+    SET CORECLR_PROFILER_PATH=$(Build.Repository.LocalPath)\src\SkyApm.ClrProfiler\x64\Debug\SkyApm.ClrProfiler.dll
+    SET CORECLR_PROFILER_HOME=$(Build.Repository.LocalPath)\src\SkyApm.ClrProfiler.Trace\bin\Debug\netstandard2.0
+    echo %CORECLR_PROFILER_PATH%
+    echo %CORECLR_PROFILER_HOME%
+    dotnet test
+  displayName: 'dotnet test SkyApm.ClrProfiler.Trace.Test'
 
 - script: |
     cd tools
@@ -44,11 +58,12 @@ steps:
   displayName: 'Dll.Repack.cmd Release'
 
 - script: |
-    cd test\SkyApm.ClrProfiler.Trace.Test
-    dotnet test
-  displayName: 'dotnet test SkyApm.ClrProfiler.Trace.Test'
-
-- script: |
     cd deploy\SkyApm.DotNet.Installer
     powershell .\build.ps1
+    if exist "$(Build.Repository.LocalPath)\deploy\SkyApm.DotNet.Installer\bin\Release\SkyApm.DotNet.Installer.msi" (
+      echo build installer success
+    ) else ( 
+      echo build installer fail 
+      exit -2
+    )
   displayName: 'build SkyApm.DotNet.Installer'
