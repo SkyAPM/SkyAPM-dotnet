@@ -5,14 +5,15 @@ using SkyApm.Tracing;
 
 namespace SkyApm.ClrProfiler.Trace.Test
 {
-    public class DataReadWrapperTrace : AbsMethodWrapper
+    // ReSharper disable once InconsistentNaming
+    public class ILReWriteWrapperTrace : AbsMethodWrapper
     {
-        private const string TypeName = "SkyApm.ClrProfiler.Trace.Test.TraceAgentTest";
+        private const string TypeName = "SkyApm.ClrProfiler.Trace.Test.ILReWriteTest";
         private static readonly string[] AssemblyNames = { "SkyApm.ClrProfiler.Trace.Test" };
 
         private readonly ITracingContext _tracingContext;
 
-        public DataReadWrapperTrace(IServiceProvider serviceProvider) : base(serviceProvider)
+        public ILReWriteWrapperTrace(IServiceProvider serviceProvider) : base(serviceProvider)
         {
             _tracingContext = (ITracingContext)serviceProvider.GetService(typeof(ITracingContext));
         }
@@ -34,12 +35,11 @@ namespace SkyApm.ClrProfiler.Trace.Test
         {
             var invocationTargetType = traceMethodInfo.Type;
             var assemblyName = invocationTargetType.Assembly.GetName().Name;
-            if (AssemblyNames.Contains(assemblyName) && TypeName == invocationTargetType.FullName)
+            if (AssemblyNames.Contains(assemblyName) &&  invocationTargetType.FullName.StartsWith(TypeName))
             {
-                if (traceMethodInfo.MethodBase.Name == "DataRead" ||
-                    traceMethodInfo.MethodBase.Name == "Test1" ||
+                if (traceMethodInfo.MethodBase.Name == "Test1" ||
                     traceMethodInfo.MethodBase.Name == "Test2" ||
-                    traceMethodInfo.MethodBase.Name == "StaticNoReturnTest")
+                    traceMethodInfo.MethodBase.Name == "StaticNoReturn")
                 {
                     return true;
                 }
@@ -47,5 +47,4 @@ namespace SkyApm.ClrProfiler.Trace.Test
             return false;
         }
     }
-
 }

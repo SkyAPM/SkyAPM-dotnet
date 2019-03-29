@@ -81,11 +81,6 @@ namespace SkyApm.ClrProfiler.Trace
             object[] methodArguments,
             uint functionToken)
         {      
-            if (invocationTarget == null)
-            {
-                throw new ArgumentException(nameof(invocationTarget));
-            }
-
             var traceMethodInfo = new TraceMethodInfo
             {
                 InvocationTarget = invocationTarget,
@@ -95,6 +90,14 @@ namespace SkyApm.ClrProfiler.Trace
 
             var functionInfo = GetFunctionInfoFromCache(functionToken, traceMethodInfo);
             traceMethodInfo.MethodBase = functionInfo.MethodBase;
+
+            if (!traceMethodInfo.MethodBase.IsStatic)
+            {
+                if (invocationTarget == null)
+                {
+                    throw new ArgumentException(nameof(invocationTarget));
+                }
+            }
 
             if (functionInfo.MethodWrapper == null)
             {
