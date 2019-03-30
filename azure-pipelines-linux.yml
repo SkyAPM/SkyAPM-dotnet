@@ -25,6 +25,12 @@ steps:
     cmake -DCMAKE_BUILD_TYPE=Release ..
     make
   displayName: 'build SkyAPM.ClrProfiler so'
+ 
+- script: |
+    cd tools
+    chmod +x ./Dll.Repack.sh
+    ./Dll.Repack.sh Debug
+  displayName: 'Dll.Repack.sh Debug'
 
 - script: |
     cd test/SkyApm.ClrProfiler.Trace.Test
@@ -36,3 +42,9 @@ steps:
     echo $CORECLR_PROFILER_HOME
     dotnet test SkyApm.ClrProfiler.Trace.Test.csproj
   displayName: 'dotnet test SkyApm.ClrProfiler.Trace.Test'
+
+- script: |
+    cd tools
+    chmod +x ./Dll.Repack.sh
+    ./Dll.Repack.sh Release
+  displayName: 'Dll.Repack.sh Release'
