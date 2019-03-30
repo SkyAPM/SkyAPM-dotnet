@@ -104,51 +104,5 @@ namespace SkyApm.ClrProfiler.Trace.Test
             T:
             return (Task)ret;
         }
-
-        private Task Test1(string a, int b)
-        {
-            return Task.Delay(10);
-        }
-
-        private Task Test2(string a, int b)
-        {
-            return Task.Delay(10);
-        }
-
-        [Fact]
-        public async Task Test1_IL_ReWriteTest()
-        {
-            var env = Environment.GetEnvironmentVariable("CORECLR_PROFILER");
-            Assert.False(string.IsNullOrEmpty(env), "CORECLR_PROFILER Env Empty");
-
-            var methodInfo = this.GetType()
-                .GetMethod("Test1", BindingFlags.Instance | BindingFlags.NonPublic);
-
-            var beforeMethodBody = methodInfo.GetMethodBody();
-
-            await Test1("", 0);
-
-            var methodBody = methodInfo.GetMethodBody();
-            
-            Assert.Equal(methodBody.LocalVariables.Count, beforeMethodBody.LocalVariables.Count + 3);
-        }
-
-        [Fact]
-        public async Task Test2_IL_ReWriteTest()
-        {
-            var env = Environment.GetEnvironmentVariable("CORECLR_PROFILER");
-            Assert.False(string.IsNullOrEmpty(env), "CORECLR_PROFILER Env Empty");
-
-            var methodInfo = this.GetType()
-                .GetMethod("Test2", BindingFlags.Instance | BindingFlags.NonPublic);
-
-            var beforeMethodBody = methodInfo.GetMethodBody();
-
-            await Test2("", 0);
-
-            var methodBody = methodInfo.GetMethodBody();
-            
-            Assert.Equal(methodBody.LocalVariables.Count, beforeMethodBody.LocalVariables.Count + 3);
-        }
     }
 }

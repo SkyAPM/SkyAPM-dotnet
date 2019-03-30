@@ -44,5 +44,5 @@ cd bin/$BuildType/netstandard2.0
 OUTDLL=$WorkDir../src/SkyApm.ClrProfiler.Trace/bin/$BuildType/netstandard2.0/SkyApm.ClrProfiler.Trace.dll
 TransportOUTDLL=$WorkDir../src/SkyApm.ClrProfiler.Trace/bin/$BuildType/netstandard2.0/SkyAPM.Transport.Grpc.dll
 
-dotnet $WorkDir/ILRepack.Runner/ILRepack.Runner.exe/ILRepack.Runner.dll /keyfile:$WorkDir/skyapm.snk /ver:$BuildVersion /xmldocs /ndebug /internalize /out:$OUTDLL $DLLS
-dotnet $WorkDir/ILRepack.Runner/ILRepack.Runner.exe/ILRepack.Runner.dll /keyfile:$WorkDir/skyapm.snk /ver:$BuildVersion /xmldocs /ndebug /internalize /out:$TransportOUTDLL $TransportDLLS
+dotnet $WorkDir/ILRepack/ILRepack.dll /keyfile:$WorkDir/skyapm.snk /ver:$BuildVersion /xmldocs /ndebug /internalize /out:$OUTDLL $DLLS
+dotnet $WorkDir/ILRepack/ILRepack.dll /keyfile:$WorkDir/skyapm.snk /ver:$BuildVersion /xmldocs /ndebug /internalize /out:$TransportOUTDLL $TransportDLLS

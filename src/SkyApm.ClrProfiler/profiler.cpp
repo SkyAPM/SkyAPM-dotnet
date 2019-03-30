@@ -489,15 +489,17 @@ namespace clrprofiler {
 		auto assembly = moduleMetaInfo->trace_assembly;
 		auto found_method = false;
 		TraceMethod trace_method;
-		if (assembly.className == functionInfo.type.name) {
-			for (const auto& method : assembly.methods) {
-				if (method.methodName == functionInfo.name) {
-					found_method = true;
-					trace_method = method;
-					break;
+        for (const auto& trace_class : assembly.classes){
+			if (trace_class.className == functionInfo.type.name) {
+				for (const auto& method : trace_class.methods) {
+					if (method.methodName == functionInfo.name) {
+						found_method = true;
+						trace_method = method;
+						break;
+					}
 				}
 			}
-		}
+        }
 		if(!found_method) {
 			return S_OK;
 		}
@@ -510,10 +512,6 @@ namespace clrprofiler {
 		if (!MethodParamsNameIsMatch(pImport, functionInfo, trace_method)) {
 			return S_OK;
 		}
-
-        if (!(functionInfo.signature.CallingConvention() & IMAGE_CEE_CS_CALLCONV_HASTHIS)) {
-            return S_OK;
-        }
 
         //return ref not support
         unsigned elementType;
@@ -669,48 +667,67 @@ namespace clrprofiler {
         auto indexEx = rewriter.cNewLocals - 2;
         auto indexMethodTrace = rewriter.cNewLocals - 1;
 
+		bool call_conv_has_this = functionInfo.signature.CallingConvention() & IMAGE_CEE_CS_CALLCONV_HASTHIS;
 		ILRewriterHelper il_rewriter_helper(pReWriter);
         ILInstr * pFirstOriginalInstr = pReWriter->GetILList()->m_pNext;
 		il_rewriter_helper.SetILPosition(pFirstOriginalInstr);
         il_rewriter_helper.LoadNull();
-        il_rewriter_helper.StLocal(indexMethodTrace);
+        il_rewriter_helper.StLocal(indexMethodTrace); // MethodTrace methodTrace = null
         il_rewriter_helper.LoadNull();
-        il_rewriter_helper.StLocal(indexEx);
+        il_rewriter_helper.StLocal(indexEx); //Exception ex = null;
         il_rewriter_helper.LoadNull();
-        il_rewriter_helper.StLocal(indexRet);
-        ILInstr* pTryStartInstr = il_rewriter_helper.CallMember0(getInstanceMemberRef, false);
-        il_rewriter_helper.Cast(traceAgentTypeRef);
+        il_rewriter_helper.StLocal(indexRet); //object ret = null;
+        ILInstr* pTryStartInstr = il_rewriter_helper.CallMember0(getInstanceMemberRef, false); //TraceAgent.GetInstance()
+        il_rewriter_helper.Cast(traceAgentTypeRef); //(TraceAgent) TraceAgent.GetInstance()
         il_rewriter_helper.LoadToken(functionInfo.type.id);
-        il_rewriter_helper.CallMember(moduleMetaInfo->getTypeFromHandleToken, false);
-        il_rewriter_helper.LoadArgument(0);
+        il_rewriter_helper.CallMember(moduleMetaInfo->getTypeFromHandleToken, false); //GetTypeFromHandle(xx)
+
+		if(call_conv_has_this){
+			il_rewriter_helper.LoadArgument(0); //this	
+		}else {
+			il_rewriter_helper.LoadNull(); //null	
+		}
+
+		//methodArguments
         auto argNum = functionInfo.signature.NumberOfArguments();
-        il_rewriter_helper.CreateArray(objectTypeRef, argNum);
+        il_rewriter_helper.CreateArray(objectTypeRef, argNum); //var arr = new object[argNum]
         auto arguments = functionInfo.signature.GetMethodArguments();
         for (unsigned i = 0; i < argNum; i++) {
-            il_rewriter_helper.BeginLoadValueIntoArray(i);
-            il_rewriter_helper.LoadArgument(i + 1);
-            auto argTypeFlags = arguments[i].GetTypeFlags(elementType);
+            il_rewriter_helper.BeginLoadValueIntoArray(i);  //arr[i]
+
+			// load method_arguments[i] , if method call_conv_has_this, argument 0 is this , so skip it
+			if (call_conv_has_this) {
+				il_rewriter_helper.LoadArgument(i + 1);
+			}
+			else {
+				il_rewriter_helper.LoadArgument(i);
+			}
+
+            auto argTypeFlags = arguments[i].GetTypeFlags(elementType); //get TypeFlags
             if(argTypeFlags & TypeFlagByRef) {
-                il_rewriter_helper.LoadIND(elementType);
+                il_rewriter_helper.LoadIND(elementType); // if has ref keyword, get method_arguments[i] value
             }
             if (argTypeFlags & TypeFlagBoxedType) {
                 auto tok = arguments[i].GetTypeTok(pEmit, corLibAssemblyRef);
                 if (tok == mdTokenNil) {
                     return S_OK;
                 }
-                il_rewriter_helper.Box(tok);
+                il_rewriter_helper.Box(tok);  // box method_arguments[i]
             }
-            il_rewriter_helper.EndLoadValueIntoArray();
+            il_rewriter_helper.EndLoadValueIntoArray(); //arr[i] = (method_arguments[i] value)
         }
+
         il_rewriter_helper.LoadInt32((INT32)function_token);
-        il_rewriter_helper.CallMember(beforeMemberRef, true);
-        il_rewriter_helper.Cast(methodTraceTypeRef);
-        il_rewriter_helper.StLocal(rewriter.cNewLocals - 1);
+        il_rewriter_helper.CallMember(beforeMemberRef, true); 
+        il_rewriter_helper.Cast(methodTraceTypeRef); // (MethodTrace) ((TraceAgent) TraceAgent.GetInstance()).BeforeMethod(xxx)
+
+        il_rewriter_helper.StLocal(rewriter.cNewLocals - 1); //methodTrace = (MethodTrace) ((TraceAgent) TraceAgent.GetInstance()).BeforeMethod(xxx)
 
         ILInstr* pRetInstr = pReWriter->NewILInstr();
         pRetInstr->m_opcode = CEE_RET;
-        pReWriter->InsertAfter(pReWriter->GetILList()->m_pPrev, pRetInstr);
+        pReWriter->InsertAfter(pReWriter->GetILList()->m_pPrev, pRetInstr); // at method end add a ret pointer
 
+		//method is void or is need unbox
         bool isVoidMethod = (retTypeFlags & TypeFlagVoid) > 0;
         auto ret = functionInfo.signature.GetRet();
         bool retIsBoxedType = false;
@@ -721,33 +738,35 @@ namespace clrprofiler {
                 retIsBoxedType = true;
             }
         }
-        il_rewriter_helper.SetILPosition(pRetInstr);
-        il_rewriter_helper.StLocal(indexEx);
-        ILInstr* pRethrowInstr = il_rewriter_helper.Rethrow();
 
-        il_rewriter_helper.LoadLocal(indexMethodTrace);
+        il_rewriter_helper.SetILPosition(pRetInstr); // SetILPosition at ret pointer
+        il_rewriter_helper.StLocal(indexEx);   // ex = e;
+        ILInstr* pRethrowInstr = il_rewriter_helper.Rethrow(); // throw;
+
+        il_rewriter_helper.LoadLocal(indexMethodTrace); //load methodTrace
         ILInstr* pNewInstr = pReWriter->NewILInstr();
         pNewInstr->m_opcode = CEE_BRFALSE_S;
-        pReWriter->InsertBefore(pRetInstr, pNewInstr);
+        pReWriter->InsertBefore(pRetInstr, pNewInstr); // if (methodTrace != null)
 
-        il_rewriter_helper.LoadLocal(indexMethodTrace);
-        il_rewriter_helper.LoadLocal(indexRet);
-        il_rewriter_helper.LoadLocal(indexEx);
-        il_rewriter_helper.CallMember(endMemberRef, true);
+        il_rewriter_helper.LoadLocal(indexMethodTrace); // load methodTrace
+        il_rewriter_helper.LoadLocal(indexRet); //load ret
+        il_rewriter_helper.LoadLocal(indexEx); // load ex
+        il_rewriter_helper.CallMember(endMemberRef, true); // methodTrace.EndMethod(ret, ex);
 
         ILInstr* pEndFinallyInstr = il_rewriter_helper.EndFinally();
-        pNewInstr->m_pTarget = pEndFinallyInstr;
+        pNewInstr->m_pTarget = pEndFinallyInstr; //finally end
 
         if (!isVoidMethod) {
-            il_rewriter_helper.LoadLocal(indexRet);
+            il_rewriter_helper.LoadLocal(indexRet); //load ret
             if (retIsBoxedType) {
-                il_rewriter_helper.UnboxAny(retTypeTok);
+                il_rewriter_helper.UnboxAny(retTypeTok); //unbox ret
             }
             else {
-                il_rewriter_helper.Cast(retTypeTok);
+                il_rewriter_helper.Cast(retTypeTok); // (retType)ret
             }
         }
 
+		//change old ret to goto  T: return ret;
         for (ILInstr * pInstr = pReWriter->GetILList()->m_pNext;
             pInstr != pReWriter->GetILList();
             pInstr = pInstr->m_pNext) {
@@ -761,10 +780,10 @@ namespace clrprofiler {
                         if (retIsBoxedType) {
                             il_rewriter_helper.Box(retTypeTok);
                         }
-                        il_rewriter_helper.StLocal(indexRet);
+                        il_rewriter_helper.StLocal(indexRet); //ret = xxx;
                     }
                     pInstr->m_opcode = CEE_LEAVE_S;
-                    pInstr->m_pTarget = pEndFinallyInstr->m_pNext;
+                    pInstr->m_pTarget = pEndFinallyInstr->m_pNext; // goto T;
                 }
                 break;
             }
@@ -773,6 +792,7 @@ namespace clrprofiler {
             }
         }
 
+		//add catch
         EHClause exClause{};
         exClause.m_Flags = COR_ILEXCEPTION_CLAUSE_NONE;
         exClause.m_pTryBegin = pTryStartInstr;
@@ -781,6 +801,7 @@ namespace clrprofiler {
         exClause.m_pHandlerEnd = pRethrowInstr;
         exClause.m_ClassToken = exTypeRef;
 
+		//add finally
         EHClause finallyClause{};
         finallyClause.m_Flags = COR_ILEXCEPTION_CLAUSE_FINALLY;
         finallyClause.m_pTryBegin = pTryStartInstr;

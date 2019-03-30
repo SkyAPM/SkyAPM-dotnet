@@ -76,8 +76,8 @@ cd bin\%BuildType%\net461
 SET OUTDLL=%WorkDir%../src\SkyApm.ClrProfiler.Trace\bin\%BuildType%\net461\SkyApm.ClrProfiler.Trace.dll
 SET TransportOUTDLL=%WorkDir%../src\SkyApm.ClrProfiler.Trace\bin\%BuildType%\net461\SkyApm.Transport.Grpc.dll
 
-dotnet %WorkDir%ILRepack.Runner\ILRepack.Runner.exe\ILRepack.Runner.dll /keyfile:%WorkDir%skyapm.snk /ver:%BuildVersion% /xmldocs /internalize /out:%OUTDLL% %DLLS%
-dotnet %WorkDir%ILRepack.Runner\ILRepack.Runner.exe\ILRepack.Runner.dll /keyfile:%WorkDir%skyapm.snk /ver:%BuildVersion% /xmldocs /internalize /out:%TransportOUTDLL% %TransportDLLS%
+dotnet %WorkDir%ILRepack\ILRepack.dll /keyfile:%WorkDir%skyapm.snk /ver:%BuildVersion% /xmldocs /internalize /out:%OUTDLL% %DLLS%
+dotnet %WorkDir%ILRepack\ILRepack.dll /keyfile:%WorkDir%skyapm.snk /ver:%BuildVersion% /xmldocs /internalize /out:%TransportOUTDLL% %TransportDLLS%
 
 %WorkDir%gacutil.exe /i SkyApm.ClrProfiler.Trace.dll
 %WorkDir%gacutil.exe /i SkyApm.Abstractions.dll
@@ -91,7 +91,7 @@ cd bin\%BuildType%\netstandard2.0
 SET OUTDLL=%WorkDir%../src\SkyApm.ClrProfiler.Trace\bin\%BuildType%\netstandard2.0\SkyApm.ClrProfiler.Trace.dll
 SET TransportOUTDLL=%WorkDir%../src\SkyApm.ClrProfiler.Trace\bin\%BuildType%\netstandard2.0\SkyApm.Transport.Grpc.dll
 
-dotnet %WorkDir%ILRepack.Runner\ILRepack.Runner.exe\ILRepack.Runner.dll /keyfile:%WorkDir%skyapm.snk /ver:%BuildVersion% /xmldocs /internalize /out:%OUTDLL% %DLLS%
-dotnet %WorkDir%ILRepack.Runner\ILRepack.Runner.exe\ILRepack.Runner.dll /keyfile:%WorkDir%skyapm.snk /ver:%BuildVersion% /xmldocs /internalize /out:%TransportOUTDLL% %TransportDLLS%
+dotnet %WorkDir%ILRepack\ILRepack.dll /keyfile:%WorkDir%skyapm.snk /ver:%BuildVersion% /xmldocs /internalize /out:%OUTDLL% %DLLS%
+dotnet %WorkDir%ILRepack\ILRepack.dll /keyfile:%WorkDir%skyapm.snk /ver:%BuildVersion% /xmldocs /internalize /out:%TransportOUTDLL% %TransportDLLS%
 
 cd /d %~dp0

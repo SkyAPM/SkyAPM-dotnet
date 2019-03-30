@@ -38,7 +38,8 @@ namespace SkyApm.ClrProfiler.Trace.Test
             {
                 if (traceMethodInfo.MethodBase.Name == "DataRead" ||
                     traceMethodInfo.MethodBase.Name == "Test1" ||
-                    traceMethodInfo.MethodBase.Name == "Test2")
+                    traceMethodInfo.MethodBase.Name == "Test2" ||
+                    traceMethodInfo.MethodBase.Name == "StaticNoReturnTest")
                 {
                     return true;
                 }

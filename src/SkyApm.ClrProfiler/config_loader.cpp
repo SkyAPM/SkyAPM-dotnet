@@ -26,33 +26,43 @@ namespace clrprofiler
 {
     using json = nlohmann::json;
 
-    std::pair<TraceAssembly, bool> TraceAssemblyFromJson(const json::value_type& src) {
+    std::pair<TraceAssembly, bool> LoadTraceAssembly(const json::value_type& src) {
         if (!src.is_object()) {
             return std::make_pair<TraceAssembly, bool>({}, false);
         }
+
         const auto assemblyName = ToWString(src.value("assemblyName", ""));
-        const auto className = ToWString(src.value("className", ""));
+		if (assemblyName.empty()) {
+			return std::make_pair<TraceAssembly, bool>({}, false);
+		}
 
-        if(assemblyName.empty() || className.empty()){
-            return std::make_pair<TraceAssembly, bool>({}, false);
-        }
-
-        std::vector<TraceMethod> traceMethods;
-        auto arr = src.value("methods", json::array());
-        if (arr.is_array()) {
-            for (auto& el : arr) {
-                const auto methodName = ToWString(el.value("methodName", ""));
-                const auto paramsName = ToWString(el.value("paramsName", ""));
-                if (methodName.empty()) {
-                    continue;
-                }
-                traceMethods.push_back(TraceMethod{ methodName,paramsName });
-            }
-        }
-        if(traceMethods.empty()) {
-            return std::make_pair<TraceAssembly, bool>({}, false);
-        }
-        return std::make_pair<TraceAssembly, bool>({ assemblyName, className, traceMethods }, true);
+		std::vector<TraceClass> trace_classes;
+		auto class_array = src.value("classes", json::array());
+		if (class_array.is_array()) {
+			for (auto& class_json : class_array) {
+				const auto className = ToWString(class_json.value("className", ""));
+				if (className.empty()) {
+					continue;
+				}
+				std::vector<TraceMethod> traceMethods;
+				auto arr = class_json.value("methods", json::array());
+				if (arr.is_array()) {
+					for (auto& method_json : arr) {
+						const auto methodName = ToWString(method_json.value("methodName", ""));
+						const auto paramsName = ToWString(method_json.value("paramsName", ""));
+						if (methodName.empty()) {
+							continue;
+						}
+						traceMethods.push_back(TraceMethod{ methodName,paramsName });
+					}
+				}
+				if (traceMethods.empty()) {
+					continue;
+				}
+				trace_classes.push_back(TraceClass{ className,traceMethods });
+			}
+		}	
+        return std::make_pair<TraceAssembly, bool>({ assemblyName, trace_classes }, true);
     }
 
     ManagedAssembly LoadManagedAssembly(const json::value_type& src)
@@ -84,7 +94,7 @@ namespace clrprofiler
             stream >> j;
 
             for (auto& el : j["instrumentation"]) {
-                auto i = TraceAssemblyFromJson(el);
+                auto i = LoadTraceAssembly(el);
                 if (std::get<1>(i)) {
                     traceAssemblies.push_back(std::get<0>(i));
                 }
