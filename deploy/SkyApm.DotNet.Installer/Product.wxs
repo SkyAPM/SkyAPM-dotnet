@@ -144,6 +144,11 @@
               KeyPath="yes" Checksum="yes"/>
       </Component>
       <Component Win64="$(var.Win64)">
+        <File Id="net461_libgrpc_csharp_ext.x64.so"
+              Source="$(var.ManagedDllPath)\net461\runtimes\linux\native\libgrpc_csharp_ext.x64.so"
+              KeyPath="yes" Checksum="yes"/>
+      </Component>
+      <Component Win64="$(var.Win64)">
         <File Id="net461_netstandard.dll"
               Source="$(var.ManagedDllPath)\net461\netstandard.dll"
               KeyPath="yes" Checksum="yes" Assembly=".net"/>
@@ -166,6 +171,11 @@
       <Component Win64="$(var.Win64)">
         <File Id="net461_SkyApm.ClrProfiler.Trace.AspNetCore.dll"
               Source="$(var.ManagedDllPath)\net461\SkyApm.ClrProfiler.Trace.AspNetCore.dll"
+              KeyPath="yes" Checksum="yes" />
+      </Component>
+      <Component Win64="$(var.Win64)">
+        <File Id="net461_SkyApm.ClrProfiler.Trace.HttpClient.dll"
+              Source="$(var.ManagedDllPath)\net461\SkyApm.ClrProfiler.Trace.HttpClient.dll"
               KeyPath="yes" Checksum="yes" />
       </Component>
       <Component Win64="$(var.Win64)">
@@ -215,6 +225,11 @@
       <Component Win64="$(var.Win64)">
         <File Id="netcore_grpc_csharp_ext.x64.dll"
               Source="$(var.ManagedDllPath)\netstandard2.0\runtimes\win\native\grpc_csharp_ext.x64.dll"
+              KeyPath="yes" Checksum="yes"/>
+      </Component>
+      <Component Win64="$(var.Win64)">
+        <File Id="netcore_libgrpc_csharp_ext.x64.so"
+              Source="$(var.ManagedDllPath)\netstandard2.0\runtimes\linux\native\libgrpc_csharp_ext.x64.so"
               KeyPath="yes" Checksum="yes"/>
       </Component>
       <Component Win64="$(var.Win64)">

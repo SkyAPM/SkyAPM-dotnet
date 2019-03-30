@@ -83,6 +83,9 @@
     <PackageReference Include="Microsoft.AspNet.WebApi">
       <Version>5.2.7</Version>
     </PackageReference>
+    <PackageReference Include="StackExchange.Redis">
+      <Version>1.2.6</Version>
+    </PackageReference>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
