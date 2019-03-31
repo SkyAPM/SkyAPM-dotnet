@@ -1,69 +1,232 @@
 trigger:
 - coreclr_profiler
+- refs/tags/v*
 
-pool:
-  vmImage: 'vs2017-win2016'
-
-steps:
-- script: |
-    git checkout coreclr_profiler
-    git submodule update --init -- "src/SkyApm.Transport.Grpc.Protocol/protocol" 
-    cd src/SkyApm.Transport.Grpc.Protocol
-    dotnet msbuild -restore:True
-  displayName: 'git checkout and submodule update'
-
-- script: |
-    %VCPKG_ROOT%/vcpkg.exe install fmt:x64-windows-static
-    %VCPKG_ROOT%/vcpkg.exe install spdlog:x64-windows-static
-    %VCPKG_ROOT%/vcpkg.exe integrate install
-  displayName: 'vcpkg install spdlog'
-
-- script: |
-    call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\VC\Auxiliary\Build\vcvars64.bat" 
-    cd src\SkyAPM.ClrProfiler
-    SET BuildArch=x64
-    SET BuildType=Debug
-    build
-    echo build success
-  displayName: 'build Debug SkyAPM.ClrProfiler dll'
-
-- script: |
-    call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\VC\Auxiliary\Build\vcvars64.bat" 
-    cd src\SkyAPM.ClrProfiler
-    SET BuildArch=x64
-    SET BuildType=Release
-    build
-    echo build success
-  displayName: 'build Release SkyAPM.ClrProfiler dll'
+jobs:
+- job: Windows
+  timeoutInMinutes: 60 
+  pool:
+    vmImage: 'vs2017-win2016'
+  steps:
+  - script: |
+      git checkout coreclr_profiler
+      git submodule update --init -- "src/SkyApm.Transport.Grpc.Protocol/protocol" 
+      cd src/SkyApm.Transport.Grpc.Protocol
+      dotnet msbuild -restore:True
+    displayName: 'git checkout and submodule update'
   
-- script: |
-    cd tools
-    Dll.Repack.cmd Debug
-  displayName: 'Dll.Repack.cmd Debug'
+  - script: |
+      %VCPKG_ROOT%/vcpkg.exe install fmt:x64-windows-static
+      %VCPKG_ROOT%/vcpkg.exe install spdlog:x64-windows-static
+      %VCPKG_ROOT%/vcpkg.exe integrate install
+    displayName: 'vcpkg install spdlog'
+  
+  - script: |
+      call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\VC\Auxiliary\Build\vcvars64.bat" 
+      cd src\SkyAPM.ClrProfiler
+      SET BuildArch=x64
+      SET BuildType=Debug
+      build
+      echo build success
+    displayName: 'build Debug SkyAPM.ClrProfiler dll'
+  
+  - script: |
+      call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\VC\Auxiliary\Build\vcvars64.bat" 
+      cd src\SkyAPM.ClrProfiler
+      SET BuildArch=x64
+      SET BuildType=Release
+      build
+      echo build success
+    displayName: 'build Release SkyAPM.ClrProfiler dll'
+    
+  - script: |
+      cd tools
+      Dll.Repack.cmd Debug
+    displayName: 'Dll.Repack.cmd Debug'
+  
+  - script: |
+      cd test\SkyApm.ClrProfiler.Trace.Test
+      SET CORECLR_PROFILER={cf0d821e-299b-5307-a3d8-b283c03916dd}
+      SET CORECLR_ENABLE_PROFILING=1
+      SET CORECLR_PROFILER_PATH=$(Build.Repository.LocalPath)\src\SkyApm.ClrProfiler\x64\Debug\SkyApm.ClrProfiler.dll
+      SET CORECLR_PROFILER_HOME=$(Build.Repository.LocalPath)\src\SkyApm.ClrProfiler.Trace\bin\Debug\netstandard2.0
+      echo %CORECLR_PROFILER_PATH%
+      echo %CORECLR_PROFILER_HOME%
+      dotnet test
+    displayName: 'dotnet test SkyApm.ClrProfiler.Trace.Test'
+  
+  - script: |
+      cd tools
+      Dll.Repack.cmd Release
+    displayName: 'Dll.Repack.cmd Release'
+  
+  - script: |
+      cd deploy\SkyApm.DotNet.Installer
+      powershell .\build.ps1
+      if exist "$(Build.Repository.LocalPath)\deploy\SkyApm.DotNet.Installer\bin\Release\SkyApm.DotNet.Installer.msi" (
+        echo build installer success
+      ) else ( 
+        echo build installer fail 
+        exit -2
+      )
+    displayName: 'build SkyApm.DotNet.Installer'
 
-- script: |
-    cd test\SkyApm.ClrProfiler.Trace.Test
-    SET CORECLR_PROFILER={cf0d821e-299b-5307-a3d8-b283c03916dd}
-    SET CORECLR_ENABLE_PROFILING=1
-    SET CORECLR_PROFILER_PATH=$(Build.Repository.LocalPath)\src\SkyApm.ClrProfiler\x64\Debug\SkyApm.ClrProfiler.dll
-    SET CORECLR_PROFILER_HOME=$(Build.Repository.LocalPath)\src\SkyApm.ClrProfiler.Trace\bin\Debug\netstandard2.0
-    echo %CORECLR_PROFILER_PATH%
-    echo %CORECLR_PROFILER_HOME%
-    dotnet test
-  displayName: 'dotnet test SkyApm.ClrProfiler.Trace.Test'
+  - task: PublishPipelineArtifact@0
+    inputs:
+      artifactName: skyapm-installer-exe
+      targetPath: $(Build.Repository.LocalPath)\deploy\SkyApm.DotNet.Installer\bin\Release\SkyApm.DotNet.Installer.msi
+    displayName: Publish skyapm-installer-exe artifact
 
-- script: |
-    cd tools
-    Dll.Repack.cmd Release
-  displayName: 'Dll.Repack.cmd Release'
+  - script: |
+      SET ManagedDllPath=$(Build.Repository.LocalPath)\src\SkyApm.ClrProfiler.Trace\bin\Release
+      cd deploy
+      mkdir skyapm-installer
+      copy $(Build.Repository.LocalPath)\skyapm.json skyapm-installer
+      copy $(Build.Repository.LocalPath)\src\SkyApm.ClrProfiler\x64\Release\SkyApm.ClrProfiler.dll skyapm-installer
+      copy $(Build.Repository.LocalPath)\tools\iisrestart.cmd skyapm-installer
+      copy $(Build.Repository.LocalPath)\tools\gac.cmd skyapm-installer
+      copy $(Build.Repository.LocalPath)\tools\gacutil.exe skyapm-installer
+      copy $(Build.Repository.LocalPath)\tools\gacutil.exe.config skyapm-installer
+      cd skyapm-installer
+      SET target=net461
+      mkdir %target%
+      copy %ManagedDllPath%\%target%\trace.json %target%
+      copy %ManagedDllPath%\%target%\runtimes\win\native\grpc_csharp_ext.x64.dll %target%
+      copy %ManagedDllPath%\%target%\runtimes\linux\native\libgrpc_csharp_ext.x64.so %target%
+      copy %ManagedDllPath%\%target%\netstandard.dll %target%
+      copy %ManagedDllPath%\%target%\SkyApm.ClrProfiler.Trace.dll %target%
+      copy %ManagedDllPath%\%target%\SkyAPM.Abstractions.dll %target%
+      copy %ManagedDllPath%\%target%\SkyAPM.Transport.Grpc.dll %target%
+      copy %ManagedDllPath%\%target%\SkyApm.ClrProfiler.Trace.AspNetCore.dll %target%
+      copy %ManagedDllPath%\%target%\SkyApm.ClrProfiler.Trace.HttpClient.dll %target%
+      copy %ManagedDllPath%\%target%\SkyApm.ClrProfiler.Trace.AspNet.dll %target%
+      copy %ManagedDllPath%\%target%\SkyApm.ClrProfiler.Trace.HttpWebRequest.dll %target%
+      copy %ManagedDllPath%\%target%\SkyApm.ClrProfiler.Trace.MySqlConnector.dll %target%
+      copy %ManagedDllPath%\%target%\SkyApm.ClrProfiler.Trace.MySqlData.dll %target%
+      copy %ManagedDllPath%\%target%\SkyApm.ClrProfiler.Trace.StackExchangeRedis.dll %target%
+      copy %ManagedDllPath%\%target%\SkyApm.ClrProfiler.Trace.SystemDataSqlClient.dll %target%
+      SET target=netstandard2.0
+      mkdir %target%
+      copy %ManagedDllPath%\%target%\trace.json %target%
+      copy %ManagedDllPath%\%target%\runtimes\win\native\grpc_csharp_ext.x64.dll %target%
+      copy %ManagedDllPath%\%target%\runtimes\linux\native\libgrpc_csharp_ext.x64.so %target%
+      copy %ManagedDllPath%\%target%\SkyApm.ClrProfiler.Trace.dll %target%
+      copy %ManagedDllPath%\%target%\SkyAPM.Abstractions.dll %target%
+      copy %ManagedDllPath%\%target%\SkyAPM.Transport.Grpc.dll %target%
+      copy %ManagedDllPath%\%target%\SkyApm.ClrProfiler.Trace.AspNetCore.dll %target%
+      copy %ManagedDllPath%\%target%\SkyApm.ClrProfiler.Trace.HttpClient.dll %target%
+      copy %ManagedDllPath%\%target%\SkyApm.ClrProfiler.Trace.MySqlConnector.dll %target%
+      copy %ManagedDllPath%\%target%\SkyApm.ClrProfiler.Trace.MySqlData.dll %target%
+      copy %ManagedDllPath%\%target%\SkyApm.ClrProfiler.Trace.StackExchangeRedis.dll %target%
+      copy %ManagedDllPath%\%target%\SkyApm.ClrProfiler.Trace.SystemDataSqlClient.dll %target%
+    displayName: 'build skyapm-installer-dir'
 
-- script: |
-    cd deploy\SkyApm.DotNet.Installer
-    powershell .\build.ps1
-    if exist "$(Build.Repository.LocalPath)\deploy\SkyApm.DotNet.Installer\bin\Release\SkyApm.DotNet.Installer.msi" (
-      echo build installer success
-    ) else ( 
-      echo build installer fail 
-      exit -2
-    )
-  displayName: 'build SkyApm.DotNet.Installer'
+  - task: PublishPipelineArtifact@0
+    inputs:
+      artifactName: skyapm-installer-dir
+      targetPath: $(Build.Repository.LocalPath)\deploy\skyapm-installer
+    displayName: Publish skyapm-installer-dir artifact
+
+- job: Linux
+  timeoutInMinutes: 60 
+  pool:
+    vmImage: 'ubuntu-16.04'
+  dependsOn:
+    - Windows
+  steps:
+  - script: |
+      git checkout coreclr_profiler
+      git submodule update --init -- "src/SkyApm.Transport.Grpc.Protocol/protocol" 
+      cd src/SkyApm.Transport.Grpc.Protocol
+      dotnet msbuild -restore:True
+    displayName: 'git checkout and submodule update'
+  
+  - script: |
+      cd $VCPKG_ROOT
+      sudo ./vcpkg install spdlog
+    displayName: 'vcpkg install spdlog'
+  
+  - script: |
+      sudo apt-get install clang-3.9 -y
+      cd src/SkyApm.ClrProfiler
+      mkdir build
+      cd build
+      cmake -DCMAKE_BUILD_TYPE=Release ..
+      make
+    displayName: 'build SkyAPM.ClrProfiler so'
+   
+  - script: |
+      cd tools
+      chmod +x ./Dll.Repack.sh
+      ./Dll.Repack.sh Debug
+    displayName: 'Dll.Repack.sh Debug'
+  
+  - script: |
+      cd test/SkyApm.ClrProfiler.Trace.Test
+      export CORECLR_PROFILER={cf0d821e-299b-5307-a3d8-b283c03916dd}
+      export CORECLR_ENABLE_PROFILING=1
+      export CORECLR_PROFILER_PATH=$(Build.Repository.LocalPath)/src/SkyApm.ClrProfiler/build/SkyApm.ClrProfiler.so
+      export CORECLR_PROFILER_HOME=$(Build.Repository.LocalPath)/src/SkyApm.ClrProfiler.Trace/bin/Debug/netstandard2.0
+      echo $CORECLR_PROFILER_PATH
+      echo $CORECLR_PROFILER_HOME
+      dotnet test SkyApm.ClrProfiler.Trace.Test.csproj
+    displayName: 'dotnet test SkyApm.ClrProfiler.Trace.Test'
+  
+  - script: |
+      cd tools
+      chmod +x ./Dll.Repack.sh
+      ./Dll.Repack.sh Release
+    displayName: 'Dll.Repack.sh Release'
+
+  - task: DownloadPipelineArtifact@0
+    inputs:
+      artifactName: skyapm-installer-exe
+      targetPath: $(Build.Repository.LocalPath)/deploy
+
+  - task: DownloadPipelineArtifact@0
+    inputs:
+      artifactName: skyapm-installer-dir
+      targetPath: $(Build.Repository.LocalPath)/deploy/skyapm-installer
+
+  - script: |
+      cp $(Build.Repository.LocalPath)/src/SkyApm.ClrProfiler/build/SkyApm.ClrProfiler.so $(Build.Repository.LocalPath)/deploy/skyapm-installer
+      cd $(Build.Repository.LocalPath)/deploy
+      cd skyapm-installer
+      zip -r $(Build.Repository.LocalPath)/deploy/SkyApm.DotNet.Installer.zip ./*
+    displayName: 'pack skyapm-installer-zip'
+
+  - script: |
+      githubUser=$(git remote -v | grep 'origin' | sed -n '1p' | sed -r 's/(.*com)\/(.*)\/(.*)/\2/')
+      echo "##vso[task.setvariable variable=GITHUB_USER]$githubUser"
+    displayName: Set GITHUB_USER env variables
+
+  - script: |
+      set -e
+      if [ "${BUILD_SOURCEBRANCH:0:10}" != "refs/tags/" ]; then
+        releaseTag=CI
+        isPreRelease=true
+      else
+        releaseTag=${BUILD_SOURCEBRANCH:10}
+        if [[ "$releaseTag" == *-* ]]; then
+          isPreRelease=true
+        else
+          isPreRelease=false
+        fi
+      fi
+      echo "##vso[task.setvariable variable=GITHUB_RELEASE_TAG]$releaseTag"
+      echo "##vso[task.setvariable variable=GITHUB_RELEASE_ISPRERELEASE]$isPreRelease"
+    displayName: Set GITHUB_RELEASE env variables
+
+  - task: GitHubRelease@0
+    inputs:
+      gitHubConnection: SkyAPM-dotnet
+      repositoryName: $(GITHUB_USER)/SkyAPM-dotnet
+      action: edit
+      tag: $(GITHUB_RELEASE_TAG)
+      assets: |
+        deploy/*.msi
+        deploy/*.zip
+      assetUploadMode: replace
+      isPreRelease: $(GITHUB_RELEASE_ISPRERELEASE)
+      addChangeLog: false
+    displayName: Upload artifacts to GitHub release
