@@ -33,14 +33,11 @@ namespace SkyApm.Sample.Backend
             services.AddEntityFrameworkSqlite().AddDbContext<SampleDbContext>(c => c.UseSqlite(sqliteConnection));
 
             services.AddSingleton<ISamplingInterceptor, CustomSamplingInterceptor>();
-            services.AddSmartSql(sp =>
-            {
-                return SmartSqlBuilder
-                .AddDataSource(DbProvider.SQLSERVER, "Data Source=.;Initial Catalog=SmartSqlTestDB;Integrated Security=True")
+            services.AddSmartSql(sp => new SmartSqlBuilder()
                 .UseLoggerFactory(sp.GetService<ILoggerFactory>())
+                .UseDataSource(DbProvider.SQLSERVER, "Data Source=.;Initial Catalog=SmartSqlTestDB;Integrated Security=True")
                 .UseCache(false)
-                .Build();
-            });
+                .Build());
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
