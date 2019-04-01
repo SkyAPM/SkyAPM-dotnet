@@ -72,6 +72,8 @@ using System.Linq;
                 return delegate (object returnValue, Exception ex)
                 {
                     DelegateHelper.AsyncMethodEnd(Leave, traceMethodInfo, ex, returnValue);
+
+                    _tracingContext.ReleaseScope();
                 };
             }
         }

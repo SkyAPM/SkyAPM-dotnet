@@ -57,6 +57,8 @@ namespace SkyApm.ClrProfiler.Trace.HttpClient
             return delegate(object returnValue, Exception ex)
             { 
                 DelegateHelper.AsyncMethodEnd(Leave, traceMethodInfo, ex, returnValue);
+
+                _tracingContext.ReleaseScope();
             };
         }
 

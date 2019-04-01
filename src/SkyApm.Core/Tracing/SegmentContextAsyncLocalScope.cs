@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Licensed to the SkyAPM under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -16,19 +16,35 @@
  *
  */
 
-using System.Threading;
 using SkyApm.Tracing.Segments;
 
 namespace SkyApm.Tracing
 {
-    public class EntrySegmentContextAccessor : IEntrySegmentContextAccessor
+    internal class SegmentContextAsyncLocalScope : ISegmentContextScope
     {
-        private readonly AsyncLocal<SegmentContext> _segmentContext = new AsyncLocal<SegmentContext>();
+        private readonly SegmentContextScopeManager _scopeManager;
+        private readonly ISegmentContextScope _scopeToRestore;
+        private bool _released;
 
-        public SegmentContext Context
+        public SegmentContextAsyncLocalScope(SegmentContextScopeManager scopeManager,
+            SegmentContext segmentContext)
         {
-            get => _segmentContext.Value;
-            set => _segmentContext.Value = value;
+            _scopeManager = scopeManager;
+            SegmentContext = segmentContext;
+            _scopeToRestore = scopeManager.Active;
+            scopeManager.Active = this;
+        }
+
+        public SegmentContext SegmentContext { get; }
+
+        public void Release()
+        {
+            if (_released)
+            {
+                return;
+            }
+            _scopeManager.Active = _scopeToRestore;
+            _released = true;
         }
     }
 }

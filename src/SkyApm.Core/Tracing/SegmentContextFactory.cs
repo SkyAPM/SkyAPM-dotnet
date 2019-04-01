@@ -18,6 +18,7 @@
 
 using System;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using SkyApm.Common;
 using SkyApm.Tracing.Segments;
 
@@ -25,9 +26,7 @@ namespace SkyApm.Tracing
 {
     public class SegmentContextFactory : ISegmentContextFactory
     {
-        private readonly IEntrySegmentContextAccessor _entrySegmentContextAccessor;
-        private readonly ILocalSegmentContextAccessor _localSegmentContextAccessor;
-        private readonly IExitSegmentContextAccessor _exitSegmentContextAccessor;
+        private readonly ISegmentContextScopeManager _segmentContextScopeManager;
         private readonly IRuntimeEnvironment _runtimeEnvironment;
         private readonly ISamplerChainBuilder _samplerChainBuilder;
         private readonly IUniqueIdGenerator _uniqueIdGenerator;
@@ -35,16 +34,12 @@ namespace SkyApm.Tracing
         public SegmentContextFactory(IRuntimeEnvironment runtimeEnvironment,
             ISamplerChainBuilder samplerChainBuilder,
             IUniqueIdGenerator uniqueIdGenerator,
-            IEntrySegmentContextAccessor entrySegmentContextAccessor,
-            ILocalSegmentContextAccessor localSegmentContextAccessor,
-            IExitSegmentContextAccessor exitSegmentContextAccessor)
+            ISegmentContextScopeManager segmentContextScopeManager)
         {
             _runtimeEnvironment = runtimeEnvironment;
             _samplerChainBuilder = samplerChainBuilder;
             _uniqueIdGenerator = uniqueIdGenerator;
-            _entrySegmentContextAccessor = entrySegmentContextAccessor;
-            _localSegmentContextAccessor = localSegmentContextAccessor;
-            _exitSegmentContextAccessor = exitSegmentContextAccessor;
+            _segmentContextScopeManager = segmentContextScopeManager;
         }
 
         public SegmentContext CreateEntrySegment(string operationName, ICarrier carrier)
@@ -71,13 +66,13 @@ namespace SkyApm.Tracing
                 segmentContext.References.Add(segmentReference);
             }
 
-            _entrySegmentContextAccessor.Context = segmentContext;
+            _segmentContextScopeManager.Activate(segmentContext);
             return segmentContext;
         }
 
         public SegmentContext CreateLocalSegment(string operationName)
         {
-            var parentSegmentContext = GetParentSegmentContext(SpanType.Local);
+            var parentSegmentContext = GetParentSegmentContext();
             var traceId = GetTraceId(parentSegmentContext);
             var segmentId = GetSegmentId();
             var sampled = GetSampled(parentSegmentContext, operationName);
@@ -91,7 +86,7 @@ namespace SkyApm.Tracing
                 {
                     Reference = Reference.CrossThread,
                     EntryEndpoint = parentReference?.EntryEndpoint ?? parentSegmentContext.Span.OperationName,
-                    NetworkAddress = parentReference?.NetworkAddress ?? parentSegmentContext.Span.OperationName,
+                    NetworkAddress = parentReference?.NetworkAddress ?? parentSegmentContext.Span.Peer,
                     ParentEndpoint = parentSegmentContext.Span.OperationName,
                     ParentSpanId = parentSegmentContext.Span.SpanId,
                     ParentSegmentId = parentSegmentContext.SegmentId,
@@ -102,13 +97,13 @@ namespace SkyApm.Tracing
                 segmentContext.References.Add(reference);
             }
 
-            _localSegmentContextAccessor.Context = segmentContext;
+            _segmentContextScopeManager.Activate(segmentContext);
             return segmentContext;
         }
 
         public SegmentContext CreateExitSegment(string operationName, StringOrIntValue networkAddress)
         {
-            var parentSegmentContext = GetParentSegmentContext(SpanType.Exit);
+            var parentSegmentContext = GetParentSegmentContext();
             var traceId = GetTraceId(parentSegmentContext);
             var segmentId = GetSegmentId();
             var sampled = GetSampled(parentSegmentContext, operationName, networkAddress);
@@ -122,7 +117,7 @@ namespace SkyApm.Tracing
                 {
                     Reference = Reference.CrossThread,
                     EntryEndpoint = parentReference?.EntryEndpoint ?? parentSegmentContext.Span.OperationName,
-                    NetworkAddress = parentReference?.NetworkAddress ?? parentSegmentContext.Span.OperationName,
+                    NetworkAddress = parentReference?.NetworkAddress ?? parentSegmentContext.Span.Peer,
                     ParentEndpoint = parentSegmentContext.Span.OperationName,
                     ParentSpanId = parentSegmentContext.Span.SpanId,
                     ParentSegmentId = parentSegmentContext.SegmentId,
@@ -134,39 +129,43 @@ namespace SkyApm.Tracing
             }
 
             segmentContext.Span.Peer = networkAddress;
-            _exitSegmentContextAccessor.Context = segmentContext;
+            _segmentContextScopeManager.Activate(segmentContext);
             return segmentContext;
         }
 
         public void Release(SegmentContext segmentContext)
         {
             segmentContext.Span.Finish();
-            switch (segmentContext.Span.SpanType)
+
+            if (_segmentContextScopeManager.Active?.SegmentContext == segmentContext)
             {
-                case SpanType.Entry:
-                     _entrySegmentContextAccessor.Context = null;
-                    break;
-                case SpanType.Local:
-                    _localSegmentContextAccessor.Context = null;
-                    break;
-                case SpanType.Exit:
-                    _exitSegmentContextAccessor.Context = null;
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(SpanType), segmentContext.Span.SpanType, "Invalid SpanType.");
+                _segmentContextScopeManager.Active.Release();
             }
         }
+        
+        public void ReleaseScope()
+        {
+            _segmentContextScopeManager.Active?.Release();
+        }
 
+        public SegmentContext ActiveContext
+        {
+            get { return _segmentContextScopeManager.Active?.SegmentContext; }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private UniqueId GetTraceId(ICarrier carrier)
         {
             return carrier.HasValue ? carrier.TraceId : _uniqueIdGenerator.Generate();
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private UniqueId GetTraceId(SegmentContext parentSegmentContext)
         {
             return parentSegmentContext?.TraceId ?? _uniqueIdGenerator.Generate();
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private UniqueId GetSegmentId()
         {
             return _uniqueIdGenerator.Generate();
@@ -205,19 +204,10 @@ namespace SkyApm.Tracing
             return sampler(sampledContext);
         }
 
-        private SegmentContext GetParentSegmentContext(SpanType spanType)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private SegmentContext GetParentSegmentContext()
         {
-            switch (spanType)
-            {
-                case SpanType.Entry:
-                    return null;
-                case SpanType.Local:
-                    return _entrySegmentContextAccessor.Context;
-                case SpanType.Exit:
-                    return _localSegmentContextAccessor.Context ?? _entrySegmentContextAccessor.Context;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(spanType), spanType, "Invalid SpanType.");
-            }
+            return _segmentContextScopeManager.Active?.SegmentContext;
         }
     }
 }

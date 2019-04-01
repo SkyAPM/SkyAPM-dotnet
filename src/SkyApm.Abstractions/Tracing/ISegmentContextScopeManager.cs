@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Licensed to the SkyAPM under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -20,8 +20,10 @@ using SkyApm.Tracing.Segments;
 
 namespace SkyApm.Tracing
 {
-    public interface IExitSegmentContextAccessor
+    public interface ISegmentContextScopeManager
     {
-        SegmentContext Context { get; set; }
+        ISegmentContextScope Activate(SegmentContext segmentContext);
+
+        ISegmentContextScope Active { get; set; }
     }
 }
