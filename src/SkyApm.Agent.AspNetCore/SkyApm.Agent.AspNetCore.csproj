@@ -9,10 +9,12 @@
         <PackageReleaseNotes>
         </PackageReleaseNotes>
         <RootNamespace>SkyApm.Agent.AspNetCore</RootNamespace>
-        <TargetFramework>netstandard2.0</TargetFramework>
+        <TargetFrameworks>netstandard2.0;netcoreapp3.0</TargetFrameworks>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" Version="2.0.0" PrivateAssets="All" />
+        <PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" Version="2.0.0" PrivateAssets="All" Condition="'$(TargetFramework)' == 'netstandard2.0'" />
+
+        <FrameworkReference Include="Microsoft.AspNetCore.App" Condition="'$(TargetFramework)' == 'netcoreapp3.0'" />
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\SkyApm.Abstractions\SkyApm.Abstractions.csproj" />

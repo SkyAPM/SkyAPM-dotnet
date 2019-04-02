@@ -17,6 +17,9 @@
  */
 
 using Microsoft.AspNetCore.Hosting;
+#if NETCOREAPP3_0
+using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IWebHostEnvironment;
+#endif
 
 namespace SkyApm.Agent.AspNetCore
 {
