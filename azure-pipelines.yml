@@ -84,9 +84,6 @@ jobs:
       copy $(Build.Repository.LocalPath)\skyapm.json skyapm-installer
       copy $(Build.Repository.LocalPath)\src\SkyApm.ClrProfiler\x64\Release\SkyApm.ClrProfiler.dll skyapm-installer
       copy $(Build.Repository.LocalPath)\tools\iisrestart.cmd skyapm-installer
-      copy $(Build.Repository.LocalPath)\tools\gac.cmd skyapm-installer
-      copy $(Build.Repository.LocalPath)\tools\gacutil.exe skyapm-installer
-      copy $(Build.Repository.LocalPath)\tools\gacutil.exe.config skyapm-installer
       cd skyapm-installer
       SET target=net461
       mkdir %target%

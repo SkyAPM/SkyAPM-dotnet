@@ -1,1 +1,0 @@
-support .netcore , build from https://github.com/caozhiyuan/il-repack/

@@ -57,9 +57,22 @@ if exist %_VSWHERE% (
   for /f "usebackq tokens=*" %%i in (`%_VSWHERE% -latest -prerelease -property installationPath`) do set _VSPATH=%%i
 )
 
-cd ../
+if not exist "%WorkDir%gacutil.exe" (
+   "%_VSPATH%\MSBuild\15.0\Bin\MSBuild.exe" gacutil\gacutil.csproj /p:Configuration="Release" /p:OutputPath="../"
+)
 
-"%_VSPATH%\MSBuild\15.0\Bin\MSBuild.exe" /p:Configuration="%BuildType%" /restore:True
+if not exist "%WorkDir%il-repack" (
+   git clone https://github.com/caozhiyuan/il-repack.git
+)
+
+cd il-repack\ILRepack
+if not exist "%WorkDir%ILRepack" (
+   dotnet publish -c release -f netcoreapp2.1 -o %WorkDir%ILRepack
+)
+
+cd %WorkDir%../
+
+"%_VSPATH%\MSBuild\15.0\Bin\MSBuild.exe" skyapm-dotnet.sln /p:Configuration="%BuildType%" /restore:True
 
 cd src
 

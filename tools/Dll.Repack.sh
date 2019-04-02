@@ -26,9 +26,19 @@ TransportOUTDLL="SkyAPM.Transport.Grpc.dll"
 TransportDLLS="SkyAPM.Transport.Grpc.dll System.Interactive.Async.dll Google.Protobuf.dll Grpc.Core.dll"
 TransportDLLS="${TransportDLLS} SkyAPM.Transport.Grpc.Protocol.dll"
 
-cd ../
+if [ ! -d "$WorkDir/il-repack" ];then
+	git clone https://github.com/caozhiyuan/il-repack.git
+fi
 
-dotnet build -c $BuildType
+cd il-repack/ILRepack
+
+if [ ! -d "$WorkDir/ILRepack" ];then
+	dotnet publish -c release -f netcoreapp2.2 -o $WorkDir/ILRepack
+fi
+
+cd $WorkDir/../
+
+dotnet build skyapm-dotnet.sln -c $BuildType
 
 cd src
 cd SkyApm.Transport.Grpc
