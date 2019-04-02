@@ -34,9 +34,9 @@ namespace SkyApm.ClrProfiler.Trace.HttpClient
 
         private readonly ITracingContext _tracingContext;
 
-        public SystemHttpClient(IServiceProvider serviceProvider) : base(serviceProvider)
+        public SystemHttpClient(ITracingContext tracingContext)
         {
-            _tracingContext = (ITracingContext)serviceProvider.GetService(typeof(ITracingContext));
+            _tracingContext = tracingContext;
         }
 
         public override EndMethodDelegate BeforeWrappedMethod(TraceMethodInfo traceMethodInfo)

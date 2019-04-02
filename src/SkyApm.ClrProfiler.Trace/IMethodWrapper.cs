@@ -29,11 +29,6 @@ namespace SkyApm.ClrProfiler.Trace
 
     public abstract class AbsMethodWrapper : IMethodWrapper
     {
-        protected AbsMethodWrapper(IServiceProvider serviceProvider)
-        {
-
-        }
-
         public virtual EndMethodDelegate BeforeWrappedMethod(TraceMethodInfo traceMethodInfo)
         {
             throw new NotImplementedException();
@@ -47,7 +42,7 @@ namespace SkyApm.ClrProfiler.Trace
 
     public class NoopMethodWrapper : AbsMethodWrapper
     {
-        public NoopMethodWrapper(IServiceProvider serviceProvider) : base(serviceProvider)
+        public NoopMethodWrapper()
         {
 
         }

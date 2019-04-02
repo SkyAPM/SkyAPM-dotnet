@@ -389,6 +389,7 @@ namespace clrprofiler {
             return S_OK;
         }
 
+		auto iLRewriteMap = moduleMetaInfo->iLRewriteMap;
         bool isiLRewrote = false;
         {
             std::lock_guard<std::mutex> guard(mapLock);

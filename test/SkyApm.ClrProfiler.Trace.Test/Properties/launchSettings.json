@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "SkyApm.ClrProfiler.Trace.Test": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    }
+  }
+}

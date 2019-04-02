@@ -34,9 +34,9 @@ using System.Linq;
 
         private readonly ITracingContext _tracingContext;
 
-        public SystemDataSqlAsyncClient(IServiceProvider serviceProvider) : base(serviceProvider)
+        public SystemDataSqlAsyncClient(ITracingContext tracingContext)
         {
-            _tracingContext = (ITracingContext)serviceProvider.GetService(typeof(ITracingContext));
+            _tracingContext = tracingContext;
         }
 
         public override EndMethodDelegate BeforeWrappedMethod(TraceMethodInfo traceMethodInfo)

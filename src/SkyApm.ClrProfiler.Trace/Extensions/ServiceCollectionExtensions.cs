@@ -112,6 +112,48 @@ namespace SkyApm.ClrProfiler.Trace.Extensions
             services.AddSingleton(assembly.GetType("SkyApm.Transport.Grpc.ConnectionManager"));
             return services;
         }
+
+        /// <summary>
+        /// AddMethodWrapperTypes
+        /// </summary>
+        /// <param name="services"></param>
+        public static void AddMethodWrapperTypes(this IServiceCollection services)
+        {
+            var profilerHome = TraceEnvironment.Instance.GetProfilerHome();
+            foreach (var dllPath in Directory.GetFiles(profilerHome, "*.dll"))
+            {
+                try
+                {
+                    var fileName = Path.GetFileName(dllPath);
+                    if (fileName.StartsWith("SkyApm.ClrProfiler.Trace", StringComparison.OrdinalIgnoreCase))
+                    {
+                        var assembly = Assembly.Load(fileName.Replace(".dll", ""));
+                        if (assembly != null)
+                        {
+                            AddMethodWrapperTypes(assembly);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Trace.WriteLine(ex);
+                }
+            }
+
+            void AddMethodWrapperTypes(Assembly assembly)
+            {
+                var types = assembly.GetTypes();
+                foreach (var type in types)
+                {
+                    if (typeof(AbsMethodWrapper).IsAssignableFrom(type) &&
+                        type.IsClass && !type.IsAbstract && 
+                        type != typeof(NoopMethodWrapper))
+                    {
+                        services.AddSingleton(typeof(IMethodWrapper), type);
+                    }
+                }
+            }
+        }
     }
 }
 

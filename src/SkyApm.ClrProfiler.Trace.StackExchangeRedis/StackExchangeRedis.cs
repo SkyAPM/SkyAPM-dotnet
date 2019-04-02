@@ -36,9 +36,9 @@ using System.Linq;
         
         private readonly ITracingContext _tracingContext;
 
-        public StackExchangeRedis(IServiceProvider serviceProvider) : base(serviceProvider)
+        public StackExchangeRedis(ITracingContext tracingContext)
         {
-            _tracingContext = (ITracingContext)serviceProvider.GetService(typeof(ITracingContext));
+            _tracingContext = tracingContext;
         }
 
         public override EndMethodDelegate BeforeWrappedMethod(TraceMethodInfo traceMethodInfo)

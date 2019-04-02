@@ -50,6 +50,8 @@ namespace SkyApm.ClrProfiler.Trace
 
                 AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
 
+                ServiceLocator.Instance.GetService<MethodFinderService>();
+
                 Task.Run(() => { ServiceLocator.Instance.GetService<IInstrumentStartup>()?.StartAsync(); });
 
                 _initialized = true;
@@ -90,9 +92,9 @@ namespace SkyApm.ClrProfiler.Trace
 
         private void RegisterServices(IServiceCollection services)
         {
+            services.AddMethodWrapperTypes();
             services.AddSingleton(TraceEnvironment.Instance);
             services.AddSingleton<MethodFinderService>();
-
             services.AddSkyAPMCore();
         }
 

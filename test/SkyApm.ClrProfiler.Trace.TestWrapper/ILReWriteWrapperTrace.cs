@@ -3,18 +3,24 @@ using System.Linq;
 using SkyApm.ClrProfiler.Trace.Utils;
 using SkyApm.Tracing;
 
-namespace SkyApm.ClrProfiler.Trace.Test
+namespace SkyApm.ClrProfiler.Trace.TestWrapper
 {
-    public class DataReadWrapperTrace : AbsMethodWrapper
+    // ReSharper disable once InconsistentNaming
+    public class ILReWriteWrapperTrace : AbsMethodWrapper
     {
-        private const string TypeName = "SkyApm.ClrProfiler.Trace.Test.TraceAgentTest";
+        private static readonly string[] TypeNames =
+        {
+            "SkyApm.ClrProfiler.Trace.Test.ILReWriteTest",
+            "SkyApm.ClrProfiler.Trace.Test.ILReWriteTest2"
+        };
+
         private static readonly string[] AssemblyNames = { "SkyApm.ClrProfiler.Trace.Test" };
 
         private readonly ITracingContext _tracingContext;
 
-        public DataReadWrapperTrace(IServiceProvider serviceProvider) : base(serviceProvider)
+        public ILReWriteWrapperTrace(ITracingContext tracingContext)
         {
-            _tracingContext = (ITracingContext)serviceProvider.GetService(typeof(ITracingContext));
+            _tracingContext = tracingContext;
         }
 
         public override EndMethodDelegate BeforeWrappedMethod(TraceMethodInfo traceMethodInfo)
@@ -34,12 +40,11 @@ namespace SkyApm.ClrProfiler.Trace.Test
         {
             var invocationTargetType = traceMethodInfo.Type;
             var assemblyName = invocationTargetType.Assembly.GetName().Name;
-            if (AssemblyNames.Contains(assemblyName) && TypeName == invocationTargetType.FullName)
+            if (AssemblyNames.Contains(assemblyName) && TypeNames.Contains(invocationTargetType.FullName))
             {
-                if (traceMethodInfo.MethodBase.Name == "DataRead" ||
-                    traceMethodInfo.MethodBase.Name == "Test1" ||
+                if (traceMethodInfo.MethodBase.Name == "Test1" ||
                     traceMethodInfo.MethodBase.Name == "Test2" ||
-                    traceMethodInfo.MethodBase.Name == "StaticNoReturnTest")
+                    traceMethodInfo.MethodBase.Name == "StaticNoReturn")
                 {
                     return true;
                 }
@@ -47,5 +52,4 @@ namespace SkyApm.ClrProfiler.Trace.Test
             return false;
         }
     }
-
 }

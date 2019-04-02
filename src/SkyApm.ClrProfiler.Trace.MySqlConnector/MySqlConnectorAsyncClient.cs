@@ -34,9 +34,9 @@ using System.Linq;
 
         private readonly ITracingContext _tracingContext;
 
-        public MySqlConnectorAsyncClient(IServiceProvider serviceProvider) : base(serviceProvider)
+        public MySqlConnectorAsyncClient(ITracingContext tracingContext)
         {
-            _tracingContext = (ITracingContext)serviceProvider.GetService(typeof(ITracingContext));
+            _tracingContext = tracingContext;
         }
 
         public override EndMethodDelegate BeforeWrappedMethod(TraceMethodInfo traceMethodInfo)

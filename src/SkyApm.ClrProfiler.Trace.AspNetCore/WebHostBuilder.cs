@@ -29,11 +29,11 @@ namespace SkyApm.ClrProfiler.Trace.AspNetCore
         private const string AssemblyName = "Microsoft.AspNetCore.Hosting";
         private const string MethodName = "BuildCommonServices";
 
-        private readonly ITracingContext _tracer;
+        private readonly ITracingContext _tracingContext;
 
-        public WebHostBuilder(IServiceProvider serviceProvider) : base(serviceProvider)
+        public WebHostBuilder(ITracingContext tracingContext)
         {
-            _tracer = (ITracingContext)serviceProvider.GetService(typeof(ITracingContext));
+            _tracingContext = tracingContext;
         }
 
         public override EndMethodDelegate BeforeWrappedMethod(TraceMethodInfo traceMethodInfo)
@@ -47,7 +47,7 @@ namespace SkyApm.ClrProfiler.Trace.AspNetCore
         private void Leave(TraceMethodInfo traceMethodInfo, object ret, Exception ex)
         {
             var serviceCollection = (ServiceCollection) ret;
-            serviceCollection.AddSingleton<IStartupFilter>(n => new ProfilerStartupFilter(_tracer));
+            serviceCollection.AddSingleton<IStartupFilter>(n => new ProfilerStartupFilter(_tracingContext));
         }
 
         public override bool CanWrap(TraceMethodInfo traceMethodInfo)

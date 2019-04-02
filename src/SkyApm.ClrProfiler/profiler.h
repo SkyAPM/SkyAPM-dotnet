@@ -41,9 +41,6 @@ namespace clrprofiler {
         //clrProfilerHomeEnvValue
         WSTRING clrProfilerHomeEnvValue;
 
-        //iLRewriteMap ,because generic method has multi functionid
-        std::unordered_map<mdMethodDef, bool> iLRewriteMap{};
-
         AssemblyProperty corAssemblyProperty{};
         bool entryPointReWrote = false;
 

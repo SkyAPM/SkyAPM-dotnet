@@ -34,9 +34,9 @@
 
         private readonly ITracingContext _tracingContext;
 
-        public HttpWebRequestWrapper(IServiceProvider serviceProvider) : base(serviceProvider)
+        public HttpWebRequestWrapper(ITracingContext tracingContext)
         {
-            _tracingContext = (ITracingContext)serviceProvider.GetService(typeof(ITracingContext));
+            _tracingContext = tracingContext;
         }
 
         public override EndMethodDelegate BeforeWrappedMethod(TraceMethodInfo traceMethodInfo)

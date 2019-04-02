@@ -114,6 +114,10 @@ namespace clrprofiler {
         const mdToken entryPointToken;
         const WSTRING assemblyName;
 		const TraceAssembly trace_assembly;
+
+		//iLRewriteMap ,because generic method has multi functionid
+		std::unordered_map<mdMethodDef, bool> iLRewriteMap{};
+
         ModuleMetaInfo(mdToken entry_point_token, WSTRING assembly_name, TraceAssembly trace_assembly)
             : entryPointToken(entry_point_token),
               assemblyName(assembly_name),

@@ -6,7 +6,7 @@
   "instrumentation": [
     {
       "assemblyName": "SkyApm.ClrProfiler.Trace.Test",
-      "targetAssemblyName": "SkyApm.ClrProfiler.Trace.Test",
+      "targetAssemblyName": "SkyApm.ClrProfiler.Trace.TestWrapper",
       "classes": [
         {
           "className": "SkyApm.ClrProfiler.Trace.Test.ILReWriteTest",
