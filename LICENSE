@@ -220,3 +220,4 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
 	 Microsoft/clr-samples: https://github.com/Microsoft/clr-samples MIT
 	 nlohmann/json: https://github.com/nlohmann/json  MIT
 	 gabime/spdlog: https://github.com/gabime/spdlog MIT
+	 Microsoft/referencesource: https://github.com/Microsoft/referencesource MIT

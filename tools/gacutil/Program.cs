@@ -27,6 +27,9 @@ namespace gacutil
         [DllImport("Fusion.dll", CharSet = CharSet.Auto)]
         internal static extern int CreateAssemblyCache(out IAssemblyCache ppAsmCache, uint dwReserved);
 
+        /// <summary>
+        /// code from https://github.com/Microsoft/referencesource/blob/master/System.Web/Configuration/IAssemblyCache.cs
+        /// </summary>
         [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
         [Guid("e707dcde-d1cd-11d2-bab9-00c04f8eceae")]
         [ComImport]
