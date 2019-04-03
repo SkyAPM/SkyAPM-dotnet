@@ -36,7 +36,7 @@ namespace SkyApm.ClrProfiler.Trace.AspNetCore
             _tracingContext = tracingContext;
         }
 
-        public override EndMethodDelegate BeforeWrappedMethod(TraceMethodInfo traceMethodInfo)
+        public override AfterMethodDelegate BeginWrapMethod(TraceMethodInfo traceMethodInfo)
         {
             return delegate (object returnValue, Exception ex)
             {

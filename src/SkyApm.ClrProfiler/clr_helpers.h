@@ -57,7 +57,7 @@ namespace clrprofiler {
     const WSTRING TraceAgentTypeName = W("SkyApm.ClrProfiler.Trace.TraceAgent");
     const WSTRING GetInstanceMethodName = W("GetInstance");
     const WSTRING BeforeMethodName = W("BeforeMethod");
-    const WSTRING EndMethodName = W("EndMethod");
+    const WSTRING AfterMethodName = W("AfterMethod");
     const WSTRING MethodTraceTypeName = W("SkyApm.ClrProfiler.Trace.MethodTrace");
 
     const WSTRING AssemblyTypeName = W("System.Reflection.Assembly");

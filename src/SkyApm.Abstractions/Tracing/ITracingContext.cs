@@ -33,6 +33,6 @@ namespace SkyApm.Tracing
 
         void ReleaseScope();
 
-        SegmentContext ActiveContext { get; }
+        SegmentContext ActiveSegmentContext { get; }
     }
 }

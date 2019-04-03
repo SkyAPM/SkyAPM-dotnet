@@ -587,13 +587,13 @@ namespace clrprofiler {
             ELEMENT_TYPE_OBJECT,
             ELEMENT_TYPE_OBJECT
         };
-        mdMemberRef endMemberRef;
+        mdMemberRef afterMemberRef;
         hr = pEmit->DefineMemberRef(
             methodTraceTypeRef,
-            EndMethodName.data(),
+            AfterMethodName.data(),
             traceEndSig,
             sizeof(traceEndSig),
-            &endMemberRef);
+            &afterMemberRef);
         RETURN_OK_IF_FAILED(hr);
 
         mdAssemblyRef corLibAssemblyRef = GetCorLibAssemblyRef(metadata_interfaces, corAssemblyProperty);
@@ -752,7 +752,7 @@ namespace clrprofiler {
         il_rewriter_helper.LoadLocal(indexMethodTrace); // load methodTrace
         il_rewriter_helper.LoadLocal(indexRet); //load ret
         il_rewriter_helper.LoadLocal(indexEx); // load ex
-        il_rewriter_helper.CallMember(endMemberRef, true); // methodTrace.EndMethod(ret, ex);
+        il_rewriter_helper.CallMember(afterMemberRef, true); // methodTrace.AfterMethod(ret, ex);
 
         ILInstr* pEndFinallyInstr = il_rewriter_helper.EndFinally();
         pNewInstr->m_pTarget = pEndFinallyInstr; //finally end

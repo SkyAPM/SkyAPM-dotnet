@@ -148,7 +148,7 @@ namespace SkyApm.Tracing
             _segmentContextScopeManager.Active?.Release();
         }
 
-        public SegmentContext ActiveContext
+        public SegmentContext ActiveSegmentContext
         {
             get { return _segmentContextScopeManager.Active?.SegmentContext; }
         }

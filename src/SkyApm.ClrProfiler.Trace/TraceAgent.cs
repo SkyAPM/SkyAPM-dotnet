@@ -26,7 +26,7 @@ using SkyApm.ClrProfiler.Trace.Extensions;
 
 namespace SkyApm.ClrProfiler.Trace
 {
-    public delegate void EndMethodDelegate(object returnValue, Exception ex);
+    public delegate void AfterMethodDelegate(object returnValue, Exception ex);
 
     public class TraceAgent
     {
@@ -50,7 +50,7 @@ namespace SkyApm.ClrProfiler.Trace
 
                 AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
 
-                ServiceLocator.Instance.GetService<MethodFinderService>();
+                ServiceLocator.Instance.GetService<MethodTraceFinderService>();
 
                 Task.Run(() => { ServiceLocator.Instance.GetService<IInstrumentStartup>()?.StartAsync(); });
 
@@ -92,10 +92,10 @@ namespace SkyApm.ClrProfiler.Trace
 
         private void RegisterServices(IServiceCollection services)
         {
-            services.AddMethodWrapperTypes();
-            services.AddSingleton(TraceEnvironment.Instance);
-            services.AddSingleton<MethodFinderService>();
-            services.AddSkyAPMCore();
+            services.AddMethodWrapperTypes()
+                .AddSingleton(TraceEnvironment.Instance)
+                .AddSingleton<MethodTraceFinderService>()
+                .AddSkyAPMCore();
         }
 
         public static object GetInstance()
@@ -110,33 +110,24 @@ namespace SkyApm.ClrProfiler.Trace
                 return default(MethodTrace);
             }
 
-            try
-            {
-                var args = methodArguments;
-                var wrapperService = ServiceLocator.Instance.GetService<MethodFinderService>();
-                var endMethodDelegate = wrapperService.BeforeWrappedMethod(type, invocationTarget, args, functionToken);
-                return endMethodDelegate != null ? new MethodTrace(endMethodDelegate) : default(MethodTrace);
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Trace.WriteLine(ex);
-                return default(MethodTrace);
-            }
+            var args = methodArguments;
+            var methodTraceFinderService = ServiceLocator.Instance.GetService<MethodTraceFinderService>();
+            return methodTraceFinderService.GetMethodTrace(type, invocationTarget, args, functionToken);
         }
     }
 
     public class MethodTrace
     {
-        private readonly EndMethodDelegate _endMethodDelegate;
+        private readonly AfterMethodDelegate _afterMethodDelegate;
 
-        public MethodTrace(EndMethodDelegate endMethodDelegate)
+        public MethodTrace(AfterMethodDelegate afterMethodDelegate)
         {
-            this._endMethodDelegate = endMethodDelegate;
+            this._afterMethodDelegate = afterMethodDelegate;
         }
 
-        public void EndMethod(object returnValue, object ex)
+        public void AfterMethod(object returnValue, object ex)
         {
-            this._endMethodDelegate(returnValue, (Exception)ex);
+            this._afterMethodDelegate(returnValue, (Exception)ex);
         }
     }
 }

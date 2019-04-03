@@ -23,7 +23,8 @@ namespace SkyApm.ClrProfiler.Trace
 {
     public class TraceEnvironment
     {
-        private readonly Lazy<string> LazyProfilerHome = new Lazy<string>(() => Environment.GetEnvironmentVariable(TraceConstant.PROFILER_HOME));
+        private readonly Lazy<string> _lazyProfilerHome = new Lazy<string>(() => Environment.GetEnvironmentVariable(TraceConstant.PROFILER_HOME));
+
         public static readonly TraceEnvironment Instance = new TraceEnvironment();
         private TraceEnvironment()
         {
@@ -32,7 +33,7 @@ namespace SkyApm.ClrProfiler.Trace
 
         public string GetProfilerHome()
         {
-            return LazyProfilerHome.Value;
+            return _lazyProfilerHome.Value;
         }
     }
 }

@@ -19,13 +19,12 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using SkyApm.Logging;
 
  namespace SkyApm.ClrProfiler.Trace
 {
-    internal class MethodFinderService
+    internal class MethodTraceFinderService
     {
         private readonly ConcurrentDictionary<uint, FunctionInfoCache> _functionInfosCache =
             new ConcurrentDictionary<uint, FunctionInfoCache>();
@@ -33,13 +32,13 @@ using SkyApm.Logging;
         private readonly ILogger _logger;
         private readonly IEnumerable<IMethodWrapper> _methodWrappers;
 
-        public MethodFinderService(ILoggerFactory loggerFactory, IEnumerable<IMethodWrapper> methodWrappers)
+        public MethodTraceFinderService(ILoggerFactory loggerFactory, IEnumerable<IMethodWrapper> methodWrappers)
         {
-            _logger = loggerFactory.CreateLogger(typeof(MethodFinderService));
+            _logger = loggerFactory.CreateLogger(typeof(MethodTraceFinderService));
             _methodWrappers = methodWrappers;
         }
 
-        public EndMethodDelegate BeforeWrappedMethod(object type,
+        public MethodTrace GetMethodTrace(object type,
             object invocationTarget,
             object[] methodArguments,
             uint functionToken)
@@ -69,7 +68,8 @@ using SkyApm.Logging;
                     PrepareMethodWrapper(functionInfo, traceMethodInfo);
                 }
 
-                return functionInfo.MethodWrapper?.BeforeWrappedMethod(traceMethodInfo);
+                var @delegate = functionInfo.MethodWrapper?.BeginWrapMethod(traceMethodInfo);
+                return @delegate == null ? null : new MethodTrace(@delegate);
             }
             catch (Exception ex)
             {

@@ -77,9 +77,9 @@ namespace SkyApm.Tracing
             _segmentContextFactory.ReleaseScope();
         }
 
-        public SegmentContext ActiveContext
+        public SegmentContext ActiveSegmentContext
         {
-            get { return _segmentContextFactory.ActiveContext; }
+            get { return _segmentContextFactory.ActiveSegmentContext; }
         }
     }
 }

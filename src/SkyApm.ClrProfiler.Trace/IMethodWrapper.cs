@@ -22,14 +22,14 @@ namespace SkyApm.ClrProfiler.Trace
 {
     internal interface IMethodWrapper
     {
-        EndMethodDelegate BeforeWrappedMethod(TraceMethodInfo traceMethodInfo);
+        AfterMethodDelegate BeginWrapMethod(TraceMethodInfo traceMethodInfo);
 
         bool CanWrap(TraceMethodInfo traceMethodInfo);
     }
 
     public abstract class AbsMethodWrapper : IMethodWrapper
     {
-        public virtual EndMethodDelegate BeforeWrappedMethod(TraceMethodInfo traceMethodInfo)
+        public virtual AfterMethodDelegate BeginWrapMethod(TraceMethodInfo traceMethodInfo)
         {
             throw new NotImplementedException();
         }
@@ -47,7 +47,7 @@ namespace SkyApm.ClrProfiler.Trace
 
         }
 
-        public override EndMethodDelegate BeforeWrappedMethod(TraceMethodInfo traceMethodInfo)
+        public override AfterMethodDelegate BeginWrapMethod(TraceMethodInfo traceMethodInfo)
         {
             return null;
         }

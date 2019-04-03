@@ -36,7 +36,7 @@ namespace SkyApm.ClrProfiler.Trace.AspNet
             _tracingContext = tracingContext;
         }
 
-        public override EndMethodDelegate BeforeWrappedMethod(TraceMethodInfo traceMethodInfo)
+        public override AfterMethodDelegate BeginWrapMethod(TraceMethodInfo traceMethodInfo)
         {
             if (HttpRuntime.UsingIntegratedPipeline)
             {

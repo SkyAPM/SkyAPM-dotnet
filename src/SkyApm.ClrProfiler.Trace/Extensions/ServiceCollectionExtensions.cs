@@ -117,7 +117,7 @@ namespace SkyApm.ClrProfiler.Trace.Extensions
         /// AddMethodWrapperTypes
         /// </summary>
         /// <param name="services"></param>
-        public static void AddMethodWrapperTypes(this IServiceCollection services)
+        public static IServiceCollection AddMethodWrapperTypes(this IServiceCollection services)
         {
             var profilerHome = TraceEnvironment.Instance.GetProfilerHome();
             foreach (var dllPath in Directory.GetFiles(profilerHome, "*.dll"))
@@ -153,6 +153,8 @@ namespace SkyApm.ClrProfiler.Trace.Extensions
                     }
                 }
             }
+
+            return services;
         }
     }
 }

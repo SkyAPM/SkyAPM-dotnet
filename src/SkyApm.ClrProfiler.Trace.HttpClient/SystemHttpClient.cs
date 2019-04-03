@@ -39,7 +39,7 @@ namespace SkyApm.ClrProfiler.Trace.HttpClient
             _tracingContext = tracingContext;
         }
 
-        public override EndMethodDelegate BeforeWrappedMethod(TraceMethodInfo traceMethodInfo)
+        public override AfterMethodDelegate BeginWrapMethod(TraceMethodInfo traceMethodInfo)
         {
             var request = (HttpRequestMessage)traceMethodInfo.MethodArguments[0];
 

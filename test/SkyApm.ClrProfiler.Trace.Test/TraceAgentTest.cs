@@ -98,7 +98,7 @@ namespace SkyApm.ClrProfiler.Trace.Test
             {
                 if (methodTrace != null)
                 {
-                    methodTrace.EndMethod(ret, ex);
+                    methodTrace.AfterMethod(ret, ex);
                 }
             }
             T:

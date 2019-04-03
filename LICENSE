@@ -212,8 +212,7 @@ licenses.
 MIT licenses
 ========================================================================
 
-The following components are provided under the MIT License. See project link for details.
-The text of each license is also included at licenses/LICENSE-[project].txt.
+The following components are provided under the MIT License.
      
 	 MicrosoftArchive/clrprofiler: https://github.com/MicrosoftArchive/clrprofiler MIT
 	 dotnet/coreclr: https://github.com/dotnet/coreclr MIT
@@ -221,3 +220,11 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
 	 nlohmann/json: https://github.com/nlohmann/json  MIT
 	 gabime/spdlog: https://github.com/gabime/spdlog MIT
 	 Microsoft/referencesource: https://github.com/Microsoft/referencesource MIT
+
+========================================================================
+Apache licenses
+========================================================================
+
+The following components are provided under the Apache License 2.0.
+
+	 aspnet/EntityFrameworkCore : https://github.com/aspnet/EntityFrameworkCore Apache 2.0

@@ -39,7 +39,7 @@
             _tracingContext = tracingContext;
         }
 
-        public override EndMethodDelegate BeforeWrappedMethod(TraceMethodInfo traceMethodInfo)
+        public override AfterMethodDelegate BeginWrapMethod(TraceMethodInfo traceMethodInfo)
         {
             var request = traceMethodInfo.InvocationTarget as System.Net.HttpWebRequest;
             if (request == null)

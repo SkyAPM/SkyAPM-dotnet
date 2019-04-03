@@ -41,7 +41,7 @@ using System.Linq;
             _tracingContext = tracingContext;
         }
 
-        public override EndMethodDelegate BeforeWrappedMethod(TraceMethodInfo traceMethodInfo)
+        public override AfterMethodDelegate BeginWrapMethod(TraceMethodInfo traceMethodInfo)
         {
             var multiplexer = traceMethodInfo.InvocationTarget;
             var message = traceMethodInfo.MethodArguments[0];
