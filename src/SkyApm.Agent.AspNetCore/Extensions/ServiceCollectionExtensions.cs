@@ -61,6 +61,7 @@ namespace SkyApm.Agent.AspNetCore
             services.AddSingleton<IConfigurationFactory, ConfigurationFactory>();
             services.AddSingleton<IHostedService, InstrumentationHostedService>();
             services.AddSingleton<IEnvironmentProvider, HostingEnvironmentProvider>();
+            services.AddSingleton<IExecutionService, CLRStatsService>();
             services.AddTracing().AddSampling().AddGrpcTransport().AddLogging();
             services.AddSkyApmExtensions().AddAspNetCoreHosting().AddHttpClient().AddSqlClient()
                 .AddEntityFrameworkCore(c => c.AddPomeloMysql().AddNpgsql().AddSqlite())
@@ -103,6 +104,7 @@ namespace SkyApm.Agent.AspNetCore
             services.AddSingleton<IPingCaller, PingCaller>();
             services.AddSingleton<IServiceRegister, ServiceRegister>();
             services.AddSingleton<IExecutionService, ConnectService>();
+            services.AddSingleton<ICLRStatsReporter, CLRStatsReporter>();
             return services;
         }
 
