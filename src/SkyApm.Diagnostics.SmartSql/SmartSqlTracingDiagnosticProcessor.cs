@@ -1,7 +1,10 @@
-﻿using System;
+using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Text;
 using SkyApm.Tracing;
+using SkyApm.Tracing.Segments;
 using SmartSql;
 using SmartSql.Diagnostics;
 
@@ -20,23 +23,42 @@ namespace SkyApm.Diagnostics.SmartSql
             _tracingContext = tracingContext;
             _localSegmentContextAccessor = localSegmentContextAccessor;
         }
+        private void AddConnectionTag(SegmentContext context, DbConnection dbConnection)
+        {
+            if (dbConnection == null)
+            {
+                return;
+            }
+            if (dbConnection.DataSource != null)
+            {
+                context.Span.Peer = new Common.StringOrIntValue(dbConnection.DataSource);
+            }
+            if (dbConnection.Database != null)
+            {
+                context.Span.AddTag(Common.Tags.DB_INSTANCE, dbConnection.Database);
+            }
+        }
+        private SegmentContext CreateSmartSqlLocalSegmentContext(string operation)
+        {
+            var context = _tracingContext.CreateLocalSegmentContext(operation);
+            context.Span.SpanLayer = SpanLayer.DB;
+            context.Span.Component = Common.Components.SMART_SQL;
+            context.Span.AddTag(Common.Tags.DB_TYPE, "Sql");
+            return context;
+        }
         #region BeginTransaction
         [DiagnosticName(SmartSqlDiagnosticListenerExtensions.SMART_SQL_BEFORE_DB_SESSION_BEGINTRANSACTION)]
         public void BeforeDbSessionBeginTransaction([Object]DbSessionBeginTransactionBeforeEventData eventData)
         {
-            var context = _tracingContext.CreateLocalSegmentContext("BeginTransaction");
-            context.Span.SpanLayer = Tracing.Segments.SpanLayer.DB;
-            context.Span.Component = Common.Components.SMART_SQL;
-            context.Span.AddTag(Common.Tags.DB_TYPE, "Sql");
+            CreateSmartSqlLocalSegmentContext("BeginTransaction");
         }
+
         [DiagnosticName(SmartSqlDiagnosticListenerExtensions.SMART_SQL_AFTER_DB_SESSION_BEGINTRANSACTION)]
         public void AfterDbSessionBeginTransaction([Object]DbSessionBeginTransactionAfterEventData eventData)
         {
             var context = _localSegmentContextAccessor.Context;
             if (context != null)
             {
-                context.Span.Peer = new Common.StringOrIntValue(eventData.DbSession.Connection?.DataSource);
-                context.Span.AddTag(Common.Tags.DB_INSTANCE, eventData.DbSession.Connection?.Database);
                 _tracingContext.Release(context);
             }
         }
@@ -55,13 +77,10 @@ namespace SkyApm.Diagnostics.SmartSql
         [DiagnosticName(SmartSqlDiagnosticListenerExtensions.SMART_SQL_BEFORE_DB_SESSION_COMMIT)]
         public void BeforeDbSessionCommit([Object]DbSessionCommitBeforeEventData eventData)
         {
-            var context = _tracingContext.CreateLocalSegmentContext(eventData.Operation);
-            context.Span.SpanLayer = Tracing.Segments.SpanLayer.DB;
-            context.Span.Component = Common.Components.SMART_SQL;
-            context.Span.Peer = new Common.StringOrIntValue(eventData.DbSession.Connection?.DataSource);
-            context.Span.AddTag(Common.Tags.DB_INSTANCE, eventData.DbSession.Connection?.Database);
-            context.Span.AddTag(Common.Tags.DB_TYPE, "Sql");
+            var context = CreateSmartSqlLocalSegmentContext(eventData.Operation);
+            AddConnectionTag(context, eventData.DbSession.Connection);
         }
+
         [DiagnosticName(SmartSqlDiagnosticListenerExtensions.SMART_SQL_AFTER_DB_SESSION_COMMIT)]
         public void AfterDbSessionCommit([Object]DbSessionCommitAfterEventData eventData)
         {
@@ -86,12 +105,8 @@ namespace SkyApm.Diagnostics.SmartSql
         [DiagnosticName(SmartSqlDiagnosticListenerExtensions.SMART_SQL_BEFORE_DB_SESSION_ROLLBACK)]
         public void BeforeDbSessionRollback([Object]DbSessionRollbackBeforeEventData eventData)
         {
-            var context = _tracingContext.CreateLocalSegmentContext(eventData.Operation);
-            context.Span.SpanLayer = Tracing.Segments.SpanLayer.DB;
-            context.Span.Component = Common.Components.SMART_SQL;
-            context.Span.Peer = new Common.StringOrIntValue(eventData.DbSession.Connection?.DataSource);
-            context.Span.AddTag(Common.Tags.DB_INSTANCE, eventData.DbSession.Connection?.Database);
-            context.Span.AddTag(Common.Tags.DB_TYPE, "Sql");
+            var context = CreateSmartSqlLocalSegmentContext(eventData.Operation);
+            AddConnectionTag(context, eventData.DbSession.Connection);
         }
         [DiagnosticName(SmartSqlDiagnosticListenerExtensions.SMART_SQL_AFTER_DB_SESSION_ROLLBACK)]
         public void AfterDbSessionRollback([Object]DbSessionRollbackAfterEventData eventData)
@@ -117,12 +132,8 @@ namespace SkyApm.Diagnostics.SmartSql
         [DiagnosticName(SmartSqlDiagnosticListenerExtensions.SMART_SQL_BEFORE_DB_SESSION_DISPOSE)]
         public void BeforeDbSessionDispose([Object]DbSessionDisposeBeforeEventData eventData)
         {
-            var context = _tracingContext.CreateLocalSegmentContext(eventData.Operation);
-            context.Span.SpanLayer = Tracing.Segments.SpanLayer.DB;
-            context.Span.Component = Common.Components.SMART_SQL;
-            context.Span.Peer = new Common.StringOrIntValue(eventData.DbSession.Connection?.DataSource);
-            context.Span.AddTag(Common.Tags.DB_INSTANCE, eventData.DbSession.Connection?.Database);
-            context.Span.AddTag(Common.Tags.DB_TYPE, "Sql");
+            var context = CreateSmartSqlLocalSegmentContext(eventData.Operation);
+            AddConnectionTag(context, eventData.DbSession.Connection);
         }
         [DiagnosticName(SmartSqlDiagnosticListenerExtensions.SMART_SQL_AFTER_DB_SESSION_DISPOSE)]
         public void AfterDbSessionDispose([Object]DbSessionDisposeAfterEventData eventData)
@@ -148,10 +159,7 @@ namespace SkyApm.Diagnostics.SmartSql
         [DiagnosticName(SmartSqlDiagnosticListenerExtensions.SMART_SQL_BEFORE_DB_SESSION_OPEN)]
         public void BeforeDbSessionOpen([Object]DbSessionOpenBeforeEventData eventData)
         {
-            var context = _tracingContext.CreateLocalSegmentContext(eventData.Operation);
-            context.Span.SpanLayer = Tracing.Segments.SpanLayer.DB;
-            context.Span.Component = Common.Components.SMART_SQL;
-            context.Span.AddTag(Common.Tags.DB_TYPE, "Sql");
+            CreateSmartSqlLocalSegmentContext(eventData.Operation);
         }
         [DiagnosticName(SmartSqlDiagnosticListenerExtensions.SMART_SQL_AFTER_DB_SESSION_OPEN)]
         public void AfterDbSessionOpen([Object]DbSessionOpenAfterEventData eventData)
@@ -159,8 +167,7 @@ namespace SkyApm.Diagnostics.SmartSql
             var context = _localSegmentContextAccessor.Context;
             if (context != null)
             {
-                context.Span.Peer = new Common.StringOrIntValue(eventData.DbSession.Connection?.DataSource);
-                context.Span.AddTag(Common.Tags.DB_INSTANCE, eventData.DbSession.Connection?.Database);
+                AddConnectionTag(context, eventData.DbSession.Connection);
                 _tracingContext.Release(context);
             }
         }
@@ -170,6 +177,7 @@ namespace SkyApm.Diagnostics.SmartSql
             var context = _localSegmentContextAccessor.Context;
             if (context != null)
             {
+                AddConnectionTag(context, eventData.DbSession.Connection);
                 context.Span.ErrorOccurred(eventData.Exception);
                 _tracingContext.Release(context);
             }
@@ -184,10 +192,7 @@ namespace SkyApm.Diagnostics.SmartSql
         [DiagnosticName(SmartSqlDiagnosticListenerExtensions.SMART_SQL_BEFORE_DB_SESSION_INVOKE)]
         public void BeforeDbSessionInvoke([Object]DbSessionInvokeBeforeEventData eventData)
         {
-            var context = _tracingContext.CreateLocalSegmentContext(ResolveOperationName(eventData.ExecutionContext));
-            context.Span.SpanLayer = Tracing.Segments.SpanLayer.DB;
-            context.Span.Component = Common.Components.SMART_SQL;
-            context.Span.AddTag(Common.Tags.DB_TYPE, "Sql");
+            CreateSmartSqlLocalSegmentContext(ResolveOperationName(eventData.ExecutionContext));
         }
         [DiagnosticName(SmartSqlDiagnosticListenerExtensions.SMART_SQL_AFTER_DB_SESSION_INVOKE)]
         public void AfterDbSessionInvoke([Object]DbSessionInvokeAfterEventData eventData)
@@ -196,9 +201,10 @@ namespace SkyApm.Diagnostics.SmartSql
             if (context != null)
             {
                 context.Span.AddTag("from_cache", eventData.ExecutionContext.Result.FromCache);
-                context.Span.Peer = new Common.StringOrIntValue(eventData.DbSession.Connection?.DataSource);
-                context.Span.AddTag(Common.Tags.DB_INSTANCE, eventData.DbSession.Connection?.Database);
-                context.Span.AddTag(Common.Tags.DB_STATEMENT, eventData.ExecutionContext.Request.RealSql);
+                var resultSize = eventData.ExecutionContext.Result.IsList
+                    ? (eventData.ExecutionContext.Result.GetData() as ICollection)?.Count
+                    : 1;
+                context.Span.AddTag("result_size", resultSize?.ToString());
                 _tracingContext.Release(context);
             }
         }
@@ -212,6 +218,41 @@ namespace SkyApm.Diagnostics.SmartSql
                 _tracingContext.Release(context);
             }
         }
+        #endregion
+
+        #region CommandExecuter
+
+        [DiagnosticName(SmartSqlDiagnosticListenerExtensions.SMART_SQL_BEFORE_COMMAND_EXECUTER_EXECUTE)]
+        public void BeforeCommandExecuterExecute([Object]CommandExecuterExecuteBeforeEventData eventData)
+        {
+            var context = CreateSmartSqlLocalSegmentContext(eventData.Operation);
+            if (eventData.ExecutionContext.Request.RealSql != null)
+            {
+                context.Span.AddTag(Common.Tags.DB_STATEMENT, eventData.ExecutionContext.Request.RealSql);
+            }
+        }
+        [DiagnosticName(SmartSqlDiagnosticListenerExtensions.SMART_SQL_AFTER_COMMAND_EXECUTER_EXECUTE)]
+        public void AfterCommandExecuterExecute([Object]CommandExecuterExecuteAfterEventData eventData)
+        {
+            var context = _localSegmentContextAccessor.Context;
+            if (context != null)
+            {
+                AddConnectionTag(context, eventData.ExecutionContext.DbSession.Connection);
+                _tracingContext.Release(context);
+            }
+        }
+        [DiagnosticName(SmartSqlDiagnosticListenerExtensions.SMART_SQL_ERROR_COMMAND_EXECUTER_EXECUTE)]
+        public void ErrorCommandExecuterExecute([Object]CommandExecuterExecuteErrorEventData eventData)
+        {
+            var context = _localSegmentContextAccessor.Context;
+            if (context != null)
+            {
+                AddConnectionTag(context, eventData.ExecutionContext.DbSession.Connection);
+                context.Span.ErrorOccurred(eventData.Exception);
+                _tracingContext.Release(context);
+            }
+        }
+
         #endregion
     }
 }
