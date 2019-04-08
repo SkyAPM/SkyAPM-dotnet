@@ -46,7 +46,7 @@ namespace SkyApm.Common
                     Interlocked.Exchange(ref _usagePercent, usagePercent);
                     await Task.Delay(1000);
                 }
-            }, TaskCreationOptions.LongRunning);
+            });
         }
     }
 }
