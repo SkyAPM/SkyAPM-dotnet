@@ -22,7 +22,7 @@ namespace SkyApm.Tracing
     {
         public bool TryParse(string text, out UniqueId uniqueId)
         {
-            uniqueId = default;
+            uniqueId = default(UniqueId);
             if (text == null) return false;
             var parts = text.Split("\\.".ToCharArray(), 3);
             if (parts.Length < 3) return false;
