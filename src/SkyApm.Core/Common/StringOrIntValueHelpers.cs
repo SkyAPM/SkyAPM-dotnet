@@ -24,7 +24,7 @@ namespace SkyApm.Common
     {
         public static StringOrIntValue ParseStringOrIntValue(string value)
         {
-            return value.StartsWith("#") ? new StringOrIntValue(new string(value.AsSpan().Slice(1, value.Length - 1).ToArray())) : new StringOrIntValue(int.Parse(value));
+            return value.StartsWith("#") ? new StringOrIntValue(value.Substring(1, value.Length - 1)) : new StringOrIntValue(int.Parse(value));
         }
     }
 }

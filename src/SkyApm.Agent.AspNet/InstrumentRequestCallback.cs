@@ -30,19 +30,21 @@ namespace SkyApm.Agent.AspNet
     {
         private readonly InstrumentConfig _config;
         private readonly ITracingContext _tracingContext;
-        private readonly IEntrySegmentContextAccessor _contextAccessor;
 
-        public InstrumentRequestCallback(IConfigAccessor configAccessor, ITracingContext tracingContext,
-            IEntrySegmentContextAccessor contextAccessor)
+        public InstrumentRequestCallback(IConfigAccessor configAccessor, ITracingContext tracingContext)
         {
             _config = configAccessor.Get<InstrumentConfig>();
             _tracingContext = tracingContext;
-            _contextAccessor = contextAccessor;
         }
 
         public void ApplicationOnBeginRequest(object sender, EventArgs e)
         {
             var httpApplication = sender as HttpApplication;
+            if (httpApplication == null)
+            {
+                return;
+            }
+
             var httpContext = httpApplication.Context;
 
             if (httpContext.Request.HttpMethod == "OPTIONS")
@@ -61,24 +63,31 @@ namespace SkyApm.Agent.AspNet
             context.Span.AddLog(LogEvent.Event("AspNet BeginRequest"),
                 LogEvent.Message(
                     $"Request starting {httpContext.Request.Url.Scheme} {httpContext.Request.HttpMethod} {httpContext.Request.Url.OriginalString}"));
+
+            httpContext.Items["AspNet.SegmentContext"] = context;
         }
 
         public void ApplicationOnEndRequest(object sender, EventArgs e)
         {
-            var context = _contextAccessor.Context;
-            if (context == null)
+            var httpApplication = sender as HttpApplication;
+            if (httpApplication == null)
             {
                 return;
             }
-            
-            var httpApplication = sender as HttpApplication;
+
             var httpContext = httpApplication.Context;
             if (httpContext.Request.HttpMethod == "OPTIONS")
             {
                 //asp.net Exclude OPTIONS request
                 return;
             }
-            
+
+            var context = httpContext.Items["AspNet.SegmentContext"] as SegmentContext;
+            if (context == null)
+            {
+                return;
+            }
+
             var statusCode = httpContext.Response.StatusCode;
             if (statusCode >= 400)
             {

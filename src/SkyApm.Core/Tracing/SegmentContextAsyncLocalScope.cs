@@ -17,33 +17,34 @@
  */
 
 using SkyApm.Tracing.Segments;
-using System.Runtime.CompilerServices;
-using System.Threading;
 
 namespace SkyApm.Tracing
 {
-    public class LocalSegmentContextAccessor : ILocalSegmentContextAccessor
+    internal class SegmentContextAsyncLocalScope : ISegmentContextScope
     {
-        private readonly ConditionalWeakTable<SegmentContext, SegmentContext> _parent = new ConditionalWeakTable<SegmentContext, SegmentContext>();
-        private readonly AsyncLocal<SegmentContext> _segmentContext = new AsyncLocal<SegmentContext>();
+        private readonly SegmentContextScopeManager _scopeManager;
+        private readonly ISegmentContextScope _scopeToRestore;
+        private bool _released;
 
-        public SegmentContext Context
+        public SegmentContextAsyncLocalScope(SegmentContextScopeManager scopeManager,
+            SegmentContext segmentContext)
         {
-            get => _segmentContext.Value;
-            set
+            _scopeManager = scopeManager;
+            SegmentContext = segmentContext;
+            _scopeToRestore = scopeManager.Active;
+            scopeManager.Active = this;
+        }
+
+        public SegmentContext SegmentContext { get; }
+
+        public void Release()
+        {
+            if (_released)
             {
-                var current = _segmentContext.Value;
-                if (value == null)
-                {
-                    if (_parent.TryGetValue(current, out var parent))
-                        _segmentContext.Value = parent;
-                }
-                else
-                {
-                    _parent.Add(value, current);
-                    _segmentContext.Value = value;
-                }
+                return;
             }
+            _scopeManager.Active = _scopeToRestore;
+            _released = true;
         }
     }
 }

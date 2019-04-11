@@ -36,7 +36,6 @@ using SkyApm.Diagnostics.EntityFrameworkCore;
 using SkyApm.Diagnostics.HttpClient;
 using SkyApm.Diagnostics.SqlClient;
 using SkyApm.Utilities.DependencyInjection;
-using SkyApm.Diagnostics.SmartSql;
 
 namespace SkyApm.Agent.AspNetCore
 {
@@ -75,9 +74,7 @@ namespace SkyApm.Agent.AspNetCore
             services.AddSingleton<ICarrierFormatter, Sw3CarrierFormatter>();
             services.AddSingleton<ICarrierFormatter, Sw6CarrierFormatter>();
             services.AddSingleton<ISegmentContextFactory, SegmentContextFactory>();
-            services.AddSingleton<IEntrySegmentContextAccessor, EntrySegmentContextAccessor>();
-            services.AddSingleton<ILocalSegmentContextAccessor, LocalSegmentContextAccessor>();
-            services.AddSingleton<IExitSegmentContextAccessor, ExitSegmentContextAccessor>();
+            services.AddSingleton<ISegmentContextScopeManager, SegmentContextScopeManager>();
             services.AddSingleton<ISamplerChainBuilder, SamplerChainBuilder>();
             services.AddSingleton<IUniqueIdGenerator, UniqueIdGenerator>();
             services.AddSingleton<IUniqueIdParser, UniqueIdParser>();

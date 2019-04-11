@@ -28,27 +28,18 @@ namespace SkyApm.Diagnostics.EntityFrameworkCore
     {
         private readonly IEnumerable<IEntityFrameworkCoreSpanMetadataProvider> _spanMetadataProviders;
         private readonly ITracingContext _tracingContext;
-        private readonly ILocalSegmentContextAccessor _localSegmentContextAccessor;
-        private readonly IExitSegmentContextAccessor _exitSegmentContextAccessor;
 
         public EntityFrameworkCoreSegmentContextFactory(
             IEnumerable<IEntityFrameworkCoreSpanMetadataProvider> spanMetadataProviders,
-            ITracingContext tracingContext, ILocalSegmentContextAccessor localSegmentContextAccessor,
-            IExitSegmentContextAccessor exitSegmentContextAccessor)
+            ITracingContext tracingContext)
         {
             _spanMetadataProviders = spanMetadataProviders;
             _tracingContext = tracingContext;
-            _localSegmentContextAccessor = localSegmentContextAccessor;
-            _exitSegmentContextAccessor = exitSegmentContextAccessor;
         }
 
         public SegmentContext GetCurrentContext(DbCommand dbCommand)
         {
-            foreach (var provider in _spanMetadataProviders)
-                if (provider.Match(dbCommand.Connection))
-                    return _exitSegmentContextAccessor.Context;
-
-            return _localSegmentContextAccessor.Context;
+            return _tracingContext.ActiveSegmentContext;
         }
 
         public SegmentContext Create(string operationName, DbCommand dbCommand)

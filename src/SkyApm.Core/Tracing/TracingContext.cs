@@ -71,5 +71,15 @@ namespace SkyApm.Tracing
             if (segmentContext.Sampled)
                 _segmentDispatcher.Dispatch(segmentContext);
         }
+
+        public void ReleaseScope()
+        {
+            _segmentContextFactory.ReleaseScope();
+        }
+
+        public SegmentContext ActiveSegmentContext
+        {
+            get { return _segmentContextFactory.ActiveSegmentContext; }
+        }
     }
 }

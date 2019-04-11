@@ -30,5 +30,12 @@ namespace SkyApm.Tracing
             ICarrierHeaderCollection carrierHeader = default(ICarrierHeaderCollection));
 
         void Release(SegmentContext segmentContext);
+
+        /// <summary>
+        /// ReleaseScope at method end  for no async mark method 
+        /// </summary>
+        void ReleaseScope();
+
+        SegmentContext ActiveSegmentContext { get; }
     }
 }

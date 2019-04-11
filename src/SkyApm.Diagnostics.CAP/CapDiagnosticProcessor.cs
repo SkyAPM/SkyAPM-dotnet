@@ -44,16 +44,10 @@ namespace SkyApm.Diagnostics.CAP
         }
 
         private readonly ITracingContext _tracingContext;
-        private readonly IEntrySegmentContextAccessor _entrySegmentContextAccessor;
-        private readonly IExitSegmentContextAccessor _exitSegmentContextAccessor;
 
-        public CapTracingDiagnosticProcessor(ITracingContext tracingContext,
-            IEntrySegmentContextAccessor entrySegmentContextAccessor,
-            IExitSegmentContextAccessor exitSegmentContextAccessor)
+        public CapTracingDiagnosticProcessor(ITracingContext tracingContext)
         {
             _tracingContext = tracingContext;
-            _exitSegmentContextAccessor = exitSegmentContextAccessor;
-            _entrySegmentContextAccessor = entrySegmentContextAccessor;
         }
 
         [DiagnosticName(CapEvents.CapBeforePublish)]
@@ -70,13 +64,13 @@ namespace SkyApm.Diagnostics.CAP
         [DiagnosticName(CapEvents.CapAfterPublish)]
         public void CapAfterPublish([Object] BrokerPublishEndEventData eventData)
         {
-            _tracingContext.Release(_exitSegmentContextAccessor.Context);
+            _tracingContext.Release(_tracingContext.ActiveSegmentContext);
         }
 
         [DiagnosticName(CapEvents.CapErrorPublish)]
         public void CapErrorPublish([Object] BrokerPublishErrorEventData eventData)
         {
-            var context = _exitSegmentContextAccessor.Context;
+            var context = _tracingContext.ActiveSegmentContext;
             if (context != null)
             {
                 context.Span.ErrorOccurred(eventData.Exception);
@@ -107,13 +101,13 @@ namespace SkyApm.Diagnostics.CAP
         [DiagnosticName(CapEvents.CapAfterConsume)]
         public void CapAfterConsume([Object] BrokerConsumeEndEventData eventData)
         {
-            _tracingContext.Release(_entrySegmentContextAccessor.Context);
+            _tracingContext.Release(_tracingContext.ActiveSegmentContext);
         }
 
         [DiagnosticName(CapEvents.CapErrorConsume)]
         public void CapErrorConsume([Object] BrokerConsumeErrorEventData eventData)
         {
-            var context = _entrySegmentContextAccessor.Context;
+            var context = _tracingContext.ActiveSegmentContext;
             if (context != null)
             {
                 context.Span.ErrorOccurred(eventData.Exception);

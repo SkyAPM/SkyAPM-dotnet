@@ -26,13 +26,10 @@ namespace SkyApm.Diagnostics.SqlClient
     public class SqlClientTracingDiagnosticProcessor : ITracingDiagnosticProcessor
     {
         private readonly ITracingContext _tracingContext;
-        private readonly IExitSegmentContextAccessor _contextAccessor;
 
-        public SqlClientTracingDiagnosticProcessor(ITracingContext tracingContext,
-            IExitSegmentContextAccessor contextAccessor)
+        public SqlClientTracingDiagnosticProcessor(ITracingContext tracingContext)
         {
             _tracingContext = tracingContext;
-            _contextAccessor = contextAccessor;
         }
         
         public string ListenerName { get; } = SqlClientDiagnosticStrings.DiagnosticListenerName;
@@ -58,7 +55,7 @@ namespace SkyApm.Diagnostics.SqlClient
         [DiagnosticName(SqlClientDiagnosticStrings.SqlAfterExecuteCommand)]
         public void AfterExecuteCommand()
         {
-            var context = _contextAccessor.Context;
+            var context = _tracingContext.ActiveSegmentContext;
             if (context != null)
             {
                 _tracingContext.Release(context);
@@ -68,7 +65,7 @@ namespace SkyApm.Diagnostics.SqlClient
         [DiagnosticName(SqlClientDiagnosticStrings.SqlErrorExecuteCommand)]
         public void ErrorExecuteCommand([Property(Name = "Exception")] Exception ex)
         {
-            var context = _contextAccessor.Context;
+            var context = _tracingContext.ActiveSegmentContext;
             if (context != null)
             {
                 context.Span.ErrorOccurred(ex);

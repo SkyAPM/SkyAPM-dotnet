@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Licensed to the SkyAPM under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -21,14 +21,19 @@ using SkyApm.Tracing.Segments;
 
 namespace SkyApm.Tracing
 {
-    public class ExitSegmentContextAccessor : IExitSegmentContextAccessor
+    public class SegmentContextScopeManager: ISegmentContextScopeManager
     {
-        private readonly AsyncLocal<SegmentContext> _segmentContext = new AsyncLocal<SegmentContext>();
+        private readonly AsyncLocal<ISegmentContextScope> _current = new AsyncLocal<ISegmentContextScope>();
 
-        public SegmentContext Context
+        public ISegmentContextScope Active
         {
-            get => _segmentContext.Value;
-            set => _segmentContext.Value = value;
+            get => _current.Value;
+            set => _current.Value = value;
+        }
+
+        public ISegmentContextScope Activate(SegmentContext segmentContext)
+        {
+            return new SegmentContextAsyncLocalScope(this, segmentContext);
         }
     }
 }

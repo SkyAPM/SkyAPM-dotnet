@@ -54,9 +54,7 @@ namespace SkyApm.Agent.AspNet.Extensions
             services.AddSingleton<ICarrierFormatter, Sw3CarrierFormatter>();
             services.AddSingleton<ICarrierFormatter, Sw6CarrierFormatter>();
             services.AddSingleton<ISegmentContextFactory, SegmentContextFactory>();
-            services.AddSingleton<IEntrySegmentContextAccessor, EntrySegmentContextAccessor>();
-            services.AddSingleton<ILocalSegmentContextAccessor, LocalSegmentContextAccessor>();
-            services.AddSingleton<IExitSegmentContextAccessor, ExitSegmentContextAccessor>();
+            services.AddSingleton<ISegmentContextScopeManager, SegmentContextScopeManager>();
             services.AddSingleton<ISamplerChainBuilder, SamplerChainBuilder>();
             services.AddSingleton<IUniqueIdGenerator, UniqueIdGenerator>();
             services.AddSingleton<IUniqueIdParser, UniqueIdParser>();

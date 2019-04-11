@@ -27,16 +27,12 @@ namespace SkyApm.Diagnostics.HttpClient
     public class HttpClientTracingDiagnosticProcessor : ITracingDiagnosticProcessor
     {
         public string ListenerName { get; } = "HttpHandlerDiagnosticListener";
-
-        //private readonly IContextCarrierFactory _contextCarrierFactory;
+        
         private readonly ITracingContext _tracingContext;
-        private readonly IExitSegmentContextAccessor _contextAccessor;
 
-        public HttpClientTracingDiagnosticProcessor(ITracingContext tracingContext,
-            IExitSegmentContextAccessor contextAccessor)
+        public HttpClientTracingDiagnosticProcessor(ITracingContext tracingContext)
         {
             _tracingContext = tracingContext;
-            _contextAccessor = contextAccessor;
         }
 
         [DiagnosticName("System.Net.Http.Request")]
@@ -55,7 +51,7 @@ namespace SkyApm.Diagnostics.HttpClient
         [DiagnosticName("System.Net.Http.Response")]
         public void HttpResponse([Property(Name = "Response")] HttpResponseMessage response)
         {
-            var context = _contextAccessor.Context;
+            var context = _tracingContext.ActiveSegmentContext;
             if (context == null)
             {
                 return;
@@ -79,7 +75,7 @@ namespace SkyApm.Diagnostics.HttpClient
         public void HttpException([Property(Name = "Request")] HttpRequestMessage request,
             [Property(Name = "Exception")] Exception exception)
         {
-            _contextAccessor.Context?.Span?.ErrorOccurred(exception);
+            _tracingContext.ActiveSegmentContext?.Span?.ErrorOccurred(exception);
         }
     }
 }

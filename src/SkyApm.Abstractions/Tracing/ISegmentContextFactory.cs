@@ -30,5 +30,9 @@ namespace SkyApm.Tracing
         SegmentContext CreateExitSegment(string operationName, StringOrIntValue networkAddress);
         
         void Release(SegmentContext segmentContext);
+
+        void ReleaseScope();
+
+        SegmentContext ActiveSegmentContext { get; }
     }
 }

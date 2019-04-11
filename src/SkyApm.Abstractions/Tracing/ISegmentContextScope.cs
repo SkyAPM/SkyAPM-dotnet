@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Licensed to the SkyAPM under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -16,19 +16,14 @@
  *
  */
 
-using System.Threading;
 using SkyApm.Tracing.Segments;
 
 namespace SkyApm.Tracing
 {
-    public class EntrySegmentContextAccessor : IEntrySegmentContextAccessor
+    public interface ISegmentContextScope
     {
-        private readonly AsyncLocal<SegmentContext> _segmentContext = new AsyncLocal<SegmentContext>();
+        SegmentContext SegmentContext { get; }
 
-        public SegmentContext Context
-        {
-            get => _segmentContext.Value;
-            set => _segmentContext.Value = value;
-        }
+        void Release();
     }
 }

@@ -32,13 +32,10 @@ namespace SkyApm.AspNetCore.Diagnostics
         public string ListenerName { get; } = "Microsoft.AspNetCore";
 
         private readonly ITracingContext _tracingContext;
-        private readonly IEntrySegmentContextAccessor _segmentContextAccessor;
 
-        public HostingTracingDiagnosticProcessor(IEntrySegmentContextAccessor segmentContextAccessor,
-            ITracingContext tracingContext)
+        public HostingTracingDiagnosticProcessor(ITracingContext tracingContext)
         {
             _tracingContext = tracingContext;
-            _segmentContextAccessor = segmentContextAccessor;
         }
 
         [DiagnosticName("Microsoft.AspNetCore.Hosting.BeginRequest")]
@@ -61,7 +58,7 @@ namespace SkyApm.AspNetCore.Diagnostics
         [DiagnosticName("Microsoft.AspNetCore.Hosting.EndRequest")]
         public void EndRequest([Property] HttpContext httpContext)
         {
-            var context = _segmentContextAccessor.Context;
+            var context = _tracingContext.ActiveSegmentContext;
             if (context == null)
             {
                 return;
@@ -84,13 +81,13 @@ namespace SkyApm.AspNetCore.Diagnostics
         [DiagnosticName("Microsoft.AspNetCore.Diagnostics.UnhandledException")]
         public void DiagnosticUnhandledException([Property] HttpContext httpContext, [Property] Exception exception)
         {
-            _segmentContextAccessor.Context?.Span?.ErrorOccurred(exception);
+           _tracingContext.ActiveSegmentContext?.Span?.ErrorOccurred(exception);
         }
 
         [DiagnosticName("Microsoft.AspNetCore.Hosting.UnhandledException")]
         public void HostingUnhandledException([Property] HttpContext httpContext, [Property] Exception exception)
         {
-            _segmentContextAccessor.Context?.Span?.ErrorOccurred(exception);
+            _tracingContext.ActiveSegmentContext?.Span?.ErrorOccurred(exception);
         }
 
         //[DiagnosticName("Microsoft.AspNetCore.Mvc.BeforeAction")]
