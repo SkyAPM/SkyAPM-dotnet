@@ -33,7 +33,7 @@ namespace SkyApm.Tracing
 
         public ISegmentContextScope Activate(SegmentContext segmentContext)
         {
-            return new SegmentContextAsyncLocalScope(this, segmentContext);
+            return new SegmentContextScope(this, segmentContext);
         }
     }
 }

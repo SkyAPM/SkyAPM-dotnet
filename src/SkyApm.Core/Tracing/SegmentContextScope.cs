@@ -20,13 +20,13 @@ using SkyApm.Tracing.Segments;
 
 namespace SkyApm.Tracing
 {
-    internal class SegmentContextAsyncLocalScope : ISegmentContextScope
+    internal class SegmentContextScope : ISegmentContextScope
     {
         private readonly SegmentContextScopeManager _scopeManager;
         private readonly ISegmentContextScope _scopeToRestore;
         private bool _released;
 
-        public SegmentContextAsyncLocalScope(SegmentContextScopeManager scopeManager,
+        public SegmentContextScope(SegmentContextScopeManager scopeManager,
             SegmentContext segmentContext)
         {
             _scopeManager = scopeManager;
