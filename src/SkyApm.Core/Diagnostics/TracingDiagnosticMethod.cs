@@ -30,22 +30,15 @@ namespace SkyApm.Diagnostics
         private readonly IParameterResolver[] _parameterResolvers;
         private readonly MethodReflector _reflector;
 
-        public TracingDiagnosticMethod(ITracingDiagnosticProcessor tracingDiagnosticProcessor, MethodInfo method,
-            string diagnosticName)
+        public TracingDiagnosticMethod(ITracingDiagnosticProcessor tracingDiagnosticProcessor, MethodInfo method)
         {
             _tracingDiagnosticProcessor = tracingDiagnosticProcessor;
             _reflector = method.GetReflector();
-            _diagnosticName = diagnosticName;
             _parameterResolvers = GetParameterResolvers(method).ToArray();
         }
 
-        public void Invoke(string diagnosticName, object value)
+        public void Invoke(object value)
         {
-            if (_diagnosticName != diagnosticName)
-            {
-                return;
-            }
-
             var args = new object[_parameterResolvers.Length];
             for (var i = 0; i < _parameterResolvers.Length; i++)
             {
