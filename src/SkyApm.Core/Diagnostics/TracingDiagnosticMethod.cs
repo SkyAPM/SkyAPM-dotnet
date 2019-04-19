@@ -26,7 +26,6 @@ namespace SkyApm.Diagnostics
     internal class TracingDiagnosticMethod
     {
         private readonly ITracingDiagnosticProcessor _tracingDiagnosticProcessor;
-        private readonly string _diagnosticName;
         private readonly IParameterResolver[] _parameterResolvers;
         private readonly MethodReflector _reflector;
 
