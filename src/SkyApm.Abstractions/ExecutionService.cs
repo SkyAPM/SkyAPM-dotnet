@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Licensed to the SkyAPM under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -47,7 +47,7 @@ namespace SkyApm
         }
 
         public async Task StopAsync(CancellationToken cancellationToken = default(CancellationToken))
-        { 
+        {
             _cancellationTokenSource?.Cancel();
             await Stopping(cancellationToken);
             Logger.Information($"Stopped instrument service {GetType().Name}.");
@@ -60,14 +60,20 @@ namespace SkyApm
 
         private async void Callback(object state)
         {
-            if (state is CancellationTokenSource token && !token.IsCancellationRequested && CanExecute())
+            if (!(state is CancellationTokenSource token) || token.IsCancellationRequested || !CanExecute()) return;
+
+            try
             {
                 await ExecuteAsync(token.Token);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(GetType().FullName + ".ExecuteAsync(token.Token) fail", ex);
             }
         }
 
         protected virtual bool CanExecute() => RuntimeEnvironment.Initialized;
-        
+
         protected virtual Task Stopping(CancellationToken cancellationToke) => Task.CompletedTask;
 
         protected abstract TimeSpan DueTime { get; }
