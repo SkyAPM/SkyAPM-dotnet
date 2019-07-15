@@ -65,7 +65,7 @@ namespace SkyApm.Transport.Grpc.V6
                         ServiceName = serviceRequest.ServiceName
                     });
                     var mapping = await client.doServiceRegisterAsync(services,
-                        null, _config.GetTimeout(), cancellationToken);
+                        _config.GetMeta(), _config.GetTimeout(), cancellationToken);
                     foreach (var service in mapping.Services)
                         if (service.Key == serviceRequest.ServiceName)
                             return new NullableValue(service.Value);
@@ -109,7 +109,7 @@ namespace SkyApm.Transport.Grpc.V6
                     var serviceInstances = new ServiceInstances();
                     serviceInstances.Instances.Add(instance);
                     var mapping = await client.doServiceInstanceRegisterAsync(serviceInstances,
-                        null, _config.GetTimeout(), cancellationToken);
+                        _config.GetMeta(), _config.GetTimeout(), cancellationToken);
                     foreach (var serviceInstance in mapping.ServiceInstances)
                         if (serviceInstance.Key == serviceInstanceRequest.InstanceUUID)
                             return new NullableValue(serviceInstance.Value);
