@@ -82,7 +82,8 @@ namespace SkyApm.DotNet.CLI.Command
                 {"Servers", servers},
                 {"Timeout", 10000},
                 {"ConnectTimeout", 10000},
-                {"ReportTimeout", 600000}
+                {"ReportTimeout", 600000},
+                {"Authentication", ""}
             };
 
             var transportConfig = new Dictionary<string, dynamic>

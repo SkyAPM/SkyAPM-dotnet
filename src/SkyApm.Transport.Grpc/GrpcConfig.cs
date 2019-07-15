@@ -18,6 +18,7 @@
 
 using System;
 using SkyApm.Config;
+using Grpc.Core;
 
 namespace SkyApm.Transport.Grpc
 {
@@ -31,6 +32,8 @@ namespace SkyApm.Transport.Grpc
         public int Timeout { get; set; }
 
         public int ReportTimeout { get; set; }
+
+        public string Authentication { get; set; }
     }
 
     public static class GrpcConfigExtensions
@@ -48,6 +51,14 @@ namespace SkyApm.Transport.Grpc
         public static DateTime GetReportTimeout(this GrpcConfig config)
         {
             return DateTime.UtcNow.AddMilliseconds(config.ReportTimeout);
+        }
+        public static Metadata GetMeta(this GrpcConfig config)
+        {
+            if (string.IsNullOrEmpty(config.Authentication))
+            {
+                return null;
+            }
+            return new Metadata { new Metadata.Entry("Authentication", config.Authentication) };
         }
     }
 }

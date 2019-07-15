@@ -56,7 +56,7 @@ namespace SkyApm.Transport.Grpc.V6
                         ServiceInstanceId = request.ServiceInstanceId,
                         ServiceInstanceUUID = request.InstanceId,
                         Time = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()
-                    }, null, _config.GetTimeout(), cancellationToken);
+                    }, _config.GetMeta(), _config.GetTimeout(), cancellationToken);
                 },
                 () => ExceptionHelpers.PingError);
         }

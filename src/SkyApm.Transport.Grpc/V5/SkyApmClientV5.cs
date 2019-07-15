@@ -57,7 +57,7 @@ namespace SkyApm.Transport.Grpc.V5
                 {
                     var applicationMapping = await client.applicationCodeRegisterAsync(
                         new Application {ApplicationCode = applicationCode},
-                        null, _config.GetTimeout(), cancellationToken);
+                        _config.GetMeta(), _config.GetTimeout(), cancellationToken);
 
                     return new NullableValue(applicationMapping?.Application?.Value ?? 0);
                 },
@@ -121,7 +121,7 @@ namespace SkyApm.Transport.Grpc.V5
                 HeartbeatTime = heartbeatTime
             };
             await new Call(_logger, _connectionManager).Execute(
-                async () => await client.heartbeatAsync(heartbeat, null, _config.GetTimeout(), cancellationToken),
+                async () => await client.heartbeatAsync(heartbeat, _config.GetMeta(), _config.GetTimeout(), cancellationToken),
                 () => ExceptionHelpers.HeartbeatError);
         }
     }

@@ -81,7 +81,7 @@ namespace SkyApm.Transport.Grpc.V6
                 };
                 request.Metrics.Add(metric);
                 var client = new CLRMetricReportService.CLRMetricReportServiceClient(connection);
-                await client.collectAsync(request, null, _config.GetTimeout(), cancellationToken);
+                await client.collectAsync(request, _config.GetMeta(), _config.GetTimeout(), cancellationToken);
             }
             catch (Exception e)
             {

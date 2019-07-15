@@ -57,7 +57,7 @@ namespace SkyApm.Transport.Grpc.V6
                 var stopwatch = Stopwatch.StartNew();
                 var client = new TraceSegmentReportService.TraceSegmentReportServiceClient(connection);
                 using (var asyncClientStreamingCall =
-                    client.collect(null, _config.GetReportTimeout(), cancellationToken))
+                    client.collect(_config.GetMeta(), _config.GetReportTimeout(), cancellationToken))
                 {
                     foreach (var segment in segmentRequests)
                         await asyncClientStreamingCall.RequestStream.WriteAsync(SegmentV6Helpers.Map(segment));
