@@ -19,6 +19,8 @@ namespace SkyApm.Sample.Frontend
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
+
+            // DI grpc service
             services.AddSingleton<GreeterGrpcService>();
         }
 

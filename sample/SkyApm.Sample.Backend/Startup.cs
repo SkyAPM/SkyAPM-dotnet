@@ -32,6 +32,8 @@ namespace SkyApm.Sample.Backend
             services.AddEntityFrameworkSqlite().AddDbContext<SampleDbContext>(c => c.UseSqlite(sqliteConnection));
 
             services.AddSingleton<ISamplingInterceptor, CustomSamplingInterceptor>();
+
+            // DI grpc service
             services.AddSingleton<GreeterGrpcService>();
         }
 

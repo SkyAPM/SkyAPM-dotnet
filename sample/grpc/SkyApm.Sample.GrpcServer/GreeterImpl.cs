@@ -22,7 +22,7 @@ namespace SkyApm.Sample.GrpcServer
 
         public override Task<HelloReply> SayHelloWithException(HelloRequest request, ServerCallContext context)
         {
-            throw new Exception("grpc 方法出现异常！！！");
+            throw new Exception("grpc server throw exception ！！！");
         }
     }
 }
