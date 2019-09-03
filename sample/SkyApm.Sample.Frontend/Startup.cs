@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using SkyApm.Sample.Backend.Services;
 
 namespace SkyApm.Sample.Frontend
 {
@@ -18,6 +19,7 @@ namespace SkyApm.Sample.Frontend
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
+            services.AddSingleton<GreeterGrpcService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

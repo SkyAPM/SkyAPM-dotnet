@@ -1,6 +1,6 @@
 {
   "SkyWalking": {
-    "ServiceName": "general-host-sample",
+    "ServiceName": "grpc-greeter-server",
     "Namespace": "",
     "HeaderVersions": [
       "sw6"

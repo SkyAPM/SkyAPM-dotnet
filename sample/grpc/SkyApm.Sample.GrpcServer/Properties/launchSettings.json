@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "SkyApm.Sample.GrpcServer": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}
