@@ -39,5 +39,7 @@ namespace SkyApm.Common
         public static readonly StringOrIntValue ASPNET = new StringOrIntValue("AspNet");
 
         public static readonly StringOrIntValue SMART_SQL = new StringOrIntValue("SmartSql");
+
+        public static readonly StringOrIntValue GRPC = new StringOrIntValue("GRPC");
     }
 }
