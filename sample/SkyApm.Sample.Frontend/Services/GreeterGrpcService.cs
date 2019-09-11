@@ -20,13 +20,6 @@ namespace SkyApm.Sample.Backend.Services
             _client = new Greeter.GreeterClient(invoker).WithHost(target);
         }
 
-        private CallInvoker GetChannel(ClientDiagnosticInterceptor interceptor)
-        {
-            var channel = new Channel("localhost:12345", ChannelCredentials.Insecure);
-            var invoker = channel.Intercept(interceptor);
-            return invoker;
-        }
-
         public string SayHello(string name)
         {
             var reply = _client.SayHello(new HelloRequest { Name = name });
