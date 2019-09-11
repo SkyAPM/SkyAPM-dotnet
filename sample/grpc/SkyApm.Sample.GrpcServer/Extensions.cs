@@ -1,29 +1,17 @@
 ﻿using Grpc.Core;
 using Grpc.Core.Interceptors;
 using GrpcGreeter;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using SkyApm.Diagnostics.Grpc.Server;
 using System;
+using System.Collections.Generic;
+using System.Text;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace SkyApm.Sample.GrpcServer
 {
-    public class Startup
+    public static class Extensions
     {
-        public Startup(IConfiguration configuration)
-        {
-            Configuration = configuration;
-        }
-
-        public IConfiguration Configuration { get; }
-
-        public IServiceProvider ConfigureServices(IServiceCollection services)
-        {
-            services.AddLogging();
-            return services.BuildServiceProvider();
-        }
-
-        public void Use(IServiceProvider provider)
+        public static IServiceProvider StartGrpcServer(this IServiceProvider provider)
         {
             var interceptor = provider.GetService<ServerDiagnosticInterceptor>();
             var definition = Greeter.BindService(new GreeterImpl());
@@ -38,11 +26,9 @@ namespace SkyApm.Sample.GrpcServer
                 Ports = { new ServerPort("localhost", port, ServerCredentials.Insecure) },
             };
             server.Start();
-            
+
             Console.WriteLine("Greeter server listening on port " + port);
-            //Console.WriteLine("Press any key to stop the server...");
-            //Console.ReadKey();
-            //server.ShutdownAsync().Wait();
+            return provider;
         }
     }
 }

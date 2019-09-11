@@ -42,10 +42,18 @@ namespace SkyApm.Diagnostics.Grpc.Client
                 var options = context.Options.WithHeaders(metadata);
                 context = new ClientInterceptorContext<TRequest, TResponse>(context.Method, context.Host, options);
                 var response = continuation(request, context);
-                var responseAsync = response.ResponseAsync.ContinueWith<TResponse>(r =>
+                var responseAsync = response.ResponseAsync.ContinueWith(r =>
                 {
-                    _processor.EndRequest();
-                    return r.Result;
+                    try
+                    {
+                        _processor.EndRequest();
+                        return r.Result;
+                    }
+                    catch (Exception ex)
+                    {
+                        _processor.DiagnosticUnhandledException(ex);
+                        throw ex;
+                    }
                 });
                 return new AsyncUnaryCall<TResponse>(responseAsync, response.ResponseHeadersAsync, response.GetStatus, response.GetTrailers, response.Dispose);
             }
@@ -55,7 +63,5 @@ namespace SkyApm.Diagnostics.Grpc.Client
                 throw ex;
             }
         }
-
-
     }
 }
