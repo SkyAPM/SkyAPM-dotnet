@@ -18,33 +18,38 @@
 
 using System.Collections;
 using System.Collections.Generic;
-using DotNetCore.CAP.Diagnostics;
+using DotNetCore.CAP.Messages;
 using SkyApm.Tracing;
 
 namespace SkyApm.Diagnostics.CAP
 {
     public class CapCarrierHeaderCollection : ICarrierHeaderCollection
     {
-        private readonly TracingHeaders _tracingHeaders;
+        private readonly IDictionary<string,string> _messageHeaders;
 
-        public CapCarrierHeaderCollection(TracingHeaders tracingHeaders)
+        public CapCarrierHeaderCollection(TransportMessage message)
         {
-            _tracingHeaders = tracingHeaders;
+            _messageHeaders = message.Headers;
+        }
+
+        public CapCarrierHeaderCollection(Message message)
+        {
+            _messageHeaders = message.Headers;
         }
         
         public IEnumerator<KeyValuePair<string, string>> GetEnumerator()
         {
-            return _tracingHeaders.GetEnumerator();
+            return _messageHeaders.GetEnumerator();
         }
 
         public void Add(string key, string value)
         {
-            _tracingHeaders.Add(key, value);
+            _messageHeaders.Add(key, value);
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return _tracingHeaders.GetEnumerator();
+            return GetEnumerator();
         }
     }
 }
