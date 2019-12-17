@@ -19,6 +19,7 @@
 using System.Collections.Concurrent;
 using DotNetCore.CAP.Diagnostics;
 using DotNetCore.CAP.Messages;
+using DotNetCore.CAP.Transport;
 using SkyApm.Common;
 using SkyApm.Tracing;
 using SkyApm.Tracing.Segments;
@@ -32,8 +33,12 @@ namespace SkyApm.Diagnostics.CAP
     public class CapTracingDiagnosticProcessor : ITracingDiagnosticProcessor
     {
         private readonly ConcurrentDictionary<string, SegmentContext> _contexts = new ConcurrentDictionary<string, SegmentContext>();
-
         public string ListenerName => CapEvents.DiagnosticListenerName;
+
+        private const string OperateNamePrefix = "CAP/";
+        private const string ProducerOperateNameSuffix = "/Publisher";
+        private const string ConsumerOperateNameSuffix = "/Subscriber";
+
         private readonly ITracingContext _tracingContext;
         private readonly IEntrySegmentContextAccessor _entrySegmentContextAccessor;
         private readonly IExitSegmentContextAccessor _exitSegmentContextAccessor;
@@ -56,9 +61,9 @@ namespace SkyApm.Diagnostics.CAP
             _contexts[eventData.Message.GetId()] = _entrySegmentContextAccessor.Context;
 
             var context = _tracingContext.CreateLocalSegmentContext("Event Persistence: " + eventData.Operation);
-            context.Span.SpanLayer = SpanLayer.DB;
+            //context.Span.SpanLayer = SpanLayer.DB;
             context.Span.Component = Components.CAP;
-            context.Span.AddTag(Tags.DB_TYPE, "sql");
+            //context.Span.AddTag(Tags.DB_TYPE, "sql");
             context.Span.AddLog(LogEvent.Event("Event Persistence"));
             context.Span.AddLog(LogEvent.Message("CAP message persistence start..."));
         }
@@ -91,15 +96,15 @@ namespace SkyApm.Diagnostics.CAP
         {
             _localSegmentContextAccessor.Context = _contexts[eventData.TransportMessage.GetId()];
 
-            var context = _tracingContext.CreateExitSegmentContext(
-                "Event Publishing: " + eventData.Operation,
-                eventData.BrokerAddress.Replace("-1", "5672"),
+            var context = _tracingContext.CreateExitSegmentContext(OperateNamePrefix + eventData.Operation + ProducerOperateNameSuffix,
+                eventData.BrokerAddress.Endpoint.Replace("-1", "5672"),
                 new CapCarrierHeaderCollection(eventData.TransportMessage));
-            
+
             context.Span.SpanLayer = SpanLayer.MQ;
-            context.Span.Component = Components.CAP;
+            context.Span.Component = GetComponent(eventData.BrokerAddress, true);
+
             context.Span.AddTag(Tags.MQ_TOPIC, eventData.Operation);
-            context.Span.AddTag(Tags.MQ_BROKER, eventData.BrokerAddress);
+            context.Span.AddTag(Tags.MQ_BROKER, eventData.BrokerAddress.Endpoint);
             context.Span.AddLog(LogEvent.Event("Event Publishing"));
             context.Span.AddLog(LogEvent.Message("Message publishing start..."));
         }
@@ -139,12 +144,12 @@ namespace SkyApm.Diagnostics.CAP
         public void CapBeforeConsume([Object] CapEventDataSubStore eventData)
         {
             var carrierHeader = new CapCarrierHeaderCollection(eventData.TransportMessage);
-            var context = _tracingContext.CreateEntrySegmentContext("Event Persistence: " + eventData.Operation, carrierHeader);
+            var context = _tracingContext.CreateEntrySegmentContext(OperateNamePrefix + eventData.Operation + ConsumerOperateNameSuffix, carrierHeader);
             context.Span.SpanLayer = SpanLayer.MQ;
-            context.Span.Component = Components.CAP;
-            context.Span.Peer = eventData.BrokerAddress;
+            context.Span.Component = GetComponent(eventData.BrokerAddress, false);
+            context.Span.Peer = eventData.BrokerAddress.Endpoint;
             context.Span.AddTag(Tags.MQ_TOPIC, eventData.Operation);
-            context.Span.AddTag(Tags.MQ_BROKER, eventData.BrokerAddress);
+            context.Span.AddTag(Tags.MQ_BROKER, eventData.BrokerAddress.Endpoint);
             context.Span.AddLog(LogEvent.Event("Event Persistence"));
             context.Span.AddLog(LogEvent.Message("CAP message persistence start..."));
 
@@ -183,9 +188,9 @@ namespace SkyApm.Diagnostics.CAP
             _entrySegmentContextAccessor.Context = _contexts[eventData.Message.GetId()];
 
             var context = _tracingContext.CreateLocalSegmentContext("Subscriber Invoke: " + eventData.MethodInfo.Name);
-            context.Span.SpanLayer = SpanLayer.DB;
+            //context.Span.SpanLayer = SpanLayer.DB;
             context.Span.Component = Components.CAP;
-            context.Span.AddTag(Tags.DB_TYPE, "Sql");
+            //context.Span.AddTag(Tags.DB_TYPE, "Sql");
             context.Span.AddLog(LogEvent.Event("Subscriber Invoke"));
             context.Span.AddLog(LogEvent.Message("Begin invoke the subscriber: " + eventData.MethodInfo.Name));
         }
@@ -218,6 +223,31 @@ namespace SkyApm.Diagnostics.CAP
             _tracingContext.Release(context);
 
             _contexts.TryRemove(eventData.Message.GetId(), out _);
+        }
+
+        private StringOrIntValue GetComponent(BrokerAddress address, bool isPub)
+        {
+            if (isPub)
+            {
+                switch (address.Name)
+                {
+                    case "RabbitMQ":
+                        return "rabbitmq-producer";
+                    case "Kafka":
+                        return "kafka-producer";
+                }
+            }
+            else
+            {
+                switch (address.Name)
+                {
+                    case "RabbitMQ":
+                        return "rabbitmq-consumer";
+                    case "Kafka":
+                        return "kafka-consumer";
+                }
+            }
+            return Components.CAP;
         }
     }
 }

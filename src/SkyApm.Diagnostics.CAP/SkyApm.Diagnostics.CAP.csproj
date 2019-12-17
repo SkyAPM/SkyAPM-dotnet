@@ -16,7 +16,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="DotNetCore.CAP" Version="3.0.0-preview-92995853" PrivateAssets="All" />
+    <PackageReference Include="DotNetCore.CAP" Version="3.0.0-preview-93361469" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup>
