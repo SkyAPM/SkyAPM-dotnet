@@ -16,7 +16,15 @@
  *
  */
 
+#if NETCOREAPP3_1
+
+using Microsoft.Extensions.Hosting;
+
+#else
+
 using Microsoft.AspNetCore.Hosting;
+
+#endif
 
 namespace SkyApm.Agent.AspNetCore
 {
@@ -24,9 +32,19 @@ namespace SkyApm.Agent.AspNetCore
     {
         public string EnvironmentName { get; }
 
+#if NETCOREAPP3_1
+
+        public HostingEnvironmentProvider(IHostEnvironment hostingEnvironment)
+        {
+            EnvironmentName = hostingEnvironment.EnvironmentName;
+        }
+#else
+
         public HostingEnvironmentProvider(IHostingEnvironment hostingEnvironment)
         {
             EnvironmentName = hostingEnvironment.EnvironmentName;
         }
+
+#endif
     }
 }

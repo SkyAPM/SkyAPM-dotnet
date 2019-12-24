@@ -24,9 +24,18 @@ namespace SkyApm.Agent.GeneralHost
     {
         public string EnvironmentName { get; }
 
+#if NETCOREAPP3_1
+        public HostingEnvironmentProvider(IHostEnvironment hostingEnvironment)
+        {
+            EnvironmentName = hostingEnvironment.EnvironmentName;
+        }
+#else
+
         public HostingEnvironmentProvider(IHostingEnvironment hostingEnvironment)
         {
             EnvironmentName = hostingEnvironment.EnvironmentName;
         }
+
+#endif
     }
 }
