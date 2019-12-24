@@ -5,7 +5,7 @@
     <PropertyGroup>
         <Description>$(PackagePrefix).Diagnostics.AspNetCore notifies Web Http requests.</Description>
         <AssemblyTitle>$(PackagePrefix).Diagnostics.AspNetCore</AssemblyTitle>
-        <TargetFramework>netstandard2.0</TargetFramework>
+        <TargetFrameworks>netstandard2.0;netcoreapp3.1</TargetFrameworks>
         <AssemblyName>$(PackagePrefix).Diagnostics.AspNetCore</AssemblyName>
         <PackageId>$(PackagePrefix).Diagnostics.AspNetCore</PackageId>
         <PackageTags>SkyWalking;APM;Diagnostics;AspNetCore</PackageTags>
@@ -19,8 +19,11 @@
         <ProjectReference Include="..\SkyApm.Utilities.DependencyInjection\SkyApm.Utilities.DependencyInjection.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <PackageReference Include="Microsoft.AspNetCore.Http.Extensions" Version="2.0.0" PrivateAssets="All" />
-      <PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="2.0.0" PrivateAssets="All" />
+    <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+        <PackageReference Include="Microsoft.AspNetCore.Http.Extensions" Version="2.0.0" PrivateAssets="All" />
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="2.0.0" PrivateAssets="All" />
+    </ItemGroup>
+    <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp3.1'">
+        <FrameworkReference Include="Microsoft.AspNetCore.App" />
     </ItemGroup>
 </Project>
