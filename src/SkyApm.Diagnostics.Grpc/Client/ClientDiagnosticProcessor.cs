@@ -23,9 +23,11 @@ namespace SkyApm.Diagnostics.Grpc.Client
             where TRequest : class
             where TResponse : class
         {
-            var host = grpcContext.Host;
+            // 调用grpc方法时如果没有通过WithHost()方法指定grpc服务地址，则grpcContext.Host会为null，
+            // 但context.Span.Peer为null的时候无法形成一条完整的链路，故设置了默认值[::1]
+            var host = grpcContext.Host ?? "[::1]";
             var carrierHeader = new GrpcCarrierHeaderCollection(grpcContext.Options.Headers);
-            var context = _tracingContext.CreateExitSegmentContext(grpcContext.Method.FullName, host, carrierHeader);
+            var context = _tracingContext.CreateExitSegmentContext($"{host}{grpcContext.Method.FullName}", host, carrierHeader);
             context.Span.SpanLayer = SpanLayer.RPC_FRAMEWORK;
             context.Span.Component = Components.GRPC;
             context.Span.Peer = new StringOrIntValue(host);

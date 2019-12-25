@@ -14,14 +14,10 @@ namespace SkyApm.Sample.Backend.Services
         private readonly Greeter.GreeterClient _client;
         public GreeterGrpcService(ClientDiagnosticInterceptor interceptor)
         {
-            _client = new Greeter.GreeterClient(GetChannel(interceptor));
-        }
-
-        private CallInvoker GetChannel(ClientDiagnosticInterceptor interceptor)
-        {
-            var channel = new Channel("localhost:12345", ChannelCredentials.Insecure);
+            var target = "localhost:12345";
+            var channel = new Channel(target, ChannelCredentials.Insecure);
             var invoker = channel.Intercept(interceptor);
-            return invoker;
+            _client = new Greeter.GreeterClient(invoker).WithHost(target);
         }
 
         public string SayHello(string name)
