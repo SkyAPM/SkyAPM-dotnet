@@ -20,8 +20,7 @@ namespace SkyApm.Diagnostics.Grpc.Server
 
         public void BeginRequest(ServerCallContext grpcContext)
         {
-            var context = _tracingContext.CreateEntrySegmentContext(grpcContext.Method,
-                new GrpcCarrierHeaderCollection(grpcContext.RequestHeaders));
+            var context = _tracingContext.CreateEntrySegmentContext(grpcContext.Method, new GrpcCarrierHeaderCollection(grpcContext.RequestHeaders));
             context.Span.SpanLayer = SpanLayer.RPC_FRAMEWORK;
             context.Span.Component = Components.GRPC; 
             context.Span.Peer = new StringOrIntValue(grpcContext.Peer);

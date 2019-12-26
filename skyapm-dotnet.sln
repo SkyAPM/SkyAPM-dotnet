@@ -94,7 +94,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "benchmark", "benchmark", "{
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SkyApm.Core.Tests", "test\SkyApm.Core.Tests\SkyApm.Core.Tests.csproj", "{5E654407-E22F-4696-A33F-C4B372F547BD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SkyApm.Diagnostics.Grpc", "src\SkyApm.Diagnostics.Grpc\SkyApm.Diagnostics.Grpc.csproj", "{8C389735-61CE-405C-972F-3790DF1E823E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SkyApm.Diagnostics.Grpc", "src\SkyApm.Diagnostics.Grpc\SkyApm.Diagnostics.Grpc.csproj", "{8C389735-61CE-405C-972F-3790DF1E823E}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "grpc", "grpc", "{53E9CEBA-2D11-41FD-AA60-0151A5442CC4}"
 EndProject

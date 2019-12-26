@@ -1,5 +1,6 @@
 ﻿using Grpc.Core;
 using GrpcGreeter;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using SkyApm.Agent.GeneralHost;
 using System;
@@ -13,7 +14,9 @@ namespace SkyApm.Sample.GrpcServer
     {
         public static async Task Main(string[] args)
         {
-            await CreateHostBuilder(args).Build().RunAsync();
+            var host = CreateHostBuilder(args).Build();
+            host.Services.StartGrpcServer();
+            await host.RunAsync();
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args)
@@ -25,9 +28,7 @@ namespace SkyApm.Sample.GrpcServer
                 .AddSkyAPM()
                 .ConfigureServices((hostContext, services) =>
                 {
-                    var startUp = new Startup(hostContext.Configuration);
-                    var provider = startUp.ConfigureServices(services);
-                    startUp.Use(provider);
+                    services.AddLogging();
                 });
         }
     }
