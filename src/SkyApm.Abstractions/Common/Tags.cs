@@ -39,6 +39,8 @@ namespace SkyApm.Common
 
         public static readonly string MQ_TOPIC = "mq.topic";
 
+        public static readonly string MQ_BROKER = "mq.broker";
+
         public static readonly string GRPC_METHOD_NAME = "grpc.method";
 
         public static readonly string GRPC_STATUS = "grpc.status";

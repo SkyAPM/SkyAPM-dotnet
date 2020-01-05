@@ -20,6 +20,7 @@
     <ItemGroup>
         <ProjectReference Include="..\SkyApm.Abstractions\SkyApm.Abstractions.csproj" />
         <ProjectReference Include="..\SkyApm.Diagnostics.AspNetCore\SkyApm.Diagnostics.AspNetCore.csproj" />
+        <ProjectReference Include="..\SkyApm.Diagnostics.CAP\SkyApm.Diagnostics.CAP.csproj" />
         <ProjectReference Include="..\SkyApm.Diagnostics.EntityFrameworkCore.Npgsql\SkyApm.Diagnostics.EntityFrameworkCore.Npgsql.csproj" />
         <ProjectReference Include="..\SkyApm.Diagnostics.EntityFrameworkCore.Pomelo.MySql\SkyApm.Diagnostics.EntityFrameworkCore.Pomelo.MySql.csproj" />
         <ProjectReference Include="..\SkyApm.Diagnostics.EntityFrameworkCore.Sqlite\SkyApm.Diagnostics.EntityFrameworkCore.Sqlite.csproj" />

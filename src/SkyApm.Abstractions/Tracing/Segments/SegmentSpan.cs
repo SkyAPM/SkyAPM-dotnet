@@ -42,7 +42,7 @@ namespace SkyApm.Tracing.Segments
 
         public SpanLayer SpanLayer { get; set; }
 
-        /// <summary>Limiting values. Please see <see cref="Components" /> or see <seealso href="https://github.com/apache/incubator-skywalking/blob/master/oap-server/server-starter/src/main/resources/component-libraries.yml"/></summary>
+        /// <summary>Limiting values. Please see <see cref="Components" /> or see <seealso href="https://github.com/apache/skywalking/blob/master/oap-server/server-bootstrap/src/main/resources/component-libraries.yml"/></summary>
         public StringOrIntValue Component { get; set; }
         public bool IsError { get; set; }
         public TagCollection Tags { get; } = new TagCollection();
