@@ -7,6 +7,7 @@ using Microsoft.Extensions.Hosting;
 using SkyApm.Sample.Backend.Models;
 using SkyApm.Sample.Backend.Sampling;
 using SkyApm.Sample.Backend.Services;
+using SkyApm.Sample.GrpcServer;
 using SkyApm.Tracing;
 
 namespace SkyApm.Sample.Backend
@@ -33,6 +34,8 @@ namespace SkyApm.Sample.Backend
 
             // DI grpc service
             services.AddSingleton<GreeterGrpcService>();
+
+            services.AddGrpc();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -52,6 +55,7 @@ namespace SkyApm.Sample.Backend
             app.UseEndpoints(endpoint =>
             {
                 endpoint.MapDefaultControllerRoute();
+                endpoint.MapGrpcService<GreeterImpl>();
             });
         }
     }

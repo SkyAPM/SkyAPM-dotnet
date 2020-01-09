@@ -11,6 +11,7 @@
     <ProjectReference Include="..\grpc\SkyApm.Sample.GrpcProto\SkyApm.Sample.GrpcProto.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Grpc.AspNetCore" Version="2.26.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite">
       <Version>3.1.0</Version>
     </PackageReference>
@@ -29,8 +30,5 @@
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="logs" />
   </ItemGroup>
 </Project>
