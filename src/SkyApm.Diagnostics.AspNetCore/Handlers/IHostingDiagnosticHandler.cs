@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Licensed to the SkyAPM under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -16,20 +16,18 @@
  *
  */
 
-using Microsoft.Extensions.DependencyInjection;
-using SkyApm.Diagnostics.AspNetCore.Handlers;
-using SkyApm.Utilities.DependencyInjection;
+using Microsoft.AspNetCore.Http;
+using SkyApm.Tracing;
+using SkyApm.Tracing.Segments;
 
-namespace SkyApm.AspNetCore.Diagnostics
+namespace SkyApm.Diagnostics.AspNetCore.Handlers
 {
-    public static class SkyWalkingBuilderExtensions
+    public interface IHostingDiagnosticHandler
     {
-        public static SkyApmExtensions AddAspNetCoreHosting(this SkyApmExtensions extensions)
-        {
-            extensions.Services.AddSingleton<ITracingDiagnosticProcessor, HostingTracingDiagnosticProcessor>();
-            extensions.Services.AddSingleton<IHostingDiagnosticHandler, DefaultHostingDiagnosticHandler>();
-            extensions.Services.AddSingleton<IHostingDiagnosticHandler, GrpcHostingDiagnosticHandler>();
-            return extensions;
-        }
+        bool OnlyMatch(HttpContext httpContext);
+
+        void BeginRequest(ITracingContext tracingContext, HttpContext httpContext);
+
+        void EndRequest(SegmentContext segmentContext, HttpContext httpContext);
     }
 }

@@ -16,9 +16,9 @@
  *
  */
 
-
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using SkyApm.Tracing;
 
@@ -40,7 +40,7 @@ namespace SkyApm.Diagnostics.HttpClient
 
         public IEnumerator<KeyValuePair<string, string>> GetEnumerator()
         {
-            throw new System.NotImplementedException();
+            return _request.Headers.Select(x => new KeyValuePair<string, string>(x.Key, x.Value.FirstOrDefault())).GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()

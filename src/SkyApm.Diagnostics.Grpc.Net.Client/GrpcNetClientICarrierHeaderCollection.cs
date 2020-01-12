@@ -41,7 +41,7 @@ namespace SkyApm.Diagnostics.HttpClient
         public IEnumerator<KeyValuePair<string, string>> GetEnumerator()
         {
             return _request.Headers.Select(x =>
-                     new KeyValuePair<string, string>(x.Key, x.Value.FirstOrDefault() ?? string.Empty))
+                     new KeyValuePair<string, string>(x.Key, x.Value.FirstOrDefault()))
                   .GetEnumerator();
         }
 

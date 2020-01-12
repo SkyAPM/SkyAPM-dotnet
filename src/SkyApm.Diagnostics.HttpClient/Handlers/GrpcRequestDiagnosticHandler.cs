@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Licensed to the SkyAPM under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -16,20 +16,24 @@
  *
  */
 
-using Microsoft.Extensions.DependencyInjection;
-using SkyApm.Diagnostics.AspNetCore.Handlers;
-using SkyApm.Utilities.DependencyInjection;
+using System.Linq;
+using System.Net.Http;
+using SkyApm.Diagnostics.HttpClient.Filters;
+using SkyApm.Tracing;
 
-namespace SkyApm.AspNetCore.Diagnostics
+namespace SkyApm.Diagnostics.HttpClient.Handlers
 {
-    public static class SkyWalkingBuilderExtensions
+    internal class GrpcRequestDiagnosticHandler : IRequestDiagnosticHandler
     {
-        public static SkyApmExtensions AddAspNetCoreHosting(this SkyApmExtensions extensions)
+        public bool OnlyMatch(HttpRequestMessage request)
         {
-            extensions.Services.AddSingleton<ITracingDiagnosticProcessor, HostingTracingDiagnosticProcessor>();
-            extensions.Services.AddSingleton<IHostingDiagnosticHandler, DefaultHostingDiagnosticHandler>();
-            extensions.Services.AddSingleton<IHostingDiagnosticHandler, GrpcHostingDiagnosticHandler>();
-            return extensions;
+            return request.Headers.TryGetValues("User-Agent", out var values) &&
+                   values.Any(x => x.Contains("grpc-dotnet"));
+        }
+
+        public void Handle(ITracingContext tracingContext, HttpRequestMessage request)
+        {
+            //has handled in the grpc-dotnet client diagnostics
         }
     }
 }

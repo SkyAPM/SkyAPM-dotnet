@@ -66,8 +66,7 @@ namespace SkyApm.Diagnostics.Grpc.Net.Client
         }
 
         [DiagnosticName(GrpcDiagnostics.ActivityStopKey)]
-        public void FinishCall([Property(Name = "Request")] HttpRequestMessage request,
-            [Property(Name = "Response")] HttpResponseMessage response)
+        public void FinishCall([Property(Name = "Response")] HttpResponseMessage response)
         {
             var context = _contextAccessor.Context;
             if (context == null)
