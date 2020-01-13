@@ -77,9 +77,9 @@ namespace SkyApm.Diagnostics.Grpc.Net.Client
             var activity = Activity.Current;
             if (activity.OperationName == GrpcDiagnostics.ActivityName)
             {
-                var tag = activity.Tags.FirstOrDefault(x => x.Key == GrpcDiagnostics.GrpcStatusCodeTagName).Value;
+                var statusCodeTag = activity.Tags.FirstOrDefault(x => x.Key == GrpcDiagnostics.GrpcStatusCodeTagName).Value;
 
-                var statusCode = int.TryParse(tag, out var code) ? code : -1;
+                var statusCode = int.TryParse(statusCodeTag, out var code) ? code : -1;
                 if (statusCode != 0)
                 {
                     var err = ((StatusCode)statusCode).ToString();

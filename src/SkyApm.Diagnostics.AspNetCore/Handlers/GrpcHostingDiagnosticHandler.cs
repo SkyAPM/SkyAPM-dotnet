@@ -54,13 +54,13 @@ namespace SkyApm.Diagnostics.AspNetCore.Handlers
             var activity = Activity.Current;
             if (activity.OperationName == ActivityName)
             {
-                var tag = activity.Tags.FirstOrDefault(x => x.Key == GrpcStatusCodeTagName).Value;
+                var statusCodeTag = activity.Tags.FirstOrDefault(x => x.Key == GrpcStatusCodeTagName).Value;
                 var method = activity.Tags.FirstOrDefault(x => x.Key == GrpcMethodTagName).Value ??
                              httpContext.Request.Method;
 
                 segmentContext.Span.AddTag(Tags.GRPC_METHOD_NAME, method);
 
-                var statusCode = int.TryParse(tag, out var code) ? code : -1;
+                var statusCode = int.TryParse(statusCodeTag, out var code) ? code : -1;
                 if (statusCode != 0)
                 {
                     segmentContext.Span.ErrorOccurred();
