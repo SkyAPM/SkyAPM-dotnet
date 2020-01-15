@@ -24,11 +24,11 @@ using SkyApm.Tracing;
 
 namespace SkyApm.Diagnostics.HttpClient
 {
-    public class HttpClientICarrierHeaderCollection : ICarrierHeaderCollection
+    public class GrpcNetClientICarrierHeaderCollection : ICarrierHeaderCollection
     {
         private readonly HttpRequestMessage _request;
 
-        public HttpClientICarrierHeaderCollection(HttpRequestMessage request)
+        public GrpcNetClientICarrierHeaderCollection(HttpRequestMessage request)
         {
             _request = request;
         }
@@ -40,7 +40,9 @@ namespace SkyApm.Diagnostics.HttpClient
 
         public IEnumerator<KeyValuePair<string, string>> GetEnumerator()
         {
-            return _request.Headers.Select(x => new KeyValuePair<string, string>(x.Key, x.Value.FirstOrDefault())).GetEnumerator();
+            return _request.Headers.Select(x =>
+                     new KeyValuePair<string, string>(x.Key, x.Value.FirstOrDefault()))
+                  .GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()

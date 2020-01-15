@@ -18,6 +18,8 @@
 
 using System;
 using Microsoft.Extensions.DependencyInjection;
+using SkyApm.Diagnostics.HttpClient.Filters;
+using SkyApm.Diagnostics.HttpClient.Handlers;
 using SkyApm.Utilities.DependencyInjection;
 
 namespace SkyApm.Diagnostics.HttpClient
@@ -32,7 +34,8 @@ namespace SkyApm.Diagnostics.HttpClient
             }
 
             extensions.Services.AddSingleton<ITracingDiagnosticProcessor, HttpClientTracingDiagnosticProcessor>();
-            
+            extensions.Services.AddSingleton<IRequestDiagnosticHandler, DefaultRequestDiagnosticHandler>();
+            extensions.Services.AddSingleton<IRequestDiagnosticHandler, GrpcRequestDiagnosticHandler>();
             return extensions;
         }
     }

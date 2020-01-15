@@ -17,10 +17,12 @@
  */
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using SkyApm.Common;
+using SkyApm.Diagnostics.HttpClient.Filters;
 using SkyApm.Tracing;
-using SkyApm.Tracing.Segments;
 
 namespace SkyApm.Diagnostics.HttpClient
 {
@@ -30,26 +32,31 @@ namespace SkyApm.Diagnostics.HttpClient
 
         //private readonly IContextCarrierFactory _contextCarrierFactory;
         private readonly ITracingContext _tracingContext;
+
         private readonly IExitSegmentContextAccessor _contextAccessor;
 
+        private readonly IEnumerable<IRequestDiagnosticHandler> _requestDiagnosticHandlers;
+
         public HttpClientTracingDiagnosticProcessor(ITracingContext tracingContext,
-            IExitSegmentContextAccessor contextAccessor)
+            IExitSegmentContextAccessor contextAccessor,
+            IEnumerable<IRequestDiagnosticHandler> requestDiagnosticHandlers)
         {
             _tracingContext = tracingContext;
             _contextAccessor = contextAccessor;
+            _requestDiagnosticHandlers = requestDiagnosticHandlers.Reverse();
         }
 
         [DiagnosticName("System.Net.Http.Request")]
         public void HttpRequest([Property(Name = "Request")] HttpRequestMessage request)
         {
-            var context = _tracingContext.CreateExitSegmentContext(request.RequestUri.ToString(),
-                $"{request.RequestUri.Host}:{request.RequestUri.Port}",
-                new HttpClientICarrierHeaderCollection(request));
-
-            context.Span.SpanLayer = SpanLayer.HTTP;
-            context.Span.Component = Common.Components.HTTPCLIENT;
-            context.Span.AddTag(Tags.URL, request.RequestUri.ToString());
-            context.Span.AddTag(Tags.HTTP_METHOD, request.Method.ToString());
+            foreach (var handler in _requestDiagnosticHandlers)
+            {
+                if (handler.OnlyMatch(request))
+                {
+                    handler.Handle(_tracingContext, request);
+                    return;
+                }
+            }
         }
 
         [DiagnosticName("System.Net.Http.Response")]
@@ -63,7 +70,7 @@ namespace SkyApm.Diagnostics.HttpClient
 
             if (response != null)
             {
-                var statusCode = (int) response.StatusCode;
+                var statusCode = (int)response.StatusCode;
                 if (statusCode >= 400)
                 {
                     context.Span.ErrorOccurred();

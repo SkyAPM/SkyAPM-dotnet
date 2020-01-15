@@ -14,8 +14,7 @@ namespace SkyApm.Sample.Backend
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(builder =>
                 {
-                    builder.UseStartup<Startup>()
-                        .UseUrls("http://*:5002");
+                    builder.UseStartup<Startup>();
                 }).Build();
     }
 }

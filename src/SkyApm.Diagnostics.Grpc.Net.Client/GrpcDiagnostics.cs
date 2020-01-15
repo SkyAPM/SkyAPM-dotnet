@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Licensed to the SkyAPM under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -16,20 +16,19 @@
  *
  */
 
-using Microsoft.Extensions.DependencyInjection;
-using SkyApm.Diagnostics.AspNetCore.Handlers;
-using SkyApm.Utilities.DependencyInjection;
-
-namespace SkyApm.AspNetCore.Diagnostics
+namespace SkyApm.Diagnostics.Grpc.Net.Client
 {
-    public static class SkyWalkingBuilderExtensions
+    // refer from https://github.com/grpc/grpc-dotnet/blob/637e3ec7d340bf643106187893b1331170437c2e/src/Grpc.Net.Client/Internal/GrpcDiagnostics.cs
+    internal static class GrpcDiagnostics
     {
-        public static SkyApmExtensions AddAspNetCoreHosting(this SkyApmExtensions extensions)
-        {
-            extensions.Services.AddSingleton<ITracingDiagnosticProcessor, HostingTracingDiagnosticProcessor>();
-            extensions.Services.AddSingleton<IHostingDiagnosticHandler, DefaultHostingDiagnosticHandler>();
-            extensions.Services.AddSingleton<IHostingDiagnosticHandler, GrpcHostingDiagnosticHandler>();
-            return extensions;
-        }
+        public const string ListenerName = "Grpc.Net.Client";
+
+        public const string ActivityName = "Grpc.Net.Client.GrpcOut";
+
+        public const string ActivityStartKey = ActivityName + ".Start";
+        public const string ActivityStopKey = ActivityName + ".Stop";
+
+        public const string GrpcMethodTagName = "grpc.method";
+        public const string GrpcStatusCodeTagName = "grpc.status_code";
     }
 }
