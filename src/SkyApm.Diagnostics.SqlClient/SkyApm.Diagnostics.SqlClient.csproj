@@ -17,6 +17,6 @@
     <ProjectReference Include="..\SkyApm.Utilities.DependencyInjection\SkyApm.Utilities.DependencyInjection.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="System.Data.SqlClient" Version="4.4.0" PrivateAssets="All" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.0" PrivateAssets="All" />
   </ItemGroup>
 </Project>

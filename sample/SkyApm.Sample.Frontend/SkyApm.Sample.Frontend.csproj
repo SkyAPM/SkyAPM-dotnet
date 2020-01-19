@@ -24,7 +24,4 @@
     <ProjectReference Include="..\..\src\SkyApm.Agent.AspNetCore\SkyApm.Agent.AspNetCore.csproj" />
     <ProjectReference Include="..\grpc\SkyApm.Sample.GrpcProto\SkyApm.Sample.GrpcProto.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="logs" />
-  </ItemGroup>
 </Project>
