@@ -16,35 +16,23 @@
  *
  */
 
-#if NETCOREAPP3_1
-
 using Microsoft.Extensions.Hosting;
 
-#else
+#if NETSTANDARD2_0
 
-using Microsoft.AspNetCore.Hosting;
+using IHostEnvironment = Microsoft.Extensions.Hosting.IHostingEnvironment;
 
 #endif
 
-namespace SkyApm.Agent.AspNetCore
+namespace SkyApm.Agent.Hosting
 {
     internal class HostingEnvironmentProvider : IEnvironmentProvider
     {
         public string EnvironmentName { get; }
 
-#if NETCOREAPP3_1
-
         public HostingEnvironmentProvider(IHostEnvironment hostingEnvironment)
         {
             EnvironmentName = hostingEnvironment.EnvironmentName;
         }
-#else
-
-        public HostingEnvironmentProvider(IHostingEnvironment hostingEnvironment)
-        {
-            EnvironmentName = hostingEnvironment.EnvironmentName;
-        }
-
-#endif
     }
 }

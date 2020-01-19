@@ -16,29 +16,13 @@
  *
  */
 
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Hosting;
+using SkyApm.Agent.Hosting;
 
-namespace SkyApm.Agent.GeneralHost
+namespace Microsoft.Extensions.Hosting
 {
-    internal class InstrumentationHostedService : IHostedService
+    public static class HostBuilderExtensions
     {
-        private readonly IInstrumentStartup _startup;
-
-        public InstrumentationHostedService(IInstrumentStartup startup)
-        {
-            _startup = startup;
-        }
-
-        public Task StartAsync(CancellationToken cancellationToken)
-        {
-            return _startup.StartAsync(cancellationToken);
-        }
-
-        public Task StopAsync(CancellationToken cancellationToken)
-        {
-            return _startup.StopAsync(cancellationToken);
-        }
+        public static IHostBuilder AddSkyAPM(this IHostBuilder builder) =>
+            builder.ConfigureServices((context, services) => services.AddSkyAPM());
     }
 }

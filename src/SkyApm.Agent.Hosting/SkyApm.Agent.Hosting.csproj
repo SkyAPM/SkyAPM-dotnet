@@ -1,0 +1,36 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <Import Project="..\..\build\common.props" />
+    <PropertyGroup>
+        <Description>$(Product) ASP.NET Core Agent.</Description>
+        <AssemblyTitle>$(PackagePrefix).Agent.Hosting</AssemblyTitle>
+        <AssemblyName>$(PackagePrefix).Agent.Hosting</AssemblyName>
+        <PackageId>$(PackagePrefix).Agent.Hosting</PackageId>
+        <PackageTags>SkyWalking;APM</PackageTags>
+        <PackageReleaseNotes>
+        </PackageReleaseNotes>
+        <RootNamespace>SkyApm.Agent.Hosting</RootNamespace>
+        <TargetFrameworks>netstandard2.0;netcoreapp3.1</TargetFrameworks>
+    </PropertyGroup>
+    <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+        <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="2.1.0" PrivateAssets="All" />
+    </ItemGroup>
+    <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp3.1'">
+        <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="3.1.0" PrivateAssets="All" />
+    </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\SkyApm.Abstractions\SkyApm.Abstractions.csproj" />
+        <ProjectReference Include="..\SkyApm.Diagnostics.EntityFrameworkCore.Npgsql\SkyApm.Diagnostics.EntityFrameworkCore.Npgsql.csproj" />
+        <ProjectReference Include="..\SkyApm.Diagnostics.EntityFrameworkCore.Pomelo.MySql\SkyApm.Diagnostics.EntityFrameworkCore.Pomelo.MySql.csproj" />
+        <ProjectReference Include="..\SkyApm.Diagnostics.EntityFrameworkCore.Sqlite\SkyApm.Diagnostics.EntityFrameworkCore.Sqlite.csproj" />
+        <ProjectReference Include="..\SkyApm.Diagnostics.EntityFrameworkCore\SkyApm.Diagnostics.EntityFrameworkCore.csproj" />
+        <ProjectReference Include="..\SkyApm.Core\SkyApm.Core.csproj" />
+        <ProjectReference Include="..\SkyApm.Diagnostics.Grpc.Net.Client\SkyApm.Diagnostics.Grpc.Net.Client.csproj" />
+        <ProjectReference Include="..\SkyApm.Diagnostics.Grpc\SkyApm.Diagnostics.Grpc.csproj" />
+        <ProjectReference Include="..\SkyApm.Diagnostics.HttpClient\SkyApm.Diagnostics.HttpClient.csproj" />
+        <ProjectReference Include="..\SkyApm.Diagnostics.SqlClient\SkyApm.Diagnostics.SqlClient.csproj" />
+        <ProjectReference Include="..\SkyApm.Transport.Grpc\SkyApm.Transport.Grpc.csproj" />
+        <ProjectReference Include="..\SkyApm.Utilities.Configuration\SkyApm.Utilities.Configuration.csproj" />
+        <ProjectReference Include="..\SkyApm.Utilities.DependencyInjection\SkyApm.Utilities.DependencyInjection.csproj" />
+        <ProjectReference Include="..\SkyApm.Utilities.Logging\SkyApm.Utilities.Logging.csproj" />
+    </ItemGroup>
+</Project>

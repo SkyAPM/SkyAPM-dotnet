@@ -1,8 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using SkyApm.Agent.GeneralHost;
 
-namespace SkyApm.Sample.GeneralHost
+namespace SkyApm.Sample.GenericHost
 {
     public class Program
     {
@@ -12,7 +11,7 @@ namespace SkyApm.Sample.GeneralHost
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
+            new HostBuilder()
                 .ConfigureServices(services => services.AddHostedService<Worker>())
                 .AddSkyAPM();
     }

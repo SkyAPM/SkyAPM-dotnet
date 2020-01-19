@@ -10,6 +10,12 @@ using SkyApm.Sample.Backend.Services;
 using SkyApm.Sample.GrpcServer;
 using SkyApm.Tracing;
 
+#if NETCOREAPP2_1
+
+using IHostEnvironment = Microsoft.Extensions.Hosting.IHostingEnvironment;
+
+#endif
+
 namespace SkyApm.Sample.Backend
 {
     public class Startup
@@ -24,7 +30,14 @@ namespace SkyApm.Sample.Backend
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers();
+#if NETCOREAPP2_1
+
+            services.AddMvc();
+
+#else
+             services.AddControllers();
+#endif
+
             var sqlLiteConnection = new SqliteConnection("DataSource=:memory:");
             sqlLiteConnection.Open();
 
@@ -35,7 +48,10 @@ namespace SkyApm.Sample.Backend
             // DI grpc service
             services.AddSingleton<GreeterGrpcService>();
 
+#if !NETCOREAPP2_1
+
             services.AddGrpc();
+#endif
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -46,10 +62,15 @@ namespace SkyApm.Sample.Backend
                 app.UseDeveloperExceptionPage();
             }
 
-            using var scope = app.ApplicationServices.CreateScope();
-            using var sampleDbContext = scope.ServiceProvider.GetService<SampleDbContext>();
-            sampleDbContext.Database.EnsureCreated();
+            using (var scope = app.ApplicationServices.CreateScope())
+            using (var sampleDbContext = scope.ServiceProvider.GetService<SampleDbContext>())
+            {
+                sampleDbContext.Database.EnsureCreated();
+            }
 
+#if NETCOREAPP2_1
+            app.UseMvcWithDefaultRoute();
+#else
             app.UseRouting();
 
             app.UseEndpoints(endpoint =>
@@ -57,6 +78,7 @@ namespace SkyApm.Sample.Backend
                 endpoint.MapDefaultControllerRoute();
                 endpoint.MapGrpcService<GreeterImpl>();
             });
+#endif
         }
     }
 }
