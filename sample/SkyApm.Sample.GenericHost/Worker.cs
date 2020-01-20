@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SkyApm.Sample.GeneralHost
+namespace SkyApm.Sample.GenericHost
 {
     public class Worker : BackgroundService
     {

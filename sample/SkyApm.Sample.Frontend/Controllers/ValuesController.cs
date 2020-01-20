@@ -3,10 +3,15 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using Grpc.Net.Client;
+
 using GrpcGreeter;
 using Microsoft.AspNetCore.Mvc;
 using SkyApm.Sample.Backend.Services;
+
+#if NETCOREAPP2_1
+#else
+using Grpc.Net.Client;
+#endif
 
 namespace SkyApm.Sample.Frontend.Controllers
 {
@@ -61,6 +66,8 @@ namespace SkyApm.Sample.Frontend.Controllers
             return Ok(message);
         }
 
+#if NETCOREAPP2_1
+#else
         [HttpGet("greeter/grpc-net")]
         public async Task<IActionResult> GrpcNetAsync(string name)
         {
@@ -72,5 +79,6 @@ namespace SkyApm.Sample.Frontend.Controllers
             var result = await client.SayHelloAsync(new HelloRequest() { Name = name });
             return Ok(result);
         }
+#endif
     }
 }

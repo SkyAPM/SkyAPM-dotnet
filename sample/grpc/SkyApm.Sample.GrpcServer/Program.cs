@@ -2,7 +2,6 @@
 using GrpcGreeter;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using SkyApm.Agent.GeneralHost;
 using System;
 using System.Net.Http;
 using System.Threading;
