@@ -21,6 +21,7 @@ using SkyApm.Config;
 using SkyApm.Diagnostics;
 using SkyApm.Diagnostics.EntityFrameworkCore;
 using SkyApm.Diagnostics.Grpc;
+using SkyApm.Diagnostics.Grpc.Net.Client;
 using SkyApm.Diagnostics.HttpClient;
 using SkyApm.Diagnostics.SqlClient;
 using SkyApm.Logging;
@@ -35,10 +36,10 @@ using SkyApm.Utilities.Configuration;
 using SkyApm.Utilities.DependencyInjection;
 using SkyApm.Utilities.Logging;
 using System;
-using Microsoft.Extensions.DependencyInjection;
-using SkyApm.Diagnostics.Grpc.Net.Client;
+using SkyApm;
+using SkyApm.Agent.Hosting;
 
-namespace SkyApm.Agent.Hosting
+namespace Microsoft.Extensions.DependencyInjection
 {
     public static class ServiceCollectionExtensions
     {
@@ -67,7 +68,7 @@ namespace SkyApm.Agent.Hosting
             services.AddSingleton<IConfigurationFactory, ConfigurationFactory>();
             services.AddSingleton<IHostedService, InstrumentationHostedService>();
             services.AddSingleton<IEnvironmentProvider, HostingEnvironmentProvider>();
-            services.AddTracing().AddSampling().AddGrpcTransport().AddLogging();
+            services.AddTracing().AddSampling().AddGrpcTransport().AddSkyApmLogging();
             var extensions = services.AddSkyApmExtensions()
                  .AddHttpClient()
                  .AddGrpcClient()
@@ -118,7 +119,7 @@ namespace SkyApm.Agent.Hosting
             return services;
         }
 
-        private static IServiceCollection AddLogging(this IServiceCollection services)
+        private static IServiceCollection AddSkyApmLogging(this IServiceCollection services)
         {
             services.AddSingleton<ILoggerFactory, DefaultLoggerFactory>();
             return services;

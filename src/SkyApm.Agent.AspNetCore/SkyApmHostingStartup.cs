@@ -17,8 +17,8 @@
  */
 
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 using SkyApm.Agent.AspNetCore;
-using SkyApm.Agent.Hosting;
 using SkyApm.AspNetCore.Diagnostics;
 
 [assembly: HostingStartup(typeof(SkyApmHostingStartup))]

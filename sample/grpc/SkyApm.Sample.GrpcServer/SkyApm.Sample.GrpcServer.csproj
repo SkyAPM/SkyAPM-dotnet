@@ -18,7 +18,7 @@
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="3.1.0" PrivateAssets="All" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\src\SkyApm.Agent.Hosting\SkyApm.Agent.Hosting.csproj" />
+    <ProjectReference Include="..\..\..\src\SkyApm.Agent.GeneralHost\SkyApm.Agent.GeneralHost.csproj" />
     <ProjectReference Include="..\SkyApm.Sample.GrpcProto\SkyApm.Sample.GrpcProto.csproj" />
   </ItemGroup>
 </Project>
