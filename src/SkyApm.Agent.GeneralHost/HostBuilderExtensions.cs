@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Licensed to the SkyAPM under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -16,24 +16,13 @@
  *
  */
 
-using Microsoft.Extensions.DependencyInjection;
-using SkyApm.Utilities.DependencyInjection;
-using System;
+using Microsoft.Extensions.Hosting;
+using SkyApm.Agent.Hosting;
 
-namespace SkyApm.Diagnostics.SmartSql
+namespace SkyApm.Agent.GeneralHost
 {
-    public static class SkyWalkingBuilderExtensions
+    public static class HostBuilderExtensions
     {
-        public static SkyApmExtensions AddSmartSql(this SkyApmExtensions extensions)
-        {
-            if (extensions == null)
-            {
-                throw new ArgumentNullException(nameof(extensions));
-            }
-
-            extensions.Services.AddSingleton<ITracingDiagnosticProcessor, SmartSqlTracingDiagnosticProcessor>();
-
-            return extensions;
-        }
+        public static IHostBuilder AddSkyAPM(this IHostBuilder builder) => builder.UseSkyAPM();
     }
 }

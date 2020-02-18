@@ -21,6 +21,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\SkyApm.Agent.Hosting\SkyApm.Agent.Hosting.csproj" />
+    <ProjectReference Include="..\..\src\SkyApm.Agent.GeneralHost\SkyApm.Agent.GeneralHost.csproj" />
   </ItemGroup>
 </Project>
