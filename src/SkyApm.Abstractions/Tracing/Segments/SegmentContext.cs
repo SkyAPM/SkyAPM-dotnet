@@ -16,6 +16,8 @@
  *
  */
 
+using SkyApm.Common;
+
 namespace SkyApm.Tracing.Segments
 {
     public class SegmentContext
@@ -26,9 +28,9 @@ namespace SkyApm.Tracing.Segments
 
         public SegmentSpan Span { get; }
 
-        public int ServiceId { get; }
+        public StringOrIntValue ServiceId { get; }
 
-        public int ServiceInstanceId { get; }
+        public StringOrIntValue ServiceInstanceId { get; }
 
         public bool Sampled { get; }
 
@@ -36,7 +38,7 @@ namespace SkyApm.Tracing.Segments
 
         public SegmentReferenceCollection References { get; } = new SegmentReferenceCollection();
 
-        public SegmentContext(UniqueId traceId, UniqueId segmentId, bool sampled, int serviceId, int serviceInstanceId,
+        public SegmentContext(UniqueId traceId, UniqueId segmentId, bool sampled, StringOrIntValue serviceId, StringOrIntValue serviceInstanceId,
             string operationName, SpanType spanType)
         {
             TraceId = traceId;

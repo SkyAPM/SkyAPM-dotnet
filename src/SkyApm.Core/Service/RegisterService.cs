@@ -47,12 +47,19 @@ namespace SkyApm.Service
         protected override TimeSpan Period { get; } = TimeSpan.FromSeconds(30);
 
         protected override bool CanExecute() =>
-            _transportConfig.ProtocolVersion == ProtocolVersions.V6 && !RuntimeEnvironment.Initialized;
+            _transportConfig.ProtocolVersion != ProtocolVersions.V5 && !RuntimeEnvironment.Initialized;
 
         protected override async Task ExecuteAsync(CancellationToken cancellationToken)
         {
-            await RegisterServiceAsync(cancellationToken);
-            await RegisterServiceInstanceAsync(cancellationToken);
+            if(_transportConfig.ProtocolVersion == ProtocolVersions.V6)
+            {
+                await RegisterServiceAsync(cancellationToken);
+                await RegisterServiceInstanceAsync(cancellationToken);
+            }
+            else
+            {
+                await ReportServiceInstancePropertiesAsync(cancellationToken);
+            }
         }
 
         private async Task RegisterServiceAsync(CancellationToken cancellationToken)
@@ -98,19 +105,56 @@ namespace SkyApm.Service
                 if (value.HasValue && RuntimeEnvironment is RuntimeEnvironment environment)
                 {
                     environment.ServiceInstanceId = value;
+                    environment.Initialized = true;
                     Logger.Information($"Registered ServiceInstance[Id={environment.ServiceInstanceId.Value}].");
                 }
             }
         }
 
-        private static async Task<NullableValue> Polling(int retry, Func<Task<NullableValue>> execute,
+        private async Task ReportServiceInstancePropertiesAsync(CancellationToken cancellationToken)
+        {
+            var properties = new AgentOsInfoRequest
+            {
+                HostName = DnsHelpers.GetHostName(),
+                IpAddress = DnsHelpers.GetIpV4s(),
+                OsName = PlatformInformation.GetOSName(),
+                ProcessNo = Process.GetCurrentProcess().Id,
+                Language = "dotnet"
+            };
+            var request = new ServiceInstancePropertiesRequest
+            {
+                ServiceName = _config.ServiceName ?? _config.ApplicationCode,
+                InstanceUUID = RuntimeEnvironment.InstanceId.ToString("N"),
+                Properties = properties
+            };
+            var result = await Polling(3,
+                    () => _serviceRegister.ReportInstancePropertiesAsync(request, cancellationToken),
+                    cancellationToken);
+            if (result && RuntimeEnvironment is RuntimeEnvironment environment)
+            {
+                environment.Initialized = true;
+                Logger.Information($"Reported Service Instance Properties[Service={request.ServiceName},InstanceId={request.InstanceUUID}].");
+            }
+        }
+
+        private static async Task<NullableValue> Polling(int retry, Func<Task<NullableValue>> execute, CancellationToken cancellationToken)
+        {
+            return await Polling(retry, execute, result => result.HasValue, NullableValue.Null, cancellationToken);
+        }
+
+        private static async Task<bool> Polling(int retry, Func<Task<bool>> execute, CancellationToken cancellationToken)
+        {
+            return await Polling(retry, execute, result => result, false, cancellationToken);
+        }
+
+        private static async Task<T> Polling<T>(int retry, Func<Task<T>> execute, Func<T,bool> successPredicate, T failureResult,
             CancellationToken cancellationToken)
         {
             var index = 0;
             while (index++ < retry)
             {
                 var value = await execute();
-                if (value.HasValue)
+                if (successPredicate(value))
                 {
                     return value;
                 }
@@ -118,7 +162,7 @@ namespace SkyApm.Service
                 await Task.Delay(500, cancellationToken);
             }
 
-            return NullableValue.Null;
+            return failureResult;
         }
     }
 }

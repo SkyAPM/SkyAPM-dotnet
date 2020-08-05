@@ -41,5 +41,7 @@ namespace SkyApm.Config
         public static string V5 { get; } = "v5";
         
         public static string V6 { get; } = "v6";
+
+        public static string V8 { get; } = "v8";
     }
 }

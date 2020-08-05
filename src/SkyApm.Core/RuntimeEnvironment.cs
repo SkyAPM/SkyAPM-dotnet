@@ -29,7 +29,7 @@ namespace SkyApm
 
         public NullableValue ServiceInstanceId { get; internal set; }
 
-        public bool Initialized => ServiceId.HasValue && ServiceInstanceId.HasValue;
+        public bool Initialized {get; internal set; }
 
         public Guid InstanceId { get; } = Guid.NewGuid();
         

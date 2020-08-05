@@ -46,9 +46,9 @@ namespace SkyApm.Transport
     {
         public UniqueIdRequest SegmentId { get; set; }
 
-        public int ServiceId { get; set; }
+        public StringOrIntValue ServiceId { get; set; }
 
-        public int ServiceInstanceId { get; set; }
+        public StringOrIntValue ServiceInstanceId { get; set; }
 
         public IList<SpanRequest> Spans { get; set; } = new List<SpanRequest>();
     }
@@ -84,13 +84,17 @@ namespace SkyApm.Transport
 
     public class SegmentReferenceRequest
     {
+        public UniqueIdRequest TraceId { get; set; }
+
         public UniqueIdRequest ParentSegmentId { get; set; }
 
-        public int ParentServiceInstanceId { get; set; }
+        public StringOrIntValue ParentServiceId { get; set; }
+
+        public StringOrIntValue ParentServiceInstanceId { get; set; }
 
         public int ParentSpanId { get; set; }
 
-        public int EntryServiceInstanceId { get; set; }
+        public StringOrIntValue EntryServiceInstanceId { get; set; }
 
         public int RefType { get; set; }
 

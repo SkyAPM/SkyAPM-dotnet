@@ -27,7 +27,7 @@ using SkyApm.Transport.Grpc.Common;
 
 namespace SkyApm.Transport.Grpc.V6
 {
-    public class ServiceRegister : IServiceRegister
+    internal class ServiceRegister : IServiceRegister
     {
         private const string OS_NAME = "os_name";
         private const string HOST_NAME = "host_name";
@@ -117,6 +117,11 @@ namespace SkyApm.Transport.Grpc.V6
                 },
                 () => NullableValue.Null,
                 () => ExceptionHelpers.RegisterServiceInstanceError);
+        }
+
+        public async Task<bool> ReportInstancePropertiesAsync(ServiceInstancePropertiesRequest serviceInstancePropertiesRequest, CancellationToken cancellationToken = default)
+        {
+            return true;
         }
     }
 }

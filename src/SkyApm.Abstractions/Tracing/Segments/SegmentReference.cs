@@ -30,9 +30,13 @@ namespace SkyApm.Tracing.Segments
 
         public int ParentSpanId { get; set; }
 
-        public int ParentServiceInstanceId { get; set; }
+        public UniqueId TraceId { get; set; }
 
-        public int EntryServiceInstanceId { get; set; }
+        public StringOrIntValue ParentServiceId { get; set; }
+
+        public StringOrIntValue ParentServiceInstanceId { get; set; }
+
+        public StringOrIntValue EntryServiceInstanceId { get; set; }
 
         public StringOrIntValue NetworkAddress { get; set; }
 

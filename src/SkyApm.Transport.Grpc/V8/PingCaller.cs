@@ -21,10 +21,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using SkyApm.Config;
 using SkyApm.Logging;
-using SkyWalking.NetworkProtocol;
+using SkyWalking.NetworkProtocol.V3;
 using SkyApm.Transport.Grpc.Common;
 
-namespace SkyApm.Transport.Grpc.V6
+namespace SkyApm.Transport.Grpc.V8
 {
     internal class PingCaller : IPingCaller
     {
@@ -50,12 +50,11 @@ namespace SkyApm.Transport.Grpc.V6
             var connection = _connectionManager.GetConnection();
             return new Call(_logger, _connectionManager).Execute(async () =>
                 {
-                    var client = new ServiceInstancePing.ServiceInstancePingClient(connection);
-                    await client.doPingAsync(new ServiceInstancePingPkg
+                    var client = new ManagementService.ManagementServiceClient(connection);
+                    await client.keepAliveAsync(new InstancePingPkg
                     {
-                        ServiceInstanceId = request.ServiceInstanceId,
-                        ServiceInstanceUUID = request.InstanceId,
-                        Time = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()
+                        Service = request.ServiceName,
+                        ServiceInstance = request.InstanceId,
                     }, _config.GetMeta(), _config.GetTimeout(), cancellationToken);
                 },
                 () => ExceptionHelpers.PingError);

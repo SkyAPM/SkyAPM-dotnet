@@ -53,6 +53,7 @@ namespace SkyApm.Agent.AspNet.Extensions
             services.AddSingleton<ICarrierPropagator, CarrierPropagator>();
             services.AddSingleton<ICarrierFormatter, Sw3CarrierFormatter>();
             services.AddSingleton<ICarrierFormatter, Sw6CarrierFormatter>();
+            services.AddSingleton<ICarrierFormatter, Sw8CarrierFormatter>();
             services.AddSingleton<ISegmentContextFactory, SegmentContextFactory>();
             services.AddSingleton<IEntrySegmentContextAccessor, EntrySegmentContextAccessor>();
             services.AddSingleton<ILocalSegmentContextAccessor, LocalSegmentContextAccessor>();

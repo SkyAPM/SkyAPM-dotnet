@@ -35,8 +35,8 @@ namespace SkyApm.Transport.Grpc.Common
             var traceSegment = new TraceSegmentObject
             {
                 TraceSegmentId = MapToUniqueId(request.Segment.SegmentId),
-                ApplicationId = request.Segment.ServiceId,
-                ApplicationInstanceId = request.Segment.ServiceInstanceId,
+                ApplicationId = request.Segment.ServiceId.GetIntValue(),
+                ApplicationInstanceId = request.Segment.ServiceInstanceId.GetIntValue(),
                 IsSizeLimited = false
             };
 
@@ -83,8 +83,8 @@ namespace SkyApm.Transport.Grpc.Common
         {
             var reference = new TraceSegmentReference
             {
-                ParentApplicationInstanceId = referenceRequest.ParentServiceInstanceId,
-                EntryApplicationInstanceId = referenceRequest.EntryServiceInstanceId,
+                ParentApplicationInstanceId = referenceRequest.ParentServiceInstanceId.GetIntValue(),
+                EntryApplicationInstanceId = referenceRequest.EntryServiceInstanceId.GetIntValue(),
                 ParentSpanId = referenceRequest.ParentSpanId,
                 RefType = (RefType) referenceRequest.RefType,
                 ParentTraceSegmentId = MapToUniqueId(referenceRequest.ParentSegmentId)

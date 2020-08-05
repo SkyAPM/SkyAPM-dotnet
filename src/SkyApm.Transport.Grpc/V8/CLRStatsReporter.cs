@@ -21,9 +21,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using SkyApm.Config;
 using SkyApm.Logging;
-using SkyWalking.NetworkProtocol;
+using SkyWalking.NetworkProtocol.V3;
 
-namespace SkyApm.Transport.Grpc.V6
+namespace SkyApm.Transport.Grpc.V8
 {
     internal class CLRStatsReporter : ICLRStatsReporter
     {
@@ -31,6 +31,7 @@ namespace SkyApm.Transport.Grpc.V6
         private readonly ILogger _logger;
         private readonly GrpcConfig _config;
         private readonly IRuntimeEnvironment _runtimeEnvironment;
+        private readonly InstrumentConfig _instrumentConfig;
 
         public CLRStatsReporter(ConnectionManager connectionManager, ILoggerFactory loggerFactory,
             IConfigAccessor configAccessor, IRuntimeEnvironment runtimeEnvironment)
@@ -39,6 +40,7 @@ namespace SkyApm.Transport.Grpc.V6
             _logger = loggerFactory.CreateLogger(typeof(CLRStatsReporter));
             _config = configAccessor.Get<GrpcConfig>();
             _runtimeEnvironment = runtimeEnvironment;
+            _instrumentConfig = configAccessor.Get<InstrumentConfig>();
         }
 
         public async Task ReportAsync(CLRStatsRequest statsRequest,
@@ -55,7 +57,8 @@ namespace SkyApm.Transport.Grpc.V6
             {
                 var request = new CLRMetricCollection
                 {
-                    ServiceInstanceId = _runtimeEnvironment.ServiceInstanceId.Value
+                    Service = _instrumentConfig.ServiceName ?? _instrumentConfig.ApplicationCode,
+                    ServiceInstance = _runtimeEnvironment.InstanceId.ToString("N"),
                 };
                 var metric = new CLRMetric
                 {

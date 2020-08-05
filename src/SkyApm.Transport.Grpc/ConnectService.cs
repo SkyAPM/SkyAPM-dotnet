@@ -21,7 +21,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using SkyApm.Logging;
 
-namespace SkyApm.Transport.Grpc.V6
+namespace SkyApm.Transport.Grpc
 {
     public class ConnectService: ExecutionService
     {

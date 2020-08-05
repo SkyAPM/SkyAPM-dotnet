@@ -265,4 +265,5 @@ tools/
 *.proto
 
 generated/
+generated-v3/
 

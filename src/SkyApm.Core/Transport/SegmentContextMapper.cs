@@ -56,7 +56,9 @@ namespace SkyApm.Transport
             foreach (var reference in segmentContext.References)
                 span.References.Add(new SegmentReferenceRequest
                 {
+                    TraceId = MapUniqueId(reference.TraceId),
                     ParentSegmentId = MapUniqueId(reference.ParentSegmentId),
+                    ParentServiceId = reference.ParentServiceId,
                     ParentServiceInstanceId = reference.ParentServiceInstanceId,
                     ParentSpanId = reference.ParentSpanId,
                     ParentEndpointName = reference.ParentEndpoint,

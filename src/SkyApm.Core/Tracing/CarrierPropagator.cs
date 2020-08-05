@@ -39,7 +39,8 @@ namespace SkyApm.Tracing
             var reference = segmentContext.References.FirstOrDefault();
 
             var carrier = new Carrier(segmentContext.TraceId, segmentContext.SegmentId, segmentContext.Span.SpanId,
-                segmentContext.ServiceInstanceId, reference?.EntryServiceInstanceId ?? segmentContext.ServiceInstanceId)
+                segmentContext.ServiceInstanceId, reference?.EntryServiceInstanceId ?? segmentContext.ServiceInstanceId,
+                segmentContext.ServiceId)
             {
                 NetworkAddress = segmentContext.Span.Peer,
                 EntryEndpoint = reference?.EntryEndpoint ?? segmentContext.Span.OperationName,

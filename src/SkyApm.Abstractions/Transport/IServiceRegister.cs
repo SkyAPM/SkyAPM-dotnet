@@ -31,5 +31,8 @@ namespace SkyApm.Transport
         
         Task<NullableValue> RegisterServiceInstanceAsync(ServiceInstanceRequest serviceInstanceRequest,
             CancellationToken cancellationToken = default(CancellationToken));
+
+        Task<bool> ReportInstancePropertiesAsync(ServiceInstancePropertiesRequest serviceInstancePropertiesRequest,
+            CancellationToken cancellationToken = default(CancellationToken));
     }
 }

@@ -34,14 +34,16 @@ namespace SkyApm.Tracing
         
         public int ParentSpanId { get; }
         
-        public int ParentServiceInstanceId { get; }
+        public StringOrIntValue ParentServiceInstanceId { get; }
         
-        public int EntryServiceInstanceId { get; }
+        public StringOrIntValue EntryServiceInstanceId { get; }
         
         public StringOrIntValue NetworkAddress { get; }
         
         public StringOrIntValue EntryEndpoint { get; }
         
         public StringOrIntValue ParentEndpoint { get; }
+
+        public StringOrIntValue ParentServiceId { get; }
     }
 }

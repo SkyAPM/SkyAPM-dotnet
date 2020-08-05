@@ -32,9 +32,11 @@ namespace SkyApm.Tracing
 
         int ParentSpanId { get; }
 
-        int ParentServiceInstanceId { get; }
+        StringOrIntValue ParentServiceId { get; }
+
+        StringOrIntValue ParentServiceInstanceId { get; }
         
-        int EntryServiceInstanceId { get; }
+        StringOrIntValue EntryServiceInstanceId { get; }
         
         StringOrIntValue NetworkAddress { get; }
         

@@ -38,5 +38,7 @@ namespace SkyApm.Config
         public static string SW3 { get; } = "sw3";
         
         public static string SW6 { get; } = "sw6";
+
+        public static string SW8 { get; } = "sw8";
     }
 }

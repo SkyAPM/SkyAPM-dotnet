@@ -23,6 +23,7 @@ using SkyApm.Config;
 using SkyApm.Logging;
 using SegmentReporterV5 = SkyApm.Transport.Grpc.V5.SegmentReporter;
 using SegmentReporterV6 = SkyApm.Transport.Grpc.V6.SegmentReporter;
+using SegmentReporterV8 = SkyApm.Transport.Grpc.V8.SegmentReporter;
 
 namespace SkyApm.Transport.Grpc
 {
@@ -30,6 +31,7 @@ namespace SkyApm.Transport.Grpc
     {
         private readonly ISegmentReporter _segmentReporterV5;
         private readonly ISegmentReporter _segmentReporterV6;
+        private readonly ISegmentReporter _segmentReporterV8;
         private readonly TransportConfig _transportConfig;
 
         public SegmentReporter(ConnectionManager connectionManager, IConfigAccessor configAccessor,
@@ -38,11 +40,14 @@ namespace SkyApm.Transport.Grpc
             _transportConfig = configAccessor.Get<TransportConfig>();
             _segmentReporterV5 = new V5.SegmentReporter(connectionManager, configAccessor, loggerFactory);
             _segmentReporterV6 = new V6.SegmentReporter(connectionManager, configAccessor, loggerFactory);
+            _segmentReporterV8 = new V8.SegmentReporter(connectionManager, configAccessor, loggerFactory);
         }
 
         public async Task ReportAsync(IReadOnlyCollection<SegmentRequest> segmentRequests,
             CancellationToken cancellationToken = default(CancellationToken))
         {
+            if (_transportConfig.ProtocolVersion == ProtocolVersions.V8)
+                await _segmentReporterV8.ReportAsync(segmentRequests, cancellationToken);
             if (_transportConfig.ProtocolVersion == ProtocolVersions.V6)
                 await _segmentReporterV6.ReportAsync(segmentRequests, cancellationToken);
             if (_transportConfig.ProtocolVersion == ProtocolVersions.V5)
