@@ -66,6 +66,13 @@ namespace SkyApm.Sample.Frontend.Controllers
             return Ok(message);
         }
 
+        [HttpGet("hellojava")]
+        public async Task<IActionResult> HelloJava()
+        {
+            var message = await new HttpClient().GetStringAsync("http://localhost:8080/sayhello");
+            return Ok(message);
+        }
+
 #if NETCOREAPP2_1
 #else
         [HttpGet("greeter/grpc-net")]

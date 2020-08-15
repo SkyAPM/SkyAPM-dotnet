@@ -16,7 +16,10 @@
  *
  */
 
+using SkyApm.Common;
 using System;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading;
 
 namespace SkyApm.Tracing
@@ -32,10 +35,28 @@ namespace SkyApm.Tracing
         }
 
         public UniqueId Generate()
-        {
-            return new UniqueId(_runtimeEnvironment.ServiceInstanceId.Value,
+        { 
+            var instanceIdentity = _runtimeEnvironment.ServiceInstanceId.HasValue
+                ? new StringOrNumValue<long>(_runtimeEnvironment.ServiceInstanceId.Value)
+                : new StringOrNumValue<long>(GetMD5(_runtimeEnvironment.InstanceId.ToByteArray()));
+
+            return new UniqueId(instanceIdentity,
                 Thread.CurrentThread.ManagedThreadId,
                 DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() * 10000 + GetSequence());
+        }
+
+        private string GetMD5(byte[] data)
+        {
+            using (var md5 = new MD5CryptoServiceProvider())
+            {
+                var hash = md5.ComputeHash(data);
+                var sb = new StringBuilder(32);
+                foreach (var item in hash)
+                {
+                    sb.Append(item.ToString("x2"));
+                }
+                return sb.ToString();
+            }
         }
 
         private long GetSequence()

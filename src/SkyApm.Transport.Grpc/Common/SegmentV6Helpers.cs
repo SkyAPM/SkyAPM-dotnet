@@ -49,9 +49,9 @@ namespace SkyApm.Transport.Grpc.Common
         private static UniqueId MapToUniqueId(UniqueIdRequest uniqueIdRequest)
         {
             var uniqueId = new UniqueId();
-            uniqueId.IdParts.Add(uniqueIdRequest.Part1);
-            uniqueId.IdParts.Add(uniqueIdRequest.Part2);
-            uniqueId.IdParts.Add(uniqueIdRequest.Part3);
+            uniqueId.IdParts.Add(uniqueIdRequest.Part1.GetNumValue());
+            uniqueId.IdParts.Add(uniqueIdRequest.Part2.GetNumValue());
+            uniqueId.IdParts.Add(uniqueIdRequest.Part3.GetNumValue());
             return uniqueId;
         }
 

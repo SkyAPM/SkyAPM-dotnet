@@ -16,6 +16,7 @@
  *
  */
 
+using SkyApm.Common;
 using System;
 
 namespace SkyApm.Tracing
@@ -25,6 +26,7 @@ namespace SkyApm.Tracing
         public bool TryParse(string text, out UniqueId uniqueId)
         {
             uniqueId = default(UniqueId);
+            StringOrNumValue<long> id_part0, id_part1, id_part2;
             if (string.IsNullOrEmpty(text)) return false;
 #if SPAN
             var id = text.AsSpan();
@@ -36,17 +38,35 @@ namespace SkyApm.Tracing
             index = FindIndex(id.Slice(index + 1));
             if (index < 1) return false;
 
-            if (!long.TryParse(id1, out var part0)) return false;
-            if (!long.TryParse(id.Slice(id1.Length + 1, index), out var part1)) return false;
-            if (!long.TryParse(id.Slice(id1.Length + index + 2), out var part2)) return false;
+            if (long.TryParse(id1, out var part0))
+                id_part0 = part0;
+            else
+                id_part0 = id1.ToString();
+            if (long.TryParse(id.Slice(id1.Length + 1, index), out var part1))
+                id_part1 = part1;
+            else
+                id_part1 = id.Slice(id1.Length + 1, index).ToString();
+            if (long.TryParse(id.Slice(id1.Length + index + 2), out var part2))
+                id_part2 = part2;
+            else
+                id_part2 = id.Slice(id1.Length + index + 2).ToString();
 #else
             var parts = text.Split("\\.".ToCharArray(), 3);
             if (parts.Length < 3) return false;
-            if (!long.TryParse(parts[0], out var part0)) return false;
-            if (!long.TryParse(parts[1], out var part1)) return false;
-            if (!long.TryParse(parts[2], out var part2)) return false;
+            if (long.TryParse(parts[0], out var part0))
+                id_part0 = part0;
+            else
+                id_part0 = parts[0];
+            if (long.TryParse(parts[1], out var part1))
+                id_part1 = part1; 
+            else
+                id_part1 = parts[1];
+            if (long.TryParse(parts[2], out var part2))
+                id_part2 = part2;
+            else
+                id_part2 = parts[2];
 #endif
-            uniqueId = new UniqueId(part0, part1, part2);
+            uniqueId = new UniqueId(id_part0, id_part1, id_part2);
             return true;
         }
 #if SPAN

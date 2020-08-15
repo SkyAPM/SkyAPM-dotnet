@@ -16,19 +16,27 @@
  *
  */
 
+using SkyApm.Common;
 using System;
 
 namespace SkyApm.Tracing
 {
     public struct UniqueId : IEquatable<UniqueId>
     {
-        public long Part1 { get; }
+        public StringOrNumValue<long> Part1 { get; }
 
-        public long Part2 { get; }
+        public StringOrNumValue<long> Part2 { get; }
 
-        public long Part3 { get; }
+        public StringOrNumValue<long> Part3 { get; }
 
         public UniqueId(long part1, long part2, long part3)
+        {
+            Part1 = part1;
+            Part2 = part2;
+            Part3 = part3;
+        }
+
+        public UniqueId(StringOrNumValue<long> part1, StringOrNumValue<long> part2, StringOrNumValue<long> part3)
         {
             Part1 = part1;
             Part2 = part2;
@@ -38,7 +46,7 @@ namespace SkyApm.Tracing
         public override string ToString() => $"{Part1}.{Part2}.{Part3}";
 
         public bool Equals(UniqueId other) =>
-            Part1 == other.Part1 && Part2 == other.Part2 && Part3 == other.Part3;
+            Part1.Equals(other.Part1) && Part2.Equals(other.Part2) && Part3.Equals(other.Part3);
 
         public override bool Equals(object obj) =>
             obj is UniqueId other && Equals(other);

@@ -30,11 +30,11 @@ namespace SkyApm.Transport
 
     public class UniqueIdRequest
     {
-        public long Part1 { get; set; }
+        public StringOrNumValue<long> Part1 { get; set; }
 
-        public long Part2 { get; set; }
+        public StringOrNumValue<long> Part2 { get; set; }
 
-        public long Part3 { get; set; }
+        public StringOrNumValue<long> Part3 { get; set; }
 
         public override string ToString()
         {
