@@ -38,7 +38,7 @@ namespace SkyApm.Tracing
         { 
             var instanceIdentity = _runtimeEnvironment.ServiceInstanceId.HasValue
                 ? new StringOrNumValue<long>(_runtimeEnvironment.ServiceInstanceId.Value)
-                : new StringOrNumValue<long>(GetMD5(_runtimeEnvironment.InstanceId.ToByteArray()));
+                : new StringOrNumValue<long>(_runtimeEnvironment.InstanceId.ToString("N"));
 
             return new UniqueId(instanceIdentity,
                 Thread.CurrentThread.ManagedThreadId,
