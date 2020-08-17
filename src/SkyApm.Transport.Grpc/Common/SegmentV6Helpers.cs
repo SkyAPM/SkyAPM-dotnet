@@ -111,13 +111,15 @@ namespace SkyApm.Transport.Grpc.Common
         private static void ReadStringOrIntValue<T>(T instance, StringOrIntValue stringOrIntValue,
             Action<T, string> stringValueReader, Action<T, int> intValueReader)
         {
-            if (stringOrIntValue.HasStringValue)
-            {
-                stringValueReader.Invoke(instance, stringOrIntValue.GetStringValue());
-            }
-            else if (stringOrIntValue.HasIntValue)
+            // We should first check and prefer the int value to reduce the network transport payload 
+            // in case both int and string value is present.
+            if (stringOrIntValue.HasIntValue)
             {
                 intValueReader.Invoke(instance, stringOrIntValue.GetIntValue());
+            }
+            else if (stringOrIntValue.HasStringValue)
+            {
+                stringValueReader.Invoke(instance, stringOrIntValue.GetStringValue());
             }
         }
 
