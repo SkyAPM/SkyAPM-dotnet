@@ -69,7 +69,7 @@ namespace SkyApm.Sample.Frontend.Controllers
         [HttpGet("hellojava")]
         public async Task<IActionResult> HelloJava()
         {
-            var message = await new HttpClient().GetStringAsync("http://localhost:8080/sayhello");
+            var message = await new HttpClient().GetStringAsync("http://localhost:8086/sayhello");
             return Ok(message);
         }
 

@@ -97,7 +97,7 @@ namespace SkyApm.Transport.Grpc.Common
             {
                 stringValueReader.Invoke(instance, stringOrIntValue.GetStringValue());
             }
-            else if (stringOrIntValue.HasIntValue)
+            if (stringOrIntValue.HasIntValue)
             {
                 intValueReader.Invoke(instance, stringOrIntValue.GetIntValue());
             }
