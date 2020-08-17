@@ -1,0 +1,1 @@
+java -Dserver.port=8080 -javaagent:./agent/skywalking-agent.jar -jar ./target/demo-0.0.1-SNAPSHOT.jar

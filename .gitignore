@@ -267,3 +267,4 @@ tools/
 generated/
 generated-v3/
 
+/sample/java-integration-demo/agent

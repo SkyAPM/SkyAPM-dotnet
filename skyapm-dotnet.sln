@@ -108,7 +108,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SkyApm.Sample.GenericHost",
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "java-integration", "java-integration", "{5850E98F-4BCF-48AA-BFD0-C63E1C5F3AFF}"
 	ProjectSection(SolutionItems) = preProject
-		sample\java-integration-demo\dist-package\start-java-demo-v8.cmd = sample\java-integration-demo\dist-package\start-java-demo-v8.cmd
+		sample\java-integration-demo\README.md = sample\java-integration-demo\README.md
+		sample\java-integration-demo\start-java-demo.cmd = sample\java-integration-demo\start-java-demo.cmd
 	EndProjectSection
 EndProject
 Global
