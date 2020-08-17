@@ -20,26 +20,26 @@ namespace SkyApm.Common
 {
     public static class Components
     {
-        public static readonly StringOrIntValue ASPNETCORE= new StringOrIntValue("AspNetCore");
+        public static readonly StringOrIntValue ASPNETCORE= new StringOrIntValue(3001, "AspNetCore");
 
-        public static readonly StringOrIntValue HTTPCLIENT = new StringOrIntValue("HttpClient");
+        public static readonly StringOrIntValue HTTPCLIENT = new StringOrIntValue(2, "HttpClient");
         
-        public static readonly StringOrIntValue ENTITYFRAMEWORKCORE = new StringOrIntValue("EntityFrameworkCore");
+        public static readonly StringOrIntValue ENTITYFRAMEWORKCORE = new StringOrIntValue(3002, "EntityFrameworkCore");
         
-        public static readonly StringOrIntValue SQLCLIENT = new StringOrIntValue("SqlClient");
+        public static readonly StringOrIntValue SQLCLIENT = new StringOrIntValue(3003, "SqlClient");
         
-        public static readonly StringOrIntValue CAP = new StringOrIntValue("CAP");
+        public static readonly StringOrIntValue CAP = new StringOrIntValue(3004, "CAP");
         
-        public static readonly StringOrIntValue ENTITYFRAMEWORKCORE_SQLITE = new StringOrIntValue("EntityFrameworkCore.Sqlite");
+        public static readonly StringOrIntValue ENTITYFRAMEWORKCORE_SQLITE = new StringOrIntValue(3011, "EntityFrameworkCore.Sqlite");
         
-        public static readonly StringOrIntValue POMELO_ENTITYFRAMEWORKCORE_MYSQL = new StringOrIntValue("Pomelo.EntityFrameworkCore.MySql");
+        public static readonly StringOrIntValue POMELO_ENTITYFRAMEWORKCORE_MYSQL = new StringOrIntValue(3012, "Pomelo.EntityFrameworkCore.MySql");
         
-        public static readonly StringOrIntValue NPGSQL_ENTITYFRAMEWORKCORE_POSTGRESQL = new StringOrIntValue("Npgsql.EntityFrameworkCore.PostgreSQL");
+        public static readonly StringOrIntValue NPGSQL_ENTITYFRAMEWORKCORE_POSTGRESQL = new StringOrIntValue(3013, "Npgsql.EntityFrameworkCore.PostgreSQL");
         
-        public static readonly StringOrIntValue ASPNET = new StringOrIntValue("AspNet");
+        public static readonly StringOrIntValue ASPNET = new StringOrIntValue(3015, "AspNet");
 
-        public static readonly StringOrIntValue SMART_SQL = new StringOrIntValue("SmartSql");
+        public static readonly StringOrIntValue SMART_SQL = new StringOrIntValue(3016, "SmartSql");
 
-        public static readonly StringOrIntValue GRPC = new StringOrIntValue("GRPC");
+        public static readonly StringOrIntValue GRPC = new StringOrIntValue(23, "GRPC");
     }
 }
