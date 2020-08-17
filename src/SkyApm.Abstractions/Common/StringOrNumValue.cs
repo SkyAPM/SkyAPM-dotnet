@@ -79,7 +79,8 @@ namespace SkyApm.Common
             unchecked
             {
                 var hashCode = _numValue.GetHashCode();
-                hashCode = (hashCode * 397) ^ _stringValue.GetHashCode();
+                if(_stringValue != null)
+                    hashCode = (hashCode * 397) ^ _stringValue.GetHashCode();
                 return hashCode;
             }
         }
