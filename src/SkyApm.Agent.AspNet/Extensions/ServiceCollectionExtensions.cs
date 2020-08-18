@@ -41,6 +41,7 @@ namespace SkyApm.Agent.AspNet.Extensions
             services.AddSingleton<IExecutionService, PingService>();
             services.AddSingleton<IExecutionService, ServiceDiscoveryV5Service>();
             services.AddSingleton<IExecutionService, SegmentReportService>();
+            services.AddSingleton<IExecutionService, CLRStatsService>();
             services.AddSingleton<IInstrumentStartup, InstrumentStartup>();
             services.AddSingleton<IRuntimeEnvironment>(RuntimeEnvironment.Instance);
             services.AddSingleton<TracingDiagnosticProcessorObserver>();
@@ -71,6 +72,7 @@ namespace SkyApm.Agent.AspNet.Extensions
 
             services.AddSingleton<ISkyApmClientV5, SkyApmClientV5>();
             services.AddSingleton<ISegmentReporter, SegmentReporter>();
+            services.AddSingleton<ICLRStatsReporter, CLRStatsReporter>();
             services.AddSingleton<ConnectionManager>();
             services.AddSingleton<IPingCaller, PingCaller>();
             services.AddSingleton<IServiceRegister, ServiceRegister>();
