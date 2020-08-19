@@ -36,7 +36,7 @@ namespace SkyApm.Tracing
             Key = string.IsNullOrEmpty(config.Namespace)
                 ? HeaderVersions.SW6
                 : $"{config.Namespace}-{HeaderVersions.SW6}";
-            Enable = config.HeaderVersions != null || config.HeaderVersions.Contains(HeaderVersions.SW6);
+            Enable = config.HeaderVersions != null && config.HeaderVersions.Contains(HeaderVersions.SW6);
         }
 
         public string Key { get; }
