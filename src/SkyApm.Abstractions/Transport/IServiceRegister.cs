@@ -26,12 +26,6 @@ namespace SkyApm.Transport
 {
     public interface IServiceRegister
     {
-        Task<NullableValue> RegisterServiceAsync(ServiceRequest serviceRequest,
-            CancellationToken cancellationToken = default(CancellationToken));
-        
-        Task<NullableValue> RegisterServiceInstanceAsync(ServiceInstanceRequest serviceInstanceRequest,
-            CancellationToken cancellationToken = default(CancellationToken));
-
         Task<bool> ReportInstancePropertiesAsync(ServiceInstancePropertiesRequest serviceInstancePropertiesRequest,
             CancellationToken cancellationToken = default(CancellationToken));
     }

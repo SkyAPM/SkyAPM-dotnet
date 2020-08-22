@@ -26,22 +26,22 @@ namespace SkyApm.Tracing
         
         bool? Sampled { get; }
 
-        UniqueId TraceId { get; }
+        string TraceId { get; }
 
-        UniqueId ParentSegmentId { get; }
+        string ParentSegmentId { get; }
 
         int ParentSpanId { get; }
 
-        StringOrIntValue ParentServiceId { get; }
+        string ParentServiceId { get; }
 
-        StringOrIntValue ParentServiceInstanceId { get; }
-        
-        StringOrIntValue EntryServiceInstanceId { get; }
-        
+        string ParentServiceInstanceId { get; }
+
+        string EntryServiceInstanceId { get; }
+
         StringOrIntValue NetworkAddress { get; }
-        
+
         StringOrIntValue EntryEndpoint { get; }
-        
+
         StringOrIntValue ParentEndpoint { get; }
     }
 }

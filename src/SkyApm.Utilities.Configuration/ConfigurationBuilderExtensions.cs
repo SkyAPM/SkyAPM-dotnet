@@ -16,6 +16,7 @@
  *
  */
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using Microsoft.Extensions.Configuration;
@@ -32,13 +33,14 @@ namespace SkyApm.Utilities.Configuration
             {
                 {"SkyWalking:Namespace", string.Empty},
                 {"SkyWalking:ServiceName", "My_Service"},
-                {"SkyWalking:HeaderVersions:0", HeaderVersions.SW6},
+                {"Skywalking:ServiceInstanceName", Guid.NewGuid().ToString("N")},
+                {"SkyWalking:HeaderVersions:0", HeaderVersions.SW8},
                 {"SkyWalking:Sampling:SamplePer3Secs", "-1"},
                 {"SkyWalking:Sampling:Percentage", "-1"},
                 {"SkyWalking:Logging:Level", "Information"},
                 {"SkyWalking:Logging:FilePath", defaultLogFile},
                 {"SkyWalking:Transport:Interval", "3000"},
-                {"SkyWalking:Transport:ProtocolVersion", ProtocolVersions.V6},
+                {"SkyWalking:Transport:ProtocolVersion", ProtocolVersions.V8},
                 {"SkyWalking:Transport:QueueSize", "30000"},
                 {"SkyWalking:Transport:BatchSize", "3000"},
                 {"SkyWalking:Transport:gRPC:Servers", "localhost:11800"},

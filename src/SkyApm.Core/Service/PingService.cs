@@ -41,9 +41,6 @@ namespace SkyApm.Service
             _instrumentConfig = configAccessor.Get<InstrumentConfig>();
         }
 
-        protected override bool CanExecute() =>
-            _transportConfig.ProtocolVersion != ProtocolVersions.V5 && base.CanExecute();
-
         protected override TimeSpan DueTime { get; } = TimeSpan.FromSeconds(30);
         protected override TimeSpan Period { get; } = TimeSpan.FromSeconds(60);
 
@@ -55,8 +52,7 @@ namespace SkyApm.Service
                     new PingRequest
                     {
                         ServiceName = _instrumentConfig.ServiceName ?? _instrumentConfig.ApplicationCode,
-                        ServiceInstanceId = RuntimeEnvironment.ServiceInstanceId.Value,
-                        InstanceId = RuntimeEnvironment.InstanceId.ToString("N")
+                        InstanceId = _instrumentConfig.ServiceInstanceName
                     }, cancellationToken);
                 Logger.Information($"Ping server @{DateTimeOffset.UtcNow}");
             }

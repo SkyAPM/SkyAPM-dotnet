@@ -29,14 +29,12 @@ namespace SkyApm.Transport.Grpc
     public class PingCaller : IPingCaller
     {
         private readonly TransportConfig _transportConfig;
-        private readonly IPingCaller _pingCallerV6;
         private readonly IPingCaller _pingCallerV8;
 
         public PingCaller(ConnectionManager connectionManager, ILoggerFactory loggerFactory,
             IConfigAccessor configAccessor)
         {
             _transportConfig = configAccessor.Get<TransportConfig>();
-            _pingCallerV6 = new V6.PingCaller(connectionManager, loggerFactory, configAccessor);
             _pingCallerV8 = new V8.PingCaller(connectionManager, loggerFactory, configAccessor);
         }
 
@@ -44,8 +42,6 @@ namespace SkyApm.Transport.Grpc
         {
             if (_transportConfig.ProtocolVersion == ProtocolVersions.V8)
                 await _pingCallerV8.PingAsync(request, cancellationToken);
-            if (_transportConfig.ProtocolVersion == ProtocolVersions.V6)
-                await _pingCallerV6.PingAsync(request, cancellationToken);
         }
     }
 }

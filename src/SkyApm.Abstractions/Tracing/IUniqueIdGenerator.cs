@@ -20,6 +20,6 @@ namespace SkyApm.Tracing
 {
     public interface IUniqueIdGenerator
     {
-        UniqueId Generate();
+        string Generate();
     }
 }

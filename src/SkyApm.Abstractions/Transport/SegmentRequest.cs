@@ -23,32 +23,18 @@ namespace SkyApm.Transport
 {
     public class SegmentRequest
     {
-        public IEnumerable<UniqueIdRequest> UniqueIds { get; set; }
+        public string TraceId { get; set; }
 
         public SegmentObjectRequest Segment { get; set; }
     }
 
-    public class UniqueIdRequest
-    {
-        public StringOrNumValue<long> Part1 { get; set; }
-
-        public StringOrNumValue<long> Part2 { get; set; }
-
-        public StringOrNumValue<long> Part3 { get; set; }
-
-        public override string ToString()
-        {
-            return $"{Part1}.{Part2}.{Part3}";
-        }
-    }
-
     public class SegmentObjectRequest
     {
-        public UniqueIdRequest SegmentId { get; set; }
+        public string SegmentId { get; set; }
 
-        public StringOrIntValue ServiceId { get; set; }
+        public string ServiceId { get; set; }
 
-        public StringOrIntValue ServiceInstanceId { get; set; }
+        public string ServiceInstanceId { get; set; }
 
         public IList<SpanRequest> Spans { get; set; } = new List<SpanRequest>();
     }
@@ -84,17 +70,17 @@ namespace SkyApm.Transport
 
     public class SegmentReferenceRequest
     {
-        public UniqueIdRequest TraceId { get; set; }
+        public string TraceId { get; set; }
 
-        public UniqueIdRequest ParentSegmentId { get; set; }
+        public string ParentSegmentId { get; set; }
 
-        public StringOrIntValue ParentServiceId { get; set; }
+        public string ParentServiceId { get; set; }
 
-        public StringOrIntValue ParentServiceInstanceId { get; set; }
+        public string ParentServiceInstanceId { get; set; }
 
         public int ParentSpanId { get; set; }
 
-        public StringOrIntValue EntryServiceInstanceId { get; set; }
+        public string EntryServiceInstanceId { get; set; }
 
         public int RefType { get; set; }
 

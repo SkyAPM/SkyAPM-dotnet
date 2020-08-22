@@ -6,9 +6,9 @@ namespace SkyApm.Transport
 {
     public class ServiceInstancePropertiesRequest
     {
-        public string ServiceName { get; set; }
+        public string ServiceId { get; set; }
 
-        public string InstanceUUID { get; set; }
+        public string ServiceInstanceId { get; set; }
 
         public AgentOsInfoRequest Properties { get; set; }
     }

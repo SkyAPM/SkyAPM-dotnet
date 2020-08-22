@@ -48,18 +48,6 @@ namespace SkyApm.Transport.Grpc.V8
             _logger = loggerFactory.CreateLogger(typeof(ServiceRegister));
         }
 
-        public async Task<NullableValue> RegisterServiceAsync(ServiceRequest serviceRequest,
-            CancellationToken cancellationToken = default(CancellationToken))
-        {
-            return NullableValue.Null;
-        }
-
-        public async Task<NullableValue> RegisterServiceInstanceAsync(ServiceInstanceRequest serviceInstanceRequest,
-            CancellationToken cancellationToken = default(CancellationToken))
-        {
-            return NullableValue.Null;
-        }
-
         public async Task<bool> ReportInstancePropertiesAsync(ServiceInstancePropertiesRequest serviceInstancePropertiesRequest, CancellationToken cancellationToken = default)
         {
             if (!_connectionManager.Ready)
@@ -73,8 +61,8 @@ namespace SkyApm.Transport.Grpc.V8
                 var client = new ManagementService.ManagementServiceClient(connection);
                 var instance = new InstanceProperties
                 {
-                    Service = serviceInstancePropertiesRequest.ServiceName,
-                    ServiceInstance = serviceInstancePropertiesRequest.InstanceUUID,
+                    Service = serviceInstancePropertiesRequest.ServiceId,
+                    ServiceInstance = serviceInstancePropertiesRequest.ServiceInstanceId,
                 };
 
                 instance.Properties.Add(new KeyStringValuePair

@@ -46,69 +46,11 @@ namespace SkyApm.Service
 
         protected override TimeSpan Period { get; } = TimeSpan.FromSeconds(30);
 
-        protected override bool CanExecute() =>
-            _transportConfig.ProtocolVersion != ProtocolVersions.V5 && !RuntimeEnvironment.Initialized;
+        protected override bool CanExecute() => !RuntimeEnvironment.Initialized;
 
         protected override async Task ExecuteAsync(CancellationToken cancellationToken)
         {
-            if(_transportConfig.ProtocolVersion == ProtocolVersions.V6)
-            {
-                await RegisterServiceAsync(cancellationToken);
-                await RegisterServiceInstanceAsync(cancellationToken);
-            }
-            else
-            {
-                await ReportServiceInstancePropertiesAsync(cancellationToken);
-            }
-        }
-
-        private async Task RegisterServiceAsync(CancellationToken cancellationToken)
-        {
-            if (!RuntimeEnvironment.ServiceId.HasValue)
-            {
-                var request = new ServiceRequest
-                {
-                    ServiceName = _config.ServiceName ?? _config.ApplicationCode
-                };
-                var value = await Polling(3,
-                    () => _serviceRegister.RegisterServiceAsync(request, cancellationToken),
-                    cancellationToken);
-                if (value.HasValue && RuntimeEnvironment is RuntimeEnvironment environment)
-                {
-                    environment.ServiceId = value;
-                    Logger.Information($"Registered Service[Id={environment.ServiceId.Value}].");
-                }
-            }
-        }
-
-        private async Task RegisterServiceInstanceAsync(CancellationToken cancellationToken)
-        {
-            if (RuntimeEnvironment.ServiceId.HasValue && !RuntimeEnvironment.ServiceInstanceId.HasValue)
-            {
-                var properties = new AgentOsInfoRequest
-                {
-                    HostName = DnsHelpers.GetHostName(),
-                    IpAddress = DnsHelpers.GetIpV4s(),
-                    OsName = PlatformInformation.GetOSName(),
-                    ProcessNo = Process.GetCurrentProcess().Id,
-                    Language = "dotnet"
-                };
-                var request = new ServiceInstanceRequest
-                {
-                    ServiceId = RuntimeEnvironment.ServiceId.Value,
-                    InstanceUUID = RuntimeEnvironment.InstanceId.ToString("N"),
-                    Properties = properties
-                };
-                var value = await Polling(3,
-                    () => _serviceRegister.RegisterServiceInstanceAsync(request, cancellationToken),
-                    cancellationToken);
-                if (value.HasValue && RuntimeEnvironment is RuntimeEnvironment environment)
-                {
-                    environment.ServiceInstanceId = value;
-                    environment.Initialized = true;
-                    Logger.Information($"Registered ServiceInstance[Id={environment.ServiceInstanceId.Value}].");
-                }
-            }
+            await ReportServiceInstancePropertiesAsync(cancellationToken);
         }
 
         private async Task ReportServiceInstancePropertiesAsync(CancellationToken cancellationToken)
@@ -123,8 +65,8 @@ namespace SkyApm.Service
             };
             var request = new ServiceInstancePropertiesRequest
             {
-                ServiceName = _config.ServiceName ?? _config.ApplicationCode,
-                InstanceUUID = RuntimeEnvironment.InstanceId.ToString("N"),
+                ServiceId = _config.ServiceName ?? _config.ApplicationCode,
+                ServiceInstanceId = _config.ServiceInstanceName,
                 Properties = properties
             };
             var result = await Polling(3,
@@ -133,7 +75,7 @@ namespace SkyApm.Service
             if (result && RuntimeEnvironment is RuntimeEnvironment environment)
             {
                 environment.Initialized = true;
-                Logger.Information($"Reported Service Instance Properties[Service={request.ServiceName},InstanceId={request.InstanceUUID}].");
+                Logger.Information($"Reported Service Instance Properties[Service={request.ServiceId},InstanceId={request.ServiceInstanceId}].");
             }
         }
 

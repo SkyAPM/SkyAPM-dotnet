@@ -30,10 +30,10 @@ namespace SkyApm.Transport.Grpc.Common
         {
             var traceSegment = new SegmentObject
             {
-                TraceId = request.UniqueIds.First().ToString(), //todo: is there chances request.UniqueIds.Count > 1 ?
-                TraceSegmentId = request.Segment.SegmentId.ToString(),
-                Service = request.Segment.ServiceId.ToString(),
-                ServiceInstance = request.Segment.ServiceInstanceId.ToString(),
+                TraceId = request.TraceId, //todo: is there chances request.UniqueIds.Count > 1 ?
+                TraceSegmentId = request.Segment.SegmentId,
+                Service = request.Segment.ServiceId,
+                ServiceInstance = request.Segment.ServiceInstanceId,
                 IsSizeLimited = false
             };
 
@@ -69,12 +69,12 @@ namespace SkyApm.Transport.Grpc.Common
         {
             var reference = new SegmentReference
             {
-                TraceId = referenceRequest.TraceId.ToString(), 
-                ParentService = referenceRequest.ParentServiceId.ToString(), 
-                ParentServiceInstance = referenceRequest.ParentServiceInstanceId.ToString(),
+                TraceId = referenceRequest.TraceId, 
+                ParentService = referenceRequest.ParentServiceId, 
+                ParentServiceInstance = referenceRequest.ParentServiceInstanceId,
                 ParentSpanId = referenceRequest.ParentSpanId,
                 RefType = (RefType) referenceRequest.RefType,
-                ParentTraceSegmentId = referenceRequest.ParentSegmentId.ToString(),
+                ParentTraceSegmentId = referenceRequest.ParentSegmentId,
                 ParentEndpoint = referenceRequest.ParentEndpointName.ToString(),
                 NetworkAddressUsedAtPeer = referenceRequest.NetworkAddress.ToString()
             };

@@ -33,15 +33,11 @@ namespace SkyApm.Config
         /// </summary>
         public int BatchSize { get; set; } = 3000;
 
-        public string ProtocolVersion { get; set; } = ProtocolVersions.V6;
+        public string ProtocolVersion { get; set; } = ProtocolVersions.V8;
     }
 
     public static class ProtocolVersions
     {
-        public static string V5 { get; } = "v5";
-        
-        public static string V6 { get; } = "v6";
-
         public static string V8 { get; } = "v8";
     }
 }

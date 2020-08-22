@@ -26,17 +26,17 @@ namespace SkyApm.Tracing
         
         public bool? Sampled { get; set; }
         
-        public UniqueId TraceId { get; }
+        public string TraceId { get; }
         
-        public UniqueId ParentSegmentId { get; }
+        public string ParentSegmentId { get; }
         
         public int ParentSpanId { get; }
 
-        public StringOrIntValue ParentServiceId { get; }
+        public string ParentServiceId { get; }
 
-        public StringOrIntValue ParentServiceInstanceId { get; }
+        public string ParentServiceInstanceId { get; }
         
-        public StringOrIntValue EntryServiceInstanceId { get; }
+        public string EntryServiceInstanceId { get; }
         
         public StringOrIntValue NetworkAddress { get; set; }
         
@@ -45,8 +45,8 @@ namespace SkyApm.Tracing
         public StringOrIntValue ParentEndpoint { get; set; }
 
 
-        public Carrier(UniqueId traceId, UniqueId parentSegmentId, int parentSpanId, StringOrIntValue parentServiceInstanceId,
-            StringOrIntValue entryServiceInstanceId, StringOrIntValue parentServiceId = default)
+        public Carrier(string traceId, string parentSegmentId, int parentSpanId, string parentServiceInstanceId,
+            string entryServiceInstanceId, string parentServiceId = default)
         {
             TraceId = traceId;
             ParentSegmentId = parentSegmentId;

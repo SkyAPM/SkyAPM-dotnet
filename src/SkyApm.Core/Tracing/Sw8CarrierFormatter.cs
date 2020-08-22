@@ -24,13 +24,11 @@ namespace SkyApm.Tracing
 {
     public class Sw8CarrierFormatter : ICarrierFormatter
     {
-        private readonly IUniqueIdParser _uniqueIdParser;
         private readonly IBase64Formatter _base64Formatter;
 
-        public Sw8CarrierFormatter(IUniqueIdParser uniqueIdParser, IBase64Formatter base64Formatter,
+        public Sw8CarrierFormatter(IBase64Formatter base64Formatter,
             IConfigAccessor configAccessor)
         {
-            _uniqueIdParser = uniqueIdParser;
             _base64Formatter = base64Formatter;
             var config = configAccessor.Get<InstrumentConfig>();
             Key = string.IsNullOrEmpty(config.Namespace)
@@ -60,11 +58,8 @@ namespace SkyApm.Tracing
             if (!int.TryParse(parts[0], out var sampled))
                 return Defer();
 
-            if (!_uniqueIdParser.TryParse(_base64Formatter.Decode(parts[1]), out var traceId))
-                return Defer();
-            
-            if (!_uniqueIdParser.TryParse(_base64Formatter.Decode(parts[2]), out var segmentId))
-                return Defer();
+            var traceId = _base64Formatter.Decode(parts[1]);
+            var segmentId = _base64Formatter.Decode(parts[2]);
 
             if (!int.TryParse(parts[3], out var parentSpanId))
                 return Defer();
@@ -91,11 +86,11 @@ namespace SkyApm.Tracing
                 return string.Empty;
             return string.Join("-",
                 carrier.Sampled != null && carrier.Sampled.Value ? "1" : "0",
-                _base64Formatter.Encode(carrier.TraceId.ToString()),
-                _base64Formatter.Encode(carrier.ParentSegmentId.ToString()),
+                _base64Formatter.Encode(carrier.TraceId),
+                _base64Formatter.Encode(carrier.ParentSegmentId),
                 carrier.ParentSpanId.ToString(),
-                _base64Formatter.Encode(carrier.ParentServiceId.ToString()),
-                _base64Formatter.Encode(carrier.ParentServiceInstanceId.ToString()),
+                _base64Formatter.Encode(carrier.ParentServiceId),
+                _base64Formatter.Encode(carrier.ParentServiceInstanceId),
                 _base64Formatter.Encode(carrier.ParentEndpoint.ToString()),
                 _base64Formatter.Encode(carrier.NetworkAddress.ToString()));
         }

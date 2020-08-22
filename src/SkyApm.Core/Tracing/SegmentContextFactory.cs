@@ -56,9 +56,9 @@ namespace SkyApm.Tracing
             var traceId = GetTraceId(carrier);
             var segmentId = GetSegmentId();
             var sampled = GetSampled(carrier, operationName);
-            var segmentContext = new SegmentContext(traceId, segmentId, sampled, 
-                new StringOrIntValue(_runtimeEnvironment.ServiceId.Value, _instrumentConfig.ServiceName ?? _instrumentConfig.ApplicationCode),
-                new StringOrIntValue(_runtimeEnvironment.ServiceInstanceId.Value, _runtimeEnvironment.InstanceId.ToString("N")),
+            var segmentContext = new SegmentContext(traceId, segmentId, sampled,
+                _instrumentConfig.ServiceName ?? _instrumentConfig.ApplicationCode,
+                _instrumentConfig.ServiceInstanceName,
                 operationName, SpanType.Entry);
 
             if (carrier.HasValue)
@@ -89,9 +89,9 @@ namespace SkyApm.Tracing
             var traceId = GetTraceId(parentSegmentContext);
             var segmentId = GetSegmentId();
             var sampled = GetSampled(parentSegmentContext, operationName);
-            var segmentContext = new SegmentContext(traceId, segmentId, sampled, 
-                new StringOrIntValue(_runtimeEnvironment.ServiceId.Value, _instrumentConfig.ServiceName ?? _instrumentConfig.ApplicationCode),
-                new StringOrIntValue(_runtimeEnvironment.ServiceInstanceId.Value, _runtimeEnvironment.InstanceId.ToString("N")),
+            var segmentContext = new SegmentContext(traceId, segmentId, sampled,
+                _instrumentConfig.ServiceName ?? _instrumentConfig.ApplicationCode,
+                _instrumentConfig.ServiceInstanceName,
                 operationName, SpanType.Local);
 
             if (parentSegmentContext != null)
@@ -125,8 +125,8 @@ namespace SkyApm.Tracing
             var segmentId = GetSegmentId();
             var sampled = GetSampled(parentSegmentContext, operationName, networkAddress);
             var segmentContext = new SegmentContext(traceId, segmentId, sampled,
-                new StringOrIntValue(_runtimeEnvironment.ServiceId.Value, _instrumentConfig.ServiceName ?? _instrumentConfig.ApplicationCode),
-                new StringOrIntValue(_runtimeEnvironment.ServiceInstanceId.Value, _runtimeEnvironment.InstanceId.ToString("N")),
+                _instrumentConfig.ServiceName ?? _instrumentConfig.ApplicationCode,
+                _instrumentConfig.ServiceInstanceName,
                 operationName, SpanType.Exit);
 
             if (parentSegmentContext != null)
@@ -173,17 +173,17 @@ namespace SkyApm.Tracing
             }
         }
 
-        private UniqueId GetTraceId(ICarrier carrier)
+        private string GetTraceId(ICarrier carrier)
         {
             return carrier.HasValue ? carrier.TraceId : _uniqueIdGenerator.Generate();
         }
 
-        private UniqueId GetTraceId(SegmentContext parentSegmentContext)
+        private string GetTraceId(SegmentContext parentSegmentContext)
         {
             return parentSegmentContext?.TraceId ?? _uniqueIdGenerator.Generate();
         }
 
-        private UniqueId GetSegmentId()
+        private string GetSegmentId()
         {
             return _uniqueIdGenerator.Generate();
         }

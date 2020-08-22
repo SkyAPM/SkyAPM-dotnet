@@ -58,7 +58,7 @@ namespace SkyApm.Transport.Grpc.V8
                 var request = new CLRMetricCollection
                 {
                     Service = _instrumentConfig.ServiceName ?? _instrumentConfig.ApplicationCode,
-                    ServiceInstance = _runtimeEnvironment.InstanceId.ToString("N"),
+                    ServiceInstance = _instrumentConfig.ServiceInstanceName,
                 };
                 var metric = new CLRMetric
                 {
