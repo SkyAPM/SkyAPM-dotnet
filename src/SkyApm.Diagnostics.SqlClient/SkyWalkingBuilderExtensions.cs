@@ -18,6 +18,7 @@
 
 using System;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using SkyApm.Utilities.DependencyInjection;
 
 namespace SkyApm.Diagnostics.SqlClient
@@ -31,7 +32,7 @@ namespace SkyApm.Diagnostics.SqlClient
                 throw new ArgumentNullException(nameof(extensions));
             }
 
-            extensions.Services.AddSingleton<ITracingDiagnosticProcessor, SqlClientTracingDiagnosticProcessor>();
+            extensions.Services.TryAddSingleton<ITracingDiagnosticProcessor, SqlClientTracingDiagnosticProcessor>();
             
             return extensions;
         }

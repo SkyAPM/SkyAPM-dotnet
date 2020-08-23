@@ -20,6 +20,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using SkyApm.Agent.AspNetCore;
 using SkyApm.AspNetCore.Diagnostics;
+using SkyApm.Diagnostics.HttpClient;
+using SkyApm.Diagnostics.SqlClient;
 
 [assembly: HostingStartup(typeof(SkyApmHostingStartup))]
 
@@ -29,7 +31,7 @@ namespace SkyApm.Agent.AspNetCore
     {
         public void Configure(IWebHostBuilder builder)
         {
-            builder.ConfigureServices(services => services.AddSkyAPM(ext => ext.AddAspNetCoreHosting()));
+            builder.ConfigureServices(services => services.AddSkyAPM(ext => ext.AddAspNetCoreHosting().AddHttpClient().AddSqlClient()));
         }
     }
 }

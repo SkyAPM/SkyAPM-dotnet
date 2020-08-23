@@ -75,7 +75,7 @@ namespace SkyApm.DotNet.CLI.Command
                 return;
             }
 
-            servers = servers ?? "localhost:11800";
+            servers ??= "localhost:11800";
 
             var gRPCConfig = new Dictionary<string, dynamic>
             {
@@ -89,7 +89,7 @@ namespace SkyApm.DotNet.CLI.Command
             var transportConfig = new Dictionary<string, dynamic>
             {
                 {"Interval", 3000},
-                {"ProtocolVersion", "v6"},
+                {"ProtocolVersion", "v8"},
                 {"QueueSize", 30000},
                 {"BatchSize", 3000},
                 {"gRPC", gRPCConfig}
@@ -107,16 +107,16 @@ namespace SkyApm.DotNet.CLI.Command
                 {"Percentage", -1d}
             };
 
-            var HeaderVersionsConfig = new string[]
+            var headerVersionsConfig = new string[]
             {
-                "sw6"
+                "sw8"
             };
 
             var skyAPMConfig = new Dictionary<string, dynamic>
             {
                 {"ServiceName", serviceName},
                 {"Namespace", string.Empty},
-                {"HeaderVersions", HeaderVersionsConfig},
+                {"HeaderVersions", headerVersionsConfig},
                 {"Sampling", samplingConfig},
                 {"Logging", loggingConfig},
                 {"Transport", transportConfig}

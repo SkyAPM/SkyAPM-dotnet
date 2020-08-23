@@ -17,6 +17,7 @@
  */
 
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using SkyApm.Diagnostics.AspNetCore.Handlers;
 using SkyApm.Utilities.DependencyInjection;
 
@@ -26,9 +27,9 @@ namespace SkyApm.AspNetCore.Diagnostics
     {
         public static SkyApmExtensions AddAspNetCoreHosting(this SkyApmExtensions extensions)
         {
-            extensions.Services.AddSingleton<ITracingDiagnosticProcessor, HostingTracingDiagnosticProcessor>();
-            extensions.Services.AddSingleton<IHostingDiagnosticHandler, DefaultHostingDiagnosticHandler>();
-            extensions.Services.AddSingleton<IHostingDiagnosticHandler, GrpcHostingDiagnosticHandler>();
+            extensions.Services.TryAddSingleton<ITracingDiagnosticProcessor, HostingTracingDiagnosticProcessor>();
+            extensions.Services.TryAddSingleton<IHostingDiagnosticHandler, DefaultHostingDiagnosticHandler>();
+            extensions.Services.TryAddSingleton<IHostingDiagnosticHandler, GrpcHostingDiagnosticHandler>();
             return extensions;
         }
     }
