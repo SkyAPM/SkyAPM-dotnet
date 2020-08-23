@@ -29,6 +29,7 @@ namespace SkyApm.Service
     {
         private readonly IPingCaller _pingCaller;
         private readonly TransportConfig _transportConfig;
+        private readonly InstrumentConfig _instrumentConfig;
 
         public PingService(IConfigAccessor configAccessor, IPingCaller pingCaller,
             IRuntimeEnvironment runtimeEnvironment,
@@ -37,10 +38,8 @@ namespace SkyApm.Service
         {
             _pingCaller = pingCaller;
             _transportConfig = configAccessor.Get<TransportConfig>();
+            _instrumentConfig = configAccessor.Get<InstrumentConfig>();
         }
-
-        protected override bool CanExecute() =>
-            _transportConfig.ProtocolVersion == ProtocolVersions.V6 && base.CanExecute();
 
         protected override TimeSpan DueTime { get; } = TimeSpan.FromSeconds(30);
         protected override TimeSpan Period { get; } = TimeSpan.FromSeconds(60);
@@ -52,8 +51,8 @@ namespace SkyApm.Service
                 await _pingCaller.PingAsync(
                     new PingRequest
                     {
-                        ServiceInstanceId = RuntimeEnvironment.ServiceInstanceId.Value,
-                        InstanceId = RuntimeEnvironment.InstanceId.ToString("N")
+                        ServiceName = _instrumentConfig.ServiceName ?? _instrumentConfig.ApplicationCode,
+                        InstanceId = _instrumentConfig.ServiceInstanceName
                     }, cancellationToken);
                 Logger.Information($"Ping server @{DateTimeOffset.UtcNow}");
             }

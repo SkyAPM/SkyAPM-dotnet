@@ -16,31 +16,35 @@
  *
  */
 
-using System.Collections.Generic;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
-using SkyApm.Config;
 using SkyApm.Logging;
 
 namespace SkyApm.Transport.Grpc
 {
-    public class SegmentReporter : ISegmentReporter
+    public class ConnectService: ExecutionService
     {
-        private readonly ISegmentReporter _segmentReporterV8;
-        private readonly TransportConfig _transportConfig;
+        private readonly ConnectionManager _connectionManager;
 
-        public SegmentReporter(ConnectionManager connectionManager, IConfigAccessor configAccessor,
-            ILoggerFactory loggerFactory)
+        public ConnectService(ConnectionManager connectionManager,
+            IRuntimeEnvironment runtimeEnvironment,
+            ILoggerFactory loggerFactory) : base(runtimeEnvironment, loggerFactory)
         {
-            _transportConfig = configAccessor.Get<TransportConfig>();
-            _segmentReporterV8 = new V8.SegmentReporter(connectionManager, configAccessor, loggerFactory);
+            _connectionManager = connectionManager;
         }
 
-        public async Task ReportAsync(IReadOnlyCollection<SegmentRequest> segmentRequests,
-            CancellationToken cancellationToken = default(CancellationToken))
+        protected override TimeSpan DueTime { get; } = TimeSpan.Zero;
+        protected override TimeSpan Period { get; } = TimeSpan.FromSeconds(15);
+
+        protected override async Task ExecuteAsync(CancellationToken cancellationToken)
         {
-            if (_transportConfig.ProtocolVersion == ProtocolVersions.V8)
-                await _segmentReporterV8.ReportAsync(segmentRequests, cancellationToken);
+            if (!_connectionManager.Ready)
+            {
+                await _connectionManager.ConnectAsync();
+            }
         }
+
+        protected override bool CanExecute() => !_connectionManager.Ready;
     }
 }

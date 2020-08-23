@@ -9,6 +9,8 @@
     <PackageReference Include="BenchmarkDotNet" Version="0.*" />
 
     <ProjectReference Include="..\..\src\SkyApm.Core\SkyApm.Core.csproj" />
+
+    <ProjectReference Include="..\..\src\SkyApm.Utilities.Configuration\SkyApm.Utilities.Configuration.csproj" />
   </ItemGroup>
 
 </Project>

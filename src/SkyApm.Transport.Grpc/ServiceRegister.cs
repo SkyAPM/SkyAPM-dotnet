@@ -16,31 +16,34 @@
  *
  */
 
-using System.Collections.Generic;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
+using SkyApm.Common;
 using SkyApm.Config;
 using SkyApm.Logging;
+using SkyApm.Transport.Grpc.Common;
 
 namespace SkyApm.Transport.Grpc
 {
-    public class SegmentReporter : ISegmentReporter
+    public class ServiceRegister : IServiceRegister
     {
-        private readonly ISegmentReporter _segmentReporterV8;
         private readonly TransportConfig _transportConfig;
+        private readonly IServiceRegister _serviceRegisterV8;
 
-        public SegmentReporter(ConnectionManager connectionManager, IConfigAccessor configAccessor,
+        public ServiceRegister(ConnectionManager connectionManager, IConfigAccessor configAccessor,
             ILoggerFactory loggerFactory)
         {
             _transportConfig = configAccessor.Get<TransportConfig>();
-            _segmentReporterV8 = new V8.SegmentReporter(connectionManager, configAccessor, loggerFactory);
+            _serviceRegisterV8 = new V8.ServiceRegister(connectionManager, configAccessor, loggerFactory);
         }
 
-        public async Task ReportAsync(IReadOnlyCollection<SegmentRequest> segmentRequests,
+        public async Task<bool> ReportInstancePropertiesAsync(ServiceInstancePropertiesRequest serviceInstancePropertiesRequest,
             CancellationToken cancellationToken = default(CancellationToken))
         {
             if (_transportConfig.ProtocolVersion == ProtocolVersions.V8)
-                await _segmentReporterV8.ReportAsync(segmentRequests, cancellationToken);
+                return await _serviceRegisterV8.ReportInstancePropertiesAsync(serviceInstancePropertiesRequest, cancellationToken);
+            return true;
         }
     }
 }

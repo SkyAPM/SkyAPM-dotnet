@@ -16,31 +16,32 @@
  *
  */
 
-using System.Collections.Generic;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using SkyApm.Config;
 using SkyApm.Logging;
+using SkyWalking.NetworkProtocol.V3;
 
 namespace SkyApm.Transport.Grpc
 {
-    public class SegmentReporter : ISegmentReporter
+    public class CLRStatsReporter : ICLRStatsReporter
     {
-        private readonly ISegmentReporter _segmentReporterV8;
         private readonly TransportConfig _transportConfig;
+        private readonly ICLRStatsReporter _clrStatsReporterV8;
 
-        public SegmentReporter(ConnectionManager connectionManager, IConfigAccessor configAccessor,
-            ILoggerFactory loggerFactory)
+        public CLRStatsReporter(ConnectionManager connectionManager, ILoggerFactory loggerFactory,
+            IConfigAccessor configAccessor, IRuntimeEnvironment runtimeEnvironment)
         {
             _transportConfig = configAccessor.Get<TransportConfig>();
-            _segmentReporterV8 = new V8.SegmentReporter(connectionManager, configAccessor, loggerFactory);
+            _clrStatsReporterV8 = new V8.CLRStatsReporter(connectionManager, loggerFactory, configAccessor, runtimeEnvironment);
         }
 
-        public async Task ReportAsync(IReadOnlyCollection<SegmentRequest> segmentRequests,
+        public async Task ReportAsync(CLRStatsRequest statsRequest,
             CancellationToken cancellationToken = default(CancellationToken))
         {
             if (_transportConfig.ProtocolVersion == ProtocolVersions.V8)
-                await _segmentReporterV8.ReportAsync(segmentRequests, cancellationToken);
+                await _clrStatsReporterV8.ReportAsync(statsRequest);
         }
     }
 }

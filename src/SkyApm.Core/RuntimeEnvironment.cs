@@ -25,14 +25,8 @@ namespace SkyApm
     {
         public static IRuntimeEnvironment Instance { get; } = new RuntimeEnvironment();
 
-        public NullableValue ServiceId { get; internal set; }
+        public bool Initialized {get; internal set; }
 
-        public NullableValue ServiceInstanceId { get; internal set; }
-
-        public bool Initialized => ServiceId.HasValue && ServiceInstanceId.HasValue;
-
-        public Guid InstanceId { get; } = Guid.NewGuid();
-        
         public IEnvironmentProvider Environment { get; set; }
     }
 }

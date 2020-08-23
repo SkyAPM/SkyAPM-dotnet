@@ -23,13 +23,7 @@ namespace SkyApm
 {
     public interface IRuntimeEnvironment
     {
-        NullableValue ServiceId { get; }
-
-        NullableValue ServiceInstanceId { get; }
-
         bool Initialized { get; }
-
-        Guid InstanceId { get; }
 
         IEnvironmentProvider Environment { get; }
     }

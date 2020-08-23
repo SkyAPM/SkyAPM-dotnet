@@ -19,32 +19,29 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using SkyApm.Config;
 using SkyApm.Logging;
+using SkyWalking.NetworkProtocol;
+using SkyApm.Transport.Grpc.Common;
 
-namespace SkyApm.Transport.Grpc.V6
+namespace SkyApm.Transport.Grpc
 {
-    public class ConnectService: ExecutionService
+    public class PingCaller : IPingCaller
     {
-        private readonly ConnectionManager _connectionManager;
+        private readonly TransportConfig _transportConfig;
+        private readonly IPingCaller _pingCallerV8;
 
-        public ConnectService(ConnectionManager connectionManager,
-            IRuntimeEnvironment runtimeEnvironment,
-            ILoggerFactory loggerFactory) : base(runtimeEnvironment, loggerFactory)
+        public PingCaller(ConnectionManager connectionManager, ILoggerFactory loggerFactory,
+            IConfigAccessor configAccessor)
         {
-            _connectionManager = connectionManager;
+            _transportConfig = configAccessor.Get<TransportConfig>();
+            _pingCallerV8 = new V8.PingCaller(connectionManager, loggerFactory, configAccessor);
         }
 
-        protected override TimeSpan DueTime { get; } = TimeSpan.Zero;
-        protected override TimeSpan Period { get; } = TimeSpan.FromSeconds(15);
-
-        protected override async Task ExecuteAsync(CancellationToken cancellationToken)
+        public async Task PingAsync(PingRequest request, CancellationToken cancellationToken = default(CancellationToken))
         {
-            if (!_connectionManager.Ready)
-            {
-                await _connectionManager.ConnectAsync();
-            }
+            if (_transportConfig.ProtocolVersion == ProtocolVersions.V8)
+                await _pingCallerV8.PingAsync(request, cancellationToken);
         }
-
-        protected override bool CanExecute() => !_connectionManager.Ready;
     }
 }

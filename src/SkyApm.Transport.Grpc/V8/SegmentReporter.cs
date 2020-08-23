@@ -23,10 +23,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using SkyApm.Config;
 using SkyApm.Logging;
-using SkyWalking.NetworkProtocol;
+using SkyWalking.NetworkProtocol.V3;
 using SkyApm.Transport.Grpc.Common;
 
-namespace SkyApm.Transport.Grpc.V5
+namespace SkyApm.Transport.Grpc.V8
 {
     internal class SegmentReporter : ISegmentReporter
     {
@@ -55,12 +55,12 @@ namespace SkyApm.Transport.Grpc.V5
             try
             {
                 var stopwatch = Stopwatch.StartNew();
-                var client = new TraceSegmentService.TraceSegmentServiceClient(connection);
+                var client = new TraceSegmentReportService.TraceSegmentReportServiceClient(connection);
                 using (var asyncClientStreamingCall =
                     client.collect(_config.GetMeta(), _config.GetReportTimeout(), cancellationToken))
                 {
                     foreach (var segment in segmentRequests)
-                        await asyncClientStreamingCall.RequestStream.WriteAsync(SegmentV5Helpers.Map(segment));
+                        await asyncClientStreamingCall.RequestStream.WriteAsync(SegmentV8Helpers.Map(segment));
                     await asyncClientStreamingCall.RequestStream.CompleteAsync();
                     await asyncClientStreamingCall.ResponseAsync;
                 }
