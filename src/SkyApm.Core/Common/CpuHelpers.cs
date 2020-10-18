@@ -16,7 +16,6 @@
  *
  */
 
-using System;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
@@ -44,9 +43,9 @@ namespace SkyApm.Common
                     var usagePercent = (currentCpuTime.TotalMilliseconds - prevCpuTime) / interval;
                     Interlocked.Exchange(ref _prevCpuTime, currentCpuTime.TotalMilliseconds);
                     Interlocked.Exchange(ref _usagePercent, usagePercent);
-                    await Task.Delay(1000);
+                    await Task.Delay(interval);
                 }
-            });
+            }, TaskCreationOptions.LongRunning);
         }
     }
 }
