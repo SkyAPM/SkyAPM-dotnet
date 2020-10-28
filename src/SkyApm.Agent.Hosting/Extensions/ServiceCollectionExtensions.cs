@@ -101,6 +101,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<ISamplingInterceptor>(p => p.GetService<SimpleCountSamplingInterceptor>());
             services.AddSingleton<IExecutionService>(p => p.GetService<SimpleCountSamplingInterceptor>());
             services.AddSingleton<ISamplingInterceptor, RandomSamplingInterceptor>();
+            services.AddSingleton<ISamplingInterceptor, IgnorePathSamplingInterceptor>();
             return services;
         }
 

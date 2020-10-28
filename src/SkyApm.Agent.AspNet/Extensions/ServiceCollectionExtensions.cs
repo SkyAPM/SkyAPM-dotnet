@@ -63,6 +63,7 @@ namespace SkyApm.Agent.AspNet.Extensions
             services.AddSingleton<ISamplingInterceptor>(p => p.GetService<SimpleCountSamplingInterceptor>());
             services.AddSingleton<IExecutionService>(p => p.GetService<SimpleCountSamplingInterceptor>());
             services.AddSingleton<ISamplingInterceptor, RandomSamplingInterceptor>();
+            services.AddSingleton<ISamplingInterceptor, IgnorePathSamplingInterceptor>();
 
             services.AddSingleton<ISegmentReporter, SegmentReporter>();
             services.AddSingleton<ICLRStatsReporter, CLRStatsReporter>();
