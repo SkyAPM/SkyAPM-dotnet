@@ -27,6 +27,10 @@ namespace SkyApm.Config
 
         public double Percentage { get; set; } = -1d;
 
+        /// <summary>
+        /// Paths to ignore, support wildchar match.
+        /// Usage: a/b/c => a/b/c, a/* => a/b, a/** => a/b/c/d, a/?/c => a/b/c
+        /// </summary>
         public List<string> IgnorePaths { get; set; }
     }
 }
