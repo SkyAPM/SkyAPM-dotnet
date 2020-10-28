@@ -73,6 +73,13 @@ namespace SkyApm.Sample.Frontend.Controllers
             return Ok(message);
         }
 
+        [HttpGet("ignore")]
+        public async Task<IActionResult> Ignore()
+        {
+            var message = await new HttpClient().GetStreamAsync("http://localhost:5002/api/values/ignore");
+            return Ok(message);
+        }
+
 #if NETCOREAPP2_1
 #else
         [HttpGet("greeter/grpc-net")]

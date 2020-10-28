@@ -16,6 +16,8 @@
  *
  */
 
+using System.Collections.Generic;
+
 namespace SkyApm.Config
 {
     [Config("SkyWalking", "Sampling")]
@@ -24,5 +26,7 @@ namespace SkyApm.Config
         public int SamplePer3Secs { get; set; } = -1;
 
         public double Percentage { get; set; } = -1d;
+
+        public List<string> IgnorePaths { get; set; }
     }
 }
