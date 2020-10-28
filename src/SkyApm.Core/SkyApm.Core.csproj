@@ -8,7 +8,7 @@
     <PackageTags>SkyWalking;APM</PackageTags>
     <PackageReleaseNotes>
     </PackageReleaseNotes>
-    <RootNamespace>SkyWalking</RootNamespace>
+    <RootNamespace>SkyApm</RootNamespace>
     <TargetFrameworks>netstandard2.0;netcoreapp2.1;netcoreapp3.1</TargetFrameworks>
     <DefineConstants Condition="'$(TargetFramework)' == 'netcoreapp2.1'">$(DefineConstants);SPAN</DefineConstants>
   </PropertyGroup>
