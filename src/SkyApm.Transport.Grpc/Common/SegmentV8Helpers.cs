@@ -58,7 +58,7 @@ namespace SkyApm.Transport.Grpc.Common
             ReadStringOrIntValue(spanObject, request.OperationName, OperationNameReader, OperationNameIdReader);
             ReadStringOrIntValue(spanObject, request.Peer, PeerReader, PeerIdReader);
 
-            spanObject.Tags.Add(request.Tags.Select(x => new KeyStringValuePair {Key = x.Key, Value = x.Value}));
+            spanObject.Tags.Add(request.Tags.Select(x => new KeyStringValuePair {Key = x.Key, Value = x.Value ?? string.Empty}));
             spanObject.Refs.AddRange(request.References.Select(MapToSegmentReference).ToArray());
             spanObject.Logs.AddRange(request.Logs.Select(MapToLogMessage).ToArray());
 
@@ -85,7 +85,7 @@ namespace SkyApm.Transport.Grpc.Common
         private static Log MapToLogMessage(LogDataRequest request)
         {
             var logMessage = new Log {Time = request.Timestamp};
-            logMessage.Data.AddRange(request.Data.Select(x => new KeyStringValuePair {Key = x.Key, Value = x.Value})
+            logMessage.Data.AddRange(request.Data.Select(x => new KeyStringValuePair {Key = x.Key, Value = x.Value ?? string.Empty})
                 .ToArray());
             return logMessage;
         }
