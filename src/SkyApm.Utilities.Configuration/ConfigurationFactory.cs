@@ -29,19 +29,22 @@ namespace SkyApm.Utilities.Configuration
         private const string CONFIG_FILE_PATH = "SKYAPM__CONFIG__PATH";
         private readonly IEnvironmentProvider _environmentProvider;
         private readonly IEnumerable<IAdditionalConfigurationSource> _additionalConfigurations;
+        private readonly IConfiguration _configuration;
 
         public ConfigurationFactory(IEnvironmentProvider environmentProvider,
-            IEnumerable<IAdditionalConfigurationSource> additionalConfigurations)
+            IEnumerable<IAdditionalConfigurationSource> additionalConfigurations,
+            IConfiguration configuration)
         {
             _environmentProvider = environmentProvider;
             _additionalConfigurations = additionalConfigurations;
+            _configuration = configuration;
         }
 
         public IConfiguration Create()
         {
             var builder = new ConfigurationBuilder();
 
-            builder.AddSkyWalkingDefaultConfig();
+            builder.AddSkyWalkingDefaultConfig(_configuration);
 
             builder.AddJsonFile("appsettings.json", true)
                 .AddJsonFile($"appsettings.{_environmentProvider.EnvironmentName}.json", true);
