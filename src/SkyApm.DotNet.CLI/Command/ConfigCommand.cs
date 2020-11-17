@@ -89,7 +89,7 @@ namespace SkyApm.DotNet.CLI.Command
             var transportConfig = new Dictionary<string, dynamic>
             {
                 {"Interval", 3000},
-                {"ProtocolVersion", "v6"},
+                {"ProtocolVersion", "v8"},
                 {"QueueSize", 30000},
                 {"BatchSize", 3000},
                 {"gRPC", gRPCConfig}
@@ -109,7 +109,7 @@ namespace SkyApm.DotNet.CLI.Command
 
             var HeaderVersionsConfig = new string[]
             {
-                "sw6"
+                "sw8"
             };
 
             var skyAPMConfig = new Dictionary<string, dynamic>
