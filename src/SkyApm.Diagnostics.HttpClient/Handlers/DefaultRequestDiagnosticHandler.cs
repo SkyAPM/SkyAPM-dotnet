@@ -16,8 +16,11 @@
  *
  */
 
+using System.Linq;
 using System.Net.Http;
 using SkyApm.Common;
+using SkyApm.Config;
+using SkyApm.Diagnostics.HttpClient.Config;
 using SkyApm.Diagnostics.HttpClient.Filters;
 using SkyApm.Tracing;
 using SkyApm.Tracing.Segments;
@@ -26,6 +29,13 @@ namespace SkyApm.Diagnostics.HttpClient.Handlers
 {
     public class DefaultRequestDiagnosticHandler : IRequestDiagnosticHandler
     {
+        private readonly HttpClientDiagnosticConfig _httpClientDiagnosticConfig;
+
+        public DefaultRequestDiagnosticHandler(IConfigAccessor configAccessor)
+        {
+            _httpClientDiagnosticConfig = configAccessor.Get<HttpClientDiagnosticConfig>();
+        }
+
         public bool OnlyMatch(HttpRequestMessage request)
         {
             return true;
@@ -33,9 +43,14 @@ namespace SkyApm.Diagnostics.HttpClient.Handlers
 
         public void Handle(ITracingContext tracingContext, HttpRequestMessage request)
         {
-            var context = tracingContext.CreateExitSegmentContext(request.RequestUri.ToString(),
+            var operationName = request.RequestUri.ToString();
+            var shouldStopPropagation = _httpClientDiagnosticConfig.StopHeaderPropagationPaths != null 
+                && _httpClientDiagnosticConfig.StopHeaderPropagationPaths
+                    .Any(pattern => FastPathMatcher.Match(pattern, operationName));
+
+            var context = tracingContext.CreateExitSegmentContext(operationName,
                 $"{request.RequestUri.Host}:{request.RequestUri.Port}",
-                new HttpClientICarrierHeaderCollection(request));
+                shouldStopPropagation ? null : new HttpClientICarrierHeaderCollection(request));
 
             context.Span.SpanLayer = SpanLayer.HTTP;
             context.Span.Component = Common.Components.HTTPCLIENT;

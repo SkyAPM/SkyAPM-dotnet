@@ -25,6 +25,11 @@
         "ConnectTimeout": 100000,
         "ReportTimeout": 600000
       }
+    },
+    "Component": {
+      "HttpClient": {
+        "StopHeaderPropagationPaths": [ "**/localhost:5002/api/values/stoppropagation" ]
+      }
     }
   }
 }

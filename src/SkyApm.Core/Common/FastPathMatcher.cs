@@ -18,7 +18,7 @@
 
 namespace SkyApm.Common
 {
-    internal class FastPathMatcher
+    public class FastPathMatcher
     {
         public static bool Match(string pattern, string path)
         {
