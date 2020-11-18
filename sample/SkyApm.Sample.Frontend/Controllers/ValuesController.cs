@@ -80,6 +80,13 @@ namespace SkyApm.Sample.Frontend.Controllers
             return Ok(message);
         }
 
+        [HttpGet("StopPropagation")]
+        public async Task<IActionResult> StopPropagation()
+        {
+            var message = await new HttpClient().GetStreamAsync("http://localhost:5002/api/values/stoppropagation");
+            return Ok(message);
+        }
+
 #if NETCOREAPP2_1
 #else
         [HttpGet("greeter/grpc-net")]
