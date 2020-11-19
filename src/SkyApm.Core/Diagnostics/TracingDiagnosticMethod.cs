@@ -30,6 +30,8 @@ namespace SkyApm.Diagnostics
         private readonly IParameterResolver[] _parameterResolvers;
         private readonly MethodReflector _reflector;
 
+        public string DiagnosticName => _diagnosticName;
+
         public TracingDiagnosticMethod(ITracingDiagnosticProcessor tracingDiagnosticProcessor, MethodInfo method,
             string diagnosticName)
         {
