@@ -63,7 +63,8 @@ namespace SkyApm.Diagnostics
         protected virtual void Subscribe(DiagnosticListener listener,
             ITracingDiagnosticProcessor tracingDiagnosticProcessor)
         {
-            listener.Subscribe(new TracingDiagnosticObserver(tracingDiagnosticProcessor, _loggerFactory));
+            var diagnosticProcessor = new TracingDiagnosticObserver(tracingDiagnosticProcessor, _loggerFactory);
+            listener.Subscribe(diagnosticProcessor, diagnosticProcessor.IsEnabled);
         }
     }
 }
