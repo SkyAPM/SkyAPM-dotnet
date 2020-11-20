@@ -19,6 +19,9 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Net;
+using System.Net.Sockets;
 using Microsoft.Extensions.Configuration;
 using SkyApm.Config;
 
@@ -33,7 +36,7 @@ namespace SkyApm.Utilities.Configuration
             {
                 {"SkyWalking:Namespace", configuration.GetSection("SkyWalking:Namespace").Value ?? string.Empty },
                 {"SkyWalking:ServiceName", configuration.GetSection("SkyWalking:ServiceName").Value ?? "My_Service" },
-                {"Skywalking:ServiceInstanceName", configuration.GetSection("SkyWalking:ServiceInstanceName").Value ?? Guid.NewGuid().ToString("N") },
+                {"Skywalking:ServiceInstanceName", configuration.GetSection("SkyWalking:ServiceInstanceName").Value ?? BuildDefaultServiceInstanceName() },
                 {"SkyWalking:HeaderVersions:0", configuration.GetSection("SkyWalking:HeaderVersions:0").Value ?? HeaderVersions.SW8 },
                 {"SkyWalking:Sampling:SamplePer3Secs", configuration.GetSection("SkyWalking:Sampling:SamplePer3Secs").Value ?? "-1" },
                 {"SkyWalking:Sampling:Percentage", configuration.GetSection("SkyWalking:Sampling:Percentage").Value ?? "-1" },
@@ -49,6 +52,28 @@ namespace SkyApm.Utilities.Configuration
                 {"SkyWalking:Transport:gRPC:ConnectTimeout",configuration.GetSection("SkyWalking:Transport:gRPC:ConnectTimeout").Value ?? "10000" }
             };
             return builder.AddInMemoryCollection(defaultConfig);
+        }
+
+        /// <summary>
+        /// Try append an ip to the instancename to make it more meaningful
+        /// </summary>
+        /// <returns></returns>
+        private static string BuildDefaultServiceInstanceName()
+        {
+            var guid = Guid.NewGuid().ToString("N");
+            try
+            {
+                var hostName = Dns.GetHostName();
+                var ipAddress = Dns.GetHostAddresses(hostName)
+                    .Where(x => x.AddressFamily == AddressFamily.InterNetwork)
+                    .First().ToString();
+
+                return $"{ipAddress}@{guid}";
+            }
+            catch (Exception)
+            {
+                return guid;
+            }
         }
     }
 }
