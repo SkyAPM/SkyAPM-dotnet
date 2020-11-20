@@ -42,10 +42,6 @@ namespace SkyApm.Diagnostics.AspNetCore.Handlers
             context.Span.AddTag(Tags.URL, httpContext.Request.GetDisplayUrl());
             context.Span.AddTag(Tags.PATH, httpContext.Request.Path);
             context.Span.AddTag(Tags.HTTP_METHOD, httpContext.Request.Method);
-            context.Span.AddLog(
-                LogEvent.Event("AspNetCore Hosting BeginRequest"),
-                LogEvent.Message(
-                    $"Request starting {httpContext.Request.Protocol} {httpContext.Request.Method} {httpContext.Request.GetDisplayUrl()}"));
         }
 
         public void EndRequest(SegmentContext segmentContext, HttpContext httpContext)
@@ -57,10 +53,6 @@ namespace SkyApm.Diagnostics.AspNetCore.Handlers
             }
 
             segmentContext.Span.AddTag(Tags.STATUS_CODE, statusCode);
-            segmentContext.Span.AddLog(
-                LogEvent.Event("AspNetCore Hosting EndRequest"),
-                LogEvent.Message(
-                    $"Request finished {httpContext.Response.StatusCode} {httpContext.Response.ContentType}"));
         }
     }
 }
