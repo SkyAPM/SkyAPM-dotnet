@@ -16,6 +16,7 @@
  *
  */
 
+using System;
 using System.Linq;
 using System.Net.Http;
 using SkyApm.Common;
@@ -43,7 +44,7 @@ namespace SkyApm.Diagnostics.HttpClient.Handlers
 
         public void Handle(ITracingContext tracingContext, HttpRequestMessage request)
         {
-            var operationName = request.RequestUri.ToString();
+            var operationName = request.RequestUri.GetLeftPart(UriPartial.Path);
             var shouldStopPropagation = _httpClientDiagnosticConfig.StopHeaderPropagationPaths != null 
                 && _httpClientDiagnosticConfig.StopHeaderPropagationPaths
                     .Any(pattern => FastPathMatcher.Match(pattern, operationName));
