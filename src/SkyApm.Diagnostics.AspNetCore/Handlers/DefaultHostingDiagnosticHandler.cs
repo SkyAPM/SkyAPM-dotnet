@@ -20,6 +20,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using SkyApm.AspNetCore.Diagnostics;
 using SkyApm.Common;
+using SkyApm.Config;
+using SkyApm.Diagnostics.AspNetCore.Config;
 using SkyApm.Tracing;
 using SkyApm.Tracing.Segments;
 
@@ -27,6 +29,13 @@ namespace SkyApm.Diagnostics.AspNetCore.Handlers
 {
     public class DefaultHostingDiagnosticHandler : IHostingDiagnosticHandler
     {
+        private readonly HostingDiagnosticConfig _config;
+
+        public DefaultHostingDiagnosticHandler(IConfigAccessor configAccessor)
+        {
+            _config = configAccessor.Get<HostingDiagnosticConfig>();
+        }
+
         public bool OnlyMatch(HttpContext request)
         {
             return true;
@@ -42,6 +51,16 @@ namespace SkyApm.Diagnostics.AspNetCore.Handlers
             context.Span.AddTag(Tags.URL, httpContext.Request.GetDisplayUrl());
             context.Span.AddTag(Tags.PATH, httpContext.Request.Path);
             context.Span.AddTag(Tags.HTTP_METHOD, httpContext.Request.Method);
+
+            if(_config.AutoTagCookies?.Count > 0)
+            {
+                foreach (var key in _config.AutoTagCookies)
+                {
+                    if (!httpContext.Request.Cookies.TryGetValue(key, out string value))
+                        continue;
+                    context.Span.AddTag(key, value);
+                }
+            }
         }
 
         public void EndRequest(SegmentContext segmentContext, HttpContext httpContext)
