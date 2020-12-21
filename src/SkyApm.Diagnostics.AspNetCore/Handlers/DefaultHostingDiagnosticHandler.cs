@@ -58,7 +58,7 @@ namespace SkyApm.Diagnostics.AspNetCore.Handlers
                 {
                     if (!httpContext.Request.Cookies.TryGetValue(key, out string value))
                         continue;
-                    context.Span.AddTag(key, value);
+                    context.Span.AddTag("cookie." + key, value);
                 }
             }
         }
