@@ -73,6 +73,14 @@ namespace SkyApm.Sample.Frontend.Controllers
             return Ok(message);
         }
 
+        [HttpGet("setcookie")]
+        public async Task<IActionResult> SetCookie()
+        {
+            Response.Cookies.Append("c-a", "1111");
+            Response.Cookies.Append("c-b", "2222");
+            return Ok("ok");
+        }
+
         [HttpGet("ignore")]
         public async Task<IActionResult> Ignore()
         {
