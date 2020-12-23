@@ -17,13 +17,13 @@
  */
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc.Abstractions;
-using SkyApm.Common;
 using SkyApm.Diagnostics;
+using SkyApm.Diagnostics.AspNetCore.Handlers;
 using SkyApm.Tracing;
-using SkyApm.Tracing.Segments;
 
 namespace SkyApm.AspNetCore.Diagnostics
 {
@@ -33,29 +33,27 @@ namespace SkyApm.AspNetCore.Diagnostics
 
         private readonly ITracingContext _tracingContext;
         private readonly IEntrySegmentContextAccessor _segmentContextAccessor;
+        private readonly IEnumerable<IHostingDiagnosticHandler> _diagnosticHandlers;
 
         public HostingTracingDiagnosticProcessor(IEntrySegmentContextAccessor segmentContextAccessor,
-            ITracingContext tracingContext)
+            ITracingContext tracingContext, IEnumerable<IHostingDiagnosticHandler> diagnosticHandlers)
         {
             _tracingContext = tracingContext;
+            _diagnosticHandlers = diagnosticHandlers.Reverse();
             _segmentContextAccessor = segmentContextAccessor;
         }
 
         [DiagnosticName("Microsoft.AspNetCore.Hosting.BeginRequest")]
         public void BeginRequest([Property] HttpContext httpContext)
         {
-            var context = _tracingContext.CreateEntrySegmentContext(httpContext.Request.Path,
-                new HttpRequestCarrierHeaderCollection(httpContext.Request));
-            context.Span.SpanLayer = SpanLayer.HTTP;
-            context.Span.Component = Common.Components.ASPNETCORE;
-            context.Span.Peer = new StringOrIntValue(httpContext.Connection.RemoteIpAddress.ToString());
-            context.Span.AddTag(Tags.URL, httpContext.Request.GetDisplayUrl());
-            context.Span.AddTag(Tags.PATH, httpContext.Request.Path);
-            context.Span.AddTag(Tags.HTTP_METHOD, httpContext.Request.Method);
-            context.Span.AddLog(
-                LogEvent.Event("AspNetCore Hosting BeginRequest"),
-                LogEvent.Message(
-                    $"Request starting {httpContext.Request.Protocol} {httpContext.Request.Method} {httpContext.Request.GetDisplayUrl()}"));
+            foreach (var handler in _diagnosticHandlers)
+            {
+                if (handler.OnlyMatch(httpContext))
+                {
+                    handler.BeginRequest(_tracingContext, httpContext);
+                    return;
+                }
+            }
         }
 
         [DiagnosticName("Microsoft.AspNetCore.Hosting.EndRequest")]
@@ -66,18 +64,16 @@ namespace SkyApm.AspNetCore.Diagnostics
             {
                 return;
             }
-            var statusCode = httpContext.Response.StatusCode;
-            if (statusCode >= 400)
+
+            foreach (var handler in _diagnosticHandlers)
             {
-                context.Span.ErrorOccurred();
+                if (handler.OnlyMatch(httpContext))
+                {
+                    handler.EndRequest(context, httpContext);
+                    break;
+                }
             }
 
-            context.Span.AddTag(Tags.STATUS_CODE, statusCode);
-            context.Span.AddLog(
-                LogEvent.Event("AspNetCore Hosting EndRequest"),
-                LogEvent.Message(
-                    $"Request finished {httpContext.Response.StatusCode} {httpContext.Response.ContentType}"));
-            
             _tracingContext.Release(context);
         }
 

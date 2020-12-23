@@ -1,5 +1,6 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore;
 using Microsoft.Extensions.Hosting;
+using Microsoft.AspNetCore.Hosting;
 
 namespace SkyApm.Sample.Backend
 {
@@ -10,12 +11,21 @@ namespace SkyApm.Sample.Backend
             BuildHost(args).Run();
         }
 
+#if NETCOREAPP2_1
+
+        public static IWebHost BuildHost(string[] args) =>
+            WebHost.CreateDefaultBuilder<Startup>(args)
+                .Build();
+
+#else
+
         public static IHost BuildHost(string[] args) =>
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(builder =>
                 {
-                    builder.UseStartup<Startup>()
-                        .UseUrls("http://*:5002");
+                    builder.UseStartup<Startup>();
                 }).Build();
+
+#endif
     }
 }

@@ -16,7 +16,10 @@
  *
  */
 
+using SkyApm.Config;
 using System;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading;
 
 namespace SkyApm.Tracing
@@ -24,18 +27,35 @@ namespace SkyApm.Tracing
     public class UniqueIdGenerator : IUniqueIdGenerator
     {
         private readonly ThreadLocal<long> sequence = new ThreadLocal<long>(() => 0);
-        private readonly IRuntimeEnvironment _runtimeEnvironment;
+        private readonly InstrumentConfig _instrumentConfig;
+        private readonly string _instanceIdentity;
 
-        public UniqueIdGenerator(IRuntimeEnvironment runtimeEnvironment)
+        public UniqueIdGenerator(IConfigAccessor configAccessor)
         {
-            _runtimeEnvironment = runtimeEnvironment;
+            _instrumentConfig = configAccessor.Get<InstrumentConfig>();
+            _instanceIdentity = GetMD5(_instrumentConfig.ServiceInstanceName);
         }
 
-        public UniqueId Generate()
+        public string Generate()
         {
-            return new UniqueId(_runtimeEnvironment.ServiceInstanceId.Value,
-                Thread.CurrentThread.ManagedThreadId,
-                DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() * 10000 + GetSequence());
+            var part1 = _instanceIdentity;
+            var part2 = Thread.CurrentThread.ManagedThreadId;
+            var part3 = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() * 10000 + GetSequence();
+            return $"{part1}.{part2}.{part3}";
+        }
+
+        private string GetMD5(string data)
+        {
+            using (var md5 = new MD5CryptoServiceProvider())
+            {
+                var hash = md5.ComputeHash(Encoding.UTF8.GetBytes(data));
+                var sb = new StringBuilder(32);
+                foreach (var item in hash)
+                {
+                    sb.Append(item.ToString("x2"));
+                }
+                return sb.ToString();
+            }
         }
 
         private long GetSequence()

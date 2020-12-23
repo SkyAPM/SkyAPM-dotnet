@@ -15,13 +15,14 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Google.Protobuf" Version="3.6.1" />
-        <PackageReference Include="Grpc" Version="2.23.0" />
-        <PackageReference Include="Grpc.Tools" Version="1.17.0" PrivateAssets="All" />
+        <PackageReference Include="Google.Protobuf" Version="3.11.2" />
+        <PackageReference Include="Grpc" Version="2.26.0" />
+        <PackageReference Include="Grpc.Tools" Version="2.26.0" PrivateAssets="All" />
     </ItemGroup>
     
     <ItemGroup>
         <Protobuf Include="protocol/**/*.proto" ProtoRoot="protocol" OutputDir="%(RelativePath)generated" CompileOutputs="false" />
+		<Protobuf Include="protocol-v3/**/*.proto" ProtoRoot="protocol-v3" OutputDir="%(RelativePath)generated-v3" CompileOutputs="false" />
     </ItemGroup>
 
     <PropertyGroup>

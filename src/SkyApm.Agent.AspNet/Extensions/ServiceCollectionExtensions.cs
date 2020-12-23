@@ -25,8 +25,6 @@ using SkyApm.Service;
 using SkyApm.Tracing;
 using SkyApm.Transport;
 using SkyApm.Transport.Grpc;
-using SkyApm.Transport.Grpc.V5;
-using SkyApm.Transport.Grpc.V6;
 using SkyApm.Utilities.Configuration;
 using SkyApm.Utilities.Logging;
 
@@ -39,8 +37,8 @@ namespace SkyApm.Agent.AspNet.Extensions
             services.AddSingleton<ISegmentDispatcher, AsyncQueueSegmentDispatcher>();
             services.AddSingleton<IExecutionService, RegisterService>();
             services.AddSingleton<IExecutionService, PingService>();
-            services.AddSingleton<IExecutionService, ServiceDiscoveryV5Service>();
             services.AddSingleton<IExecutionService, SegmentReportService>();
+            services.AddSingleton<IExecutionService, CLRStatsService>();
             services.AddSingleton<IInstrumentStartup, InstrumentStartup>();
             services.AddSingleton<IRuntimeEnvironment>(RuntimeEnvironment.Instance);
             services.AddSingleton<TracingDiagnosticProcessorObserver>();
@@ -51,15 +49,13 @@ namespace SkyApm.Agent.AspNet.Extensions
 
             services.AddSingleton<ITracingContext, Tracing.TracingContext>();
             services.AddSingleton<ICarrierPropagator, CarrierPropagator>();
-            services.AddSingleton<ICarrierFormatter, Sw3CarrierFormatter>();
-            services.AddSingleton<ICarrierFormatter, Sw6CarrierFormatter>();
+            services.AddSingleton<ICarrierFormatter, Sw8CarrierFormatter>();
             services.AddSingleton<ISegmentContextFactory, SegmentContextFactory>();
             services.AddSingleton<IEntrySegmentContextAccessor, EntrySegmentContextAccessor>();
             services.AddSingleton<ILocalSegmentContextAccessor, LocalSegmentContextAccessor>();
             services.AddSingleton<IExitSegmentContextAccessor, ExitSegmentContextAccessor>();
             services.AddSingleton<ISamplerChainBuilder, SamplerChainBuilder>();
             services.AddSingleton<IUniqueIdGenerator, UniqueIdGenerator>();
-            services.AddSingleton<IUniqueIdParser, UniqueIdParser>();
             services.AddSingleton<ISegmentContextMapper, SegmentContextMapper>();
             services.AddSingleton<IBase64Formatter, Base64Formatter>();
 
@@ -67,9 +63,10 @@ namespace SkyApm.Agent.AspNet.Extensions
             services.AddSingleton<ISamplingInterceptor>(p => p.GetService<SimpleCountSamplingInterceptor>());
             services.AddSingleton<IExecutionService>(p => p.GetService<SimpleCountSamplingInterceptor>());
             services.AddSingleton<ISamplingInterceptor, RandomSamplingInterceptor>();
+            services.AddSingleton<ISamplingInterceptor, IgnorePathSamplingInterceptor>();
 
-            services.AddSingleton<ISkyApmClientV5, SkyApmClientV5>();
             services.AddSingleton<ISegmentReporter, SegmentReporter>();
+            services.AddSingleton<ICLRStatsReporter, CLRStatsReporter>();
             services.AddSingleton<ConnectionManager>();
             services.AddSingleton<IPingCaller, PingCaller>();
             services.AddSingleton<IServiceRegister, ServiceRegister>();

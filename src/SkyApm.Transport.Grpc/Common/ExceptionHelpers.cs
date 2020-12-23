@@ -28,5 +28,6 @@ namespace SkyApm.Transport.Grpc.Common
         public static readonly string RegisterServiceError = "Register service fail.";
         public static readonly string RegisterServiceInstanceError = "Register service instance fail.";
         public static readonly string PingError = "Ping server fail.";
+        public static readonly string ReportServiceInstancePropertiesError = "Report service instance properties fail.";
     }
 }

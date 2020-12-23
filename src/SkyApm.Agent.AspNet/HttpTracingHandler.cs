@@ -26,20 +26,38 @@ using System.Threading.Tasks;
 using CommonServiceLocator;
 using SkyApm.Tracing;
 using SkyApm.Tracing.Segments;
-using SpanLayer = SkyApm.Tracing.Segments.SpanLayer;
 
 namespace SkyApm.Agent.AspNet
 {
     public class HttpTracingHandler : DelegatingHandler
     {
+        /// <summary>
+        /// If you are passing this delegating handler to <see cref="HttpClientFactory.Create"/> method, please pass a `null` in constructor as innerHandler.
+        /// if you are passing it in <see cref="HttpClient"/> constructor, just use it's non-parameter constructor.
+        /// as follow:
+        /// <code>var httpClient = HttpClientFactory.Create(new HttpTracingHandler(null))</code>
+        /// or
+        /// <code>var httpClient = new HttpClient(new HttpTracingHandler())</code>
+        /// </summary>
         public HttpTracingHandler()
             : this(new HttpClientHandler())
         {
         }
 
+        /// <summary>
+        /// If you are passing this delegating handler to <see cref="HttpClientFactory.Create"/> method, please pass a `null` in constructor as innerHandler.
+        /// if you are passing it in <see cref="HttpClient"/> constructor, just use it's non-parameter constructor.
+        /// as follow:
+        /// <code>var httpClient = HttpClientFactory.Create(new HttpTracingHandler(null))</code>
+        /// or
+        /// <code>var httpClient = new HttpClient(new HttpTracingHandler())</code>
+        /// </summary>
         public HttpTracingHandler(HttpMessageHandler innerHandler)
         {
-            InnerHandler = innerHandler;
+            if (innerHandler != null)
+            {
+                InnerHandler = innerHandler;
+            }
         }
 
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,

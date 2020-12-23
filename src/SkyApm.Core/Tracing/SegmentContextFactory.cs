@@ -19,6 +19,7 @@
 using System;
 using System.Linq;
 using SkyApm.Common;
+using SkyApm.Config;
 using SkyApm.Tracing.Segments;
 
 namespace SkyApm.Tracing
@@ -31,13 +32,15 @@ namespace SkyApm.Tracing
         private readonly IRuntimeEnvironment _runtimeEnvironment;
         private readonly ISamplerChainBuilder _samplerChainBuilder;
         private readonly IUniqueIdGenerator _uniqueIdGenerator;
+        private readonly InstrumentConfig _instrumentConfig;
 
         public SegmentContextFactory(IRuntimeEnvironment runtimeEnvironment,
             ISamplerChainBuilder samplerChainBuilder,
             IUniqueIdGenerator uniqueIdGenerator,
             IEntrySegmentContextAccessor entrySegmentContextAccessor,
             ILocalSegmentContextAccessor localSegmentContextAccessor,
-            IExitSegmentContextAccessor exitSegmentContextAccessor)
+            IExitSegmentContextAccessor exitSegmentContextAccessor,
+            IConfigAccessor configAccessor)
         {
             _runtimeEnvironment = runtimeEnvironment;
             _samplerChainBuilder = samplerChainBuilder;
@@ -45,6 +48,7 @@ namespace SkyApm.Tracing
             _entrySegmentContextAccessor = entrySegmentContextAccessor;
             _localSegmentContextAccessor = localSegmentContextAccessor;
             _exitSegmentContextAccessor = exitSegmentContextAccessor;
+            _instrumentConfig = configAccessor.Get<InstrumentConfig>();
         }
 
         public SegmentContext CreateEntrySegment(string operationName, ICarrier carrier)
@@ -52,8 +56,10 @@ namespace SkyApm.Tracing
             var traceId = GetTraceId(carrier);
             var segmentId = GetSegmentId();
             var sampled = GetSampled(carrier, operationName);
-            var segmentContext = new SegmentContext(traceId, segmentId, sampled, _runtimeEnvironment.ServiceId.Value,
-                _runtimeEnvironment.ServiceInstanceId.Value, operationName, SpanType.Entry);
+            var segmentContext = new SegmentContext(traceId, segmentId, sampled,
+                _instrumentConfig.ServiceName ?? _instrumentConfig.ApplicationCode,
+                _instrumentConfig.ServiceInstanceName,
+                operationName, SpanType.Entry);
 
             if (carrier.HasValue)
             {
@@ -66,7 +72,9 @@ namespace SkyApm.Tracing
                     ParentSpanId = carrier.ParentSpanId,
                     ParentSegmentId = carrier.ParentSegmentId,
                     EntryServiceInstanceId = carrier.EntryServiceInstanceId,
-                    ParentServiceInstanceId = carrier.ParentServiceInstanceId
+                    ParentServiceInstanceId = carrier.ParentServiceInstanceId,
+                    TraceId = carrier.TraceId,
+                    ParentServiceId = carrier.ParentServiceId,
                 };
                 segmentContext.References.Add(segmentReference);
             }
@@ -81,8 +89,10 @@ namespace SkyApm.Tracing
             var traceId = GetTraceId(parentSegmentContext);
             var segmentId = GetSegmentId();
             var sampled = GetSampled(parentSegmentContext, operationName);
-            var segmentContext = new SegmentContext(traceId, segmentId, sampled, _runtimeEnvironment.ServiceId.Value,
-                _runtimeEnvironment.ServiceInstanceId.Value, operationName, SpanType.Local);
+            var segmentContext = new SegmentContext(traceId, segmentId, sampled,
+                _instrumentConfig.ServiceName ?? _instrumentConfig.ApplicationCode,
+                _instrumentConfig.ServiceInstanceName,
+                operationName, SpanType.Local);
 
             if (parentSegmentContext != null)
             {
@@ -97,7 +107,9 @@ namespace SkyApm.Tracing
                     ParentSegmentId = parentSegmentContext.SegmentId,
                     EntryServiceInstanceId =
                         parentReference?.EntryServiceInstanceId ?? parentSegmentContext.ServiceInstanceId,
-                    ParentServiceInstanceId = parentSegmentContext.ServiceInstanceId
+                    ParentServiceInstanceId = parentSegmentContext.ServiceInstanceId,
+                    ParentServiceId = parentSegmentContext.ServiceId,
+                    TraceId = parentSegmentContext.TraceId
                 };
                 segmentContext.References.Add(reference);
             }
@@ -112,8 +124,10 @@ namespace SkyApm.Tracing
             var traceId = GetTraceId(parentSegmentContext);
             var segmentId = GetSegmentId();
             var sampled = GetSampled(parentSegmentContext, operationName, networkAddress);
-            var segmentContext = new SegmentContext(traceId, segmentId, sampled, _runtimeEnvironment.ServiceId.Value,
-                _runtimeEnvironment.ServiceInstanceId.Value, operationName, SpanType.Exit);
+            var segmentContext = new SegmentContext(traceId, segmentId, sampled,
+                _instrumentConfig.ServiceName ?? _instrumentConfig.ApplicationCode,
+                _instrumentConfig.ServiceInstanceName,
+                operationName, SpanType.Exit);
 
             if (parentSegmentContext != null)
             {
@@ -128,7 +142,9 @@ namespace SkyApm.Tracing
                     ParentSegmentId = parentSegmentContext.SegmentId,
                     EntryServiceInstanceId =
                         parentReference?.EntryServiceInstanceId ?? parentSegmentContext.ServiceInstanceId,
-                    ParentServiceInstanceId = parentSegmentContext.ServiceInstanceId
+                    ParentServiceInstanceId = parentSegmentContext.ServiceInstanceId,
+                    ParentServiceId = parentSegmentContext.ServiceId,
+                    TraceId = parentSegmentContext.TraceId
                 };
                 segmentContext.References.Add(reference);
             }
@@ -157,17 +173,17 @@ namespace SkyApm.Tracing
             }
         }
 
-        private UniqueId GetTraceId(ICarrier carrier)
+        private string GetTraceId(ICarrier carrier)
         {
             return carrier.HasValue ? carrier.TraceId : _uniqueIdGenerator.Generate();
         }
 
-        private UniqueId GetTraceId(SegmentContext parentSegmentContext)
+        private string GetTraceId(SegmentContext parentSegmentContext)
         {
             return parentSegmentContext?.TraceId ?? _uniqueIdGenerator.Generate();
         }
 
-        private UniqueId GetSegmentId()
+        private string GetSegmentId()
         {
             return _uniqueIdGenerator.Generate();
         }

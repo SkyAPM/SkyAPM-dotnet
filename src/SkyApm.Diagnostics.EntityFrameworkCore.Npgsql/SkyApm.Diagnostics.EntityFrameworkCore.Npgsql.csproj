@@ -17,7 +17,4 @@
     <ProjectReference Include="..\SkyApm.Core\SkyApm.Core.csproj" />
     <ProjectReference Include="..\SkyApm.Utilities.DependencyInjection\SkyApm.Utilities.DependencyInjection.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="2.0.0" PrivateAssets="All" />
-  </ItemGroup>
 </Project>

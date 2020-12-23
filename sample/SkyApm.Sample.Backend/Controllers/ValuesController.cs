@@ -23,5 +23,17 @@ namespace SkyApm.Sample.Backend.Controllers
         {
             return "value";
         }
+
+        [HttpGet("ignore")]
+        public string Ignore()
+        {
+            return "ignore";
+        }
+
+        [HttpGet("StopPropagation")]
+        public string StopPropagation()
+        {
+            return "stop propagation";
+        }
     } 
 }

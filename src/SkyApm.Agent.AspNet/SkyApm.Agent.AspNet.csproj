@@ -24,10 +24,10 @@
     <Reference Include="System.Net.Http" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="CommonServiceLocator" Version="2.0.4" />
-    <PackageReference Include="Microsoft.Extensions.Configuration" Version="2.2.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.2.0" />
+    <PackageReference Include="CommonServiceLocator" Version="2.0.5" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="3.1.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.0" />
     <PackageReference Include="Microsoft.Web.Infrastructure" Version="1.0.0" />
-    <PackageReference Include="Nito.AsyncEx.Context" Version="1.1.0" />
+    <PackageReference Include="Nito.AsyncEx.Context" Version="5.0.0" />
   </ItemGroup>
 </Project>

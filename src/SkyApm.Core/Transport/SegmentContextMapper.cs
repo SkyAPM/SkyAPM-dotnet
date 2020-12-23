@@ -28,14 +28,11 @@ namespace SkyApm.Transport
         {
             var segmentRequest = new SegmentRequest
             {
-                UniqueIds = new[]
-                {
-                    MapUniqueId(segmentContext.TraceId)
-                }
+                TraceId = segmentContext.TraceId
             };
             var segmentObjectRequest = new SegmentObjectRequest
             {
-                SegmentId = MapUniqueId(segmentContext.SegmentId),
+                SegmentId = segmentContext.SegmentId,
                 ServiceId = segmentContext.ServiceId,
                 ServiceInstanceId = segmentContext.ServiceInstanceId
             };
@@ -56,7 +53,9 @@ namespace SkyApm.Transport
             foreach (var reference in segmentContext.References)
                 span.References.Add(new SegmentReferenceRequest
                 {
-                    ParentSegmentId = MapUniqueId(reference.ParentSegmentId),
+                    TraceId = reference.TraceId,
+                    ParentSegmentId = reference.ParentSegmentId,
+                    ParentServiceId = reference.ParentServiceId,
                     ParentServiceInstanceId = reference.ParentServiceInstanceId,
                     ParentSpanId = reference.ParentSpanId,
                     ParentEndpointName = reference.ParentEndpoint,
@@ -79,16 +78,6 @@ namespace SkyApm.Transport
 
             segmentObjectRequest.Spans.Add(span);
             return segmentRequest;
-        }
-
-        private static UniqueIdRequest MapUniqueId(UniqueId uniqueId)
-        {
-            return new UniqueIdRequest
-            {
-                Part1 = uniqueId.Part1,
-                Part2 = uniqueId.Part2,
-                Part3 = uniqueId.Part3
-            };
         }
     }
 }

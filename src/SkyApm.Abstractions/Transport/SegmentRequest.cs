@@ -23,32 +23,18 @@ namespace SkyApm.Transport
 {
     public class SegmentRequest
     {
-        public IEnumerable<UniqueIdRequest> UniqueIds { get; set; }
+        public string TraceId { get; set; }
 
         public SegmentObjectRequest Segment { get; set; }
     }
 
-    public class UniqueIdRequest
-    {
-        public long Part1 { get; set; }
-
-        public long Part2 { get; set; }
-
-        public long Part3 { get; set; }
-
-        public override string ToString()
-        {
-            return $"{Part1}.{Part2}.{Part3}";
-        }
-    }
-
     public class SegmentObjectRequest
     {
-        public UniqueIdRequest SegmentId { get; set; }
+        public string SegmentId { get; set; }
 
-        public int ServiceId { get; set; }
+        public string ServiceId { get; set; }
 
-        public int ServiceInstanceId { get; set; }
+        public string ServiceInstanceId { get; set; }
 
         public IList<SpanRequest> Spans { get; set; } = new List<SpanRequest>();
     }
@@ -84,13 +70,17 @@ namespace SkyApm.Transport
 
     public class SegmentReferenceRequest
     {
-        public UniqueIdRequest ParentSegmentId { get; set; }
+        public string TraceId { get; set; }
 
-        public int ParentServiceInstanceId { get; set; }
+        public string ParentSegmentId { get; set; }
+
+        public string ParentServiceId { get; set; }
+
+        public string ParentServiceInstanceId { get; set; }
 
         public int ParentSpanId { get; set; }
 
-        public int EntryServiceInstanceId { get; set; }
+        public string EntryServiceInstanceId { get; set; }
 
         public int RefType { get; set; }
 

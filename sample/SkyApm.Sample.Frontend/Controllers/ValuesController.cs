@@ -1,9 +1,17 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+
+using GrpcGreeter;
 using Microsoft.AspNetCore.Mvc;
 using SkyApm.Sample.Backend.Services;
+
+#if NETCOREAPP2_1
+#else
+using Grpc.Net.Client;
+#endif
 
 namespace SkyApm.Sample.Frontend.Controllers
 {
@@ -22,7 +30,7 @@ namespace SkyApm.Sample.Frontend.Controllers
         public async Task<IEnumerable<string>> Get()
         {
             await new HttpClient().GetAsync("http://localhost:5002/api/values");
-            return new string[] {"value1", "value2"};
+            return new string[] { "value1", "value2" };
         }
 
         [HttpGet("{id}")]
@@ -57,5 +65,49 @@ namespace SkyApm.Sample.Frontend.Controllers
             var message = await _greeter.SayHelloWithExceptionAsync(name);
             return Ok(message);
         }
+
+        [HttpGet("hellojava")]
+        public async Task<IActionResult> HelloJava()
+        {
+            var message = await new HttpClient().GetStringAsync("http://localhost:8086/sayhello");
+            return Ok(message);
+        }
+
+        [HttpGet("setcookie")]
+        public async Task<IActionResult> SetCookie()
+        {
+            Response.Cookies.Append("c-a", "1111");
+            Response.Cookies.Append("c-b", "2222");
+            return Ok("ok");
+        }
+
+        [HttpGet("ignore")]
+        public async Task<IActionResult> Ignore()
+        {
+            var message = await new HttpClient().GetStreamAsync("http://localhost:5002/api/values/ignore");
+            return Ok(message);
+        }
+
+        [HttpGet("StopPropagation")]
+        public async Task<IActionResult> StopPropagation()
+        {
+            var message = await new HttpClient().GetStreamAsync("http://localhost:5002/api/values/stoppropagation");
+            return Ok(message);
+        }
+
+#if NETCOREAPP2_1
+#else
+        [HttpGet("greeter/grpc-net")]
+        public async Task<IActionResult> GrpcNetAsync(string name)
+        {
+            const string Switch_AllowUnencryptedHttp2 = "System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport";
+            AppContext.SetSwitch(Switch_AllowUnencryptedHttp2, true);
+
+            var channel = GrpcChannel.ForAddress("http://localhost:5003");
+            var client = new Greeter.GreeterClient(channel);
+            var result = await client.SayHelloAsync(new HelloRequest() { Name = name });
+            return Ok(result);
+        }
+#endif
     }
 }

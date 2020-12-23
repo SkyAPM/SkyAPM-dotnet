@@ -16,6 +16,8 @@
  *
  */
 
+using System.Collections.Generic;
+
 namespace SkyApm.Config
 {
     [Config("SkyWalking", "Sampling")]
@@ -24,5 +26,11 @@ namespace SkyApm.Config
         public int SamplePer3Secs { get; set; } = -1;
 
         public double Percentage { get; set; } = -1d;
+
+        /// <summary>
+        /// Paths to ignore, support wildchar match.
+        /// Usage: a/b/c => a/b/c, a/* => a/b, a/** => a/b/c/d, a/?/c => a/b/c
+        /// </summary>
+        public List<string> IgnorePaths { get; set; }
     }
 }

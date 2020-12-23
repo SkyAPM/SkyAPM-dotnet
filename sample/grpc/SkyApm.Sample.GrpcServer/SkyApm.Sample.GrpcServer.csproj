@@ -2,13 +2,8 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp2.2</TargetFramework>
-    <LangVersion>7.3</LangVersion>
+    <TargetFrameworks>netcoreapp2.1;netcoreapp3.1</TargetFrameworks>
   </PropertyGroup>
-
-  <ItemGroup>
-    <None Remove="skyapm.json" />
-  </ItemGroup>
 
   <ItemGroup>
     <Content Include="skyapm.json">
@@ -16,15 +11,14 @@
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
   </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Grpc" Version="2.23.0" />
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="2.2.0" />
+  <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp2.1'">
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="2.1.0" PrivateAssets="All" />
   </ItemGroup>
-
+  <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp3.1'">
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="3.1.0" PrivateAssets="All" />
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\SkyApm.Agent.GeneralHost\SkyApm.Agent.GeneralHost.csproj" />
     <ProjectReference Include="..\SkyApm.Sample.GrpcProto\SkyApm.Sample.GrpcProto.csproj" />
   </ItemGroup>
-
 </Project>
