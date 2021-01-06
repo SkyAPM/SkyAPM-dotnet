@@ -28,7 +28,7 @@ SkyAPM C#/.NET instrument agent
 > MyGet feed URL https://www.myget.org/F/skyapm-dotnet/api/v3/index.json
 
 # Supported
-- This project currently supports apps targeting netcoreapp2.0/netframework4.6.1 or higher.
+- This project currently supports apps targeting netcoreapp2.0 or higher.
 - [Supported middlewares, frameworks and libraries.](docs/Supported-list.md)
 
 # Features
