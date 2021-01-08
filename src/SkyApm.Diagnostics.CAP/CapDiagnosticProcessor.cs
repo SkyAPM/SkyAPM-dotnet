@@ -16,11 +16,12 @@
  *
  */
 
+using System;
 using System.Collections.Concurrent;
 using DotNetCore.CAP.Diagnostics;
 using DotNetCore.CAP.Messages;
-using DotNetCore.CAP.Serialization;
 using DotNetCore.CAP.Transport;
+using Newtonsoft.Json;
 using SkyApm.Common;
 using SkyApm.Tracing;
 using SkyApm.Tracing.Segments;
@@ -41,19 +42,16 @@ namespace SkyApm.Diagnostics.CAP
         private const string ConsumerOperateNameSuffix = "/Subscriber";
 
         private readonly ITracingContext _tracingContext;
-        private readonly ISerializer _serializer;
         private readonly IEntrySegmentContextAccessor _entrySegmentContextAccessor;
         private readonly IExitSegmentContextAccessor _exitSegmentContextAccessor;
         private readonly ILocalSegmentContextAccessor _localSegmentContextAccessor;
 
         public CapTracingDiagnosticProcessor(ITracingContext tracingContext,
-            ISerializer serializer,
             IEntrySegmentContextAccessor entrySegmentContextAccessor,
             IExitSegmentContextAccessor exitSegmentContextAccessor,
             ILocalSegmentContextAccessor localSegmentContextAccessor)
         {
             _tracingContext = tracingContext;
-            _serializer = serializer;
             _exitSegmentContextAccessor = exitSegmentContextAccessor;
             _localSegmentContextAccessor = localSegmentContextAccessor;
             _entrySegmentContextAccessor = entrySegmentContextAccessor;
@@ -79,7 +77,9 @@ namespace SkyApm.Diagnostics.CAP
             if (context == null) return;
 
             context.Span.AddLog(LogEvent.Event("Event Persistence End"));
-            context.Span.AddLog(LogEvent.Message($"CAP message persistence succeeded! Spend Time: { eventData.ElapsedTimeMs }ms.  -->  Message Id: { eventData.Message.GetId() } , Name: { eventData.Operation} "));
+            context.Span.AddLog(LogEvent.Message($"CAP message persistence succeeded!{Environment.NewLine}" +
+                                                 $"--> Spend Time: { eventData.ElapsedTimeMs }ms.{Environment.NewLine}" +
+                                                 $"--> Message Id: { eventData.Message.GetId() } , Name: { eventData.Operation} "));
 
             _tracingContext.Release(context);
         }
@@ -91,7 +91,9 @@ namespace SkyApm.Diagnostics.CAP
             if (context == null) return;
 
             context.Span.AddLog(LogEvent.Event("Event Persistence Error"));
-            context.Span.AddLog(LogEvent.Message($"CAP message persistence failed!  -->  Message Info: { _serializer.Serialize(eventData.Message)}"));
+            context.Span.AddLog(LogEvent.Message($"CAP message persistence failed!{Environment.NewLine}" +
+                                                 $"--> Message Info:{Environment.NewLine}" +
+                                                 $"{ JsonConvert.SerializeObject(eventData.Message, Formatting.Indented)}"));
 
             context.Span.ErrorOccurred(eventData.Exception);
             _tracingContext.Release(context);
@@ -122,7 +124,9 @@ namespace SkyApm.Diagnostics.CAP
             if (context == null) return;
 
             context.Span.AddLog(LogEvent.Event("Event Publishing End"));
-            context.Span.AddLog(LogEvent.Message($"CAP message publishing succeeded! Spend Time: { eventData.ElapsedTimeMs }ms.  -->  Message Id: { eventData.TransportMessage.GetId() }, Name: {eventData.Operation}"));
+            context.Span.AddLog(LogEvent.Message($"CAP message publishing succeeded!{Environment.NewLine}" +
+                                                 $"--> Spend Time: { eventData.ElapsedTimeMs }ms.  {Environment.NewLine}" +
+                                                 $"--> Message Id: { eventData.TransportMessage.GetId() }, Name: {eventData.Operation}"));
 
             _tracingContext.Release(context);
 
@@ -136,7 +140,9 @@ namespace SkyApm.Diagnostics.CAP
             if (context == null) return;
 
             context.Span.AddLog(LogEvent.Event("Event Publishing Error"));
-            context.Span.AddLog(LogEvent.Message($"CAP message publishing failed! Spend Time: { eventData.ElapsedTimeMs }ms.  -->  Message Id: { eventData.TransportMessage.GetId() }, Name: {eventData.Operation}"));
+            context.Span.AddLog(LogEvent.Message($"CAP message publishing failed!{Environment.NewLine}" +
+                                                 $"--> Spend Time: { eventData.ElapsedTimeMs }ms.  {Environment.NewLine}" +
+                                                 $"--> Message Id: { eventData.TransportMessage.GetId() }, Name: {eventData.Operation}"));
             context.Span.ErrorOccurred(eventData.Exception);
 
             _tracingContext.Release(context);
@@ -170,7 +176,9 @@ namespace SkyApm.Diagnostics.CAP
             if (context == null) return;
 
             context.Span.AddLog(LogEvent.Event("Event Persistence End"));
-            context.Span.AddLog(LogEvent.Message($"CAP message persistence succeeded! Spend Time: { eventData.ElapsedTimeMs }ms.  -->  Message Id: { eventData.TransportMessage.GetId() }, Group: {eventData.TransportMessage.GetGroup()}, Name: {eventData.Operation}"));
+            context.Span.AddLog(LogEvent.Message($"CAP message persistence succeeded!{Environment.NewLine}" +
+                                                 $"--> Spend Time: { eventData.ElapsedTimeMs }ms. {Environment.NewLine}" +
+                                                 $"--> Message Id: { eventData.TransportMessage.GetId() }, Group: {eventData.TransportMessage.GetGroup()}, Name: {eventData.Operation}"));
 
             _tracingContext.Release(context);
         }
@@ -182,7 +190,9 @@ namespace SkyApm.Diagnostics.CAP
             if (context == null) return;
 
             context.Span.AddLog(LogEvent.Event("Event Persistence Error"));
-            context.Span.AddLog(LogEvent.Message($"CAP message publishing failed! Spend Time: { eventData.ElapsedTimeMs }ms.  -->  Message Id: { eventData.TransportMessage.GetId() }, Group: {eventData.TransportMessage.GetGroup()}, Name: {eventData.Operation}"));
+            context.Span.AddLog(LogEvent.Message($"CAP message publishing failed! {Environment.NewLine}" +
+                                                 $"--> Spend Time: { eventData.ElapsedTimeMs }ms.  {Environment.NewLine}" +
+                                                 $"--> Message Id: { eventData.TransportMessage.GetId() }, Group: {eventData.TransportMessage.GetGroup()}, Name: {eventData.Operation}"));
             context.Span.ErrorOccurred(eventData.Exception);
 
             _tracingContext.Release(context);
@@ -197,7 +207,8 @@ namespace SkyApm.Diagnostics.CAP
             context.Span.SpanLayer = SpanLayer.MQ;
             context.Span.Component = Components.CAP;
             context.Span.AddLog(LogEvent.Event("Subscriber Invoke Start"));
-            context.Span.AddLog(LogEvent.Message($"Begin invoke the subscriber: {eventData.MethodInfo.Name}   --> Message Id: { eventData.Message.GetId()}, Group: {eventData.Message.GetGroup()}, Name: {eventData.Operation}"));
+            context.Span.AddLog(LogEvent.Message($"Begin invoke the subscriber: {eventData.MethodInfo} {Environment.NewLine}" +
+                                                 $"--> Message Id: { eventData.Message.GetId()}, Group: {eventData.Message.GetGroup()}, Name: {eventData.Operation}"));
 
             _contexts[eventData.Message.GetId() + eventData.Message.GetGroup()] = context;
         }
@@ -210,7 +221,8 @@ namespace SkyApm.Diagnostics.CAP
 
             context.Span.AddLog(LogEvent.Event("Subscriber Invoke End"));
             context.Span.AddLog(LogEvent.Message("Subscriber invoke succeeded!"));
-            context.Span.AddLog(LogEvent.Message($"Subscriber invoke spend time: { eventData.ElapsedTimeMs}ms --> Method Name : {eventData.MethodInfo.Name}"));
+            context.Span.AddLog(LogEvent.Message($"Subscriber invoke spend time: { eventData.ElapsedTimeMs}ms. {Environment.NewLine}" +
+                                                 $"--> Method Info: {eventData.MethodInfo}"));
 
             _tracingContext.Release(context);
 
@@ -224,7 +236,11 @@ namespace SkyApm.Diagnostics.CAP
             if (context == null) return;
 
             context.Span.AddLog(LogEvent.Event("Subscriber Invoke Error"));
-            context.Span.AddLog(LogEvent.Message($"Subscriber invoke failed! --> Method Name: { eventData.MethodInfo.Name},  Message Info: " + _serializer.Serialize(eventData.Message)));
+            context.Span.AddLog(LogEvent.Message($"Subscriber invoke failed! {Environment.NewLine}" +
+                                                 $"--> Method Info: { eventData.MethodInfo} {Environment.NewLine}" +
+                                                 $"--> Message Info: {Environment.NewLine}" +
+                                                 $"{ JsonConvert.SerializeObject(eventData.Message, Formatting.Indented)}"));
+
             context.Span.ErrorOccurred(eventData.Exception);
 
             _tracingContext.Release(context);
