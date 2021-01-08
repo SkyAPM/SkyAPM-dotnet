@@ -45,7 +45,7 @@ namespace SkyApm.Agent.AspNet.Extensions
             services.AddSingleton<IConfigAccessor, ConfigAccessor>();
             services.AddSingleton<IEnvironmentProvider, HostingEnvironmentProvider>();
             services.AddSingleton<InstrumentRequestCallback>();
-            services.AddSingleton<IConfigurationFactory, ConfigurationFactory>();
+            services.AddSingleton<IConfigurationFactory, SkyApm.Agent.AspNet.Configuration.ConfigurationFactory>();
 
             services.AddSingleton<ITracingContext, Tracing.TracingContext>();
             services.AddSingleton<ICarrierPropagator, CarrierPropagator>();
