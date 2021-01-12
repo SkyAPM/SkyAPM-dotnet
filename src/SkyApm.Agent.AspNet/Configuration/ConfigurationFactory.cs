@@ -16,13 +16,8 @@
  *
  */
 
-using Microsoft.Extensions.Configuration;
 using SkyApm.Utilities.Configuration;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SkyApm.Agent.AspNet.Configuration
 {
