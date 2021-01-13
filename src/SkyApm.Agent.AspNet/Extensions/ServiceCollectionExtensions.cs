@@ -45,15 +45,15 @@ namespace SkyApm.Agent.AspNet.Extensions
             services.AddSingleton<IConfigAccessor, ConfigAccessor>();
             services.AddSingleton<IEnvironmentProvider, HostingEnvironmentProvider>();
             services.AddSingleton<InstrumentRequestCallback>();
-            services.AddSingleton<IConfigurationFactory, ConfigurationFactory>();
+            services.AddSingleton<IConfigurationFactory, SkyApm.Agent.AspNet.Configuration.ConfigurationFactory>();
 
             services.AddSingleton<ITracingContext, Tracing.TracingContext>();
             services.AddSingleton<ICarrierPropagator, CarrierPropagator>();
             services.AddSingleton<ICarrierFormatter, Sw8CarrierFormatter>();
             services.AddSingleton<ISegmentContextFactory, SegmentContextFactory>();
-            services.AddSingleton<IEntrySegmentContextAccessor, EntrySegmentContextAccessor>();
-            services.AddSingleton<ILocalSegmentContextAccessor, LocalSegmentContextAccessor>();
-            services.AddSingleton<IExitSegmentContextAccessor, ExitSegmentContextAccessor>();
+            services.AddSingleton<IEntrySegmentContextAccessor, SkyApm.AspNet.Tracing.EntrySegmentContextAccessor>();
+            services.AddSingleton<ILocalSegmentContextAccessor, SkyApm.AspNet.Tracing.LocalSegmentContextAccessor>();
+            services.AddSingleton<IExitSegmentContextAccessor, SkyApm.AspNet.Tracing.ExitSegmentContextAccessor>();
             services.AddSingleton<ISamplerChainBuilder, SamplerChainBuilder>();
             services.AddSingleton<IUniqueIdGenerator, UniqueIdGenerator>();
             services.AddSingleton<ISegmentContextMapper, SegmentContextMapper>();

@@ -60,40 +60,63 @@ namespace SkyApm.Agent.AspNet
             }
         }
 
-        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,
-            CancellationToken cancellationToken)
+        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,
+                    CancellationToken cancellationToken)
         {
-            var tracingContext = ServiceLocator.Current.GetInstance<ITracingContext>();
-            var operationName = request.RequestUri.ToString();
-            var networkAddress = $"{request.RequestUri.Host}:{request.RequestUri.Port}";
-            var context = tracingContext.CreateExitSegmentContext(operationName, networkAddress,
-                new CarrierHeaderCollection(request.Headers));
-            try
+            // Task based version of this method has one big flaw - it is run on a separate thread and it doesn't have a direct access to the current HttpContext.
+            // It is bypassed by storing current HttpContext in a local variable, that is accessible inside the Task.
+            var currentHttpContext = System.Web.HttpContext.Current;
+
+            return base.SendAsync(request, cancellationToken).ContinueWith((prevTask) =>
             {
-                context.Span.SpanLayer = SpanLayer.HTTP;
-                context.Span.Component = Common.Components.HTTPCLIENT;
-                context.Span.AddTag(Common.Tags.URL, request.RequestUri.ToString());
-                context.Span.AddTag(Common.Tags.PATH, request.RequestUri.PathAndQuery);
-                context.Span.AddTag(Common.Tags.HTTP_METHOD, request.Method.ToString());
-                var response = await base.SendAsync(request, cancellationToken);
-                var statusCode = (int) response.StatusCode;
-                if (statusCode >= 400)
+                // TODO: Normally, HttpContext.Current inside a separate task should always be null. So the code below is a bit of a overkill. 
+                // We can simplify this code while doing a PR.
+                System.Web.HttpContext existingContext = null;
+                if (currentHttpContext != null && currentHttpContext != System.Web.HttpContext.Current)
                 {
-                    context.Span.ErrorOccurred();
+                    existingContext = System.Web.HttpContext.Current;
+                    System.Web.HttpContext.Current = currentHttpContext;
                 }
 
-                context.Span.AddTag(Common.Tags.STATUS_CODE, statusCode);
+                SegmentContext context = null;
+
+                var response = prevTask.Result;
+                var tracingContext = ServiceLocator.Current.GetInstance<ITracingContext>();
+
+                try
+                {
+                    var operationName = request.RequestUri.ToString();
+                    var networkAddress = $"{request.RequestUri.Host}:{request.RequestUri.Port}";
+                    context = tracingContext.CreateExitSegmentContext(operationName, networkAddress,
+                        new CarrierHeaderCollection(request.Headers));
+
+                    context.Span.SpanLayer = SpanLayer.HTTP;
+                    context.Span.Component = Common.Components.HTTPCLIENT;
+                    context.Span.AddTag(Common.Tags.URL, request.RequestUri.ToString());
+                    context.Span.AddTag(Common.Tags.PATH, request.RequestUri.PathAndQuery);
+                    context.Span.AddTag(Common.Tags.HTTP_METHOD, request.Method.ToString());
+                    var statusCode = (int)response.StatusCode;
+                    if (statusCode >= 400)
+                    {
+                        context.Span.ErrorOccurred();
+                    }
+
+                    context.Span.AddTag(Common.Tags.STATUS_CODE, statusCode);
+                }
+                catch (Exception exception)
+                {
+                    context?.Span.ErrorOccurred(exception);
+                    throw;
+                }
+                finally
+                {
+                    tracingContext.Release(context);
+                    // TODO: In case of simplification of HttpContext.Current routine, we should set null here.
+                    System.Web.HttpContext.Current = existingContext;
+                }
                 return response;
-            }
-            catch (Exception exception)
-            {
-                context.Span.ErrorOccurred(exception);
-                throw;
-            }
-            finally
-            {
-                tracingContext.Release(context);
-            }
+            }, TaskContinuationOptions.OnlyOnRanToCompletion | TaskContinuationOptions.ExecuteSynchronously
+            );
         }
 
         private class CarrierHeaderCollection : ICarrierHeaderCollection

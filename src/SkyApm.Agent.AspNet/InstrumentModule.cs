@@ -19,7 +19,6 @@
 using CommonServiceLocator;
 using Microsoft.Extensions.DependencyInjection;
 using System.Web;
-using Nito.AsyncEx;
 using SkyApm.Agent.AspNet.Extensions;
 
 namespace SkyApm.Agent.AspNet
