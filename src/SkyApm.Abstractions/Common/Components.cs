@@ -42,6 +42,6 @@ namespace SkyApm.Common
 
         public static readonly StringOrIntValue GRPC = new StringOrIntValue(23, "GRPC");
 
-        public static readonly StringOrIntValue MongoDBLIENT = new StringOrIntValue(42, "MongoDB.Driver");
+        public static readonly StringOrIntValue MongoDBCLIENT = new StringOrIntValue(42, "MongoDB.Driver");
     }
 }
