@@ -35,8 +35,7 @@ namespace SkyApm.Diagnostics.MongoDB
 
         [DiagnosticName("MongoActivity.Stop")]
         public void AfterExecuteCommand([Object] CommandSucceededEvent @event)
-        {
-            Console.WriteLine(@event.Duration.TotalMilliseconds);
+        { 
             var context = _contextAccessor.Context;
             context?.Span.AddTag(Common.Tags.STATUS_CODE, "ok");
 
