@@ -43,21 +43,28 @@ namespace SkyApm.AspNetCore.Diagnostics
             _segmentContextAccessor = segmentContextAccessor;
         }
 
-        [DiagnosticName("Microsoft.AspNetCore.Hosting.BeginRequest")]
-        public void BeginRequest([Property] HttpContext httpContext)
+        /// <remarks>
+        /// Variable name starts with an upper case, because it's used for parameter binding. In both ASP .NET Core 2.x and 3.x we get an object in which 
+        /// HttpContext of the current request is available under the `HttpContext` property.
+        /// </remarks>
+        [DiagnosticName("Microsoft.AspNetCore.Hosting.HttpRequestIn.Start")]
+        public void BeginRequest([Property] HttpContext HttpContext)
         {
             foreach (var handler in _diagnosticHandlers)
             {
-                if (handler.OnlyMatch(httpContext))
+                if (handler.OnlyMatch(HttpContext))
                 {
-                    handler.BeginRequest(_tracingContext, httpContext);
+                    handler.BeginRequest(_tracingContext, HttpContext);
                     return;
                 }
             }
         }
 
-        [DiagnosticName("Microsoft.AspNetCore.Hosting.EndRequest")]
-        public void EndRequest([Property] HttpContext httpContext)
+        /// <remarks>
+        /// See remarks in <see cref="BeginRequest(HttpContext)"/>.
+        /// </remarks>
+        [DiagnosticName("Microsoft.AspNetCore.Hosting.HttpRequestIn.Stop")]
+        public void EndRequest([Property] HttpContext HttpContext)
         {
             var context = _segmentContextAccessor.Context;
             if (context == null)
@@ -67,9 +74,9 @@ namespace SkyApm.AspNetCore.Diagnostics
 
             foreach (var handler in _diagnosticHandlers)
             {
-                if (handler.OnlyMatch(httpContext))
+                if (handler.OnlyMatch(HttpContext))
                 {
-                    handler.EndRequest(context, httpContext);
+                    handler.EndRequest(context, HttpContext);
                     break;
                 }
             }
@@ -96,6 +103,19 @@ namespace SkyApm.AspNetCore.Diagnostics
 
         //[DiagnosticName("Microsoft.AspNetCore.Mvc.AfterAction")]
         public void AfterAction([Property] ActionDescriptor actionDescriptor, [Property] HttpContext httpContext)
+        {
+        }
+
+        /// <summary>
+        /// Empty method used to register additional activity in diagnostic listener. This method normally will not be called.
+        /// </summary>
+        /// <remarks>
+        /// Both `Microsoft.AspNetCore.Hosting.HttpRequestIn.Start` and `Microsoft.AspNetCore.Hosting.HttpRequestIn.Stop` activities will be called only, 
+        /// if diagnostic listener will have the `Microsoft.AspNetCore.Hosting.HttpRequestIn` activity enabled. Currently this is the only way to register an
+        /// extra activity to be tracked, without extra code changes in SkyApm.Diagnostics.Tracing* classes.
+        /// </remarks>
+        [DiagnosticName("Microsoft.AspNetCore.Hosting.HttpRequestIn")]
+        public void RegisterMasterActivity()
         {
         }
     }
