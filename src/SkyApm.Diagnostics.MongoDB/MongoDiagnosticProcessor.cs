@@ -23,7 +23,7 @@ namespace SkyApm.Diagnostics.MongoDB
             var operationName = DiagnosticsActivityEventSubscriber.GetCollectionName(@event);
             var context = _tracingContext.CreateExitSegmentContext(operationName, @event.ConnectionId.ServerId.EndPoint.ToString());
             context.Span.SpanLayer = Tracing.Segments.SpanLayer.DB;
-            context.Span.Component = Common.Components.MongoDBLIENT;
+            context.Span.Component = Common.Components.MongoDBCLIENT;
             context.Span.AddTag("db.system", "mongodb");
             context.Span.AddTag("db.name", @event.DatabaseNamespace?.DatabaseName);
             context.Span.AddTag("db.mongodb.collection", operationName);
