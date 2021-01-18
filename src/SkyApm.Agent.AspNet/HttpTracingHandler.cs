@@ -60,63 +60,54 @@ namespace SkyApm.Agent.AspNet
             }
         }
 
-        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,
-                    CancellationToken cancellationToken)
+        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,
+            CancellationToken cancellationToken)
         {
-            // Task based version of this method has one big flaw - it is run on a separate thread and it doesn't have a direct access to the current HttpContext.
-            // It is bypassed by storing current HttpContext in a local variable, that is accessible inside the Task.
-            var currentHttpContext = System.Web.HttpContext.Current;
-
-            return base.SendAsync(request, cancellationToken).ContinueWith((prevTask) =>
+            var tracingContext = ServiceLocator.Current.GetInstance<ITracingContext>();
+            var operationName = request.RequestUri.ToString();
+            var networkAddress = $"{request.RequestUri.Host}:{request.RequestUri.Port}";
+            var context = tracingContext.CreateExitSegmentContext(operationName, networkAddress,
+                new CarrierHeaderCollection(request.Headers));
+            try
             {
-                // TODO: Normally, HttpContext.Current inside a separate task should always be null. So the code below is a bit of a overkill. 
-                // We can simplify this code while doing a PR.
-                System.Web.HttpContext existingContext = null;
-                if (currentHttpContext != null && currentHttpContext != System.Web.HttpContext.Current)
+                HttpResponseMessage response;
+
+                context.Span.SpanLayer = SpanLayer.HTTP;
+                context.Span.Component = Common.Components.HTTPCLIENT;
+                context.Span.AddTag(Common.Tags.URL, request.RequestUri.ToString());
+                context.Span.AddTag(Common.Tags.PATH, request.RequestUri.PathAndQuery);
+                context.Span.AddTag(Common.Tags.HTTP_METHOD, request.Method.ToString());
+
+                // With ConfigureAwait on next await call, current HttpContext will not be available for the rest of the method.
+                // Because HttpContext is needed when we are using tracing context accessors, it must be stored in local variable.
+                var currentHttpContext = System.Web.HttpContext.Current;
+
+                // Prevents deadlock for synchronous calls to HttpClient methods. 
+                // More here: C#: Why you should use ConfigureAwait(false) in your library code
+                // https://medium.com/bynder-tech/c-why-you-should-use-configureawait-false-in-your-library-code-d7837dce3d7f
+                response = await base.SendAsync(request, cancellationToken).ConfigureAwait(false);
+
+                // Restoring HttpContext.
+                System.Web.HttpContext.Current = currentHttpContext;
+
+                var statusCode = (int)response.StatusCode;
+                if (statusCode >= 400)
                 {
-                    existingContext = System.Web.HttpContext.Current;
-                    System.Web.HttpContext.Current = currentHttpContext;
+                    context.Span.ErrorOccurred();
                 }
 
-                SegmentContext context = null;
-
-                var response = prevTask.Result;
-                var tracingContext = ServiceLocator.Current.GetInstance<ITracingContext>();
-
-                try
-                {
-                    var operationName = request.RequestUri.ToString();
-                    var networkAddress = $"{request.RequestUri.Host}:{request.RequestUri.Port}";
-                    context = tracingContext.CreateExitSegmentContext(operationName, networkAddress,
-                        new CarrierHeaderCollection(request.Headers));
-
-                    context.Span.SpanLayer = SpanLayer.HTTP;
-                    context.Span.Component = Common.Components.HTTPCLIENT;
-                    context.Span.AddTag(Common.Tags.URL, request.RequestUri.ToString());
-                    context.Span.AddTag(Common.Tags.PATH, request.RequestUri.PathAndQuery);
-                    context.Span.AddTag(Common.Tags.HTTP_METHOD, request.Method.ToString());
-                    var statusCode = (int)response.StatusCode;
-                    if (statusCode >= 400)
-                    {
-                        context.Span.ErrorOccurred();
-                    }
-
-                    context.Span.AddTag(Common.Tags.STATUS_CODE, statusCode);
-                }
-                catch (Exception exception)
-                {
-                    context?.Span.ErrorOccurred(exception);
-                    throw;
-                }
-                finally
-                {
-                    tracingContext.Release(context);
-                    // TODO: In case of simplification of HttpContext.Current routine, we should set null here.
-                    System.Web.HttpContext.Current = existingContext;
-                }
+                context.Span.AddTag(Common.Tags.STATUS_CODE, statusCode);
                 return response;
-            }, TaskContinuationOptions.OnlyOnRanToCompletion | TaskContinuationOptions.ExecuteSynchronously
-            );
+            }
+            catch (Exception exception)
+            {
+                context.Span.ErrorOccurred(exception);
+                throw;
+            }
+            finally
+            {
+                tracingContext.Release(context);
+            }
         }
 
         private class CarrierHeaderCollection : ICarrierHeaderCollection
