@@ -35,8 +35,8 @@ deploy:
     appveyor_repo_tag: true
 - provider: NuGet
   api_key:
-    secure: I6vvPtMCX9hyycxE5r/STvJtaMT/dswZq9yDOKDQoTCh+WNOJdw4KduUV3k4GnBw
+    secure: mTm1mzAZsPVpicpuj+Ji1PyJLoCwb3OXRWIR7yUW0p7f3y8FbH10Cj60AEkqF0MK
   skip_symbols: true
-  artifact: /artifacts\/packages\/(?!SkyAPM\.Agent\.AspNet\.nupkg$).+\.nupkg/
+  artifact: /artifacts\/packages\/.+\.nupkg/
   on:
     appveyor_repo_tag: true
