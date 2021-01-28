@@ -28,7 +28,8 @@
     },
     "Component": {
       "AspNetCore": {
-        "AutoTagCookies": ["c-b"]
+        "CollectCookies": [ "c-b" ],
+        "CollectHeaders": ["User-Agent"]
       },
       "HttpClient": {
         "StopHeaderPropagationPaths": [ "**/localhost:5002/api/values/stoppropagation" ]
