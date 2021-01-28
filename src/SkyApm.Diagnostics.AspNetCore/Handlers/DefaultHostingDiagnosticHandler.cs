@@ -18,12 +18,15 @@
 
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
+using Microsoft.Extensions.Primitives;
 using SkyApm.AspNetCore.Diagnostics;
 using SkyApm.Common;
 using SkyApm.Config;
 using SkyApm.Diagnostics.AspNetCore.Config;
 using SkyApm.Tracing;
 using SkyApm.Tracing.Segments;
+using System.Collections.Generic;
+using System.Text;
 
 namespace SkyApm.Diagnostics.AspNetCore.Handlers
 {
@@ -52,14 +55,18 @@ namespace SkyApm.Diagnostics.AspNetCore.Handlers
             context.Span.AddTag(Tags.PATH, httpContext.Request.Path);
             context.Span.AddTag(Tags.HTTP_METHOD, httpContext.Request.Method);
 
-            if(_config.AutoTagCookies?.Count > 0)
+            if(_config.CollectCookies?.Count > 0)
             {
-                foreach (var key in _config.AutoTagCookies)
-                {
-                    if (!httpContext.Request.Cookies.TryGetValue(key, out string value))
-                        continue;
-                    context.Span.AddTag("cookie." + key, value);
-                }
+                var cookies = CollectCookies(httpContext, _config.CollectCookies);
+                if (!string.IsNullOrEmpty(cookies))
+                    context.Span.AddTag(Tags.HTTP_COOKIES, cookies);
+            }
+
+            if(_config.CollectHeaders?.Count > 0)
+            {
+                var headers = CollectHeaders(httpContext, _config.CollectHeaders);
+                if (!string.IsNullOrEmpty(headers))
+                    context.Span.AddTag(Tags.HTTP_HEADERS, headers);
             }
         }
 
@@ -72,6 +79,42 @@ namespace SkyApm.Diagnostics.AspNetCore.Handlers
             }
 
             segmentContext.Span.AddTag(Tags.STATUS_CODE, statusCode);
+        }
+
+        private string CollectCookies(HttpContext httpContext, IEnumerable<string> keys)
+        {
+            var sb = new StringBuilder();
+            foreach (var key in keys)
+            {
+                if (!httpContext.Request.Cookies.TryGetValue(key, out string value))
+                    continue;
+
+                if(sb.Length > 0)
+                    sb.Append("; ");
+
+                sb.Append(key);
+                sb.Append('=');
+                sb.Append(value);
+            }
+            return sb.ToString();
+        }
+
+        private string CollectHeaders(HttpContext httpContext, IEnumerable<string> keys)
+        {
+            var sb = new StringBuilder();
+            foreach (var key in keys)
+            {
+                if (!httpContext.Request.Headers.TryGetValue(key, out StringValues value))
+                    continue;
+
+                if(sb.Length > 0)
+                    sb.Append('\n');
+
+                sb.Append(key);
+                sb.Append(": ");
+                sb.Append(value);
+            }
+            return sb.ToString();
         }
     }
 }
