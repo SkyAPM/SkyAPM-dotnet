@@ -35,6 +35,10 @@ namespace SkyApm.Diagnostics.HttpClient
 
         public void Add(string key, string value)
         {
+            if(_request.Headers.Contains(key))
+            {
+                _request.Headers.Remove(key);
+            }
             _request.Headers.Add(key, value);
         }
 
