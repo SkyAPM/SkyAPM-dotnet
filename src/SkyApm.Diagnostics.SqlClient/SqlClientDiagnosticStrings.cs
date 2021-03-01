@@ -27,5 +27,9 @@ namespace SkyApm.Diagnostics.SqlClient
         public const string SqlBeforeExecuteCommand = "System.Data.SqlClient.WriteCommandBefore";
         public const string SqlAfterExecuteCommand = "System.Data.SqlClient.WriteCommandAfter";
         public const string SqlErrorExecuteCommand = "System.Data.SqlClient.WriteCommandError";
+
+        public const string DotNetCoreSqlBeforeExecuteCommand = "Microsoft.Data.SqlClient.WriteCommandBefore";
+        public const string DotNetCoreSqlAfterExecuteCommand = "Microsoft.Data.SqlClient.WriteCommandAfter";
+        public const string DotNetCoreSqlErrorExecuteCommand = "Microsoft.Data.SqlClient.WriteCommandError";
     }
 }

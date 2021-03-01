@@ -42,7 +42,9 @@ namespace SkyApm.Diagnostics.SqlClient
             var commandType = sqlCommand.CommandText?.Split(' ');
             return $"{SqlClientDiagnosticStrings.SqlClientPrefix}{commandType?.FirstOrDefault()}";
         }
-        
+
+
+        #region System.Data.SqlClient
         [DiagnosticName(SqlClientDiagnosticStrings.SqlBeforeExecuteCommand)]
         public void BeforeExecuteCommand([Property(Name = "Command")] SqlCommand sqlCommand)
         {
@@ -75,5 +77,43 @@ namespace SkyApm.Diagnostics.SqlClient
                 _tracingContext.Release(context);
             }   
         }
+        #endregion
+
+        #region Microsoft.Data.SqlClient
+        //https://docs.microsoft.com/en-us/dotnet/api/microsoft.data.sqlclient?view=sqlclient-dotnet-core-2.1
+
+        [DiagnosticName(SqlClientDiagnosticStrings.SqlBeforeExecuteCommand)]
+        public void BeforeDotNetCoreExecuteCommand([Property(Name = "Command")] SqlCommand sqlCommand)
+        {
+            var context = _tracingContext.CreateExitSegmentContext(ResolveOperationName(sqlCommand),
+                sqlCommand.Connection.DataSource);
+            context.Span.SpanLayer = Tracing.Segments.SpanLayer.DB;
+            context.Span.Component = Common.Components.SQLCLIENT;
+            context.Span.AddTag(Common.Tags.DB_TYPE, "sql");
+            context.Span.AddTag(Common.Tags.DB_INSTANCE, sqlCommand.Connection.Database);
+            context.Span.AddTag(Common.Tags.DB_STATEMENT, sqlCommand.CommandText);
+        }
+
+        [DiagnosticName(SqlClientDiagnosticStrings.DotNetCoreSqlAfterExecuteCommand)]
+        public void AfterDotNetCoreExecuteCommand()
+        {
+            var context = _contextAccessor.Context;
+            if (context != null)
+            {
+                _tracingContext.Release(context);
+            }
+        }
+
+        [DiagnosticName(SqlClientDiagnosticStrings.DotNetCoreSqlErrorExecuteCommand)]
+        public void ErrorDotNetCoreExecuteCommand([Property(Name = "Exception")] Exception ex)
+        {
+            var context = _contextAccessor.Context;
+            if (context != null)
+            {
+                context.Span.ErrorOccurred(ex);
+                _tracingContext.Release(context);
+            }
+        }
+        #endregion
     }
 }
