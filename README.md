@@ -44,9 +44,7 @@ A quick list of SkyWalking .NET Core Agent's capabilities
 ## Deploy SkyWalking Backend And UI
 
 #### Requirements
-- Start with v1.0.0, SkyAPM .NET Core Agent will only support SkyWalking 8.0 or higher. The SkyWalking deployment doc is [here](https://github.com/apache/incubator-skywalking/blob/master/docs/en/setup/backend/backend-ui-setup.md). If you are new user, recommand you to read the 
-[whole official documents](https://github.com/apache/incubator-skywalking/blob/master/docs/README.md)
-- If you are using Skywalking 7.0 or lower, you should use the SkyAPM .NET Core Agent v0.9.0 packages.
+Start with v1.0.0, SkyAPM .NET Core Agent only supports SkyWalking 8.0 or higher. The SkyWalking doc is [here](https://skywalking.apache.org/docs/). 
 
 ## Install SkyWalking .NET Core Agent
 
