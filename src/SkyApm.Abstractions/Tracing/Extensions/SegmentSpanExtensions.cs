@@ -18,6 +18,7 @@
 
 using System;
 using SkyApm.Tracing.Segments;
+using SkyApm.Common;
 
 namespace SkyApm.Tracing
 {
@@ -33,10 +34,11 @@ namespace SkyApm.Tracing
             span.IsError = true;
             if (exception != null)
             {
-                span.AddLog(LogEvent.Event("error"), 
+                var stackTrace = exception.HasInnerExceptions() ? exception.ToDemystifiedString() : exception.StackTrace;
+                span.AddLog(LogEvent.Event("error"),
                     LogEvent.ErrorKind(exception.GetType().FullName),
-                    LogEvent.Message(exception.Message), 
-                    LogEvent.ErrorStack(exception.StackTrace));
+                    LogEvent.Message(exception.Message),
+                    LogEvent.ErrorStack(stackTrace));
             }
         }
     }
