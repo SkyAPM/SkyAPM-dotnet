@@ -12,9 +12,9 @@ namespace SkyApm.Core.Tests
         [Fact]
         public void InnerException_Should_Generate_Correct()
         {
-            var exception = new Exception("first level exception", new Exception("second level exception", new Exception("three level exception")));
+            var exception = new Exception("first level exception", new Exception("second level exception", new Exception("third level exception")));
             var result = exception.ToDemystifiedString();
-            Assert.Matches(@"System.Exception: first level exception\s+---> System\.Exception: second level exception\s+---> System\.Exception: three level exception\s+--- End of inner exception stack trace ---\s+--- End of inner exception stack trace ---", result);
+            Assert.Matches(@"System.Exception: first level exception\s+---> System\.Exception: second level exception\s+---> System\.Exception: third level exception\s+--- End of inner exception stack trace ---\s+--- End of inner exception stack trace ---", result);
         }
 
         [Fact]
@@ -39,6 +39,22 @@ namespace SkyApm.Core.Tests
             var result = exception.ToDemystifiedString();
 
             Assert.Matches(@"System.AggregateException: One or more errors occurred\. \(first exception\) \(second exception\)\s+---> System\.Exception: first exception\s+--- End of inner exception stack trace ---\s+---> System\.Exception: second exception\s+--- End of inner exception stack trace ---\s+---> System\.Exception: first exception\s+--- End of inner exception stack trace ---", result);
+        }
+
+        [Fact]
+        public void InnerExceptions_Exceed_Max_Depth_Should_Ignored()
+        {
+            var exception = new Exception("first level exception", new Exception("second level exception", new Exception("third level exception")));
+            var result = exception.ToDemystifiedString(2);
+            Assert.Matches(@"System\.Exception: first level exception\s+---> System\.Exception: second level exception\s+--- End of inner exception stack trace ---", result);
+        }
+
+        [Fact]
+        public void AggregateException_InnerExceptions_Exceed_Max_Depth_Should_Ignored()
+        {
+            var exception = new AggregateException(new Exception("first exception"), new Exception("second exception"), new Exception("third exception"));
+            var result = exception.ToDemystifiedString(2);
+            Assert.Matches(@"System\.AggregateException: One or more errors occurred\. \(first exception\) \(second exception\) \(third exception\)\s+---> System\.Exception: first exception\s+--- End of inner exception stack trace ---", result);
         }
 
         private void FirstLevelException()

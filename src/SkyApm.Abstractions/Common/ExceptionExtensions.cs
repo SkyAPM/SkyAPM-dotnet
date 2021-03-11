@@ -10,11 +10,12 @@ namespace SkyApm.Common
         /// Gets demystified string representation of the <paramref name="exception"/>.
         /// </summary>
         /// <param name="exception"></param>
+        /// <param name="maxDepth"></param>
         /// <returns></returns>
-        public static string ToDemystifiedString(this Exception exception)
+        public static string ToDemystifiedString(this Exception exception, int maxDepth = 5)
         {
             var builder = new StringBuilder();
-            builder.AppendDemystified(exception);
+            builder.Append(exception, maxDepth);
             return builder.ToString();
         }
 
