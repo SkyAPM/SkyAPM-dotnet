@@ -14,11 +14,7 @@ namespace SkyApm.Core.Tests
         {
             var exception = new Exception("first level exception", new Exception("second level exception", new Exception("three level exception")));
             var result = exception.ToDemystifiedString();
-            Assert.Equal(@"System.Exception: first level exception
- ---> System.Exception: second level exception
- ---> System.Exception: three level exception
-   --- End of inner exception stack trace ---
-   --- End of inner exception stack trace ---", result);
+            Assert.Matches(@"System.Exception: first level exception\s+---> System\.Exception: second level exception\s+---> System\.Exception: three level exception\s+--- End of inner exception stack trace ---\s+--- End of inner exception stack trace ---", result);
         }
 
         [Fact]
@@ -42,13 +38,7 @@ namespace SkyApm.Core.Tests
             var exception = new AggregateException(new Exception("first exception"), new Exception("second exception"));
             var result = exception.ToDemystifiedString();
 
-            Assert.Equal(@"System.AggregateException: One or more errors occurred. (first exception) (second exception)
- ---> System.Exception: first exception
-   --- End of inner exception stack trace ---
- ---> System.Exception: second exception
-   --- End of inner exception stack trace ---
- ---> System.Exception: first exception
-   --- End of inner exception stack trace ---", result);
+            Assert.Matches(@"System.AggregateException: One or more errors occurred\. \(first exception\) \(second exception\)\s+---> System\.Exception: first exception\s+--- End of inner exception stack trace ---\s+---> System\.Exception: second exception\s+--- End of inner exception stack trace ---\s+---> System\.Exception: first exception\s+--- End of inner exception stack trace ---", result);
         }
 
         private void FirstLevelException()
