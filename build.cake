@@ -12,7 +12,11 @@ Task("Clean")
 {
 	if (DirectoryExists("./artifacts"))
 	{
-		DeleteDirectory("./artifacts", true);
+		DeleteDirectory("./artifacts", new DeleteDirectorySettings 
+		{
+			Recursive = true,
+			Force = true
+		});
 	}
 });
 

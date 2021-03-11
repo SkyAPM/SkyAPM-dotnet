@@ -32,7 +32,7 @@ namespace SkyApm.Core.Tests
             catch (Exception ex)
             {
                 var result = ex.ToDemystifiedString();
-                Assert.Matches(@"System\.Exception: first level exception\s+at SkyApm\.Core\.Tests\.ExceptionExtensionTests\.FirstLevelException\(\) in .*\s+at SkyApm\.Core\.Tests\.ExceptionExtensionTests\.InnerException_With_StackTrace_Should_Generate_Correct\(\) in .*\s+---> System\.Exception: second level exception\s+at SkyApm\.Core\.Tests\.ExceptionExtensionTests\.SecondLevelException\(\) in .*\s+at SkyApm\.Core\.Tests\.ExceptionExtensionTests\.FirstLevelException\(\) in .*\s+---> System\.NotImplementedException: not implemented\s+at SkyApm\.Core\.Tests\.ExceptionExtensionTests\.SecondLevelException\(\) in .*\s+--- End of inner exception stack trace ---\s+--- End of inner exception stack trace ---", result);
+                Assert.Matches(@"System\.Exception: first level exception\s+at SkyApm\.Core\.Tests\.ExceptionExtensionTests\.FirstLevelException\(\).*\s+at SkyApm\.Core\.Tests\.ExceptionExtensionTests\.InnerException_With_StackTrace_Should_Generate_Correct\(\).*\s+---> System\.Exception: second level exception\s+at SkyApm\.Core\.Tests\.ExceptionExtensionTests\.SecondLevelException\(\).*\s+at SkyApm\.Core\.Tests\.ExceptionExtensionTests\.FirstLevelException\(\).*\s+---> System\.NotImplementedException: not implemented\s+at SkyApm\.Core\.Tests\.ExceptionExtensionTests\.SecondLevelException\(\).*\s+--- End of inner exception stack trace ---\s+--- End of inner exception stack trace ---", result);
             }
         }
 
