@@ -39,8 +39,7 @@ namespace SkyApm.Common
                             return builder;
                     }
                 }
-
-                if (exception.InnerException != null)
+                else if (exception.InnerException != null)
                 {
                     builder.AppendInnerException(exception.InnerException, currentDepth, maxDepth);
                 }

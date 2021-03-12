@@ -36,9 +36,9 @@ namespace SkyApm.Core.Tests
         public void AggregateException_Should_Generate_Correct()
         {
             var exception = new AggregateException(new Exception("first exception"), new Exception("second exception"));
-            var result = exception.ToDemystifiedString();
+            var result = exception.ToDemystifiedString(0);
 
-            Assert.Matches(@"System.AggregateException: One or more errors occurred\. \(first exception\) \(second exception\)\s+---> System\.Exception: first exception\s+--- End of inner exception stack trace ---\s+---> System\.Exception: second exception\s+--- End of inner exception stack trace ---\s+---> System\.Exception: first exception\s+--- End of inner exception stack trace ---", result);
+            Assert.Matches(@"System\.AggregateException: One or more errors occurred\. \(first exception\) \(second exception\)\s+---> System\.Exception: first exception\s+--- End of inner exception stack trace ---\s+---> System\.Exception: second exception\s+--- End of inner exception stack trace ---", result);
         }
 
         [Fact]
