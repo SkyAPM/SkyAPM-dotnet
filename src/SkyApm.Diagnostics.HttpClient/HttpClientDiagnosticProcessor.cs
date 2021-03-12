@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using SkyApm.Common;
+using SkyApm.Config;
 using SkyApm.Diagnostics.HttpClient.Filters;
 using SkyApm.Tracing;
 
@@ -37,13 +38,17 @@ namespace SkyApm.Diagnostics.HttpClient
 
         private readonly IEnumerable<IRequestDiagnosticHandler> _requestDiagnosticHandlers;
 
+        private readonly TracingConfig _tracingConfig;
+
         public HttpClientTracingDiagnosticProcessor(ITracingContext tracingContext,
             IExitSegmentContextAccessor contextAccessor,
-            IEnumerable<IRequestDiagnosticHandler> requestDiagnosticHandlers)
+            IEnumerable<IRequestDiagnosticHandler> requestDiagnosticHandlers,
+            IConfigAccessor configAccessor)
         {
             _tracingContext = tracingContext;
             _contextAccessor = contextAccessor;
             _requestDiagnosticHandlers = requestDiagnosticHandlers.Reverse();
+            _tracingConfig = configAccessor.Get<TracingConfig>();
         }
 
         [DiagnosticName("System.Net.Http.Request")]
@@ -86,7 +91,7 @@ namespace SkyApm.Diagnostics.HttpClient
         public void HttpException([Property(Name = "Request")] HttpRequestMessage request,
             [Property(Name = "Exception")] Exception exception)
         {
-            _contextAccessor.Context?.Span?.ErrorOccurred(exception);
+            _contextAccessor.Context?.Span?.ErrorOccurred(exception, _tracingConfig);
         }
     }
 }

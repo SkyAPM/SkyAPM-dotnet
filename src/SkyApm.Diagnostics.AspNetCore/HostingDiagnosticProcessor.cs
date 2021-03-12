@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Abstractions;
+using SkyApm.Config;
 using SkyApm.Diagnostics;
 using SkyApm.Diagnostics.AspNetCore.Handlers;
 using SkyApm.Tracing;
@@ -34,13 +35,16 @@ namespace SkyApm.AspNetCore.Diagnostics
         private readonly ITracingContext _tracingContext;
         private readonly IEntrySegmentContextAccessor _segmentContextAccessor;
         private readonly IEnumerable<IHostingDiagnosticHandler> _diagnosticHandlers;
+        private readonly TracingConfig _tracingConfig;
 
         public HostingTracingDiagnosticProcessor(IEntrySegmentContextAccessor segmentContextAccessor,
-            ITracingContext tracingContext, IEnumerable<IHostingDiagnosticHandler> diagnosticHandlers)
+            ITracingContext tracingContext, IEnumerable<IHostingDiagnosticHandler> diagnosticHandlers,
+            IConfigAccessor configAccessor)
         {
             _tracingContext = tracingContext;
             _diagnosticHandlers = diagnosticHandlers.Reverse();
             _segmentContextAccessor = segmentContextAccessor;
+            _tracingConfig = configAccessor.Get<TracingConfig>();
         }
 
         /// <remarks>
@@ -87,13 +91,13 @@ namespace SkyApm.AspNetCore.Diagnostics
         [DiagnosticName("Microsoft.AspNetCore.Diagnostics.UnhandledException")]
         public void DiagnosticUnhandledException([Property] HttpContext httpContext, [Property] Exception exception)
         {
-            _segmentContextAccessor.Context?.Span?.ErrorOccurred(exception);
+            _segmentContextAccessor.Context?.Span?.ErrorOccurred(exception, _tracingConfig);
         }
 
         [DiagnosticName("Microsoft.AspNetCore.Hosting.UnhandledException")]
         public void HostingUnhandledException([Property] HttpContext httpContext, [Property] Exception exception)
         {
-            _segmentContextAccessor.Context?.Span?.ErrorOccurred(exception);
+            _segmentContextAccessor.Context?.Span?.ErrorOccurred(exception, _tracingConfig);
         }
 
         //[DiagnosticName("Microsoft.AspNetCore.Mvc.BeforeAction")]

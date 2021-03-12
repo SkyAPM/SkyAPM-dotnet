@@ -12,7 +12,7 @@ namespace SkyApm.Common
         /// <param name="exception"></param>
         /// <param name="maxDepth"></param>
         /// <returns></returns>
-        public static string ToDemystifiedString(this Exception exception, int maxDepth = 5)
+        public static string ToDemystifiedString(this Exception exception, int maxDepth = 3)
         {
             var builder = new StringBuilder();
             builder.Append(exception, maxDepth);
