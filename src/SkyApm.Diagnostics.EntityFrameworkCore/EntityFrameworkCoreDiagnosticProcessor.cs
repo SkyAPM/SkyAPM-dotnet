@@ -22,6 +22,7 @@ using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Storage.Internal;
+using SkyApm.Config;
 using SkyApm.Tracing;
 
 namespace SkyApm.Diagnostics.EntityFrameworkCore
@@ -30,6 +31,7 @@ namespace SkyApm.Diagnostics.EntityFrameworkCore
     {
         private Func<CommandEventData, string> _operationNameResolver;
         private readonly IEntityFrameworkCoreSegmentContextFactory _contextFactory;
+        private readonly TracingConfig _tracingConfig;
 
         public string ListenerName => DbLoggerCategory.Name;
 
@@ -52,9 +54,10 @@ namespace SkyApm.Diagnostics.EntityFrameworkCore
         }
 
         public EntityFrameworkCoreTracingDiagnosticProcessor(
-            IEntityFrameworkCoreSegmentContextFactory contextFactory)
+            IEntityFrameworkCoreSegmentContextFactory contextFactory, IConfigAccessor configAccessor)
         {
             _contextFactory = contextFactory;
+            _tracingConfig = configAccessor.Get<TracingConfig>();
         }
 
         [DiagnosticName("Microsoft.EntityFrameworkCore.Database.Command.CommandExecuting")]
@@ -95,7 +98,7 @@ namespace SkyApm.Diagnostics.EntityFrameworkCore
             var context = _contextFactory.GetCurrentContext(eventData.Command);
             if (context != null)
             {
-                context.Span.ErrorOccurred(eventData.Exception);
+                context.Span.ErrorOccurred(eventData.Exception, _tracingConfig);
                 _contextFactory.Release(context);
             }
         }

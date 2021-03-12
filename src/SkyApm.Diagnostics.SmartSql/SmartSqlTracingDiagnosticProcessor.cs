@@ -21,6 +21,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Text;
+using SkyApm.Config;
 using SkyApm.Tracing;
 using SkyApm.Tracing.Segments;
 using SmartSql;
@@ -34,12 +35,14 @@ namespace SkyApm.Diagnostics.SmartSql
 
         private readonly ITracingContext _tracingContext;
         private readonly ILocalSegmentContextAccessor _localSegmentContextAccessor;
+        private readonly TracingConfig _tracingConfig;
 
         public SmartSqlTracingDiagnosticProcessor(ITracingContext tracingContext,
-            ILocalSegmentContextAccessor localSegmentContextAccessor)
+            ILocalSegmentContextAccessor localSegmentContextAccessor, IConfigAccessor configAccessor)
         {
             _tracingContext = tracingContext;
             _localSegmentContextAccessor = localSegmentContextAccessor;
+            _tracingConfig = configAccessor.Get<TracingConfig>();
         }
         private void AddConnectionTag(SegmentContext context, DbConnection dbConnection)
         {
@@ -86,7 +89,7 @@ namespace SkyApm.Diagnostics.SmartSql
             var context = _localSegmentContextAccessor.Context;
             if (context != null)
             {
-                context.Span.ErrorOccurred(eventData.Exception);
+                context.Span.ErrorOccurred(eventData.Exception, _tracingConfig);
                 _tracingContext.Release(context);
             }
         }
@@ -114,7 +117,7 @@ namespace SkyApm.Diagnostics.SmartSql
             var context = _localSegmentContextAccessor.Context;
             if (context != null)
             {
-                context.Span.ErrorOccurred(eventData.Exception);
+                context.Span.ErrorOccurred(eventData.Exception, _tracingConfig);
                 _tracingContext.Release(context);
             }
         }
@@ -141,7 +144,7 @@ namespace SkyApm.Diagnostics.SmartSql
             var context = _localSegmentContextAccessor.Context;
             if (context != null)
             {
-                context.Span.ErrorOccurred(eventData.Exception);
+                context.Span.ErrorOccurred(eventData.Exception, _tracingConfig);
                 _tracingContext.Release(context);
             }
         }
@@ -168,7 +171,7 @@ namespace SkyApm.Diagnostics.SmartSql
             var context = _localSegmentContextAccessor.Context;
             if (context != null)
             {
-                context.Span.ErrorOccurred(eventData.Exception);
+                context.Span.ErrorOccurred(eventData.Exception, _tracingConfig);
                 _tracingContext.Release(context);
             }
         }
@@ -196,7 +199,7 @@ namespace SkyApm.Diagnostics.SmartSql
             if (context != null)
             {
                 AddConnectionTag(context, eventData.DbSession.Connection);
-                context.Span.ErrorOccurred(eventData.Exception);
+                context.Span.ErrorOccurred(eventData.Exception, _tracingConfig);
                 _tracingContext.Release(context);
             }
         }
@@ -232,7 +235,7 @@ namespace SkyApm.Diagnostics.SmartSql
             var context = _localSegmentContextAccessor.Context;
             if (context != null)
             {
-                context.Span.ErrorOccurred(eventData.Exception);
+                context.Span.ErrorOccurred(eventData.Exception, _tracingConfig);
                 _tracingContext.Release(context);
             }
         }
@@ -266,7 +269,7 @@ namespace SkyApm.Diagnostics.SmartSql
             if (context != null)
             {
                 AddConnectionTag(context, eventData.ExecutionContext.DbSession.Connection);
-                context.Span.ErrorOccurred(eventData.Exception);
+                context.Span.ErrorOccurred(eventData.Exception, _tracingConfig);
                 _tracingContext.Release(context);
             }
         }

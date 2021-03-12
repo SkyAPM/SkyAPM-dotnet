@@ -22,6 +22,7 @@ using System.Linq;
 using System.Net.Http;
 using Grpc.Core;
 using SkyApm.Common;
+using SkyApm.Config;
 using SkyApm.Diagnostics.HttpClient;
 using SkyApm.Tracing;
 using SkyApm.Tracing.Segments;
@@ -36,12 +37,14 @@ namespace SkyApm.Diagnostics.Grpc.Net.Client
         private readonly ITracingContext _tracingContext;
 
         private readonly IExitSegmentContextAccessor _contextAccessor;
+        private readonly TracingConfig _tracingConfig;
 
         public GrpcClientDiagnosticProcessor(ITracingContext tracingContext,
-            IExitSegmentContextAccessor contextAccessor)
+            IExitSegmentContextAccessor contextAccessor, IConfigAccessor configAccessor)
         {
             _tracingContext = tracingContext;
             _contextAccessor = contextAccessor;
+            _tracingConfig = configAccessor.Get<TracingConfig>();
         }
 
         [DiagnosticName(GrpcDiagnostics.ActivityStartKey)]
@@ -83,7 +86,7 @@ namespace SkyApm.Diagnostics.Grpc.Net.Client
                 if (statusCode != 0)
                 {
                     var err = ((StatusCode)statusCode).ToString();
-                    context.Span.ErrorOccurred(new Exception(err));
+                    context.Span.ErrorOccurred(new Exception(err), _tracingConfig);
                 }
 
                 context.Span.AddTag(Tags.GRPC_STATUS, statusCode);

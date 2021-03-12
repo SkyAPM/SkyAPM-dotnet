@@ -31,11 +31,13 @@ namespace SkyApm.Agent.AspNet
         private readonly InstrumentConfig _config;
         private readonly ITracingContext _tracingContext;
         private readonly IEntrySegmentContextAccessor _contextAccessor;
+        private readonly TracingConfig _tracingConfig;
 
         public InstrumentRequestCallback(IConfigAccessor configAccessor, ITracingContext tracingContext,
             IEntrySegmentContextAccessor contextAccessor)
         {
             _config = configAccessor.Get<InstrumentConfig>();
+            _tracingConfig = configAccessor.Get<TracingConfig>();
             _tracingContext = tracingContext;
             _contextAccessor = contextAccessor;
         }
@@ -88,7 +90,7 @@ namespace SkyApm.Agent.AspNet
             var exception = httpContext.Error;
             if (exception != null)
             {
-                context.Span.ErrorOccurred(exception);
+                context.Span.ErrorOccurred(exception, _tracingConfig);
             }
 
             context.Span.AddLog(LogEvent.Event("AspNet EndRequest"),

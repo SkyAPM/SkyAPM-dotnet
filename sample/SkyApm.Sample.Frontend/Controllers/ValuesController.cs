@@ -95,6 +95,12 @@ namespace SkyApm.Sample.Frontend.Controllers
             return Ok(message);
         }
 
+        [HttpGet("throw")]
+        public async Task<IActionResult> Throw()
+        {
+            throw new NotImplementedException();
+        }
+
 #if NETCOREAPP2_1
 #else
         [HttpGet("greeter/grpc-net")]

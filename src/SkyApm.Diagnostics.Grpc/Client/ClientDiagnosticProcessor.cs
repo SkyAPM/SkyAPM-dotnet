@@ -19,6 +19,7 @@
 using Grpc.Core;
 using Grpc.Core.Interceptors;
 using SkyApm.Common;
+using SkyApm.Config;
 using SkyApm.Tracing;
 using SkyApm.Tracing.Segments;
 using System;
@@ -29,12 +30,14 @@ namespace SkyApm.Diagnostics.Grpc.Client
     {
         private readonly ITracingContext _tracingContext;
         private readonly IExitSegmentContextAccessor _segmentContextAccessor;
+        private readonly TracingConfig _tracingConfig;
 
         public ClientDiagnosticProcessor(IExitSegmentContextAccessor segmentContextAccessor,
-            ITracingContext tracingContext)
+            ITracingContext tracingContext, IConfigAccessor configAccessor)
         {
             _tracingContext = tracingContext;
             _segmentContextAccessor = segmentContextAccessor;
+            _tracingConfig = configAccessor.Get<TracingConfig>();
         }
 
         public Metadata BeginRequest<TRequest, TResponse>(ClientInterceptorContext<TRequest, TResponse> grpcContext)
@@ -82,7 +85,7 @@ namespace SkyApm.Diagnostics.Grpc.Client
             var context = _segmentContextAccessor.Context;
             if (context != null)
             {
-                context.Span?.ErrorOccurred(exception);
+                context.Span?.ErrorOccurred(exception, _tracingConfig);
                 _tracingContext.Release(context);
             }
         }

@@ -23,6 +23,7 @@ using DotNetCore.CAP.Messages;
 using DotNetCore.CAP.Transport;
 using Newtonsoft.Json;
 using SkyApm.Common;
+using SkyApm.Config;
 using SkyApm.Tracing;
 using SkyApm.Tracing.Segments;
 using CapEvents = DotNetCore.CAP.Diagnostics.CapDiagnosticListenerNames;
@@ -45,16 +46,19 @@ namespace SkyApm.Diagnostics.CAP
         private readonly IEntrySegmentContextAccessor _entrySegmentContextAccessor;
         private readonly IExitSegmentContextAccessor _exitSegmentContextAccessor;
         private readonly ILocalSegmentContextAccessor _localSegmentContextAccessor;
+        private readonly TracingConfig _tracingConfig;
 
         public CapTracingDiagnosticProcessor(ITracingContext tracingContext,
             IEntrySegmentContextAccessor entrySegmentContextAccessor,
             IExitSegmentContextAccessor exitSegmentContextAccessor,
-            ILocalSegmentContextAccessor localSegmentContextAccessor)
+            ILocalSegmentContextAccessor localSegmentContextAccessor,
+            IConfigAccessor configAccessor)
         {
             _tracingContext = tracingContext;
             _exitSegmentContextAccessor = exitSegmentContextAccessor;
             _localSegmentContextAccessor = localSegmentContextAccessor;
             _entrySegmentContextAccessor = entrySegmentContextAccessor;
+            _tracingConfig = configAccessor.Get<TracingConfig>();
         }
 
         [DiagnosticName(CapEvents.BeforePublishMessageStore)]
@@ -95,7 +99,7 @@ namespace SkyApm.Diagnostics.CAP
                                                  $"--> Message Info:{Environment.NewLine}" +
                                                  $"{ JsonConvert.SerializeObject(eventData.Message, Formatting.Indented)}"));
 
-            context.Span.ErrorOccurred(eventData.Exception);
+            context.Span.ErrorOccurred(eventData.Exception, _tracingConfig);
             _tracingContext.Release(context);
         }
 
@@ -143,7 +147,7 @@ namespace SkyApm.Diagnostics.CAP
             context.Span.AddLog(LogEvent.Message($"CAP message publishing failed!{Environment.NewLine}" +
                                                  $"--> Spend Time: { eventData.ElapsedTimeMs }ms.  {Environment.NewLine}" +
                                                  $"--> Message Id: { eventData.TransportMessage.GetId() }, Name: {eventData.Operation}"));
-            context.Span.ErrorOccurred(eventData.Exception);
+            context.Span.ErrorOccurred(eventData.Exception, _tracingConfig);
 
             _tracingContext.Release(context);
 
@@ -193,7 +197,7 @@ namespace SkyApm.Diagnostics.CAP
             context.Span.AddLog(LogEvent.Message($"CAP message publishing failed! {Environment.NewLine}" +
                                                  $"--> Spend Time: { eventData.ElapsedTimeMs }ms.  {Environment.NewLine}" +
                                                  $"--> Message Id: { eventData.TransportMessage.GetId() }, Group: {eventData.TransportMessage.GetGroup()}, Name: {eventData.Operation}"));
-            context.Span.ErrorOccurred(eventData.Exception);
+            context.Span.ErrorOccurred(eventData.Exception, _tracingConfig);
 
             _tracingContext.Release(context);
         }
@@ -241,7 +245,7 @@ namespace SkyApm.Diagnostics.CAP
                                                  $"--> Message Info: {Environment.NewLine}" +
                                                  $"{ JsonConvert.SerializeObject(eventData.Message, Formatting.Indented)}"));
 
-            context.Span.ErrorOccurred(eventData.Exception);
+            context.Span.ErrorOccurred(eventData.Exception, _tracingConfig);
 
             _tracingContext.Release(context);
 
