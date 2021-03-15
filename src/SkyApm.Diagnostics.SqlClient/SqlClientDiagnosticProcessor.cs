@@ -20,6 +20,7 @@ using System;
 using System.Data.Common;
 using System.Linq;
 using SkyApm.Tracing;
+using SkyApm.Config;
 
 namespace SkyApm.Diagnostics.SqlClient
 {
@@ -27,13 +28,16 @@ namespace SkyApm.Diagnostics.SqlClient
     {
         private readonly ITracingContext _tracingContext;
         private readonly IExitSegmentContextAccessor _contextAccessor;
+        private readonly TracingConfig _tracingConfig;
 
         public SqlClientTracingDiagnosticProcessor(ITracingContext tracingContext,
-                IExitSegmentContextAccessor contextAccessor)
+            IExitSegmentContextAccessor contextAccessor, IConfigAccessor configAccessor)
         {
             _tracingContext = tracingContext;
             _contextAccessor = contextAccessor;
+            _tracingConfig = configAccessor.Get<TracingConfig>();
         }
+
 
         public string ListenerName { get; } = SqlClientDiagnosticStrings.DiagnosticListenerName;
 
@@ -73,7 +77,7 @@ namespace SkyApm.Diagnostics.SqlClient
             var context = _contextAccessor.Context;
             if (context != null)
             {
-                context.Span.ErrorOccurred(ex);
+                context.Span.ErrorOccurred(ex, _tracingConfig);
                 _tracingContext.Release(context);
             }
         }
