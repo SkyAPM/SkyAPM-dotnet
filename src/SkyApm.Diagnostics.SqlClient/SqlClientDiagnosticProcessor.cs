@@ -17,10 +17,10 @@
  */
 
 using System;
-using System.Data.SqlClient;
+using System.Data.Common;
 using System.Linq;
-using SkyApm.Config;
 using SkyApm.Tracing;
+using SkyApm.Config;
 
 namespace SkyApm.Diagnostics.SqlClient
 {
@@ -37,17 +37,19 @@ namespace SkyApm.Diagnostics.SqlClient
             _contextAccessor = contextAccessor;
             _tracingConfig = configAccessor.Get<TracingConfig>();
         }
-        
+
+
         public string ListenerName { get; } = SqlClientDiagnosticStrings.DiagnosticListenerName;
 
-        private static string ResolveOperationName(SqlCommand sqlCommand)
+        private static string ResolveOperationName(DbCommand sqlCommand)
         {
             var commandType = sqlCommand.CommandText?.Split(' ');
             return $"{SqlClientDiagnosticStrings.SqlClientPrefix}{commandType?.FirstOrDefault()}";
         }
-        
+
+        #region System.Data.SqlClient
         [DiagnosticName(SqlClientDiagnosticStrings.SqlBeforeExecuteCommand)]
-        public void BeforeExecuteCommand([Property(Name = "Command")] SqlCommand sqlCommand)
+        public void BeforeExecuteCommand([Property(Name = "Command")] DbCommand sqlCommand)
         {
             var context = _tracingContext.CreateExitSegmentContext(ResolveOperationName(sqlCommand),
                 sqlCommand.Connection.DataSource);
@@ -55,8 +57,9 @@ namespace SkyApm.Diagnostics.SqlClient
             context.Span.Component = Common.Components.SQLCLIENT;
             context.Span.AddTag(Common.Tags.DB_TYPE, "sql");
             context.Span.AddTag(Common.Tags.DB_INSTANCE, sqlCommand.Connection.Database);
-            context.Span.AddTag(Common.Tags.DB_STATEMENT,  sqlCommand.CommandText);
+            context.Span.AddTag(Common.Tags.DB_STATEMENT, sqlCommand.CommandText);
         }
+
 
         [DiagnosticName(SqlClientDiagnosticStrings.SqlAfterExecuteCommand)]
         public void AfterExecuteCommand()
@@ -65,7 +68,7 @@ namespace SkyApm.Diagnostics.SqlClient
             if (context != null)
             {
                 _tracingContext.Release(context);
-            }   
+            }
         }
 
         [DiagnosticName(SqlClientDiagnosticStrings.SqlErrorExecuteCommand)]
@@ -76,7 +79,29 @@ namespace SkyApm.Diagnostics.SqlClient
             {
                 context.Span.ErrorOccurred(ex, _tracingConfig);
                 _tracingContext.Release(context);
-            }   
+            }
         }
+        #endregion
+
+
+        #region Microsoft.Data.SqlClient
+        [DiagnosticName(SqlClientDiagnosticStrings.DotNetCoreSqlBeforeExecuteCommand)]
+        public void DotNetCoreBeforeExecuteCommand([Property(Name = "Command")] DbCommand sqlCommand)
+        {
+            this.BeforeExecuteCommand(sqlCommand);
+        }
+
+        [DiagnosticName(SqlClientDiagnosticStrings.DotNetCoreSqlAfterExecuteCommand)]
+        public void DotNetCoreAfterExecuteCommand()
+        {
+            this.AfterExecuteCommand();
+        }
+
+        [DiagnosticName(SqlClientDiagnosticStrings.DotNetCoreSqlErrorExecuteCommand)]
+        public void DotNetCoreErrorExecuteCommand([Property(Name = "Exception")] Exception ex)
+        {
+            this.ErrorExecuteCommand(ex);
+        }
+        #endregion
     }
 }
