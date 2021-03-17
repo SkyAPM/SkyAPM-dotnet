@@ -32,7 +32,9 @@
     "Component": {
       "AspNetCore": {
         "CollectCookies": [ "c-b" ],
-        "CollectHeaders": ["User-Agent"]
+        "CollectHeaders": [ "User-Agent" ],
+        "CollectBodyContentTypes": [ "application/json", "application/x-www-form-urlencoded" ],
+        "CollectBodyLengthThreshold": 4096
       },
       "HttpClient": {
         "StopHeaderPropagationPaths": [ "**/localhost:5002/api/values/stoppropagation" ]

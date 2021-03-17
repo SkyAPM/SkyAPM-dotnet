@@ -31,6 +31,8 @@ namespace SkyApm.Common
 
         public static readonly string HTTP_HEADERS = "http.headers";
 
+        public static readonly string HTTP_BODY = "http.body";
+
         public static readonly string STATUS_CODE = "status_code";
 
         public static readonly string DB_TYPE = "db.type";

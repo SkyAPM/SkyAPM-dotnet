@@ -18,14 +18,21 @@
 
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
+#if NETSTANDARD2_0
+using Microsoft.AspNetCore.Http.Internal;
+#endif
 using Microsoft.Extensions.Primitives;
 using SkyApm.AspNetCore.Diagnostics;
 using SkyApm.Common;
 using SkyApm.Config;
 using SkyApm.Diagnostics.AspNetCore.Config;
+using SkyApm.Diagnostics.AspNetCore.Extensions;
 using SkyApm.Tracing;
 using SkyApm.Tracing.Segments;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Net.Mime;
 using System.Text;
 
 namespace SkyApm.Diagnostics.AspNetCore.Handlers
@@ -67,6 +74,13 @@ namespace SkyApm.Diagnostics.AspNetCore.Handlers
                 var headers = CollectHeaders(httpContext, _config.CollectHeaders);
                 if (!string.IsNullOrEmpty(headers))
                     context.Span.AddTag(Tags.HTTP_HEADERS, headers);
+            }
+
+            if(_config.CollectBodyContentTypes?.Count > 0)
+            {
+                var body = CollectBody(httpContext, _config.CollectBodyLengthThreshold);
+                if (!string.IsNullOrEmpty(body))
+                    context.Span.AddTag(Tags.HTTP_BODY, body);
             }
         }
 
@@ -115,6 +129,42 @@ namespace SkyApm.Diagnostics.AspNetCore.Handlers
                 sb.Append(value);
             }
             return sb.ToString();
+        }
+
+        private string CollectBody(HttpContext httpContext, int lengthThreshold)
+        {
+            var request = httpContext.Request;
+
+            if (string.IsNullOrEmpty(httpContext.Request.ContentType)
+                || httpContext.Request.ContentLength == null
+                || request.ContentLength > lengthThreshold)
+            {
+                return null;
+            }
+
+            var contentType = new ContentType(request.ContentType);
+            if (!_config.CollectBodyContentTypes.Any(supportedType => contentType.MediaType == supportedType))
+                return null;
+
+#if NETSTANDARD2_0
+            httpContext.Request.EnableRewind();
+#else
+            httpContext.Request.EnableBuffering();
+#endif
+            request.Body.Position = 0;
+            try
+            {
+                var encoding = contentType.CharSet.ToEncoding(Encoding.UTF8);
+                using (var reader = new StreamReader(request.Body, encoding, true, lengthThreshold, true))
+                {
+                    var body = reader.ReadToEndAsync().Result;
+                    return body;
+                }
+            }
+            finally
+            {
+                request.Body.Position = 0;
+            }
         }
     }
 }

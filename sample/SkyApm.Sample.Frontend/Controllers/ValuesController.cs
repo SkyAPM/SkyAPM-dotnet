@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using GrpcGreeter;
 using Microsoft.AspNetCore.Mvc;
 using SkyApm.Sample.Backend.Services;
+using SkyApm.Sample.Frontend.Models;
 
 #if NETCOREAPP2_1
 #else
@@ -99,6 +100,18 @@ namespace SkyApm.Sample.Frontend.Controllers
         public async Task<IActionResult> Throw()
         {
             throw new NotImplementedException();
+        }
+
+        [HttpPost("logbody")]
+        public async Task<IActionResult> LogBody([FromBody] Person person)
+        {
+            return Json(person);
+        }
+
+        [HttpPost("logformbody")]
+        public async Task<IActionResult> LogFormBody([FromForm] Person person)
+        {
+            return Json(person);
         }
 
 #if NETCOREAPP2_1
