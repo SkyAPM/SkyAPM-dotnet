@@ -24,28 +24,35 @@ using SkyApm.Tracing;
 
 namespace SkyApm.AspNetCore.Diagnostics
 {
-    public class HttpRequestCarrierHeaderCollection : ICarrierHeaderCollection
+    public class HttpRequestCarrierHeaderCollection : ICarrierHeaderDictionary
     {
-        private readonly IEnumerable<KeyValuePair<string, string>> _headers;
+        private readonly IHeaderDictionary _headers;
 
         public HttpRequestCarrierHeaderCollection(HttpRequest httpRequest)
         {
-            _headers = httpRequest.Headers.Select(x => new KeyValuePair<string, string>(x.Key, x.Value)).ToArray();
+            _headers = httpRequest.Headers;
         }
 
         public IEnumerator<KeyValuePair<string, string>> GetEnumerator()
         {
-            return _headers.GetEnumerator();
+            return _headers.Select(x => new KeyValuePair<string, string>(x.Key, x.Value)).GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return _headers.GetEnumerator();
+            return GetEnumerator();
         }
         
         public void Add(string key, string value)
         {
             throw new System.NotImplementedException();
+        }
+
+        public string Get(string key)
+        {
+            if (_headers.TryGetValue(key, out var value))
+                return value;
+            return null;
         }
     }
 }

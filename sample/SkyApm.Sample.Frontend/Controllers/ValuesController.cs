@@ -57,7 +57,7 @@ namespace SkyApm.Sample.Frontend.Controllers
             response = await new HttpClient().GetStringAsync($"http://localhost:5002/api/grpc/greeter?name={name}");
             content.AppendLine(response);
 
-            return Ok(content);
+            return Ok(content.ToString());
         }
 
         [HttpGet("greeter/exception")]
