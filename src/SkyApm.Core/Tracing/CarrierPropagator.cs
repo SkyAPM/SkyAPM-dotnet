@@ -68,22 +68,28 @@ namespace SkyApm.Tracing
                 {
                     continue;
                 }
-                
-                foreach (var header in headerCollection)
-                {
-                    if (formatter.Key == header.Key)
-                    {
-                        carrier = formatter.Decode(header.Value);
-                        if (carrier.HasValue)
-                        {
-                            if (formatter.Key.EndsWith("sw3") && carrier is Carrier c)
-                            {
-                                c.Sampled = true;
-                            }
 
-                            return carrier;
-                        }
+                string headerValue = null;
+                if(headerCollection is ICarrierHeaderDictionary headerDictionary)
+                {
+                    headerValue = headerDictionary.Get(formatter.Key);
+                }
+                else
+                {
+                    headerValue = headerCollection.FirstOrDefault(header => header.Key == formatter.Key).Value;
+                }
+                if (headerValue == null)
+                    continue;
+
+                carrier = formatter.Decode(headerValue);
+                if (carrier.HasValue)
+                {
+                    if (formatter.Key.EndsWith("sw3") && carrier is Carrier c)
+                    {
+                        c.Sampled = true;
                     }
+
+                    return carrier;
                 }
             }
 

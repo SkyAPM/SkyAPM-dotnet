@@ -24,7 +24,7 @@ using SkyApm.Tracing;
 
 namespace SkyApm.Diagnostics.HttpClient
 {
-    public class GrpcNetClientICarrierHeaderCollection : ICarrierHeaderCollection
+    public class GrpcNetClientICarrierHeaderCollection : ICarrierHeaderDictionary
     {
         private readonly HttpRequestMessage _request;
 
@@ -36,6 +36,13 @@ namespace SkyApm.Diagnostics.HttpClient
         public void Add(string key, string value)
         {
             _request.Headers.Add(key, value);
+        }
+
+        public string Get(string key)
+        {
+            if (_request.Headers.TryGetValues(key, out var values))
+                return values.FirstOrDefault();
+            return null;
         }
 
         public IEnumerator<KeyValuePair<string, string>> GetEnumerator()

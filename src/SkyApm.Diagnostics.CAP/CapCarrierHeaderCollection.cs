@@ -23,7 +23,7 @@ using SkyApm.Tracing;
 
 namespace SkyApm.Diagnostics.CAP
 {
-    public class CapCarrierHeaderCollection : ICarrierHeaderCollection
+    public class CapCarrierHeaderCollection : ICarrierHeaderDictionary
     {
         private readonly IDictionary<string,string> _messageHeaders;
 
@@ -50,6 +50,13 @@ namespace SkyApm.Diagnostics.CAP
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
+        }
+
+        public string Get(string key)
+        {
+            if (_messageHeaders.TryGetValue(key, out var value))
+                return value;
+            return null;
         }
     }
 }

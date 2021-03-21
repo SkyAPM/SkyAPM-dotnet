@@ -23,7 +23,7 @@ using SkyApm.Tracing;
 
 namespace SkyApm.Agent.AspNet
 {
-    internal class HttpRequestCarrierHeaderCollection : ICarrierHeaderCollection
+    internal class HttpRequestCarrierHeaderCollection : ICarrierHeaderDictionary
     {
         private readonly Dictionary<string, string> _headers;
 
@@ -49,6 +49,13 @@ namespace SkyApm.Agent.AspNet
         public void Add(string key, string value)
         {
             throw new System.NotImplementedException();
+        }
+
+        public string Get(string key)
+        {
+            if (_headers.TryGetValue(key, out var value))
+                return value;
+            return null;
         }
     }
 }
