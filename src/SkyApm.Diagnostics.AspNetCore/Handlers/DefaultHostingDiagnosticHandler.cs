@@ -80,7 +80,7 @@ namespace SkyApm.Diagnostics.AspNetCore.Handlers
             {
                 var body = CollectBody(httpContext, _config.CollectBodyLengthThreshold);
                 if (!string.IsNullOrEmpty(body))
-                    context.Span.AddTag(Tags.HTTP_BODY, body);
+                    context.Span.AddTag(Tags.HTTP_REQUEST_BODY, body);
             }
         }
 
@@ -155,7 +155,7 @@ namespace SkyApm.Diagnostics.AspNetCore.Handlers
             try
             {
                 var encoding = contentType.CharSet.ToEncoding(Encoding.UTF8);
-                using (var reader = new StreamReader(request.Body, encoding, true, lengthThreshold, true))
+                using (var reader = new StreamReader(request.Body, encoding, true, 1024, true))
                 {
                     var body = reader.ReadToEndAsync().Result;
                     return body;

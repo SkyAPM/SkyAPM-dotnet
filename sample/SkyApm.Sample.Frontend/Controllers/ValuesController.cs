@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Net.Http.Json;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -32,6 +33,13 @@ namespace SkyApm.Sample.Frontend.Controllers
         {
             await new HttpClient().GetAsync("http://localhost:5002/api/values");
             return new string[] { "value1", "value2" };
+        }
+
+        [HttpGet("postin")]
+        public async Task<string> PostIn()
+        {
+            var result = await new HttpClient().PostAsync("http://localhost:5002/api/values/postin", JsonContent.Create(new { Name = "SkyApm" }));
+            return await result.Content.ReadAsStringAsync();
         }
 
         [HttpGet("{id}")]

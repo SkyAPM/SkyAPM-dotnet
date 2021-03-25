@@ -35,5 +35,11 @@ namespace SkyApm.Sample.Backend.Controllers
         {
             return "stop propagation";
         }
+
+        [HttpPost("postin")]
+        public string PostIn([FromBody]PostModel model)
+        {
+            return model.Name;
+        }
     } 
 }
