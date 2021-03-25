@@ -37,7 +37,11 @@
         "CollectBodyLengthThreshold": 4096
       },
       "HttpClient": {
-        "StopHeaderPropagationPaths": [ "**/localhost:5002/api/values/stoppropagation" ]
+        "StopHeaderPropagationPaths": [ "**/localhost:5002/api/values/stoppropagation" ],
+        "CollectRequestHeaders": [ "User-Agent","sw8" ],
+        "CollectRequestBodyContentTypes": [ "application/json", "application/x-www-form-urlencoded" ],
+        "CollectResponseBodyContentTypes": [ "application/json", "application/x-www-form-urlencoded", "text/plain" ],
+        "CollectBodyLengthThreshold": 4096
       }
     }
   }

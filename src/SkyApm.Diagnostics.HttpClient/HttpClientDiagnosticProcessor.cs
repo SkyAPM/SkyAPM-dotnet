@@ -22,6 +22,8 @@ using System.Linq;
 using System.Net.Http;
 using SkyApm.Common;
 using SkyApm.Config;
+using SkyApm.Diagnostics.HttpClient.Config;
+using SkyApm.Diagnostics.HttpClient.Extensions;
 using SkyApm.Diagnostics.HttpClient.Filters;
 using SkyApm.Tracing;
 
@@ -40,6 +42,8 @@ namespace SkyApm.Diagnostics.HttpClient
 
         private readonly TracingConfig _tracingConfig;
 
+        private readonly HttpClientDiagnosticConfig _httpClientDiagnosticConfig;
+
         public HttpClientTracingDiagnosticProcessor(ITracingContext tracingContext,
             IExitSegmentContextAccessor contextAccessor,
             IEnumerable<IRequestDiagnosticHandler> requestDiagnosticHandlers,
@@ -49,6 +53,7 @@ namespace SkyApm.Diagnostics.HttpClient
             _contextAccessor = contextAccessor;
             _requestDiagnosticHandlers = requestDiagnosticHandlers.Reverse();
             _tracingConfig = configAccessor.Get<TracingConfig>();
+            _httpClientDiagnosticConfig = configAccessor.Get<HttpClientDiagnosticConfig>();
         }
 
         [DiagnosticName("System.Net.Http.Request")]
@@ -82,6 +87,15 @@ namespace SkyApm.Diagnostics.HttpClient
                 }
 
                 context.Span.AddTag(Tags.STATUS_CODE, statusCode);
+
+                if(response.Content != null && _httpClientDiagnosticConfig.CollectResponseBodyContentTypes?.Count > 0)
+                {
+                    var responseBody = response.Content.TryCollectAsString(
+                        _httpClientDiagnosticConfig.CollectResponseBodyContentTypes,
+                        _httpClientDiagnosticConfig.CollectBodyLengthThreshold);
+                    if (!string.IsNullOrEmpty(responseBody))
+                        context.Span.AddTag(Tags.HTTP_RESPONSE_BODY, responseBody);
+                }
             }
 
             _tracingContext.Release(context);
