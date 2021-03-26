@@ -32,7 +32,7 @@ namespace SkyApm.Diagnostics.HttpClient.Config
         /// <summary>
         /// Request/Response body will skip collecting if the content length is larger than this value.
         /// </summary>
-        public int CollectBodyLengthThreshold { get; set; }
+        public int CollectBodyLengthThreshold { get; set; } = 2048;
 
     }
 }
