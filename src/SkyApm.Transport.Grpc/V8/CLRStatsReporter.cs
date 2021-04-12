@@ -75,8 +75,8 @@ namespace SkyApm.Transport.Grpc.V8
                     },
                     Thread = new ClrThread
                     {
-                        AvailableWorkerThreads = statsRequest.Thread.MaxWorkerThreads,
-                        AvailableCompletionPortThreads = statsRequest.Thread.MaxCompletionPortThreads,
+                        AvailableWorkerThreads = statsRequest.Thread.AvailableWorkerThreads,
+                        AvailableCompletionPortThreads = statsRequest.Thread.AvailableCompletionPortThreads,
                         MaxWorkerThreads = statsRequest.Thread.MaxWorkerThreads,
                         MaxCompletionPortThreads = statsRequest.Thread.MaxCompletionPortThreads
                     },
