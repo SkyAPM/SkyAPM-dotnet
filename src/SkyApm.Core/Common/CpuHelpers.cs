@@ -40,7 +40,7 @@ namespace SkyApm.Common
                 {
                     var prevCpuTime = _prevCpuTime;
                     var currentCpuTime = process.TotalProcessorTime;
-                    var usagePercent = (currentCpuTime.TotalMilliseconds - prevCpuTime) / interval;
+                    var usagePercent = (currentCpuTime.TotalMilliseconds - prevCpuTime) * 100 / interval;
                     Interlocked.Exchange(ref _prevCpuTime, currentCpuTime.TotalMilliseconds);
                     Interlocked.Exchange(ref _usagePercent, usagePercent);
                     await Task.Delay(interval);
