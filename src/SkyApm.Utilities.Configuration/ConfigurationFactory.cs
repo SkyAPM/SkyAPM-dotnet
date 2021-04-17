@@ -67,6 +67,11 @@ namespace SkyApm.Utilities.Configuration
 
             builder.AddEnvironmentVariables();
 
+            if (_configuration != null)
+            {
+                builder.AddConfiguration(_configuration);
+            }
+
             foreach (var additionalConfiguration in _additionalConfigurations)
             {
                 additionalConfiguration.Load(builder);
