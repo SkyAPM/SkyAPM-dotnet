@@ -2,6 +2,7 @@
 using System.Web.Mvc;
 using System.Web.Routing;
 using System.Web.Http;
+using SkyApm.Agent.AspNet;
 
 namespace SkyApm.Sample.AspNet
 {
@@ -12,6 +13,11 @@ namespace SkyApm.Sample.AspNet
             AreaRegistration.RegisterAllAreas();
             GlobalConfiguration.Configure(WebApiConfig.Register);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
+
+            InstrumentModuleFactory.ConfigServices(services => 
+            { 
+                //register your components here
+            });
         }
     }
 }

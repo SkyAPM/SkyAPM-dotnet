@@ -19,6 +19,8 @@
 using Microsoft.Web.Infrastructure.DynamicModuleHelper;
 using System.Web;
 using SkyApm.Agent.AspNet;
+using System;
+using Microsoft.Extensions.DependencyInjection;
 
 [assembly:PreApplicationStartMethod(typeof(InstrumentModuleFactory), nameof(InstrumentModuleFactory.Create))]
 
@@ -26,9 +28,20 @@ namespace SkyApm.Agent.AspNet
 {
     public class InstrumentModuleFactory
     {
+        internal static Action<IServiceCollection> ServicesBuilder { get; private set; }
+
         public static void Create()
         {
             DynamicModuleUtility.RegisterModule(typeof(InstrumentModule));
+        }
+
+        /// <summary>
+        /// Entrance to register or override services
+        /// </summary>
+        /// <param name="servicesBuilder"></param>
+        public static void ConfigServices(Action<IServiceCollection> servicesBuilder)
+        {
+            ServicesBuilder = servicesBuilder;
         }
     }
 }
