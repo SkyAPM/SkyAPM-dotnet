@@ -48,7 +48,16 @@ namespace SkyApm.Diagnostics.HttpClient.Handlers
         public void Handle(ITracingContext tracingContext, HttpRequestMessage request)
         {
             var operationName = request.RequestUri.GetLeftPart(UriPartial.Path);
-            var shouldStopPropagation = _httpClientDiagnosticConfig.StopHeaderPropagationPaths != null 
+
+            var ignored = _httpClientDiagnosticConfig.IgnorePaths != null
+                && _httpClientDiagnosticConfig.IgnorePaths
+                    .Any(pattern => FastPathMatcher.Match(pattern, operationName));
+            if (ignored)
+            {
+                return;
+            }
+
+            var shouldStopPropagation = _httpClientDiagnosticConfig.StopHeaderPropagationPaths != null
                 && _httpClientDiagnosticConfig.StopHeaderPropagationPaths
                     .Any(pattern => FastPathMatcher.Match(pattern, operationName));
 

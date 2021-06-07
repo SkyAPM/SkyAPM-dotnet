@@ -9,6 +9,12 @@ namespace SkyApm.Diagnostics.HttpClient.Config
     public class HttpClientDiagnosticConfig
     {
         /// <summary>
+        /// Paths to ignore, support wildchar match.
+        /// Usage: a/b/c => a/b/c, a/* => a/b, a/** => a/b/c/d, a/?/c => a/b/c
+        /// </summary>
+        public List<string> IgnorePaths { get; set; }
+
+        /// <summary>
         /// Stop header propagation on specific paths, path support wildchar match.
         /// Usage: a/b/c => a/b/c, a/* => a/b, a/** => a/b/c/d, a/?/c => a/b/c
         /// </summary>
