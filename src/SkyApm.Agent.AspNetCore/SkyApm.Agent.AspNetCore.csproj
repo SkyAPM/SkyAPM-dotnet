@@ -1,21 +1,24 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-    <Import Project="..\..\build\common.props" />
-    <PropertyGroup>
-        <Description>$(Product) ASP.NET Core Agent.</Description>
-        <AssemblyTitle>$(PackagePrefix).Agent.AspNetCore</AssemblyTitle>
-        <AssemblyName>$(PackagePrefix).Agent.AspNetCore</AssemblyName>
-        <PackageId>$(PackagePrefix).Agent.AspNetCore</PackageId>
-        <PackageTags>SkyWalking;APM</PackageTags>
-        <PackageReleaseNotes>
-        </PackageReleaseNotes>
-        <RootNamespace>SkyApm.Agent.AspNetCore</RootNamespace>
-        <TargetFrameworks>netstandard2.0;netcoreapp3.1</TargetFrameworks>
-    </PropertyGroup>
-    <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
-        <PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" Version="2.1.0" PrivateAssets="All" />
-    </ItemGroup>
-    <ItemGroup>
-        <ProjectReference Include="..\SkyApm.Agent.Hosting\SkyApm.Agent.Hosting.csproj" />
-        <ProjectReference Include="..\SkyApm.Diagnostics.AspNetCore\SkyApm.Diagnostics.AspNetCore.csproj" />
-    </ItemGroup>
+  <Import Project="..\..\build\common.props" />
+  <PropertyGroup>
+    <Description>$(Product) ASP.NET Core Agent.</Description>
+    <AssemblyTitle>$(PackagePrefix).Agent.AspNetCore</AssemblyTitle>
+    <AssemblyName>$(PackagePrefix).Agent.AspNetCore</AssemblyName>
+    <PackageId>$(PackagePrefix).Agent.AspNetCore</PackageId>
+    <PackageTags>SkyWalking;APM</PackageTags>
+    <PackageReleaseNotes>
+    </PackageReleaseNotes>
+    <RootNamespace>SkyApm.Agent.AspNetCore</RootNamespace>
+    <TargetFrameworks>netstandard2.0;netcoreapp3.1</TargetFrameworks>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+    <PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" Version="2.1.0" PrivateAssets="All" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp3.1'">
+    <PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" Version="3.1.0" PrivateAssets="All" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SkyApm.Agent.Hosting\SkyApm.Agent.Hosting.csproj" />
+    <ProjectReference Include="..\SkyApm.Diagnostics.AspNetCore\SkyApm.Diagnostics.AspNetCore.csproj" />
+  </ItemGroup>
 </Project>

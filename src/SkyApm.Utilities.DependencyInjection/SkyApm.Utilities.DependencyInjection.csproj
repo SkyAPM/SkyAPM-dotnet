@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Description>Microsoft.Utilities.DependencyInjection (IServiceCollection) support for $(Product).</Description>
     <AssemblyTitle>$(PackagePrefix).Utilities.DependencyInjection</AssemblyTitle>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFrameworks>netstandard2.0;netcoreapp3.1</TargetFrameworks>
     <AssemblyName>$(PackagePrefix).Utilities.DependencyInjection</AssemblyName>
     <PackageId>$(PackagePrefix).Utilities.DependencyInjection</PackageId>
     <PackageTags>SkyWalking;APM;Diagnostics</PackageTags>
@@ -14,7 +14,10 @@
   <ItemGroup>
     <ProjectReference Include="..\SkyApm.Core\SkyApm.Core.csproj" />
   </ItemGroup>
-  <ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp3.1'">
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="3.1.0" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="2.1.0" />
   </ItemGroup>
 </Project>

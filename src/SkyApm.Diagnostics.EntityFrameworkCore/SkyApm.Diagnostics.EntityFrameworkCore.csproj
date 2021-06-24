@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\..\build\common.props" />
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFrameworks>netstandard2.0;netcoreapp3.1</TargetFrameworks>
   </PropertyGroup>
   <PropertyGroup>
     <AssemblyName>$(PackagePrefix).Diagnostics.EntityFrameworkCore</AssemblyName>
@@ -11,10 +11,17 @@
     <Description>SkyApm.Diagnostics.EntityFrameworkCore notifies of EF requests.</Description>
     <RootNamespace>SkyApm.Diagnostics.EntityFrameworkCore</RootNamespace>
   </PropertyGroup>
-  <ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp3.1'">
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.0" PrivateAssets="All" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="3.1.0" PrivateAssets="All" />
   </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.1.0" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="2.1.0" PrivateAssets="All" />
+  </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\SkyApm.Abstractions\SkyApm.Abstractions.csproj" />
     <ProjectReference Include="..\SkyApm.Core\SkyApm.Core.csproj" />
