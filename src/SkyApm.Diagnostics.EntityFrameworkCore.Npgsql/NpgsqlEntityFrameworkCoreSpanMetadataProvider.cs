@@ -17,12 +17,13 @@
  */
 
 using System.Data.Common;
+using SkyApm.Common;
 
 namespace SkyApm.Diagnostics.EntityFrameworkCore
 {
     public class NpgsqlEntityFrameworkCoreSpanMetadataProvider : IEntityFrameworkCoreSpanMetadataProvider
     {
-        public string Component { get; } = Common.Components.NPGSQL_ENTITYFRAMEWORKCORE_POSTGRESQL.GetStringValue();
+        public StringOrIntValue Component { get; } = Components.NPGSQL_ENTITYFRAMEWORKCORE_POSTGRESQL;
 
         public bool Match(DbConnection connection)
         {

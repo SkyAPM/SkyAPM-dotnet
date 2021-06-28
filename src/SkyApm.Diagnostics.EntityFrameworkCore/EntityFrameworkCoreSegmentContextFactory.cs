@@ -70,14 +70,14 @@ namespace SkyApm.Diagnostics.EntityFrameworkCore
         {
             var context = _tracingContext.CreateExitSegmentContext(operationName,
                 metadataProvider.GetPeer(dbCommand.Connection));
-            context.Span.Component = new StringOrIntValue(metadataProvider.Component);
+            context.Span.Component = metadataProvider.Component;
             return context;
         }
 
         private SegmentContext CreateLocalSegment(string operationName, DbCommand dbCommand)
         {
             var context = _tracingContext.CreateLocalSegmentContext(operationName);
-            context.Span.Component = Common.Components.ENTITYFRAMEWORKCORE;
+            context.Span.Component = Components.ENTITYFRAMEWORKCORE;
             return context;
         }
     }

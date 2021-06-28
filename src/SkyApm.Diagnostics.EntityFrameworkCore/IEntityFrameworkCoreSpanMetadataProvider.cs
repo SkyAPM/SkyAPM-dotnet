@@ -22,7 +22,7 @@ namespace SkyApm.Diagnostics.EntityFrameworkCore
 {
     public interface IEntityFrameworkCoreSpanMetadataProvider
     {
-        string Component { get; }
+        Common.StringOrIntValue Component { get; }
 
         bool Match(DbConnection connection);
 

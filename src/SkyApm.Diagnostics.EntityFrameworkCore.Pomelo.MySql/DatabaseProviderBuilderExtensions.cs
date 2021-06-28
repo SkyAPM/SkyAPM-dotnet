@@ -24,6 +24,7 @@ namespace SkyApm.Diagnostics.EntityFrameworkCore
     {
         public static DatabaseProviderBuilder AddPomeloMysql(this DatabaseProviderBuilder builder)
         {
+            builder.Services.AddSingleton<IEntityFrameworkCoreSpanMetadataProvider, MySqlConnectorSpanMetadataProvider>();
             builder.Services.AddSingleton<IEntityFrameworkCoreSpanMetadataProvider, MySqlEntityFrameworkCoreSpanMetadataProvider>();
             return builder;
         }

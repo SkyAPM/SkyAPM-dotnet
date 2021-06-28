@@ -17,12 +17,13 @@
  */
 
 using System.Data.Common;
+using SkyApm.Common;
 
 namespace SkyApm.Diagnostics.EntityFrameworkCore
 {
     public class SqliteEntityFrameworkCoreSpanMetadataProvider : IEntityFrameworkCoreSpanMetadataProvider
     {
-        public string Component { get; } = Common.Components.ENTITYFRAMEWORKCORE_SQLITE.GetStringValue();
+        public StringOrIntValue Component { get; } = Components.ENTITYFRAMEWORKCORE_SQLITE;
 
         public bool Match(DbConnection connection)
         {
