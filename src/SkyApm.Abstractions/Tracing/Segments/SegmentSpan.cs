@@ -30,7 +30,7 @@ namespace SkyApm.Tracing.Segments
 
         public int ParentSpanId { get; } = -1;
 
-        public long StartTime { get; } = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+        public long StartTime { get; }
 
         public long EndTime { get; private set; }
 
@@ -49,10 +49,11 @@ namespace SkyApm.Tracing.Segments
 
         public LogCollection Logs { get; } = new LogCollection();
 
-        public SegmentSpan(string operationName, SpanType spanType)
+        public SegmentSpan(string operationName, SpanType spanType, long startTimeMilliseconds = default)
         {
             OperationName = new StringOrIntValue(operationName);
             SpanType = spanType;
+            StartTime = startTimeMilliseconds == default ? DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() : startTimeMilliseconds;
         }
 
         public SegmentSpan AddTag(string key, string value)
@@ -79,9 +80,9 @@ namespace SkyApm.Tracing.Segments
             Logs.AddLog(log);
         }
 
-        public void Finish()
+        public void Finish(long endTimeMilliseconds = default)
         {
-            EndTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+            EndTime = endTimeMilliseconds == default ? DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() : endTimeMilliseconds;
         }
     }
 

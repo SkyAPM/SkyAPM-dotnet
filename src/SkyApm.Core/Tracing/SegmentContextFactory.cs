@@ -51,7 +51,7 @@ namespace SkyApm.Tracing
             _instrumentConfig = configAccessor.Get<InstrumentConfig>();
         }
 
-        public SegmentContext CreateEntrySegment(string operationName, ICarrier carrier)
+        public SegmentContext CreateEntrySegment(string operationName, ICarrier carrier, long startTimeMilliseconds = default)
         {
             var traceId = GetTraceId(carrier);
             var segmentId = GetSegmentId();
@@ -59,7 +59,7 @@ namespace SkyApm.Tracing
             var segmentContext = new SegmentContext(traceId, segmentId, sampled,
                 _instrumentConfig.ServiceName ?? _instrumentConfig.ApplicationCode,
                 _instrumentConfig.ServiceInstanceName,
-                operationName, SpanType.Entry);
+                operationName, SpanType.Entry, startTimeMilliseconds);
 
             if (carrier.HasValue)
             {
@@ -83,7 +83,7 @@ namespace SkyApm.Tracing
             return segmentContext;
         }
 
-        public SegmentContext CreateLocalSegment(string operationName)
+        public SegmentContext CreateLocalSegment(string operationName, long startTimeMilliseconds = default)
         {
             var parentSegmentContext = GetParentSegmentContext(SpanType.Local);
             var traceId = GetTraceId(parentSegmentContext);
@@ -92,7 +92,7 @@ namespace SkyApm.Tracing
             var segmentContext = new SegmentContext(traceId, segmentId, sampled,
                 _instrumentConfig.ServiceName ?? _instrumentConfig.ApplicationCode,
                 _instrumentConfig.ServiceInstanceName,
-                operationName, SpanType.Local);
+                operationName, SpanType.Local, startTimeMilliseconds);
 
             if (parentSegmentContext != null)
             {
@@ -118,7 +118,7 @@ namespace SkyApm.Tracing
             return segmentContext;
         }
 
-        public SegmentContext CreateExitSegment(string operationName, StringOrIntValue networkAddress)
+        public SegmentContext CreateExitSegment(string operationName, StringOrIntValue networkAddress, long startTimeMilliseconds = default)
         {
             var parentSegmentContext = GetParentSegmentContext(SpanType.Exit);
             var traceId = GetTraceId(parentSegmentContext);
@@ -127,7 +127,7 @@ namespace SkyApm.Tracing
             var segmentContext = new SegmentContext(traceId, segmentId, sampled,
                 _instrumentConfig.ServiceName ?? _instrumentConfig.ApplicationCode,
                 _instrumentConfig.ServiceInstanceName,
-                operationName, SpanType.Exit);
+                operationName, SpanType.Exit, startTimeMilliseconds);
 
             if (parentSegmentContext != null)
             {
@@ -154,13 +154,13 @@ namespace SkyApm.Tracing
             return segmentContext;
         }
 
-        public void Release(SegmentContext segmentContext)
+        public void Release(SegmentContext segmentContext, long endTimeMilliseconds = default)
         {
-            segmentContext.Span.Finish();
+            segmentContext.Span.Finish(endTimeMilliseconds);
             switch (segmentContext.Span.SpanType)
             {
                 case SpanType.Entry:
-                     _entrySegmentContextAccessor.Context = null;
+                    _entrySegmentContextAccessor.Context = null;
                     break;
                 case SpanType.Local:
                     _localSegmentContextAccessor.Context = null;

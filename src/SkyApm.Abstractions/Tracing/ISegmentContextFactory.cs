@@ -23,12 +23,12 @@ namespace SkyApm.Tracing
 {
     public interface ISegmentContextFactory
     {
-        SegmentContext CreateEntrySegment(string operationName, ICarrier carrier);
+        SegmentContext CreateEntrySegment(string operationName, ICarrier carrier, long startTimeMilliseconds = default);
 
-        SegmentContext CreateLocalSegment(string operationName);
+        SegmentContext CreateLocalSegment(string operationName, long startTimeMilliseconds = default);
 
-        SegmentContext CreateExitSegment(string operationName, StringOrIntValue networkAddress);
-        
-        void Release(SegmentContext segmentContext);
+        SegmentContext CreateExitSegment(string operationName, StringOrIntValue networkAddress, long startTimeMilliseconds = default);
+
+        void Release(SegmentContext segmentContext, long endTimeMilliseconds = default);
     }
 }
