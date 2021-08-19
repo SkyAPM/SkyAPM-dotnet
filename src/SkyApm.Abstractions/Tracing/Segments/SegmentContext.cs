@@ -39,14 +39,14 @@ namespace SkyApm.Tracing.Segments
         public SegmentReferenceCollection References { get; } = new SegmentReferenceCollection();
 
         public SegmentContext(string traceId, string segmentId, bool sampled, string serviceId, string serviceInstanceId,
-            string operationName, SpanType spanType)
+            string operationName, SpanType spanType, long startTimeMilliseconds = default)
         {
             TraceId = traceId;
             Sampled = sampled;
             SegmentId = segmentId;
             ServiceId = serviceId;
             ServiceInstanceId = serviceInstanceId;
-            Span = new SegmentSpan(operationName, spanType);
+            Span = new SegmentSpan(operationName, spanType, startTimeMilliseconds);
         }
     }
 }
