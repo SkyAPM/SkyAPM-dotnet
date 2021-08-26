@@ -32,6 +32,7 @@ namespace SkyApm.Diagnostics.EntityFrameworkCore
         private Func<CommandEventData, string> _operationNameResolver;
         private readonly IEntityFrameworkCoreSegmentContextFactory _contextFactory;
         private readonly TracingConfig _tracingConfig;
+        private readonly bool _logParameterValue;
 
         public string ListenerName => DbLoggerCategory.Name;
 
@@ -58,6 +59,7 @@ namespace SkyApm.Diagnostics.EntityFrameworkCore
         {
             _contextFactory = contextFactory;
             _tracingConfig = configAccessor.Get<TracingConfig>();
+            _logParameterValue = configAccessor.Get<SamplingConfig>().LogSqlParameterValue;
         }
 
         [DiagnosticName("Microsoft.EntityFrameworkCore.Database.Command.CommandExecuting")]
@@ -110,7 +112,7 @@ namespace SkyApm.Diagnostics.EntityFrameworkCore
                 return string.Empty;
             }
 
-            return dbParameters.FormatParameters(false);
+            return dbParameters.FormatParameters(_logParameterValue);
         }
     }
 }

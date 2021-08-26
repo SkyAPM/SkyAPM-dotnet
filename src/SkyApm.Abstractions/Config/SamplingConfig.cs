@@ -32,5 +32,11 @@ namespace SkyApm.Config
         /// Usage: a/b/c => a/b/c, a/* => a/b, a/** => a/b/c/d, a/?/c => a/b/c
         /// </summary>
         public List<string> IgnorePaths { get; set; }
+
+        /// <summary>
+        /// whether or not  to record the value of sql parameter.
+        /// true:record parameter value 
+        /// </summary>
+        public bool LogSqlParameterValue { get; set; }
     }
 }
