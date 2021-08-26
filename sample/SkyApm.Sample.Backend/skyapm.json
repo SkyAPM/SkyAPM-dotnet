@@ -7,7 +7,8 @@
     ],
     "Sampling": {
       "SamplePer3Secs": -1,
-      "Percentage": -1.0
+      "Percentage": -1.0,
+      "LogSqlParameterValue": false  
     },
     "Logging": {
       "Level": "Information",
