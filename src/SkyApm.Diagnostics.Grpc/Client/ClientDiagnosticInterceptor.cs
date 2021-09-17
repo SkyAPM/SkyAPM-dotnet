@@ -19,9 +19,6 @@
 using Grpc.Core;
 using Grpc.Core.Interceptors;
 using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SkyApm.Diagnostics.Grpc.Client
 {
@@ -36,30 +33,17 @@ namespace SkyApm.Diagnostics.Grpc.Client
 
         public override TResponse BlockingUnaryCall<TRequest, TResponse>(TRequest request, ClientInterceptorContext<TRequest, TResponse> context, BlockingUnaryCallContinuation<TRequest, TResponse> continuation)
         {
-            var metadata = _processor.BeginRequest(context);
-            try
+            return Call(context, (newContext) =>
             {
-                var options = context.Options.WithHeaders(metadata);
-                context = new ClientInterceptorContext<TRequest, TResponse>(context.Method, context.Host, options);
-                var response = continuation(request, context);
-                _processor.EndRequest();
-                return response;
-            }
-            catch (Exception ex)
-            {
-                _processor.DiagnosticUnhandledException(ex);
-                throw ex;
-            }
+                return continuation(request, newContext);
+            });
         }
 
         public override AsyncUnaryCall<TResponse> AsyncUnaryCall<TRequest, TResponse>(TRequest request, ClientInterceptorContext<TRequest, TResponse> context, AsyncUnaryCallContinuation<TRequest, TResponse> continuation)
         {
-            var metadata = _processor.BeginRequest(context);
-            try
+            return Call(context, (newContext) =>
             {
-                var options = context.Options.WithHeaders(metadata);
-                context = new ClientInterceptorContext<TRequest, TResponse>(context.Method, context.Host, options);
-                var response = continuation(request, context);
+                var response = continuation(request, newContext);
                 var responseAsync = response.ResponseAsync.ContinueWith(r =>
                 {
                     try
@@ -74,6 +58,45 @@ namespace SkyApm.Diagnostics.Grpc.Client
                     }
                 });
                 return new AsyncUnaryCall<TResponse>(responseAsync, response.ResponseHeadersAsync, response.GetStatus, response.GetTrailers, response.Dispose);
+            });
+        }
+
+        public override AsyncClientStreamingCall<TRequest, TResponse> AsyncClientStreamingCall<TRequest, TResponse>(ClientInterceptorContext<TRequest, TResponse> context, AsyncClientStreamingCallContinuation<TRequest, TResponse> continuation)
+        {
+            return Call(context, (newContext) =>
+            {
+                return continuation(newContext);
+            });
+        }
+
+        public override AsyncServerStreamingCall<TResponse> AsyncServerStreamingCall<TRequest, TResponse>(TRequest request, ClientInterceptorContext<TRequest, TResponse> context, AsyncServerStreamingCallContinuation<TRequest, TResponse> continuation)
+        {
+            return Call(context, (newContext) =>
+            {
+                return continuation(request, newContext);
+            });
+        }
+
+        public override AsyncDuplexStreamingCall<TRequest, TResponse> AsyncDuplexStreamingCall<TRequest, TResponse>(ClientInterceptorContext<TRequest, TResponse> context, AsyncDuplexStreamingCallContinuation<TRequest, TResponse> continuation)
+        {
+            return Call(context, (newContext) =>
+            {
+                return continuation(newContext);
+            });
+        }
+
+        public T Call<T, TRequest, TResponse>(ClientInterceptorContext<TRequest, TResponse> context, Func<ClientInterceptorContext<TRequest, TResponse>, T> func)
+            where TRequest : class
+            where TResponse : class
+        {
+            var metadata = _processor.BeginRequest(context);
+            try
+            {
+                var options = context.Options.WithHeaders(metadata);
+                var newContext = new ClientInterceptorContext<TRequest, TResponse>(context.Method, context.Host, options);
+                var response = func(newContext);
+                _processor.EndRequest();
+                return response;
             }
             catch (Exception ex)
             {
