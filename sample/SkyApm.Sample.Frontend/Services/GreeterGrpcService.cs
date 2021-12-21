@@ -43,5 +43,66 @@ namespace SkyApm.Sample.Backend.Services
             var reply = await _client.SayHelloWithExceptionAsync(new HelloRequest { Name = name });
             return reply.Message;
         }
+
+        public async Task<string> SayHelloByClientStreamingAsync()
+        {
+            using (var call = _client.SayHelloByClientStreaming())
+            {
+                for (int i = 0; i < 10; i++)
+                {
+                    await call.RequestStream.WriteAsync(new HelloRequest
+                    {
+                        Name = $"hello-{i}"
+                    });
+                }
+                await call.RequestStream.CompleteAsync();
+                var response = await call.ResponseAsync;
+                return response.Message;
+            }
+        }
+
+        public async Task<string> SayHelloByServerStreamingAsync()
+        {
+            using (var call = _client.SayHelloByServerStreaming(new HelloRequest { Name = "hello" }))
+            {
+                var iterator = call.ResponseStream;
+                var list = new List<string>();
+                while (await iterator.MoveNext())
+                {
+                    list.Add(iterator.Current.Message);
+                }
+                return string.Join(",", list);
+            }
+        }
+
+
+        public async Task<string> SayHelloByDuplexStreamingAsync()
+        {
+            using (var call = _client.SayHelloByDuplexStreaming())
+            {
+                var list = new List<string>();
+
+                var responseTask = Task.Run(async () =>
+                {
+                    var iterator = call.ResponseStream;
+                    while (await iterator.MoveNext())
+                    {
+                        list.Add(iterator.Current.Message);
+                    }
+                });
+
+                for (int i = 0; i < 10; i++)
+                {
+                    await call.RequestStream.WriteAsync(new HelloRequest
+                    {
+                        Name = $"hello-{i}"
+                    });
+                }
+                await call.RequestStream.CompleteAsync();
+                await responseTask;
+
+                return string.Join(",", list);
+            }
+        }
     }
 }

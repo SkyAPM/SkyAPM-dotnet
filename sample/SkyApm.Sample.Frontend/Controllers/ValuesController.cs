@@ -75,6 +75,27 @@ namespace SkyApm.Sample.Frontend.Controllers
             return Ok(message);
         }
 
+        [HttpGet("greeter/clientstreaming")]
+        public async Task<IActionResult> SayHelloByClientStreamingAsync()
+        {
+            var message = await _greeter.SayHelloByClientStreamingAsync();
+            return Ok(message);
+        }
+
+        [HttpGet("greeter/serverstreaming")]
+        public async Task<IActionResult> SayHelloByServerStreamingAsync()
+        {
+            var message = await _greeter.SayHelloByServerStreamingAsync();
+            return Ok(message);
+        }
+
+        [HttpGet("greeter/duplexstreaming")]
+        public async Task<IActionResult> SayHelloByDuplexStreamingAsync()
+        {
+            var message = await _greeter.SayHelloByDuplexStreamingAsync();
+            return Ok(message);
+        }
+
         [HttpGet("hellojava")]
         public async Task<IActionResult> HelloJava()
         {

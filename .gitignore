@@ -263,6 +263,7 @@ BenchmarkDotNet.Artifacts/
 tools/
 
 *.proto
+!hello.proto
 
 generated/
 generated-v3/

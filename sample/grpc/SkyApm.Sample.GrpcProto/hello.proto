@@ -1,0 +1,29 @@
+﻿syntax = "proto3";
+
+package GrpcGreeter ;
+
+service Greeter {
+
+    rpc SayHello (HelloRequest) returns (HelloReply) {
+    }
+
+    rpc SayHelloWithException (HelloRequest) returns (HelloReply) {
+    }
+
+    rpc SayHelloByServerStreaming (HelloRequest) returns (stream HelloReply) {
+    }
+
+    rpc SayHelloByClientStreaming (stream HelloRequest) returns (HelloReply) {
+    }
+
+    rpc SayHelloByDuplexStreaming (stream HelloRequest) returns (stream HelloReply) {
+    }
+}
+
+message HelloRequest {
+    string name = 1;
+}
+
+message HelloReply {
+    string message = 1;
+}
