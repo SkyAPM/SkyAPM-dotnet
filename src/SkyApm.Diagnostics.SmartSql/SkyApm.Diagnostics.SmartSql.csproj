@@ -2,7 +2,7 @@
   <Import Project="..\..\build\common.props" />
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFrameworks>netcoreapp3.1;net5.0;net6.0</TargetFrameworks>
     <AssemblyName>$(PackagePrefix).Diagnostics.SmartSql</AssemblyName>
     <AssemblyTitle>$(PackagePrefix).Diagnostics.SmartSql</AssemblyTitle>
     <PackageId>$(PackagePrefix).Diagnostics.SmartSql</PackageId>
