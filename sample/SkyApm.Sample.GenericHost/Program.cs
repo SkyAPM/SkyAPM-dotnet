@@ -11,7 +11,7 @@ namespace SkyApm.Sample.GenericHost
             CreateHostBuilder(args).Build().Run();
         }
 
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
+        static IHostBuilder CreateHostBuilder(string[] args) =>
             new HostBuilder()
                 .ConfigureServices(services => services.AddHostedService<Worker>())
                 .AddSkyAPM();

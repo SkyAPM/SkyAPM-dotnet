@@ -5,7 +5,7 @@
     <PropertyGroup>
         <Description>$(PackagePrefix).Diagnostics.AspNetCore notifies Web Http requests.</Description>
         <AssemblyTitle>$(PackagePrefix).Diagnostics.AspNetCore</AssemblyTitle>
-        <TargetFrameworks>netstandard2.0;netstandard2.1;netcoreapp3.1</TargetFrameworks>
+        <TargetFrameworks>netcoreapp3.1;net5.0;net6.0</TargetFrameworks>
         <AssemblyName>$(PackagePrefix).Diagnostics.AspNetCore</AssemblyName>
         <PackageId>$(PackagePrefix).Diagnostics.AspNetCore</PackageId>
         <PackageTags>SkyWalking;APM;Diagnostics;AspNetCore</PackageTags>
@@ -18,18 +18,14 @@
         <ProjectReference Include="..\SkyApm.Abstractions\SkyApm.Abstractions.csproj" />
         <ProjectReference Include="..\SkyApm.Utilities.DependencyInjection\SkyApm.Utilities.DependencyInjection.csproj" />
     </ItemGroup>
-
-    <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
-		<PackageReference Include="Microsoft.AspNetCore.Http" Version="2.0.0" PrivateAssets="All" />
-        <PackageReference Include="Microsoft.AspNetCore.Http.Extensions" Version="2.0.0" PrivateAssets="All" />
-        <PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="2.0.0" PrivateAssets="All" />
-    </ItemGroup>
-	<ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.1'">
-		<PackageReference Include="Microsoft.AspNetCore.Http" Version="2.1.0" PrivateAssets="All" />
-		<PackageReference Include="Microsoft.AspNetCore.Http.Extensions" Version="2.1.0" PrivateAssets="All" />
-		<PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="2.1.0" PrivateAssets="All" />
-	</ItemGroup>
+    
     <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp3.1'">
+        <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    </ItemGroup>
+    <ItemGroup Condition="'$(TargetFramework)' == 'net5.0'">
+        <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    </ItemGroup>
+    <ItemGroup Condition="'$(TargetFramework)' == 'net6.0'">
         <FrameworkReference Include="Microsoft.AspNetCore.App" />
     </ItemGroup>
 </Project>

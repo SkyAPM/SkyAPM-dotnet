@@ -5,7 +5,7 @@
   <PropertyGroup>
     <Description>$(PackagePrefix).Diagnostics.HttpClient notifies outgoing Http requests.</Description>
     <AssemblyTitle>$(PackagePrefix).Diagnostics.HttpClient</AssemblyTitle>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFrameworks>netcoreapp3.1;net5.0;net6.0</TargetFrameworks>
     <AssemblyName>$(PackagePrefix).Diagnostics.HttpClient</AssemblyName>
     <PackageId>$(PackagePrefix).Diagnostics.HttpClient</PackageId>
     <PackageTags>SkyWalking;APM;Diagnostics;HttpClient</PackageTags>

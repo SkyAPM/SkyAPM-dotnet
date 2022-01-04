@@ -9,7 +9,7 @@
     <PackageReleaseNotes>
     </PackageReleaseNotes>
     <RootNamespace>SkyApm</RootNamespace>
-    <TargetFrameworks>netstandard2.0;netcoreapp2.1;netcoreapp3.1</TargetFrameworks>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <DefineConstants Condition="'$(TargetFramework)' == 'netcoreapp2.1'">$(DefineConstants);SPAN</DefineConstants>
   </PropertyGroup>
   <ItemGroup>

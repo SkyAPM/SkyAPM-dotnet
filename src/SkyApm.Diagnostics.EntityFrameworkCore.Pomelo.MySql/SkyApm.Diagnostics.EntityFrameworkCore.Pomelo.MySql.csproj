@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\..\build\common.props" />
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFrameworks>netcoreapp3.1;net5.0;net6.0</TargetFrameworks>
   </PropertyGroup>
   <PropertyGroup>
     <AssemblyName>$(PackagePrefix).Diagnostics.EntityFrameworkCore.Pomelo.MySql</AssemblyName>
