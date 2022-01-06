@@ -17,10 +17,14 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 6.0.0
+        dotnet-version: 6.0.101
+    - name: Setup Submodule
+      run: git submodule update --init
     - name: Restore dependencies
       run: dotnet restore
+    - name: Build Protocol
+      run: dotnet build src/SkyApm.Transport.Grpc.Protocol --no-restore
     - name: Build
       run: dotnet build --no-restore
     - name: Test
-      run: dotnet test --no-build --verbosity normal
+      run: dotnet test --no-build --verbosity normal --framework net6.0
