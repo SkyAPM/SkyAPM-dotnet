@@ -61,8 +61,8 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
     - name: Build Protocol
-      run: dotnet build src/SkyApm.Transport.Grpc.Protocol --no-restore --framework netcoreapp3.1
+      run: dotnet build src/SkyApm.Transport.Grpc.Protocol --no-restore
     - name: Build
-      run: dotnet build --no-restore --framework netcoreapp3.1
+      run: dotnet build --no-restore
     - name: Test
       run: dotnet test --no-build --verbosity normal --framework netcoreapp3.1
