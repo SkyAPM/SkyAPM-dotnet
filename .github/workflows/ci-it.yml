@@ -28,3 +28,41 @@ jobs:
       run: dotnet build --no-restore
     - name: Test
       run: dotnet test --no-build --verbosity normal --framework net6.0
+
+  net5:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 5.0.404
+    - name: Setup Submodule
+      run: git submodule update --init
+    - name: Restore dependencies
+      run: dotnet restore
+    - name: Build Protocol
+      run: dotnet build src/SkyApm.Transport.Grpc.Protocol --no-restore
+    - name: Build
+      run: dotnet build --no-restore
+    - name: Test
+      run: dotnet test --no-build --verbosity normal --framework net5.0
+
+  netcoreapp3_1:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 3.1.416
+    - name: Setup Submodule
+      run: git submodule update --init
+    - name: Restore dependencies
+      run: dotnet restore
+    - name: Build Protocol
+      run: dotnet build src/SkyApm.Transport.Grpc.Protocol --no-restore
+    - name: Build
+      run: dotnet build --no-restore
+    - name: Test
+      run: dotnet test --no-build --verbosity normal --framework netcoreapp3.1
