@@ -1,6 +1,6 @@
 {
   "SkyWalking": {
-    "ServiceName": "asp-net-core-backend",
+    "ServiceName": "FreeSqlSqliteDemo",
     "Namespace": "",
     "HeaderVersions": [
       "sw8"
