@@ -105,6 +105,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SkyApm.Sample.GenericHost",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SkyApm.Diagnostics.MongoDB", "src\SkyApm.Diagnostics.MongoDB\SkyApm.Diagnostics.MongoDB.csproj", "{8D3C5573-C282-45F5-A7F4-2E323F322CB7}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SkyApm.Diagnostics.FreeSql", "src\SkyApm.Diagnostics.FreeSql\SkyApm.Diagnostics.FreeSql.csproj", "{82580A47-9DBC-43E8-B581-0C35147B4FAD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -231,6 +233,10 @@ Global
 		{8D3C5573-C282-45F5-A7F4-2E323F322CB7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8D3C5573-C282-45F5-A7F4-2E323F322CB7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8D3C5573-C282-45F5-A7F4-2E323F322CB7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{82580A47-9DBC-43E8-B581-0C35147B4FAD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{82580A47-9DBC-43E8-B581-0C35147B4FAD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{82580A47-9DBC-43E8-B581-0C35147B4FAD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{82580A47-9DBC-43E8-B581-0C35147B4FAD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -275,6 +281,7 @@ Global
 		{D96279FD-0020-427B-85C5-DC1C2336AA25} = {EF6194B2-9ACB-49B9-8049-DD6AFAEB0399}
 		{71F61C77-E04F-464D-A0B7-E109CE7E30D7} = {844CEACD-4C85-4B15-9E2B-892B01FDA4BB}
 		{8D3C5573-C282-45F5-A7F4-2E323F322CB7} = {B5E677CF-2920-4B0A-A056-E73F6B2CF2BC}
+		{82580A47-9DBC-43E8-B581-0C35147B4FAD} = {B5E677CF-2920-4B0A-A056-E73F6B2CF2BC}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {94C0DA2C-CCCB-4314-93A2-9809B5DD0583}
