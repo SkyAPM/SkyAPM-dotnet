@@ -18,6 +18,7 @@
 
 using FreeSql.Aop;
 using Microsoft.Extensions.DependencyInjection;
+using SkyApm.Utilities.DependencyInjection;
 using System;
 using System.Diagnostics;
 
@@ -28,15 +29,23 @@ namespace SkyApm.Diagnostics.FreeSql
     {
         public static readonly DiagnosticListener dl = new DiagnosticListener("FreeSqlDiagnosticListener");
 
-        /// <summary>
-        /// Use SkyWalking's FreeSql Diagnostic
-        /// </summary>
-        /// <param name="services"></param>
-        /// <param name="fsql"></param>
-        public static void AddSkyApmFreeSql(this IServiceCollection services, IFreeSql fsql)
+        public static SkyApmExtensions AddFreeSql(this SkyApmExtensions extensions, IFreeSql fsql)
         {
-            services.AddSingleton<ITracingDiagnosticProcessor, FreeSqlTracingDiagnosticProcessor>();
+            if (extensions == null)
+            {
+                throw new ArgumentNullException(nameof(extensions));
+            }
+            extensions.Services.AddSingleton<ITracingDiagnosticProcessor, FreeSqlTracingDiagnosticProcessor>();
+            if (fsql != null)
+            {
+                ConfigAop(fsql);
+            }
+            return extensions;
+        }
 
+       
+        public static void ConfigAop(IFreeSql fsql)
+        {
             fsql.Aop.CurdBefore += new EventHandler<CurdBeforeEventArgs>((s, e) =>
             {
 
@@ -79,6 +88,7 @@ namespace SkyApm.Diagnostics.FreeSql
 
                 dl.Write(FreeSqlTracingDiagnosticProcessor.FreeSql_TraceAfter, e);
             });
+
         }
     }
 }

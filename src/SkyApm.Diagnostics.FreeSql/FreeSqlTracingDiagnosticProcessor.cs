@@ -67,7 +67,7 @@ namespace SkyApm.Diagnostics.FreeSql
         {
             var context = _tracingContext.CreateLocalSegmentContext(operation);
             context.Span.SpanLayer = SpanLayer.DB;
-            context.Span.Component = ComponentName;
+            context.Span.Component = Common.Components.Free_SQL; 
             context.Span.AddTag(Common.Tags.DB_TYPE, "Sql");
             return context;
         }
