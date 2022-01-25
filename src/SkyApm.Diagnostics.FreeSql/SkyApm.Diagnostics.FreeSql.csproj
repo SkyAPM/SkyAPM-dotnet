@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\..\build\common.props" />
+
+  <PropertyGroup>
+    <TargetFrameworks>netcoreapp3.1;net5.0;net6.0</TargetFrameworks>
+    <AssemblyName>$(PackagePrefix).Diagnostics.FreeSql</AssemblyName>
+    <AssemblyTitle>$(PackagePrefix).Diagnostics.SmartSql</AssemblyTitle>
+    <PackageId>$(PackagePrefix).Diagnostics.FreeSql</PackageId>
+    <PackageTags>SkyWalking;APM;Diagnostics;FreeSql</PackageTags>
+    <Description>SkyApm.Diagnostics.FreeSql notifies of FreeSql requests.</Description>
+    <RootNamespace>SkyApm.Diagnostics.FreeSql</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FreeSql" Version="3.0.100" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SkyApm.Abstractions\SkyApm.Abstractions.csproj" />
+    <ProjectReference Include="..\SkyApm.Core\SkyApm.Core.csproj" />
+    <ProjectReference Include="..\SkyApm.Utilities.DependencyInjection\SkyApm.Utilities.DependencyInjection.csproj" />
+  </ItemGroup>
+</Project>
