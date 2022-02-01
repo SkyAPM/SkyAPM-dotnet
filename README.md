@@ -96,9 +96,6 @@ Use `dotnet skyapm config [your_service_name] [your_servers]` to generate config
 dotnet skyapm config sample_app 192.168.0.1:11800
 ```
 
-# Roadmap
-[What are we going to do next?](/docs/roadmap.md)
-
 # Contributing
 This section is in progress here: [Contributing to SkyAPM-dotnet](/CONTIBUTING.md)
 
