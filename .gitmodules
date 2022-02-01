@@ -1,7 +1,4 @@
 
-[submodule "src/SkyApm.Transport.Grpc.Protocol/protocol"]
-	path = src/SkyApm.Transport.Grpc.Protocol/protocol
-	url = https://github.com/apache/incubator-skywalking-data-collect-protocol
 [submodule "src/SkyApm.Transport.Grpc.Protocol/protocol-v3"]
 	path = src/SkyApm.Transport.Grpc.Protocol/protocol-v3
 	url = https://github.com/apache/incubator-skywalking-data-collect-protocol
