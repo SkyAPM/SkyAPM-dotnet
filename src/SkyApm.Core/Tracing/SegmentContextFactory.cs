@@ -78,7 +78,6 @@ namespace SkyApm.Tracing
                 };
                 segmentContext.References.Add(segmentReference);
             }
-
             _entrySegmentContextAccessor.Context = segmentContext;
             return segmentContext;
         }

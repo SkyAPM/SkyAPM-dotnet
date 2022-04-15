@@ -65,6 +65,43 @@ namespace SkyApm.Transport.Grpc.V8
                     await asyncClientStreamingCall.ResponseAsync;
                 }
 
+
+                //var client1 = new LogReportService.LogReportServiceClient(connection);
+                //using (var asyncClientStreamingCall = client1.collect(_config.GetMeta(), _config.GetReportTimeout(), cancellationToken))
+                //{
+                //    foreach (var item in segmentRequests)
+                //    {
+                //        var logbody = new LogData()
+                //        {
+                //            TraceContext=new TraceContext()
+                //            {
+                //                TraceId=item.TraceId,
+                //                TraceSegmentId=item.Segment.SegmentId,
+                //                //SpanId=item.Segment
+                //            },
+                //            Timestamp = DateTimeOffset.UtcNow.Ticks,
+                //            Service = item.Segment.ServiceId,
+                //            ServiceInstance = item.Segment.ServiceInstanceId,
+                //            Endpoint = "",
+                //            Body = new LogDataBody()
+                //            {
+                //                Type = "json",
+                //                Json = new JSONLog()
+                //                {
+                //                    Json = "≤‚ ‘»’÷æ",
+                //                },
+                //            },
+                //        };
+                //        await asyncClientStreamingCall.RequestStream.WriteAsync(logbody);
+                //    }
+
+                //    await asyncClientStreamingCall.RequestStream.CompleteAsync();
+                //    await asyncClientStreamingCall.ResponseAsync;
+                //}
+
+
+
+
                 stopwatch.Stop();
                 _logger.Information($"Report {segmentRequests.Count} trace segment. cost: {stopwatch.Elapsed}s");
             }

@@ -29,7 +29,11 @@ namespace SkyApm.Agent.AspNetCore
     {
         public void Configure(IWebHostBuilder builder)
         {
-            builder.ConfigureServices(services => services.AddSkyAPM(ext => ext.AddAspNetCoreHosting()));
+            builder.ConfigureServices(services => services.AddSkyAPM(ext => ext.AddAspNetCoreHosting())
+            .AddLogging(logging =>
+            {
+                logging.AddSkyApmLogger();
+            }));
         }
     }
 }
