@@ -16,58 +16,27 @@
  *
  */
 
-using System.Diagnostics;
-using System.Linq;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Extensions;
 using SkyApm.AspNetCore.Diagnostics;
-using SkyApm.Common;
 using SkyApm.Tracing;
 using SkyApm.Tracing.Segments;
 
 namespace SkyApm.Diagnostics.AspNetCore.Handlers
 {
-    public class GrpcHostingDiagnosticHandler : IHostingDiagnosticHandler
+    public class GrpcHostingDiagnosticHandler : BaseGrpcHostingDiagnosticHandler, IHostingDiagnosticHandler
     {
-        public const string ActivityName = "Microsoft.AspNetCore.Hosting.HttpRequestIn";
-        public const string GrpcMethodTagName = "grpc.method";
-        public const string GrpcStatusCodeTagName = "grpc.status_code";
-
-        public bool OnlyMatch(HttpContext httpContext)
-        {
-            return httpContext.Request.Headers.TryGetValue("Content-Type", out var value)
-                   && value.Any(x => x == "application/grpc");
-        }
+        public bool OnlyMatch(HttpContext httpContext) => IsMatch(httpContext);
 
         public void BeginRequest(ITracingContext tracingContext, HttpContext httpContext)
         {
             var context = tracingContext.CreateEntrySegmentContext(httpContext.Request.Path,
                 new HttpRequestCarrierHeaderCollection(httpContext.Request));
-            context.Span.SpanLayer = SpanLayer.RPC_FRAMEWORK;
-            context.Span.Component = Common.Components.GRPC;
-            context.Span.Peer = new StringOrIntValue(httpContext.Connection.RemoteIpAddress.ToString());
-            context.Span.AddTag(Tags.URL, httpContext.Request.GetDisplayUrl());
+            BeginRequestSetupSpan(context.Span, httpContext);
         }
 
         public void EndRequest(SegmentContext segmentContext, HttpContext httpContext)
         {
-            var activity = Activity.Current;
-            if (activity.OperationName == ActivityName)
-            {
-                var statusCodeTag = activity.Tags.FirstOrDefault(x => x.Key == GrpcStatusCodeTagName).Value;
-                var method = activity.Tags.FirstOrDefault(x => x.Key == GrpcMethodTagName).Value ??
-                             httpContext.Request.Method;
-
-                segmentContext.Span.AddTag(Tags.GRPC_METHOD_NAME, method);
-
-                var statusCode = int.TryParse(statusCodeTag, out var code) ? code : -1;
-                if (statusCode != 0)
-                {
-                    segmentContext.Span.ErrorOccurred();
-                }
-
-                segmentContext.Span.AddTag(Tags.GRPC_STATUS, statusCode);
-            }
+            EndRequestSetupSpan(segmentContext.Span, httpContext);
         }
     }
 }

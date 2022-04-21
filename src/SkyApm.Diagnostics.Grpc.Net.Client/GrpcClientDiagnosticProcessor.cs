@@ -16,20 +16,14 @@
  *
  */
 
-using System;
-using System.Diagnostics;
-using System.Linq;
 using System.Net.Http;
-using Grpc.Core;
-using SkyApm.Common;
 using SkyApm.Config;
 using SkyApm.Diagnostics.HttpClient;
 using SkyApm.Tracing;
-using SkyApm.Tracing.Segments;
 
 namespace SkyApm.Diagnostics.Grpc.Net.Client
 {
-    public class GrpcClientDiagnosticProcessor : ITracingDiagnosticProcessor
+    public class GrpcClientDiagnosticProcessor : BaseGrpcClientDiagnosticProcessor, IGrpcClientDiagnosticProcessor
     {
         public string ListenerName => GrpcDiagnostics.ListenerName;
 
@@ -50,22 +44,11 @@ namespace SkyApm.Diagnostics.Grpc.Net.Client
         [DiagnosticName(GrpcDiagnostics.ActivityStartKey)]
         public void InitializeCall([Property(Name = "Request")] HttpRequestMessage request)
         {
-            var context = _tracingContext.CreateExitSegmentContext(request.RequestUri.ToString(),
-                $"{request.RequestUri.Host}:{request.RequestUri.Port}",
+            var context = _tracingContext.CreateExitSegmentContext(GetOperationName(request),
+                GetHost(request),
                 new GrpcNetClientICarrierHeaderCollection(request));
 
-            context.Span.SpanLayer = SpanLayer.RPC_FRAMEWORK;
-            context.Span.Component = Common.Components.GRPC;
-            context.Span.AddTag(Tags.URL, request.RequestUri.ToString());
-
-            var activity = Activity.Current;
-            if (activity.OperationName == GrpcDiagnostics.ActivityName)
-            {
-                var method = activity.Tags.FirstOrDefault(x => x.Key == GrpcDiagnostics.GrpcMethodTagName).Value ??
-                             request.Method.ToString();
-
-                context.Span.AddTag(Tags.GRPC_METHOD_NAME, method);
-            }
+            InitializeCallSetupSpan(context.Span, request);
         }
 
         [DiagnosticName(GrpcDiagnostics.ActivityStopKey)]
@@ -77,20 +60,7 @@ namespace SkyApm.Diagnostics.Grpc.Net.Client
                 return;
             }
 
-            var activity = Activity.Current;
-            if (activity.OperationName == GrpcDiagnostics.ActivityName)
-            {
-                var statusCodeTag = activity.Tags.FirstOrDefault(x => x.Key == GrpcDiagnostics.GrpcStatusCodeTagName).Value;
-
-                var statusCode = int.TryParse(statusCodeTag, out var code) ? code : -1;
-                if (statusCode != 0)
-                {
-                    var err = ((StatusCode)statusCode).ToString();
-                    context.Span.ErrorOccurred(new Exception(err), _tracingConfig);
-                }
-
-                context.Span.AddTag(Tags.GRPC_STATUS, statusCode);
-            }
+            FinishCallSetupSpan(_tracingConfig, context.Span, response);
 
             _tracingContext.Release(context);
         }

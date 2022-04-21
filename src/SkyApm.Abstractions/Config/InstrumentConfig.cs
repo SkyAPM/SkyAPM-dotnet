@@ -32,8 +32,9 @@ namespace SkyApm.Config
 
         public string ServiceInstanceName { get; set; }
 
-
         public string[] HeaderVersions { get; set; }
+
+        public string StructType { get; set; } = "segment";
     }
 
     public static class HeaderVersions

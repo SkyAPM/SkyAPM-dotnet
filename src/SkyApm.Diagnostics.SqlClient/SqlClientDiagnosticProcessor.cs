@@ -24,7 +24,7 @@ using SkyApm.Config;
 
 namespace SkyApm.Diagnostics.SqlClient
 {
-    public class SqlClientTracingDiagnosticProcessor : ITracingDiagnosticProcessor
+    public class SqlClientTracingDiagnosticProcessor : BaseSqlClientTracingDiagnosticProcessor, ISqlClientTracingDiagnosticProcessor
     {
         private readonly ITracingContext _tracingContext;
         private readonly IExitSegmentContextAccessor _contextAccessor;
@@ -41,25 +41,14 @@ namespace SkyApm.Diagnostics.SqlClient
 
         public string ListenerName { get; } = SqlClientDiagnosticStrings.DiagnosticListenerName;
 
-        private static string ResolveOperationName(DbCommand sqlCommand)
-        {
-            var commandType = sqlCommand.CommandText?.Split(' ');
-            return $"{SqlClientDiagnosticStrings.SqlClientPrefix}{commandType?.FirstOrDefault()}";
-        }
-
         #region System.Data.SqlClient
         [DiagnosticName(SqlClientDiagnosticStrings.SqlBeforeExecuteCommand)]
         public void BeforeExecuteCommand([Property(Name = "Command")] DbCommand sqlCommand)
         {
             var context = _tracingContext.CreateExitSegmentContext(ResolveOperationName(sqlCommand),
                 sqlCommand.Connection.DataSource);
-            context.Span.SpanLayer = Tracing.Segments.SpanLayer.DB;
-            context.Span.Component = Common.Components.SQLCLIENT;
-            context.Span.AddTag(Common.Tags.DB_TYPE, "sql");
-            context.Span.AddTag(Common.Tags.DB_INSTANCE, sqlCommand.Connection.Database);
-            context.Span.AddTag(Common.Tags.DB_STATEMENT, sqlCommand.CommandText);
+            BeforeExecuteCommandSetupSpan(context.Span, sqlCommand);
         }
-
 
         [DiagnosticName(SqlClientDiagnosticStrings.SqlAfterExecuteCommand)]
         public void AfterExecuteCommand()

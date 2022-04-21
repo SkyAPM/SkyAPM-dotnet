@@ -16,6 +16,7 @@
  *
  */
 
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
@@ -69,6 +70,28 @@ namespace SkyApm.Transport
             Interlocked.Increment(ref _offset);
 
             _logger.Debug($"Dispatch trace segment. [SegmentId]={segmentContext.SegmentId}.");
+            return true;
+        }
+
+        public bool Dispatch(TraceSegment traceSegment)
+        {
+            if (!_runtimeEnvironment.Initialized || traceSegment == null || !traceSegment.Sampled)
+                return false;
+
+            // todo performance optimization for ConcurrentQueue
+            if (_config.QueueSize < _offset || _cancellation.IsCancellationRequested)
+                return false;
+
+            var segment = _segmentContextMapper.Map(traceSegment);
+
+            if (segment == null)
+                return false;
+
+            _segmentQueue.Enqueue(segment);
+
+            Interlocked.Increment(ref _offset);
+
+            _logger.Debug($"Dispatch trace segment. [SegmentId]={traceSegment.SegmentId}.");
             return true;
         }
 

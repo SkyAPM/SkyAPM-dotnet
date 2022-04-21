@@ -31,7 +31,9 @@ namespace SkyApm.Diagnostics.Grpc.Net.Client
                 throw new ArgumentNullException(nameof(extensions));
             }
 
-            extensions.Services.AddSingleton<ITracingDiagnosticProcessor, GrpcClientDiagnosticProcessor>();
+            extensions.Services.AddSingleton<ITracingDiagnosticProcessor, GrpcClientDiagnosticProcessorAdapter>();
+            extensions.Services.AddSingleton<GrpcClientDiagnosticProcessor>();
+            extensions.Services.AddSingleton<SpanGrpcClientDiagnosticProcessor>();
 
             return extensions;
         }

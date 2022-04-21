@@ -22,6 +22,10 @@ namespace SkyApm.Tracing
 {
     public interface ITracingContext
     {
+        SegmentSpan ActiveSpan { get; }
+
+        TraceSegment ActiveSegment { get; }
+
         SegmentContext CreateEntrySegmentContext(string operationName, ICarrierHeaderCollection carrierHeader, long startTimeMilliseconds = default);
 
         SegmentContext CreateLocalSegmentContext(string operationName, long startTimeMilliseconds = default);
@@ -30,5 +34,23 @@ namespace SkyApm.Tracing
             ICarrierHeaderCollection carrierHeader = default, long startTimeMilliseconds = default);
 
         void Release(SegmentContext segmentContext, long endTimeMilliseconds = default);
+
+        SegmentSpan CreateEntrySpan(string operationName, ICarrierHeaderCollection carrierHeader, long startTimeMilliseconds = default);
+
+        SegmentSpan CreateLocalSpan(string operationName, long startTimeMilliseconds = default);
+
+        SegmentSpan CreateLocalSpan(string operationName, CrossThreadCarrier carrier, long startTimeMilliseconds = default);
+
+        SegmentSpan CreateExitSpan(string operationName, string networkAddress, ICarrierHeaderCollection carrierHeader = default, long startTimeMilliseconds = default);
+
+        SegmentSpan CreateExitSpan(string operationName, string networkAddress, CrossThreadCarrier carrier, ICarrierHeaderCollection carrierHeader = default, long startTimeMilliseconds = default);
+
+        void StopSpan(SegmentSpan span);
+
+        void StopSpan();
+
+        CrossThreadCarrier StopSpanGetCarrier(SegmentSpan span);
+
+        CrossThreadCarrier StopSpanGetCarrier();
     }
 }

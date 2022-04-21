@@ -23,5 +23,7 @@ namespace SkyApm.Transport
     public interface ISegmentContextMapper
     {
         SegmentRequest Map(SegmentContext segmentContext);
+
+        SegmentRequest Map(TraceSegment traceSegment);
     }
 }

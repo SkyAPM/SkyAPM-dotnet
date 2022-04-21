@@ -17,15 +17,13 @@
  */
 
 using Grpc.Core;
-using SkyApm.Common;
 using SkyApm.Config;
 using SkyApm.Tracing;
-using SkyApm.Tracing.Segments;
 using System;
 
 namespace SkyApm.Diagnostics.Grpc.Server
 {
-    public class ServerDiagnosticProcessor
+    public class ServerDiagnosticProcessor : BaseServerDiagnosticProcessor, IServerDiagnosticProcessor
     {
         private readonly ITracingContext _tracingContext;
         private readonly IEntrySegmentContextAccessor _segmentContextAccessor;
@@ -42,13 +40,7 @@ namespace SkyApm.Diagnostics.Grpc.Server
         public void BeginRequest(ServerCallContext grpcContext)
         {
             var context = _tracingContext.CreateEntrySegmentContext(grpcContext.Method, new GrpcCarrierHeaderCollection(grpcContext.RequestHeaders));
-            context.Span.SpanLayer = SpanLayer.RPC_FRAMEWORK;
-            context.Span.Component = Components.GRPC; 
-            context.Span.Peer = new StringOrIntValue(grpcContext.Peer);
-            context.Span.AddTag(Tags.GRPC_METHOD_NAME, grpcContext.Method);
-            context.Span.AddLog(
-                LogEvent.Event("Grpc Server BeginRequest"),
-                LogEvent.Message($"Request starting {grpcContext.Method}"));
+            BeginRequestSetupSpan(context.Span, grpcContext);
         }
 
         public void EndRequest(ServerCallContext grpcContext)
@@ -58,16 +50,8 @@ namespace SkyApm.Diagnostics.Grpc.Server
             {
                 return;
             }
-            var statusCode = grpcContext.Status.StatusCode;
-            if (statusCode != StatusCode.OK)
-            {
-                context.Span.ErrorOccurred();
-            }
 
-            context.Span.AddTag(Tags.GRPC_STATUS, statusCode.ToString());
-            context.Span.AddLog(
-                LogEvent.Event("Grpc Server EndRequest"),
-                LogEvent.Message($"Request finished {statusCode} "));
+            EndRequestSetupSpan(context.Span, grpcContext);
 
             _tracingContext.Release(context);
         }
@@ -77,7 +61,7 @@ namespace SkyApm.Diagnostics.Grpc.Server
             var context = _segmentContextAccessor.Context;
             if (context != null)
             {
-                context.Span?.ErrorOccurred(exception, _tracingConfig);
+                DiagnosticUnhandledExceptionSetupSpan(_tracingConfig, context.Span, exception);
                 _tracingContext.Release(context);
             }
         }

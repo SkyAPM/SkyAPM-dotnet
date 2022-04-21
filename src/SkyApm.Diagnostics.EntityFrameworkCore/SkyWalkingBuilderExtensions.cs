@@ -31,7 +31,9 @@ namespace SkyApm.Diagnostics.EntityFrameworkCore
                 throw new ArgumentNullException(nameof(extensions));
             }
 
-            extensions.Services.AddSingleton<ITracingDiagnosticProcessor, EntityFrameworkCoreTracingDiagnosticProcessor>();
+            extensions.Services.AddSingleton<ITracingDiagnosticProcessor, EntityFrameworkCoreTracingDiagnosticProcessorAdapter>();
+            extensions.Services.AddSingleton<EntityFrameworkCoreTracingDiagnosticProcessor>();
+            extensions.Services.AddSingleton<SpanEntityFrameworkCoreTracingDiagnosticProcessor>();
             extensions.Services.AddSingleton<IEntityFrameworkCoreSegmentContextFactory, EntityFrameworkCoreSegmentContextFactory>();
 
             if (optionAction != null)

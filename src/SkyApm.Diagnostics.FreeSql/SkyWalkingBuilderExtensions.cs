@@ -35,7 +35,9 @@ namespace SkyApm.Diagnostics.FreeSql
             {
                 throw new ArgumentNullException(nameof(extensions));
             }
-            extensions.Services.AddSingleton<ITracingDiagnosticProcessor, FreeSqlTracingDiagnosticProcessor>();
+            extensions.Services.AddSingleton<ITracingDiagnosticProcessor, FreeSqlTracingDiagnosticProcessorAdapter>();
+            extensions.Services.AddSingleton<FreeSqlTracingDiagnosticProcessor>();
+            extensions.Services.AddSingleton<SpanFreeSqlTracingDiagnosticProcessor>();
             if (fsql != null)
             {
                 ConfigAop(fsql);

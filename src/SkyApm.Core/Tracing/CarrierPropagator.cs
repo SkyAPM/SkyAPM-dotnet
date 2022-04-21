@@ -55,6 +55,25 @@ namespace SkyApm.Tracing
             }
         }
 
+        public void Inject(TraceSegment segment, SegmentSpan span, ICarrierHeaderCollection headerCollection)
+        {
+            var carrier = new Carrier(segment.TraceId, segment.SegmentId, span.SpanId,
+                segment.ServiceInstanceId, null,
+                segment.ServiceId)
+            {
+                NetworkAddress = span.Peer,
+                EntryEndpoint = null,
+                ParentEndpoint = segment.FirstSpan.OperationName,
+                Sampled = segment.Sampled
+            };
+
+            foreach (var formatter in _carrierFormatters)
+            {
+                if (formatter.Enable)
+                    headerCollection.Add(formatter.Key, formatter.Encode(carrier));
+            }
+        }
+
         public ICarrier Extract(ICarrierHeaderCollection headerCollection)
         {
             ICarrier carrier = NullableCarrier.Instance;

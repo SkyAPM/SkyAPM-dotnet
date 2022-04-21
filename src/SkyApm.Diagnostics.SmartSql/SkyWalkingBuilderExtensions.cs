@@ -31,7 +31,9 @@ namespace SkyApm.Diagnostics.SmartSql
                 throw new ArgumentNullException(nameof(extensions));
             }
 
-            extensions.Services.AddSingleton<ITracingDiagnosticProcessor, SmartSqlTracingDiagnosticProcessor>();
+            extensions.Services.AddSingleton<ITracingDiagnosticProcessor, SmartSqlTracingDiagnosticProcessorAdapter>();
+            extensions.Services.AddSingleton<SmartSqlTracingDiagnosticProcessor>();
+            extensions.Services.AddSingleton<SpanSmartSqlTracingDiagnosticProcessor>();
 
             return extensions;
         }

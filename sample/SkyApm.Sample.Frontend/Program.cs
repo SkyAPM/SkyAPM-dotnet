@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 
 namespace SkyApm.Sample.Frontend
@@ -24,7 +25,12 @@ namespace SkyApm.Sample.Frontend
                 .ConfigureWebHostDefaults(builder =>
                 {
                     builder.UseStartup<Startup>();
-                }).Build();
+                })
+                .ConfigureAppConfiguration(builder =>
+                {
+                    builder.AddJsonFile("skyapm.json");
+                })
+                .Build();
 
 #endif
     }

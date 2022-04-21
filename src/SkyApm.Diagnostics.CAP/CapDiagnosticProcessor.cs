@@ -20,9 +20,6 @@ using System;
 using System.Collections.Concurrent;
 using DotNetCore.CAP.Diagnostics;
 using DotNetCore.CAP.Messages;
-using DotNetCore.CAP.Transport;
-using Newtonsoft.Json;
-using SkyApm.Common;
 using SkyApm.Config;
 using SkyApm.Tracing;
 using SkyApm.Tracing.Segments;
@@ -33,14 +30,10 @@ namespace SkyApm.Diagnostics.CAP
     /// <summary>
     ///  Diagnostics processor for listen and process events of CAP.
     /// </summary>
-    public class CapTracingDiagnosticProcessor : ITracingDiagnosticProcessor
+    public class CapTracingDiagnosticProcessor : BaseCapDiagnosticProcessor, ICapDiagnosticProcessor
     {
         private readonly ConcurrentDictionary<string, SegmentContext> _contexts = new ConcurrentDictionary<string, SegmentContext>();
         public string ListenerName => CapEvents.DiagnosticListenerName;
-
-        private const string OperateNamePrefix = "CAP/";
-        private const string ProducerOperateNameSuffix = "/Publisher";
-        private const string ConsumerOperateNameSuffix = "/Subscriber";
 
         private readonly ITracingContext _tracingContext;
         private readonly IEntrySegmentContextAccessor _entrySegmentContextAccessor;
@@ -66,12 +59,9 @@ namespace SkyApm.Diagnostics.CAP
         {
             _contexts[eventData.Message.GetId()] = _entrySegmentContextAccessor.Context;
 
-            var context = _tracingContext.CreateLocalSegmentContext("Event Persistence: " + eventData.Operation);
-            context.Span.SpanLayer = SpanLayer.DB;
-            context.Span.Component = Components.CAP;
-            context.Span.AddTag(Tags.DB_TYPE, "Sql");
-            context.Span.AddLog(LogEvent.Event("Event Persistence Start"));
-            context.Span.AddLog(LogEvent.Message("CAP message persistence start..."));
+            var operationName = GetBeforePublishStoreOpName(eventData);
+            var context = _tracingContext.CreateLocalSegmentContext(operationName);
+            BeforePublishStoreSetupSpan(context.Span, eventData);
         }
 
         [DiagnosticName(CapEvents.AfterPublishMessageStore)]
@@ -80,10 +70,7 @@ namespace SkyApm.Diagnostics.CAP
             var context = _localSegmentContextAccessor.Context;
             if (context == null) return;
 
-            context.Span.AddLog(LogEvent.Event("Event Persistence End"));
-            context.Span.AddLog(LogEvent.Message($"CAP message persistence succeeded!{Environment.NewLine}" +
-                                                 $"--> Spend Time: { eventData.ElapsedTimeMs }ms.{Environment.NewLine}" +
-                                                 $"--> Message Id: { eventData.Message.GetId() } , Name: { eventData.Operation} "));
+            AfterPublishStoreSetupSpan(context.Span, eventData);
 
             _tracingContext.Release(context);
         }
@@ -94,12 +81,7 @@ namespace SkyApm.Diagnostics.CAP
             var context = _localSegmentContextAccessor.Context;
             if (context == null) return;
 
-            context.Span.AddLog(LogEvent.Event("Event Persistence Error"));
-            context.Span.AddLog(LogEvent.Message($"CAP message persistence failed!{Environment.NewLine}" +
-                                                 $"--> Message Info:{Environment.NewLine}" +
-                                                 $"{ JsonConvert.SerializeObject(eventData.Message, Formatting.Indented)}"));
-
-            context.Span.ErrorOccurred(eventData.Exception, _tracingConfig);
+            ErrorPublishStoreSetupSpan(_tracingConfig, context.Span, eventData);
             _tracingContext.Release(context);
         }
 
@@ -108,17 +90,11 @@ namespace SkyApm.Diagnostics.CAP
         {
             _localSegmentContextAccessor.Context = _contexts[eventData.TransportMessage.GetId()];
 
-            var host = eventData.BrokerAddress.Endpoint.Replace("-1", "5672");
-            var context = _tracingContext.CreateExitSegmentContext(OperateNamePrefix + eventData.Operation + ProducerOperateNameSuffix,
-                host, new CapCarrierHeaderCollection(eventData.TransportMessage));
+            var host = GetHost(eventData);
+            var operationName = GetBeforePublishOpName(eventData);
+            var context = _tracingContext.CreateExitSegmentContext(operationName, host, new CapCarrierHeaderCollection(eventData.TransportMessage));
 
-            context.Span.SpanLayer = SpanLayer.MQ;
-            context.Span.Component = GetComponent(eventData.BrokerAddress, true);
-            context.Span.Peer = host;
-            context.Span.AddTag(Tags.MQ_TOPIC, eventData.Operation);
-            context.Span.AddTag(Tags.MQ_BROKER, eventData.BrokerAddress.Endpoint);
-            context.Span.AddLog(LogEvent.Event("Event Publishing Start"));
-            context.Span.AddLog(LogEvent.Message("CAP message publishing start..."));
+            BeforePublishSetupSpan(context.Span, eventData, host);
         }
 
         [DiagnosticName(CapEvents.AfterPublish)]
@@ -127,10 +103,7 @@ namespace SkyApm.Diagnostics.CAP
             var context = _exitSegmentContextAccessor.Context;
             if (context == null) return;
 
-            context.Span.AddLog(LogEvent.Event("Event Publishing End"));
-            context.Span.AddLog(LogEvent.Message($"CAP message publishing succeeded!{Environment.NewLine}" +
-                                                 $"--> Spend Time: { eventData.ElapsedTimeMs }ms.  {Environment.NewLine}" +
-                                                 $"--> Message Id: { eventData.TransportMessage.GetId() }, Name: {eventData.Operation}"));
+            AfterPublishSetupSpan(context.Span, eventData);
 
             _tracingContext.Release(context);
 
@@ -143,32 +116,21 @@ namespace SkyApm.Diagnostics.CAP
             var context = _exitSegmentContextAccessor.Context;
             if (context == null) return;
 
-            context.Span.AddLog(LogEvent.Event("Event Publishing Error"));
-            context.Span.AddLog(LogEvent.Message($"CAP message publishing failed!{Environment.NewLine}" +
-                                                 $"--> Spend Time: { eventData.ElapsedTimeMs }ms.  {Environment.NewLine}" +
-                                                 $"--> Message Id: { eventData.TransportMessage.GetId() }, Name: {eventData.Operation}"));
-            context.Span.ErrorOccurred(eventData.Exception, _tracingConfig);
+            ErrorPublishSetupSpan(_tracingConfig, context.Span, eventData);
 
             _tracingContext.Release(context);
 
             _contexts.TryRemove(eventData.TransportMessage.GetId(), out _);
         }
 
-
         [DiagnosticName(CapEvents.BeforeConsume)]
         public void CapBeforeConsume([Object] CapEventDataSubStore eventData)
         {
             var carrierHeader = new CapCarrierHeaderCollection(eventData.TransportMessage);
-            var eventName = eventData.TransportMessage.GetGroup() + "/" + eventData.Operation;
-            var operationName = OperateNamePrefix + eventName + ConsumerOperateNameSuffix;
+            var operationName = GetCapBeforeConsumeOpName(eventData);
             var context = _tracingContext.CreateEntrySegmentContext(operationName, carrierHeader);
-            context.Span.SpanLayer = SpanLayer.DB;
-            context.Span.Component = GetComponent(eventData.BrokerAddress, false);
-            context.Span.Peer = eventData.BrokerAddress.Endpoint.Replace("-1", "5672");
-            context.Span.AddTag(Tags.MQ_TOPIC, eventData.Operation);
-            context.Span.AddTag(Tags.MQ_BROKER, eventData.BrokerAddress.Endpoint);
-            context.Span.AddLog(LogEvent.Event("Event Persistence Start"));
-            context.Span.AddLog(LogEvent.Message("CAP message persistence start..."));
+
+            CapBeforeConsumeSetupSpan(context.Span, eventData);
 
             _contexts[eventData.TransportMessage.GetId() + eventData.TransportMessage.GetGroup()] = context;
         }
@@ -179,10 +141,7 @@ namespace SkyApm.Diagnostics.CAP
             var context = _contexts[eventData.TransportMessage.GetId() + eventData.TransportMessage.GetGroup()];
             if (context == null) return;
 
-            context.Span.AddLog(LogEvent.Event("Event Persistence End"));
-            context.Span.AddLog(LogEvent.Message($"CAP message persistence succeeded!{Environment.NewLine}" +
-                                                 $"--> Spend Time: { eventData.ElapsedTimeMs }ms. {Environment.NewLine}" +
-                                                 $"--> Message Id: { eventData.TransportMessage.GetId() }, Group: {eventData.TransportMessage.GetGroup()}, Name: {eventData.Operation}"));
+            CapAfterConsumeSetupSpan(context.Span, eventData);
 
             _tracingContext.Release(context);
         }
@@ -193,11 +152,7 @@ namespace SkyApm.Diagnostics.CAP
             var context = _contexts[eventData.TransportMessage.GetId() + eventData.TransportMessage.GetGroup()];
             if (context == null) return;
 
-            context.Span.AddLog(LogEvent.Event("Event Persistence Error"));
-            context.Span.AddLog(LogEvent.Message($"CAP message publishing failed! {Environment.NewLine}" +
-                                                 $"--> Spend Time: { eventData.ElapsedTimeMs }ms.  {Environment.NewLine}" +
-                                                 $"--> Message Id: { eventData.TransportMessage.GetId() }, Group: {eventData.TransportMessage.GetGroup()}, Name: {eventData.Operation}"));
-            context.Span.ErrorOccurred(eventData.Exception, _tracingConfig);
+            CapErrorConsumeSetupSpan(_tracingConfig, context.Span, eventData);
 
             _tracingContext.Release(context);
         }
@@ -207,12 +162,9 @@ namespace SkyApm.Diagnostics.CAP
         {
             _entrySegmentContextAccessor.Context = _contexts[eventData.Message.GetId() + eventData.Message.GetGroup()];
 
-            var context = _tracingContext.CreateLocalSegmentContext("Subscriber Invoke: " + eventData.MethodInfo.Name);
-            context.Span.SpanLayer = SpanLayer.MQ;
-            context.Span.Component = Components.CAP;
-            context.Span.AddLog(LogEvent.Event("Subscriber Invoke Start"));
-            context.Span.AddLog(LogEvent.Message($"Begin invoke the subscriber: {eventData.MethodInfo} {Environment.NewLine}" +
-                                                 $"--> Message Id: { eventData.Message.GetId()}, Group: {eventData.Message.GetGroup()}, Name: {eventData.Operation}"));
+            var operationName = GetCapBeforeSubscriberInvokeOpName(eventData);
+            var context = _tracingContext.CreateLocalSegmentContext(operationName);
+            CapBeforeSubscriberInvokeSetupSpan(context.Span, eventData);
 
             _contexts[eventData.Message.GetId() + eventData.Message.GetGroup()] = context;
         }
@@ -223,10 +175,7 @@ namespace SkyApm.Diagnostics.CAP
             var context = _contexts[eventData.Message.GetId() + eventData.Message.GetGroup()];
             if (context == null) return;
 
-            context.Span.AddLog(LogEvent.Event("Subscriber Invoke End"));
-            context.Span.AddLog(LogEvent.Message("Subscriber invoke succeeded!"));
-            context.Span.AddLog(LogEvent.Message($"Subscriber invoke spend time: { eventData.ElapsedTimeMs}ms. {Environment.NewLine}" +
-                                                 $"--> Method Info: {eventData.MethodInfo}"));
+            CapAfterSubscriberInvokeSetupSpan(context.Span, eventData);
 
             _tracingContext.Release(context);
 
@@ -239,42 +188,11 @@ namespace SkyApm.Diagnostics.CAP
             var context = _contexts[eventData.Message.GetId() + eventData.Message.GetGroup()];
             if (context == null) return;
 
-            context.Span.AddLog(LogEvent.Event("Subscriber Invoke Error"));
-            context.Span.AddLog(LogEvent.Message($"Subscriber invoke failed! {Environment.NewLine}" +
-                                                 $"--> Method Info: { eventData.MethodInfo} {Environment.NewLine}" +
-                                                 $"--> Message Info: {Environment.NewLine}" +
-                                                 $"{ JsonConvert.SerializeObject(eventData.Message, Formatting.Indented)}"));
-
-            context.Span.ErrorOccurred(eventData.Exception, _tracingConfig);
+            CapErrorSubscriberInvokeSetupSpan(_tracingConfig, context.Span, eventData);
 
             _tracingContext.Release(context);
 
             _contexts.TryRemove(eventData.Message.GetId() + eventData.Message.GetGroup(), out _);
-        }
-
-        private StringOrIntValue GetComponent(BrokerAddress address, bool isPub)
-        {
-            if (isPub)
-            {
-                switch (address.Name)
-                {
-                    case "RabbitMQ":
-                        return 52;  // "rabbitmq-producer";
-                    case "Kafka":
-                        return 40;  //"kafka-producer";
-                }
-            }
-            else
-            {
-                switch (address.Name)
-                {
-                    case "RabbitMQ":
-                        return 53; // "rabbitmq-consumer";
-                    case "Kafka":
-                        return 41; // "kafka-consumer";
-                }
-            }
-            return Components.CAP;
         }
     }
 }

@@ -28,7 +28,7 @@ using SkyApm.Tracing;
 
 namespace SkyApm.AspNetCore.Diagnostics
 {
-    public class HostingTracingDiagnosticProcessor : ITracingDiagnosticProcessor
+    public class HostingTracingDiagnosticProcessor : IHostingTracingDiagnosticProcessor
     {
         public string ListenerName { get; } = "Microsoft.AspNetCore";
 

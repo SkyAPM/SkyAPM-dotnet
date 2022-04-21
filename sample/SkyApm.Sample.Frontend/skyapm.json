@@ -2,13 +2,14 @@
   "SkyWalking": {
     "ServiceName": "asp-net-core-frontend",
     "Namespace": "",
+    "StructType": "span",
     "HeaderVersions": [
       "sw8"
     ],
     "Sampling": {
       "SamplePer3Secs": -1,
       "Percentage": -1.0,
-      "IgnorePaths": ["**/ignore"]
+      "IgnorePaths": [ "**/ignore" ]
     },
     "Logging": {
       "Level": "Information",
@@ -38,7 +39,7 @@
       },
       "HttpClient": {
         "StopHeaderPropagationPaths": [ "**/localhost:5002/api/values/stoppropagation" ],
-        "CollectRequestHeaders": [ "User-Agent","sw8" ],
+        "CollectRequestHeaders": [ "User-Agent", "sw8" ],
         "CollectRequestBodyContentTypes": [ "application/json", "application/x-www-form-urlencoded" ],
         "CollectResponseBodyContentTypes": [ "application/json", "application/x-www-form-urlencoded", "text/plain" ],
         "CollectBodyLengthThreshold": 4096
