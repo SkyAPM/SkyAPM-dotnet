@@ -13,10 +13,10 @@ namespace Sky.Apm.Sample.Logging.Controllers
     };
 
         private readonly Test _test;
-        private readonly ILogger<WeatherForecastController> _logger;
-        public WeatherForecastController(ILogger<WeatherForecastController> logger, Test test)
+        private readonly SkyApm.Logging.ILogger _loggerFactory;
+        public WeatherForecastController(SkyApm.Logging.ILoggerFactory loggerFactory, Test test)
         {
-            _logger = logger;
+            _loggerFactory = loggerFactory.CreateSkyApmLogger(GetType());
             _test = test;
         }
 
@@ -24,7 +24,7 @@ namespace Sky.Apm.Sample.Logging.Controllers
         public IEnumerable<WeatherForecast> Get()
         {
             //Console.WriteLine(_entrySegmentContextAccessor.Context?.TraceId);
-            _logger.LogInformation("我用来测试自定义日志！！！！！！！！！！！！");
+            _loggerFactory.Information("qiwnkasdnaskndlaknd laksndk asndkas ndl nsald nlasdn la！！！！！！！！！！！！");
             _test.Create();
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast
             {

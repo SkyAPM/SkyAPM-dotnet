@@ -47,6 +47,22 @@ namespace Microsoft.Extensions.DependencyInjection
             return services;
         }
 
+        public static IServiceCollection AddPushSkyApmLogger(this IServiceCollection services,Action<LogPushSkywalkingConfig> action)
+        {
+            if (services == null)
+            {
+                throw new ArgumentNullException(nameof(services));
+            }
+            if (action == null)
+            {
+                throw new ArgumentNullException(nameof(action));
+            }
+            LogPushSkywalkingConfig logPushSkywalking=new LogPushSkywalkingConfig();
+            action.Invoke(logPushSkywalking);
+            services.Configure(action);
+            return services;
+        }
+
         internal static IServiceCollection AddSkyAPMCore(this IServiceCollection services, Action<SkyApmExtensions> extensionsSetup = null)
         {
             if (services == null)
@@ -130,5 +146,6 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<ILoggerFactory, DefaultLoggerFactory>();
             return services;
         }
+
     }
 }

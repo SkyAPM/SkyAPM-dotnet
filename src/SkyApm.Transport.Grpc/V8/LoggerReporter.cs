@@ -45,7 +45,7 @@ namespace SkyApm.Transport.Grpc
                         StringBuilder logmessage=new StringBuilder();
                         foreach (var log in loggerRequest.Logs)
                         {
-                            logmessage.Append($"\r\n{log.Key}:{log.Value}");
+                            logmessage.Append($"\r\n{log.Key} : {log.Value}");
                         }
                         var logbody = new LogData()
                         {
