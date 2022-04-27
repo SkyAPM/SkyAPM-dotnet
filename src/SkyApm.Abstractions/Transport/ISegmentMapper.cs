@@ -20,7 +20,7 @@ using SkyApm.Tracing.Segments;
 
 namespace SkyApm.Transport
 {
-    public interface ISegmentContextMapper
+    public interface ISegmentMapper
     {
         SegmentRequest Map(SegmentContext segmentContext);
 

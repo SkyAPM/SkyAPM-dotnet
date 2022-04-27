@@ -1,5 +1,7 @@
 ﻿using SkyApm.Tracing.Segments;
+using System.Collections;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 
@@ -107,13 +109,13 @@ namespace SkyApm.Tracing
                     {
                         var childSegment = new TraceSegment(TraceId, _uniqueIdGenerator.Generate(), Sampled, ServiceId, ServiceInstanceId);
                         childSegment.FirstSpan = child;
-                        System.Console.WriteLine($"parent: {segment.SegmentId}, child: {childSegment.SegmentId}");
+                        AsyncDeepCopyAndUpdateSpans(child, span, segment.Spans, childSegment.Spans);
                         var reference = new SegmentReference
                         {
                             Reference = Reference.CrossThread,
                             TraceId = segment.TraceId,
                             ParentSegmentId = segment.SegmentId,
-                            ParentSpanId = span.SpanId,
+                            ParentSpanId = child.SpanId,
                             ParentServiceId = segment.ServiceId,
                             ParentServiceInstanceId = segment.ServiceInstanceId,
                             ParentEndpoint = segment.FirstSpan.OperationName,
@@ -129,6 +131,45 @@ namespace SkyApm.Tracing
 
             segment.Spans.Add(span);
             return span == segment.FirstSpan ? segment : null;
+        }
+
+        public SegmentSpan AsyncDeepCopyAndUpdateSpans(SegmentSpan span, SegmentSpan parent, IList<SegmentSpan> spans, IList<SegmentSpan> newSegmentSpans)
+        {
+            if (span.EndTime != default) return span;
+
+            var asyncDepth = span.AsyncDepth == -1 ? 0 : span.AsyncDepth;
+            span.AsyncDepth = asyncDepth + 1;
+            var copySpan = new SegmentSpan(span.OperationName.ToString(), span.SpanType)
+            {
+                SpanId = span.SpanId,
+                Peer = span.Peer,
+                SpanLayer = span.SpanLayer,
+                Component = span.Component,
+                IsError = span.IsError,
+                AsyncDepth = asyncDepth,
+                Parent = parent
+            };
+            foreach (var tag in span.Tags)
+            {
+                copySpan.AddTag(tag.Key, tag.Value);
+            }
+            foreach (var log in span.Logs)
+            {
+                copySpan.AddLog(log);
+            }
+            foreach (var child in span.Children)
+            {
+                var copyChild = AsyncDeepCopyAndUpdateSpans(child.Value, copySpan, spans, newSegmentSpans);
+                if (copyChild != null)
+                {
+                    copySpan.Children.TryAdd(child.Key, copyChild);
+                }
+            }
+
+            copySpan.Finish();
+            spans.Add(copySpan);
+
+            return copySpan;
         }
 
         private int NextSpanId() => Interlocked.Increment(ref _spanId);

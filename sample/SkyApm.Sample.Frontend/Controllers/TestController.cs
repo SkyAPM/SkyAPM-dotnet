@@ -29,7 +29,7 @@ namespace SkyApm.Sample.Backend.Controllers
         [Route("")]
         public async Task<string> Get()
         {
-            var disposableOuter = NewSegmentOrSpan("[Get] - Outer!");
+            var disposableOuter = NewSegmentOrSpan("GetOuter");
             var disposableInner = NewSegmentOrSpan("GetInner");
             await Delay("inner");
             disposableInner.Dispose();
@@ -38,9 +38,17 @@ namespace SkyApm.Sample.Backend.Controllers
             disposableOuter.Dispose();
 
             var result = await PutAsync(1);
-            //PostAsync(2);
+            WrapRequest();
 
             return $"get -> {result}";
+        }
+
+        [HttpGet]
+        [Route("delay")]
+        public async Task<int> Delay(int millisecond)
+        {
+            await Task.Delay(millisecond);
+            return millisecond;
         }
 
         [HttpGet]
@@ -96,6 +104,18 @@ namespace SkyApm.Sample.Backend.Controllers
             throw new InvalidOperationException("invalid");
         }
 
+        private async Task<string> WrapRequest()
+        {
+            var sos1 = NewSegmentOrSpan("WrapRequest-Outer");
+            var sos2 = NewSegmentOrSpan("WrapRequest-Inner");
+            NewSegmentOrSpan("WrapRequest-1").Dispose();
+            var result = await DelayAsync(3000);
+            NewSegmentOrSpan("WrapRequest-2").Dispose();
+            sos2.Dispose();
+            sos1.Dispose();
+            return result;
+        }
+
         private async Task<string> PostAsync(int flag)
         {
             var httpClient = _httpClientFactory.CreateClient();
@@ -107,6 +127,13 @@ namespace SkyApm.Sample.Backend.Controllers
         {
             var httpClient = _httpClientFactory.CreateClient();
             var response = await httpClient.PutAsync($"http://127.0.0.1:5001/test?flag={flag}", new StringContent(string.Empty));
+            return await response.Content.ReadAsStringAsync();
+        }
+
+        private async Task<string> DelayAsync(int millisecond)
+        {
+            var httpClient = _httpClientFactory.CreateClient();
+            var response = await httpClient.GetAsync($"http://127.0.0.1:5001/test/delay?millisecond={millisecond}");
             return await response.Content.ReadAsStringAsync();
         }
 

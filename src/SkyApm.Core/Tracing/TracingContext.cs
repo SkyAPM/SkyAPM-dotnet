@@ -121,7 +121,6 @@ namespace SkyApm.Tracing
 
             if(segment != null && segment.Sampled)
             {
-                segment.FirstSpan.SpanId = 0;
                 _segmentDispatcher.Dispatch(segment);
             }
         }

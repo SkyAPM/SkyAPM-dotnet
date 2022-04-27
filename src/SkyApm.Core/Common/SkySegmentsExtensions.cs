@@ -1,6 +1,6 @@
 ﻿namespace SkyApm.Tracing.Segments
 {
-    public static class SkySegmentExtensions
+    public static class SkySegmentsExtensions
     {
         public static CrossThreadCarrier GetCrossThreadCarrier(this TraceSegment segment, int spanId)
         {

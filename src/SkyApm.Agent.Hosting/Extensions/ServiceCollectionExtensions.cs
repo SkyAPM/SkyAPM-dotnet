@@ -91,7 +91,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IExitSegmentContextAccessor, ExitSegmentContextAccessor>();
             services.AddSingleton<ISamplerChainBuilder, SamplerChainBuilder>();
             services.AddSingleton<IUniqueIdGenerator, UniqueIdGenerator>();
-            services.AddSingleton<ISegmentContextMapper, SegmentContextMapper>();
+            services.AddSingleton<ISegmentMapper, SegmentMapper>();
             services.AddSingleton<IBase64Formatter, Base64Formatter>();
             return services;
         }

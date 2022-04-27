@@ -50,6 +50,8 @@ namespace SkyApm.Tracing.Segments
 
         public LogCollection Logs { get; } = new LogCollection();
 
+        public int AsyncDepth { get; set; } = -1;
+
         public string SpanPath => Parent == null ? SpanId.ToString() : $"{Parent.SpanPath},{SpanId}";
 
         public SegmentReferenceCollection References { get; } = new SegmentReferenceCollection();
@@ -86,6 +88,11 @@ namespace SkyApm.Tracing.Segments
         public void AddLog(params LogEvent[] events)
         {
             var log = new SpanLog(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(), events);
+            AddLog(log);
+        }
+
+        public void AddLog(SpanLog log)
+        {
             Logs.AddLog(log);
         }
 

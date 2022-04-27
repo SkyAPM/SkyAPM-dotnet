@@ -17,12 +17,11 @@
  */
 
 using System.Collections.Generic;
-using SkyApm.Tracing;
 using SkyApm.Tracing.Segments;
 
 namespace SkyApm.Transport
 {
-    public class SegmentContextMapper : ISegmentContextMapper
+    public class SegmentMapper : ISegmentMapper
     {
         public SegmentRequest Map(SegmentContext segmentContext)
         {
@@ -82,6 +81,7 @@ namespace SkyApm.Transport
 
         public SegmentRequest Map(TraceSegment traceSegment)
         {
+            traceSegment.FirstSpan.SpanId = 0;
             var segmentRequest = new SegmentRequest
             {
                 TraceId = traceSegment.TraceId
@@ -95,11 +95,12 @@ namespace SkyApm.Transport
             segmentRequest.Segment = segmentObjectRequest;
             foreach (var span in traceSegment.Spans)
             {
+                var operationName = span.AsyncDepth < 0 ? span.OperationName : $"[async-{span.AsyncDepth}]{span.OperationName}";
                 var spanRequest = new SpanRequest
                 {
                     SpanId = span.SpanId,
                     ParentSpanId = span.ParentSpanId,
-                    OperationName = span.OperationName,
+                    OperationName = operationName,
                     StartTime = span.StartTime,
                     EndTime = span.EndTime,
                     SpanType = (int)span.SpanType,

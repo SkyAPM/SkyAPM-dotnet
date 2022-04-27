@@ -32,7 +32,7 @@ namespace SkyApm.Transport
         private readonly ILogger _logger;
         private readonly TransportConfig _config;
         private readonly ISegmentReporter _segmentReporter;
-        private readonly ISegmentContextMapper _segmentContextMapper;
+        private readonly ISegmentMapper _segmentContextMapper;
         private readonly ConcurrentQueue<SegmentRequest> _segmentQueue;
         private readonly IRuntimeEnvironment _runtimeEnvironment;
         private readonly CancellationTokenSource _cancellation;
@@ -40,7 +40,7 @@ namespace SkyApm.Transport
 
         public AsyncQueueSegmentDispatcher(IConfigAccessor configAccessor,
             ISegmentReporter segmentReporter, IRuntimeEnvironment runtimeEnvironment,
-            ISegmentContextMapper segmentContextMapper, ILoggerFactory loggerFactory)
+            ISegmentMapper segmentContextMapper, ILoggerFactory loggerFactory)
         {
             _segmentReporter = segmentReporter;
             _segmentContextMapper = segmentContextMapper;
