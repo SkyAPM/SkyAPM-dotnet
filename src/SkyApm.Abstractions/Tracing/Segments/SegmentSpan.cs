@@ -35,7 +35,7 @@ namespace SkyApm.Tracing.Segments
 
         public long EndTime { get; set; }
 
-        public StringOrIntValue OperationName { get; }
+        public StringOrIntValue OperationName { get; set; }
 
         public StringOrIntValue Peer { get; set; }
 

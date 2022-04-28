@@ -56,16 +56,47 @@ namespace SkyApm.Sample.Backend.Controllers
         public async Task<string> MultiRequest()
         {
             await PutAsync(1);
-            await PutAsync(2);
+            await PostAsync(2);
             await PutAsync(3);
             await PutAsync(4);
-            await PutAsync(5);
+            await PostAsync(5);
             await PutAsync(6);
             await PutAsync(7);
             await PutAsync(8);
             await PutAsync(9);
 
             return "123456789";
+        }
+
+        [HttpGet]
+        [Route("asyncNoLocal")]
+        public string AsyncNoLocal()
+        {
+            DelayAsync(6000);
+            return "ok";
+        }
+
+        [HttpGet]
+        [Route("asyncInAsync")]
+        public string AsyncInAsync()
+        {
+            Async1();
+            return "ok";
+        }
+
+        private async Task Async1()
+        {
+            var context = NewSegmentOrSpan("async1");
+            await Task.Delay(6000);
+            Async2();
+            context.Dispose();
+        }
+
+        private async Task Async2()
+        {
+            var context = NewSegmentOrSpan("async2");
+            await Task.Delay(10000);
+            context.Dispose();
         }
 
         [HttpPost]
@@ -78,11 +109,11 @@ namespace SkyApm.Sample.Backend.Controllers
                 Task.Run(() =>
                 {
                     var disposableInner = NewSegmentOrSpan($"PostBackgroundTaskInner-{flag}");
-                    Thread.Sleep(5000);
+                    Thread.Sleep(2000);
                     NewSegmentOrSpan($"PostBackgroundTaskInner-{flag}.Instantaneous").Dispose();
                     disposableInner.Dispose();
                 });
-                Thread.Sleep(3000);
+                Thread.Sleep(1000);
                 disposable.Dispose();
             });
             Thread.Sleep(500);
@@ -109,7 +140,7 @@ namespace SkyApm.Sample.Backend.Controllers
             var sos1 = NewSegmentOrSpan("WrapRequest-Outer");
             var sos2 = NewSegmentOrSpan("WrapRequest-Inner");
             NewSegmentOrSpan("WrapRequest-1").Dispose();
-            var result = await DelayAsync(3000);
+            var result = await DelayAsync(2000);
             NewSegmentOrSpan("WrapRequest-2").Dispose();
             sos2.Dispose();
             sos1.Dispose();

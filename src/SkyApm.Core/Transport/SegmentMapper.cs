@@ -81,7 +81,16 @@ namespace SkyApm.Transport
 
         public SegmentRequest Map(TraceSegment traceSegment)
         {
-            traceSegment.FirstSpan.SpanId = 0;
+            return Map(traceSegment, false);
+        }
+
+        public SegmentRequest MapIfNoAsync(TraceSegment traceSegment)
+        {
+            return Map(traceSegment, true);
+        }
+
+        private SegmentRequest Map(TraceSegment traceSegment, bool nullIfAsync)
+        {
             var segmentRequest = new SegmentRequest
             {
                 TraceId = traceSegment.TraceId
@@ -95,11 +104,22 @@ namespace SkyApm.Transport
             segmentRequest.Segment = segmentObjectRequest;
             foreach (var span in traceSegment.Spans)
             {
-                var operationName = span.AsyncDepth < 0 ? span.OperationName : $"[async-{span.AsyncDepth}]{span.OperationName}";
+                string operationName;
+                if (span.AsyncDepth < 0)
+                {
+                    operationName = span.OperationName.ToString();
+                }
+                else
+                {
+                    if (nullIfAsync) return null;
+                    operationName = $"[async-{span.AsyncDepth}]{span.OperationName}";
+                }
+                var spanId = span == traceSegment.FirstSpan ? 0 : span.SpanId;
+                var parentSpanId = span.ParentSpanId == traceSegment.FirstSpan.SpanId ? 0 : span.ParentSpanId;
                 var spanRequest = new SpanRequest
                 {
-                    SpanId = span.SpanId,
-                    ParentSpanId = span.ParentSpanId,
+                    SpanId = spanId,
+                    ParentSpanId = parentSpanId,
                     OperationName = operationName,
                     StartTime = span.StartTime,
                     EndTime = span.EndTime,

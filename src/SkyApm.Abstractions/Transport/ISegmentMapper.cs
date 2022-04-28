@@ -25,5 +25,7 @@ namespace SkyApm.Transport
         SegmentRequest Map(SegmentContext segmentContext);
 
         SegmentRequest Map(TraceSegment traceSegment);
+
+        SegmentRequest MapIfNoAsync(TraceSegment traceSegment);
     }
 }

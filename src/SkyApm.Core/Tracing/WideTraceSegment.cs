@@ -109,7 +109,9 @@ namespace SkyApm.Tracing
                     {
                         var childSegment = new TraceSegment(TraceId, _uniqueIdGenerator.Generate(), Sampled, ServiceId, ServiceInstanceId);
                         childSegment.FirstSpan = child;
+                        child.AsyncDepth = segment.FirstSpan.AsyncDepth;
                         AsyncDeepCopyAndUpdateSpans(child, span, segment.Spans, childSegment.Spans);
+                        child.SpanType = SpanType.Local;
                         var reference = new SegmentReference
                         {
                             Reference = Reference.CrossThread,
@@ -139,7 +141,7 @@ namespace SkyApm.Tracing
 
             var asyncDepth = span.AsyncDepth == -1 ? 0 : span.AsyncDepth;
             span.AsyncDepth = asyncDepth + 1;
-            var copySpan = new SegmentSpan(span.OperationName.ToString(), span.SpanType)
+            var copySpan = new SegmentSpan(span.OperationName.ToString(), span.SpanType, span.StartTime)
             {
                 SpanId = span.SpanId,
                 Peer = span.Peer,
