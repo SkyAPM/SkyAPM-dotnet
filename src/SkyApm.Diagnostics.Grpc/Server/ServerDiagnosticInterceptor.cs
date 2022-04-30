@@ -25,9 +25,9 @@ namespace SkyApm.Diagnostics.Grpc.Server
 {
     public class ServerDiagnosticInterceptor : Interceptor
     {
-        private readonly IServerDiagnosticProcessor _processor;
+        private readonly ServerDiagnosticProcessor _processor;
 
-        public ServerDiagnosticInterceptor(IServerDiagnosticProcessor processor)
+        public ServerDiagnosticInterceptor(ServerDiagnosticProcessor processor)
         {
             _processor = processor;
         }

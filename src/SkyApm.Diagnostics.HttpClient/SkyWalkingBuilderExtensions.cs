@@ -33,16 +33,9 @@ namespace SkyApm.Diagnostics.HttpClient
                 throw new ArgumentNullException(nameof(extensions));
             }
 
-            extensions.Services.AddSingleton<ITracingDiagnosticProcessor, HttpClientTracingDiagnosticProcessorAdapter>();
-
-            extensions.Services.AddSingleton<HttpClientTracingDiagnosticProcessor>();
+            extensions.Services.AddSingleton<ITracingDiagnosticProcessor, HttpClientTracingDiagnosticProcessor>();
             extensions.Services.AddSingleton<IRequestDiagnosticHandler, DefaultRequestDiagnosticHandler>();
             extensions.Services.AddSingleton<IRequestDiagnosticHandler, GrpcRequestDiagnosticHandler>();
-
-            extensions.Services.AddSingleton<SpanHttpClientTracingDiagnosticProcessor>();
-            extensions.Services.AddSingleton<ISpanRequestDiagnosticHandler, SpanDefaultRequestDiagnosticHandler>();
-            extensions.Services.AddSingleton<ISpanRequestDiagnosticHandler, SpanGrpcRequestDiagnosticHandler>();
-
             return extensions;
         }
     }

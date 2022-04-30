@@ -26,15 +26,9 @@ namespace SkyApm.AspNetCore.Diagnostics
     {
         public static SkyApmExtensions AddAspNetCoreHosting(this SkyApmExtensions extensions)
         {
-            extensions.Services.AddSingleton<ITracingDiagnosticProcessor, HostingTracingDiagnosticProcessorAdapter>();
-
-            extensions.Services.AddSingleton<HostingTracingDiagnosticProcessor>();
+            extensions.Services.AddSingleton<ITracingDiagnosticProcessor, HostingTracingDiagnosticProcessor>();
             extensions.Services.AddSingleton<IHostingDiagnosticHandler, DefaultHostingDiagnosticHandler>();
             extensions.Services.AddSingleton<IHostingDiagnosticHandler, GrpcHostingDiagnosticHandler>();
-
-            extensions.Services.AddSingleton<SpanHostingTracingDiagnosticProcessor>();
-            extensions.Services.AddSingleton<ISpanHostingDiagnosticHandler, SpanDefaultHostingDiagnosticHandler>();
-            extensions.Services.AddSingleton<ISpanHostingDiagnosticHandler, SpanGrpcHostingDiagnosticHandler>();
             return extensions;
         }
     }

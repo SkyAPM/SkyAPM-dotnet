@@ -17,40 +17,79 @@
  */
 
 using SkyApm.Tracing.Segments;
+using System;
 
 namespace SkyApm.Tracing
 {
     public interface ITracingContext
     {
-        SegmentSpan ActiveSpan { get; }
-
-        TraceSegment ActiveSegment { get; }
-
+        #region SegmentContext
+        [Obsolete("Use CreateEntry instead of this method")]
         SegmentContext CreateEntrySegmentContext(string operationName, ICarrierHeaderCollection carrierHeader, long startTimeMilliseconds = default);
 
+        [Obsolete("Use CreateLocal instead of this method")]
         SegmentContext CreateLocalSegmentContext(string operationName, long startTimeMilliseconds = default);
 
-        SegmentContext CreateExitSegmentContext(string operationName, string networkAddress,
-            ICarrierHeaderCollection carrierHeader = default, long startTimeMilliseconds = default);
+        [Obsolete("Use CreateLocal instead of this method")]
+        SegmentContext CreateLocalSegmentContext(string operationName, CrossThreadCarrier carrier, long startTimeMilliseconds = default);
 
+        [Obsolete("Use CreateExit instead of this method")]
+        SegmentContext CreateExitSegmentContext(string operationName, string networkAddress, ICarrierHeaderCollection carrierHeader = default, long startTimeMilliseconds = default);
+
+        [Obsolete("Use CreateExit instead of this method")]
+        SegmentContext CreateExitSegmentContext(string operationName, string networkAddress, CrossThreadCarrier carrier, ICarrierHeaderCollection carrierHeader = default, long startTimeMilliseconds = default);
+
+        [Obsolete("Use Finish instead of this method")]
         void Release(SegmentContext segmentContext, long endTimeMilliseconds = default);
+        #endregion SegmentContext
 
+        #region SegmentSpan
+        [Obsolete("Span structure only")]
+        SegmentSpan ActiveSpan { get; }
+
+        [Obsolete("Span structure only")]
+        TraceSegment ActiveSegment { get; }
+
+        [Obsolete("Use CreateEntry instead of this method")]
         SegmentSpan CreateEntrySpan(string operationName, ICarrierHeaderCollection carrierHeader, long startTimeMilliseconds = default);
 
+        [Obsolete("Use CreateLocal instead of this method")]
         SegmentSpan CreateLocalSpan(string operationName, long startTimeMilliseconds = default);
 
+        [Obsolete("Use CreateLocal instead of this method")]
         SegmentSpan CreateLocalSpan(string operationName, CrossThreadCarrier carrier, long startTimeMilliseconds = default);
 
+        [Obsolete("Use CreateExit instead of this method")]
         SegmentSpan CreateExitSpan(string operationName, string networkAddress, ICarrierHeaderCollection carrierHeader = default, long startTimeMilliseconds = default);
 
+        [Obsolete("Use CreateExit instead of this method")]
         SegmentSpan CreateExitSpan(string operationName, string networkAddress, CrossThreadCarrier carrier, ICarrierHeaderCollection carrierHeader = default, long startTimeMilliseconds = default);
 
+        [Obsolete("Use Finish instead of this method")]
         void StopSpan(SegmentSpan span);
 
+        [Obsolete("Use Finish instead of this method")]
         void StopSpan();
+        #endregion SegmentSpan
 
-        CrossThreadCarrier StopSpanGetCarrier(SegmentSpan span);
+        #region SpanOrSegmentContext
+        SpanOrSegmentContext CurrentEntry { get; }
 
-        CrossThreadCarrier StopSpanGetCarrier();
+        SpanOrSegmentContext CurrentLocal { get; }
+
+        SpanOrSegmentContext CurrentExit { get; }
+
+        SpanOrSegmentContext CreateEntry(string operationName, ICarrierHeaderCollection carrierHeader, long startTimeMilliseconds = default);
+
+        SpanOrSegmentContext CreateLocal(string operationName, long startTimeMilliseconds = default);
+
+        SpanOrSegmentContext CreateLocal(string operationName, CrossThreadCarrier carrier, long startTimeMilliseconds = default);
+
+        SpanOrSegmentContext CreateExit(string operationName, string networkAddress, ICarrierHeaderCollection carrierHeader = default, long startTimeMilliseconds = default);
+
+        SpanOrSegmentContext CreateExit(string operationName, string networkAddress, CrossThreadCarrier carrier, ICarrierHeaderCollection carrierHeader = default, long startTimeMilliseconds = default);
+
+        void Finish(SpanOrSegmentContext spanOrSegmentContext);
+        #endregion SpanOrSegmentContext
     }
 }

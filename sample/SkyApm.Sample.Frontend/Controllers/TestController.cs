@@ -29,13 +29,13 @@ namespace SkyApm.Sample.Backend.Controllers
         [Route("")]
         public async Task<string> Get()
         {
-            var disposableOuter = NewSegmentOrSpan("GetOuter");
-            var disposableInner = NewSegmentOrSpan("GetInner");
+            var outer = _tracingContext.CreateLocal("GetOuter");
+            var inner = _tracingContext.CreateLocal("GetInner");
             await Delay("inner");
-            disposableInner.Dispose();
-            NewSegmentOrSpan("GetInner-2").Dispose();
+            _tracingContext.Finish(inner);
+            _tracingContext.Finish(_tracingContext.CreateLocal("GetInner-2"));
             WrapDelay();
-            disposableOuter.Dispose();
+            _tracingContext.Finish(outer);
 
             var result = await PutAsync(1);
             WrapRequest();
@@ -86,17 +86,17 @@ namespace SkyApm.Sample.Backend.Controllers
 
         private async Task Async1()
         {
-            var context = NewSegmentOrSpan("async1");
+            var context = _tracingContext.CreateLocal("async1");
             await Task.Delay(6000);
             Async2();
-            context.Dispose();
+            _tracingContext.Finish(context);
         }
 
         private async Task Async2()
         {
-            var context = NewSegmentOrSpan("async2");
+            var context = _tracingContext.CreateLocal("async2");
             await Task.Delay(10000);
-            context.Dispose();
+            _tracingContext.Finish(context);
         }
 
         [HttpPost]
@@ -105,16 +105,16 @@ namespace SkyApm.Sample.Backend.Controllers
         {
             Task.Run(() =>
             {
-                var disposable = NewSegmentOrSpan($"PostBackgroundTask-{flag}");
+                var outer = _tracingContext.CreateLocal($"PostBackgroundTask-{flag}");
                 Task.Run(() =>
                 {
-                    var disposableInner = NewSegmentOrSpan($"PostBackgroundTaskInner-{flag}");
+                    var inner = _tracingContext.CreateLocal($"PostBackgroundTaskInner-{flag}");
                     Thread.Sleep(2000);
-                    NewSegmentOrSpan($"PostBackgroundTaskInner-{flag}.Instantaneous").Dispose();
-                    disposableInner.Dispose();
+                    _tracingContext.Finish(_tracingContext.CreateLocal($"PostBackgroundTaskInner-{flag}.Instantaneous"));
+                    _tracingContext.Finish(inner);
                 });
                 Thread.Sleep(1000);
-                disposable.Dispose();
+                _tracingContext.Finish(outer);
             });
             Thread.Sleep(500);
             return $"post-{flag}";
@@ -124,7 +124,7 @@ namespace SkyApm.Sample.Backend.Controllers
         [Route("")]
         public string Put([FromQuery] int flag)
         {
-            NewSegmentOrSpan($"Put-{flag}").Dispose();
+            _tracingContext.Finish(_tracingContext.CreateLocal($"Put-{flag}"));
             return $"put-{flag}";
         }
 
@@ -137,13 +137,13 @@ namespace SkyApm.Sample.Backend.Controllers
 
         private async Task<string> WrapRequest()
         {
-            var sos1 = NewSegmentOrSpan("WrapRequest-Outer");
-            var sos2 = NewSegmentOrSpan("WrapRequest-Inner");
-            NewSegmentOrSpan("WrapRequest-1").Dispose();
+            var sos1 = _tracingContext.CreateLocal("WrapRequest-Outer");
+            var sos2 = _tracingContext.CreateLocal("WrapRequest-Inner");
+            _tracingContext.Finish(_tracingContext.CreateLocal("WrapRequest-1"));
             var result = await DelayAsync(2000);
-            NewSegmentOrSpan("WrapRequest-2").Dispose();
-            sos2.Dispose();
-            sos1.Dispose();
+            _tracingContext.Finish(_tracingContext.CreateLocal("WrapRequest-2"));
+            _tracingContext.Finish(sos2);
+            _tracingContext.Finish(sos1);
             return result;
         }
 
@@ -170,60 +170,17 @@ namespace SkyApm.Sample.Backend.Controllers
 
         private async Task WrapDelay()
         {
-            var disposable = NewSegmentOrSpan("WrapDelay");
+            var wrapDelay = _tracingContext.CreateLocal("WrapDelay");
             await Task.Delay(3000);
             await Delay("wrap");
-            disposable.Dispose();
+            _tracingContext.Finish(wrapDelay);
         }
 
         private async Task Delay(string suffix)
         {
-            var disposable = NewSegmentOrSpan($"Delay.{suffix}");
+            var disposable = _tracingContext.CreateLocal($"Delay.{suffix}");
             await Task.Delay(500);
-            disposable.Dispose();
-        }
-
-        private IDisposable NewSegmentOrSpan(string operationName)
-        {
-            if ("span".Equals(_configuration.GetValue("SkyWalking:StructType", "segment"), StringComparison.OrdinalIgnoreCase))
-            {
-                var span = _tracingContext.CreateLocalSpan(operationName);
-                return new SkyContext(_tracingContext, span);
-            }
-
-            var segmentContext = _tracingContext.CreateLocalSegmentContext(operationName);
-            return new SkyContext(_tracingContext, segmentContext);
-        }
-    }
-
-    class SkyContext : IDisposable
-    {
-        private readonly SegmentSpan _span;
-        private readonly SegmentContext _segmentContext;
-        private readonly ITracingContext _tracingContext;
-
-        public SkyContext(ITracingContext tracingContext, SegmentSpan span)
-        {
-            _span = span;
-            _tracingContext = tracingContext;
-        }
-
-        public SkyContext(ITracingContext tracingContext, SegmentContext context)
-        {
-            _segmentContext = context;
-            _tracingContext = tracingContext;
-        }
-
-        public void Dispose()
-        {
-            if (_span != null)
-            {
-                _tracingContext.StopSpan(_span);
-            }
-            else
-            {
-                _tracingContext.Release(_segmentContext);
-            }
+            _tracingContext.Finish(disposable);
         }
     }
 }

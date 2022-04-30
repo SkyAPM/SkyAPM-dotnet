@@ -27,6 +27,8 @@ namespace SkyApm.Tracing.Segments
 {
     public class SegmentSpan
     {
+        private TraceSegment _segment;
+
         public int SpanId { get; set; } = 0;
 
         public int ParentSpanId => Parent == null ? -1 : Parent.SpanId;
@@ -54,8 +56,20 @@ namespace SkyApm.Tracing.Segments
 
         public string SpanPath => Parent == null ? SpanId.ToString() : $"{Parent.SpanPath},{SpanId}";
 
+        /// <summary>
+        /// Should only be set by first span of segment
+        /// </summary>
+        public TraceSegment Segment
+        {
+            get => Parent == null ? _segment : Parent.Segment;
+            set => _segment = value;
+        }
+
         public SegmentReferenceCollection References { get; } = new SegmentReferenceCollection();
 
+        /// <summary>
+        /// A lot of logic uses Parent, think carefully before changing this value
+        /// </summary>
         public SegmentSpan Parent { get; set; }
 
         public ConcurrentDictionary<int, SegmentSpan> Children { get; } = new ConcurrentDictionary<int, SegmentSpan>();

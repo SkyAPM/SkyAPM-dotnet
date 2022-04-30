@@ -22,47 +22,52 @@ using System;
 
 namespace SkyApm.Diagnostics.MongoDB
 {
-    public class MongoDiagnosticsProcessor : BaseMongoDiagnosticsProcessor, IMongoDiagnosticsProcessor
+    public class MongoDiagnosticsProcessor : ITracingDiagnosticProcessor
     {
         public string ListenerName => "MongoSourceListener";
         private readonly ITracingContext _tracingContext;
-        private readonly IExitSegmentContextAccessor _contextAccessor;
  
-        public MongoDiagnosticsProcessor(ITracingContext tracingContext,
-            IExitSegmentContextAccessor contextAccessor)
+        public MongoDiagnosticsProcessor(ITracingContext tracingContext)
         {
             _tracingContext = tracingContext;
-            _contextAccessor = contextAccessor;
         }
 
         [DiagnosticName("MongoActivity.Start")]
         public void BeforeExecuteCommand([Object] CommandStartedEvent @event)
         {
             var operationName = DiagnosticsActivityEventSubscriber.GetCollectionName(@event);
-            var context = _tracingContext.CreateExitSegmentContext(operationName, @event.ConnectionId.ServerId.EndPoint.ToString());
-            BeforeExecuteCommandSetupSpan(context.Span, operationName, @event);
+            var spanOrSegment = _tracingContext.CreateExit(operationName, @event.ConnectionId.ServerId.EndPoint.ToString());
+            spanOrSegment.Span.SpanLayer = Tracing.Segments.SpanLayer.DB;
+            spanOrSegment.Span.Component = Common.Components.MongoDBCLIENT;
+            spanOrSegment.Span.AddTag("db.system", "mongodb");
+            spanOrSegment.Span.AddTag("db.name", @event.DatabaseNamespace?.DatabaseName);
+            spanOrSegment.Span.AddTag("db.mongodb.collection", operationName);
+            spanOrSegment.Span.AddTag("db.operation", operationName + @event.CommandName);
+            spanOrSegment.Span.AddTag(Common.Tags.DB_TYPE, "sql");
+            spanOrSegment.Span.AddTag(Common.Tags.DB_INSTANCE, @event.DatabaseNamespace.DatabaseName);
+            spanOrSegment.Span.AddTag(Common.Tags.DB_STATEMENT, @event.Command.ToString());
         }
 
         [DiagnosticName("MongoActivity.Stop")]
         public void AfterExecuteCommand([Object] CommandSucceededEvent @event)
-        { 
-            var context = _contextAccessor.Context;
-            if (context == null) return;
+        {
+            var spanOrSegment = _tracingContext.CurrentExit;
+            spanOrSegment?.Span.AddTag(Common.Tags.STATUS_CODE, "ok");
 
-            AfterExecuteCommandSetupSpan(context.Span, @event);
-
-            _tracingContext.Release(context);
+            _tracingContext.Finish(spanOrSegment);
         }
 
         [DiagnosticName("MongoActivity.Failed")]
         public void FailedExecuteCommand([Object] CommandFailedEvent @event)
         {
-            var context = _contextAccessor.Context;
-            if (context == null) return;
+            var spanOrSegment = _tracingContext.CurrentExit;
+            spanOrSegment?.Span.AddTag("status_description", @event.Failure.Message);
+            spanOrSegment?.Span.AddTag("error.type", @event.Failure.GetType().FullName);
+            spanOrSegment?.Span.AddTag("error.msg", @event.Failure.Message);
+            spanOrSegment?.Span.AddTag("error.stack", @event.Failure.StackTrace);
+            spanOrSegment?.Span.AddTag(Common.Tags.STATUS_CODE, "error");
 
-            FailedExecuteCommandSetupSpan(context.Span, @event);
-
-            _tracingContext.Release(context);
+            _tracingContext.Finish(spanOrSegment);
         }
          
     }

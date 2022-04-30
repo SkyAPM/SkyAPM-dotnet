@@ -24,9 +24,9 @@ namespace SkyApm.Diagnostics.Grpc.Client
 {
     public class ClientDiagnosticInterceptor : Interceptor
     {
-        private readonly IClientDiagnosticProcessor _processor;
+        private readonly ClientDiagnosticProcessor _processor;
 
-        public ClientDiagnosticInterceptor(IClientDiagnosticProcessor processor)
+        public ClientDiagnosticInterceptor(ClientDiagnosticProcessor processor)
         {
             _processor = processor;
         }

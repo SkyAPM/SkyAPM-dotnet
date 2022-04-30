@@ -23,10 +23,10 @@ namespace SkyApm.Diagnostics.EntityFrameworkCore
 {
     public interface IEntityFrameworkCoreSegmentContextFactory
     {
-        SegmentContext GetCurrentContext(DbCommand dbCommand);
+        SpanOrSegmentContext GetCurrentContext(DbCommand dbCommand);
 
-        SegmentContext Create(string operationName, DbCommand dbCommand);
+        SpanOrSegmentContext Create(string operationName, DbCommand dbCommand);
 
-        void Release(SegmentContext segmentContext);
+        void Release(SpanOrSegmentContext spanOrSegment);
     }
 }

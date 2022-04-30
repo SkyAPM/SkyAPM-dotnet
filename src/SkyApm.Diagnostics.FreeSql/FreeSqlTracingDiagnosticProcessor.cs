@@ -16,10 +16,13 @@
  *
  */
 
+using FreeSql;
 using FreeSql.Aop;
 using SkyApm.Config;
 using SkyApm.Tracing;
+using SkyApm.Tracing.Segments;
 using System;
+using System.Linq;
 
 namespace SkyApm.Diagnostics.FreeSql
 {
@@ -28,37 +31,61 @@ namespace SkyApm.Diagnostics.FreeSql
     /// <summary>
     /// FreeSqlTracingDiagnosticProcessor
     /// </summary>
-    public class FreeSqlTracingDiagnosticProcessor : BaseFreeSqlTracingDiagnosticProcessor, IFreeSqlTracingDiagnosticProcessor
+    public class FreeSqlTracingDiagnosticProcessor : ITracingDiagnosticProcessor
     {
+
+        #region Const
+
+        public const string ComponentName = "FreeSql";
+
+        public const string FreeSql_CurdBefore = "FreeSql.CurdBefore";
+        public const string FreeSql_CurdAfter = "FreeSql.CurdAfter";
+        public const string FreeSql_SyncStructureBefore = "FreeSql.SyncStructureBefore";
+        public const string FreeSql_SyncStructureAfter = "FreeSql.SyncStructureAfter";
+        public const string FreeSql_CommandBefore = "FreeSql.CommandBefore";
+        public const string FreeSql_CommandAfter = "FreeSql.CommandAfter";
+        public const string FreeSql_TraceBefore = "FreeSql.TraceBefore";
+        public const string FreeSql_TraceAfter = "FreeSql.TraceAfter";
+
+        #endregion
+
+
         public string ListenerName => "FreeSqlDiagnosticListener";
 
         private readonly ITracingContext _tracingContext;
-        private readonly ILocalSegmentContextAccessor _localSegmentContextAccessor;
         private readonly TracingConfig _tracingConfig;
         public FreeSqlTracingDiagnosticProcessor(ITracingContext tracingContext,
-            ILocalSegmentContextAccessor localSegmentContextAccessor, IConfigAccessor configAccessor)
+            IConfigAccessor configAccessor)
         {
             _tracingContext = tracingContext;
-            _localSegmentContextAccessor = localSegmentContextAccessor;
             _tracingConfig = configAccessor.Get<TracingConfig>();
+        }
+
+        private SpanOrSegmentContext CreateFreeSqlLocalSegmentContext(string operation)
+        {
+            var spanOrSegment = _tracingContext.CreateLocal(operation);
+            spanOrSegment.Span.SpanLayer = SpanLayer.DB;
+            spanOrSegment.Span.Component = Common.Components.Free_SQL; 
+            spanOrSegment.Span.AddTag(Common.Tags.DB_TYPE, "Sql");
+            return spanOrSegment;
         }
 
         #region Curd
         [DiagnosticName(FreeSql_CurdBefore)]
         public void CurdBefore([Object] CurdBeforeEventArgs eventData)
         {
-            var context = _tracingContext.CreateLocalSegmentContext(eventData.CurdType.ToString());
-            CurdBeforeSetupSpan(context.Span, eventData);
+            var spanOrSegment = CreateFreeSqlLocalSegmentContext(eventData.CurdType.ToString());
+            spanOrSegment.Span.AddTag(Common.Tags.DB_STATEMENT, eventData.Sql);
         }
-
         [DiagnosticName(FreeSql_CurdAfter)]
         public void CurdAfter([Object] CurdAfterEventArgs eventData)
         {
-            var context = _localSegmentContextAccessor.Context;
-            if (context != null)
+            var spanOrSegment = _tracingContext.CurrentLocal;
+            if (spanOrSegment != null)
             {
-                CurdAfterSetupSpan(_tracingConfig, context.Span, eventData);
-                _tracingContext.Release(context);
+                if (eventData?.Exception != null)
+                    spanOrSegment.Span.ErrorOccurred(eventData.Exception, _tracingConfig);
+                _tracingContext.Finish(spanOrSegment);
             }
         }
         #endregion
@@ -67,18 +94,20 @@ namespace SkyApm.Diagnostics.FreeSql
         [DiagnosticName(FreeSql_SyncStructureBefore)]
         public void SyncStructureBefore([Object] SyncStructureBeforeEventArgs eventData)
         {
-            var context = _tracingContext.CreateLocalSegmentContext("SyncStructure");
-            SyncStructureBeforeSetupSpan(context.Span, eventData);
+            var spanOrSegment = CreateFreeSqlLocalSegmentContext("SyncStructure");
+            spanOrSegment.Span.AddTag(Common.Tags.DB_STATEMENT, string.Join(", ", eventData.EntityTypes.Select(a => a.Name)));
         }
-
         [DiagnosticName(FreeSql_SyncStructureAfter)]
         public void SyncStructureAfter([Object] SyncStructureAfterEventArgs eventData)
         {
-            var context = _localSegmentContextAccessor.Context;
-            if (context != null)
+            var spanOrSegment = _tracingContext.CurrentLocal;
+            if (spanOrSegment != null)
             {
-                SyncStructureAfterSetupSpan(_tracingConfig, context.Span, eventData);
-                _tracingContext.Release(context);
+                if (string.IsNullOrEmpty(eventData.Sql) == false)
+                    spanOrSegment.Span.AddTag(Common.Tags.DB_STATEMENT, eventData.Sql);
+                if (eventData?.Exception != null)
+                    spanOrSegment.Span.ErrorOccurred(eventData.Exception, _tracingConfig);
+                _tracingContext.Finish(spanOrSegment);
             }
         }
         #endregion
@@ -87,18 +116,20 @@ namespace SkyApm.Diagnostics.FreeSql
         [DiagnosticName(FreeSql_CommandBefore)]
         public void CommandBefore([Object] CommandBeforeEventArgs eventData)
         {
-            var context = _tracingContext.CreateLocalSegmentContext("Command");
-            CommandBeforeSetupSpan(context.Span, eventData);
+            var spanOrSegment = CreateFreeSqlLocalSegmentContext("Command");
+            spanOrSegment.Span.AddTag(Common.Tags.DB_STATEMENT, eventData.Command.CommandText);
         }
-
         [DiagnosticName(FreeSql_CommandAfter)]
         public void CommandAfter([Object] CommandAfterEventArgs eventData)
         {
-            var context = _localSegmentContextAccessor.Context;
-            if (context != null)
+            var spanOrSegment = _tracingContext.CurrentLocal;
+            if (spanOrSegment != null)
             {
-                CommandAfterSetupSpan(_tracingConfig, context.Span, eventData);
-                _tracingContext.Release(context);
+                if (string.IsNullOrEmpty(eventData.Log) == false)
+                    spanOrSegment.Span.AddTag(Common.Tags.DB_STATEMENT, eventData.Log);
+                if (eventData?.Exception != null)
+                    spanOrSegment.Span.ErrorOccurred(eventData.Exception, _tracingConfig);
+                _tracingContext.Finish(spanOrSegment);
             }
         }
         #endregion
@@ -107,18 +138,20 @@ namespace SkyApm.Diagnostics.FreeSql
         [DiagnosticName(FreeSql_TraceBefore)]
         public void TraceBeforeUnitOfWork([Object] TraceBeforeEventArgs eventData)
         {
-            var context = _tracingContext.CreateLocalSegmentContext(eventData.Operation);
-            TraceBeforeUnitOfWorkSetupSpan(context.Span, eventData);
-        }
+            var context = CreateFreeSqlLocalSegmentContext(eventData.Operation);
 
+        }
         [DiagnosticName(FreeSql_TraceAfter)]
         public void TraceAfterUnitOfWork([Object] TraceAfterEventArgs eventData)
         {
-            var context = _localSegmentContextAccessor.Context;
-            if (context != null)
+            var spanOrSegment = _tracingContext.CurrentLocal;
+            if (spanOrSegment != null)
             {
-                TraceAfterUnitOfWorkSetupSpan(_tracingConfig, context.Span, eventData);
-                _tracingContext.Release(context);
+                if (string.IsNullOrEmpty(eventData.Remark) == false)
+                    spanOrSegment.Span.AddTag(Common.Tags.DB_STATEMENT, eventData.Remark);
+                if (eventData?.Exception != null)
+                    spanOrSegment.Span.ErrorOccurred(eventData.Exception, _tracingConfig);
+                _tracingContext.Finish(spanOrSegment);
             }
         }
         #endregion

@@ -21,13 +21,13 @@ namespace SkyApm.Sample.GenericHost
         {
             while (!stoppingToken.IsCancellationRequested)
             {
-                var context = _tracingContext.CreateEntrySegmentContext(nameof(ExecuteAsync), new TextCarrierHeaderCollection(new Dictionary<string, string>()));
+                var context = _tracingContext.CreateEntry(nameof(ExecuteAsync), new TextCarrierHeaderCollection(new Dictionary<string, string>()));
 
                 await Task.Delay(1000, stoppingToken);
 
                 context.Span.AddLog(LogEvent.Message($"Worker running at: {DateTime.Now}"));
 
-                _tracingContext.Release(context);
+                _tracingContext.Finish(context);
             }
         }
     }

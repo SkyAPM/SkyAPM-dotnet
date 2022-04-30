@@ -31,10 +31,8 @@ namespace SkyApm.Diagnostics.SqlClient
                 throw new ArgumentNullException(nameof(extensions));
             }
 
-            extensions.Services.AddSingleton<ITracingDiagnosticProcessor, SqlClientTracingDiagnosticProcessorAdapter>();
-            extensions.Services.AddSingleton<SqlClientTracingDiagnosticProcessor>();
-            extensions.Services.AddSingleton<SpanSqlClientTracingDiagnosticProcessor>();
-
+            extensions.Services.AddSingleton<ITracingDiagnosticProcessor, SqlClientTracingDiagnosticProcessor>();
+            
             return extensions;
         }
     }

@@ -25,10 +25,7 @@ namespace SkyApm.Diagnostics.MongoDB
     {
         public static SkyApmExtensions AddMongoDB(this SkyApmExtensions extensions)
         {              
-            extensions.Services.AddSingleton<ITracingDiagnosticProcessor, MongoDiagnosticsProcessorAdapter>();
-            extensions.Services.AddSingleton<MongoDiagnosticsProcessor>();
-            extensions.Services.AddSingleton<SpanMongoDiagnosticsProcessor>();
-
+            extensions.Services.AddSingleton<ITracingDiagnosticProcessor, MongoDiagnosticsProcessor>();
             return extensions;
         }
     }

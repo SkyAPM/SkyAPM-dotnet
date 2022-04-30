@@ -17,14 +17,17 @@
  */
 
 using System;
+using System.Data.Common;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.EntityFrameworkCore.Storage.Internal;
 using SkyApm.Config;
+using SkyApm.Tracing;
 
 namespace SkyApm.Diagnostics.EntityFrameworkCore
 {
-    public class EntityFrameworkCoreTracingDiagnosticProcessor : BaseEntityFrameworkCoreTracingDiagnosticProcessor, IEntityFrameworkCoreTracingDiagnosticProcessor
+    public class EntityFrameworkCoreTracingDiagnosticProcessor : ITracingDiagnosticProcessor
     {
         private Func<CommandEventData, string> _operationNameResolver;
         private readonly IEntityFrameworkCoreSegmentContextFactory _contextFactory;
@@ -64,8 +67,11 @@ namespace SkyApm.Diagnostics.EntityFrameworkCore
         {
             var operationName = OperationNameResolver(eventData);
             var context = _contextFactory.Create(operationName, eventData.Command);
-
-            CommandExecutingSetupSpan(context.Span, eventData, _logParameterValue);
+            context.Span.SpanLayer = Tracing.Segments.SpanLayer.DB;
+            context.Span.AddTag(Common.Tags.DB_TYPE, "Sql");
+            context.Span.AddTag(Common.Tags.DB_INSTANCE, eventData.Command.Connection.Database);
+            context.Span.AddTag(Common.Tags.DB_STATEMENT, eventData.Command.CommandText);
+            context.Span.AddTag(Common.Tags.DB_BIND_VARIABLES, BuildParameterVariables(eventData.Command.Parameters));
         }
 
         [DiagnosticName("Microsoft.EntityFrameworkCore.Database.Command.CommandExecuted")]
@@ -94,9 +100,19 @@ namespace SkyApm.Diagnostics.EntityFrameworkCore
             var context = _contextFactory.GetCurrentContext(eventData.Command);
             if (context != null)
             {
-                CommandErrorSetupSpan(_tracingConfig, context.Span, eventData);
+                context.Span.ErrorOccurred(eventData.Exception, _tracingConfig);
                 _contextFactory.Release(context);
             }
+        }
+
+        private string BuildParameterVariables(DbParameterCollection dbParameters)
+        {
+            if (dbParameters == null)
+            {
+                return string.Empty;
+            }
+
+            return dbParameters.FormatParameters(_logParameterValue);
         }
     }
 }

@@ -28,30 +28,25 @@ namespace SkyApm.Diagnostics.EntityFrameworkCore
     {
         private readonly IEnumerable<IEntityFrameworkCoreSpanMetadataProvider> _spanMetadataProviders;
         private readonly ITracingContext _tracingContext;
-        private readonly ILocalSegmentContextAccessor _localSegmentContextAccessor;
-        private readonly IExitSegmentContextAccessor _exitSegmentContextAccessor;
 
         public EntityFrameworkCoreSegmentContextFactory(
             IEnumerable<IEntityFrameworkCoreSpanMetadataProvider> spanMetadataProviders,
-            ITracingContext tracingContext, ILocalSegmentContextAccessor localSegmentContextAccessor,
-            IExitSegmentContextAccessor exitSegmentContextAccessor)
+            ITracingContext tracingContext)
         {
             _spanMetadataProviders = spanMetadataProviders;
             _tracingContext = tracingContext;
-            _localSegmentContextAccessor = localSegmentContextAccessor;
-            _exitSegmentContextAccessor = exitSegmentContextAccessor;
         }
 
-        public SegmentContext GetCurrentContext(DbCommand dbCommand)
+        public SpanOrSegmentContext GetCurrentContext(DbCommand dbCommand)
         {
             foreach (var provider in _spanMetadataProviders)
                 if (provider.Match(dbCommand.Connection))
-                    return _exitSegmentContextAccessor.Context;
+                    return _tracingContext.CurrentExit;
 
-            return _localSegmentContextAccessor.Context;
+            return _tracingContext.CurrentLocal;
         }
 
-        public SegmentContext Create(string operationName, DbCommand dbCommand)
+        public SpanOrSegmentContext Create(string operationName, DbCommand dbCommand)
         {
             foreach (var provider in _spanMetadataProviders)
                 if (provider.Match(dbCommand.Connection))
@@ -60,25 +55,25 @@ namespace SkyApm.Diagnostics.EntityFrameworkCore
             return CreateLocalSegment(operationName, dbCommand);
         }
 
-        public void Release(SegmentContext segmentContext)
+        public void Release(SpanOrSegmentContext spanOrSegment)
         {
-            _tracingContext.Release(segmentContext);
+            _tracingContext.Finish(spanOrSegment);
         }
 
-        private SegmentContext CreateExitSegment(string operationName, DbCommand dbCommand,
+        private SpanOrSegmentContext CreateExitSegment(string operationName, DbCommand dbCommand,
             IEntityFrameworkCoreSpanMetadataProvider metadataProvider)
         {
-            var context = _tracingContext.CreateExitSegmentContext(operationName,
+            var spanOrSegment = _tracingContext.CreateExit(operationName,
                 metadataProvider.GetPeer(dbCommand.Connection));
-            context.Span.Component = new StringOrIntValue(metadataProvider.Component);
-            return context;
+            spanOrSegment.Span.Component = new StringOrIntValue(metadataProvider.Component);
+            return spanOrSegment;
         }
 
-        private SegmentContext CreateLocalSegment(string operationName, DbCommand dbCommand)
+        private SpanOrSegmentContext CreateLocalSegment(string operationName, DbCommand dbCommand)
         {
-            var context = _tracingContext.CreateLocalSegmentContext(operationName);
-            context.Span.Component = Common.Components.ENTITYFRAMEWORKCORE;
-            return context;
+            var spanOrSegment = _tracingContext.CreateLocal(operationName);
+            spanOrSegment.Span.Component = Common.Components.ENTITYFRAMEWORKCORE;
+            return spanOrSegment;
         }
     }
 }

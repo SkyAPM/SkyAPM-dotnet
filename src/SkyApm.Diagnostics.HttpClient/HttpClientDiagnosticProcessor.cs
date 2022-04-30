@@ -20,21 +20,21 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using SkyApm.Common;
 using SkyApm.Config;
 using SkyApm.Diagnostics.HttpClient.Config;
+using SkyApm.Diagnostics.HttpClient.Extensions;
 using SkyApm.Diagnostics.HttpClient.Filters;
 using SkyApm.Tracing;
 
 namespace SkyApm.Diagnostics.HttpClient
 {
-    public class HttpClientTracingDiagnosticProcessor : BaseHttpClientTracingDiagnosticProcessor, IHttpClientTracingDiagnosticProcessor
+    public class HttpClientTracingDiagnosticProcessor : ITracingDiagnosticProcessor
     {
         public string ListenerName { get; } = "HttpHandlerDiagnosticListener";
 
         //private readonly IContextCarrierFactory _contextCarrierFactory;
         private readonly ITracingContext _tracingContext;
-
-        private readonly IExitSegmentContextAccessor _contextAccessor;
 
         private readonly IEnumerable<IRequestDiagnosticHandler> _requestDiagnosticHandlers;
 
@@ -43,12 +43,10 @@ namespace SkyApm.Diagnostics.HttpClient
         private readonly HttpClientDiagnosticConfig _httpClientDiagnosticConfig;
 
         public HttpClientTracingDiagnosticProcessor(ITracingContext tracingContext,
-            IExitSegmentContextAccessor contextAccessor,
             IEnumerable<IRequestDiagnosticHandler> requestDiagnosticHandlers,
             IConfigAccessor configAccessor)
         {
             _tracingContext = tracingContext;
-            _contextAccessor = contextAccessor;
             _requestDiagnosticHandlers = requestDiagnosticHandlers.Reverse();
             _tracingConfig = configAccessor.Get<TracingConfig>();
             _httpClientDiagnosticConfig = configAccessor.Get<HttpClientDiagnosticConfig>();
@@ -70,22 +68,40 @@ namespace SkyApm.Diagnostics.HttpClient
         [DiagnosticName("System.Net.Http.Response")]
         public void HttpResponse([Property(Name = "Response")] HttpResponseMessage response)
         {
-            var context = _contextAccessor.Context;
-            if (context == null)
+            var spanOrSegment = _tracingContext.CurrentExit;
+            if (spanOrSegment == null)
             {
                 return;
             }
 
-            HttpResponseSetupSpan(_httpClientDiagnosticConfig, context.Span, response);
+            if (response != null)
+            {
+                var statusCode = (int)response.StatusCode;
+                if (statusCode >= 400)
+                {
+                    spanOrSegment.Span.ErrorOccurred();
+                }
 
-            _tracingContext.Release(context);
+                spanOrSegment.Span.AddTag(Tags.STATUS_CODE, statusCode);
+
+                if(response.Content != null && _httpClientDiagnosticConfig.CollectResponseBodyContentTypes?.Count > 0)
+                {
+                    var responseBody = response.Content.TryCollectAsString(
+                        _httpClientDiagnosticConfig.CollectResponseBodyContentTypes,
+                        _httpClientDiagnosticConfig.CollectBodyLengthThreshold);
+                    if (!string.IsNullOrEmpty(responseBody))
+                        spanOrSegment.Span.AddTag(Tags.HTTP_RESPONSE_BODY, responseBody);
+                }
+            }
+
+            _tracingContext.Finish(spanOrSegment);
         }
 
         [DiagnosticName("System.Net.Http.Exception")]
         public void HttpException([Property(Name = "Request")] HttpRequestMessage request,
             [Property(Name = "Exception")] Exception exception)
         {
-            _contextAccessor.Context?.Span?.ErrorOccurred(exception, _tracingConfig);
+            _tracingContext.CurrentExit?.Span?.ErrorOccurred(exception, _tracingConfig);
         }
     }
 }

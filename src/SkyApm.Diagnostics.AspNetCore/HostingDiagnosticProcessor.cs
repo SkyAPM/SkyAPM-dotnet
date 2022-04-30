@@ -25,10 +25,11 @@ using SkyApm.Config;
 using SkyApm.Diagnostics;
 using SkyApm.Diagnostics.AspNetCore.Handlers;
 using SkyApm.Tracing;
+using SkyApm.Tracing.Segments;
 
 namespace SkyApm.AspNetCore.Diagnostics
 {
-    public class HostingTracingDiagnosticProcessor : IHostingTracingDiagnosticProcessor
+    public class HostingTracingDiagnosticProcessor : ITracingDiagnosticProcessor
     {
         public string ListenerName { get; } = "Microsoft.AspNetCore";
 
@@ -52,13 +53,13 @@ namespace SkyApm.AspNetCore.Diagnostics
         /// HttpContext of the current request is available under the `HttpContext` property.
         /// </remarks>
         [DiagnosticName("Microsoft.AspNetCore.Hosting.HttpRequestIn.Start")]
-        public void BeginRequest([Property] HttpContext HttpContext)
+        public void BeginRequest([Property(Name = "HttpContext")] HttpContext httpContext)
         {
             foreach (var handler in _diagnosticHandlers)
             {
-                if (handler.OnlyMatch(HttpContext))
+                if (handler.OnlyMatch(httpContext))
                 {
-                    handler.BeginRequest(_tracingContext, HttpContext);
+                    handler.BeginRequest(_tracingContext, httpContext);
                     return;
                 }
             }
@@ -68,36 +69,33 @@ namespace SkyApm.AspNetCore.Diagnostics
         /// See remarks in <see cref="BeginRequest(HttpContext)"/>.
         /// </remarks>
         [DiagnosticName("Microsoft.AspNetCore.Hosting.HttpRequestIn.Stop")]
-        public void EndRequest([Property] HttpContext HttpContext)
+        public void EndRequest([Property(Name = "HttpContext")] HttpContext httpContext)
         {
-            var context = _segmentContextAccessor.Context;
-            if (context == null)
-            {
-                return;
-            }
+            var spanOrSegment = _tracingContext.CurrentEntry;
+            if (spanOrSegment == null) return;
 
             foreach (var handler in _diagnosticHandlers)
             {
-                if (handler.OnlyMatch(HttpContext))
+                if (handler.OnlyMatch(httpContext))
                 {
-                    handler.EndRequest(context, HttpContext);
+                    handler.EndRequest(spanOrSegment, httpContext);
                     break;
                 }
             }
 
-            _tracingContext.Release(context);
+            _tracingContext.Finish(spanOrSegment);
         }
 
         [DiagnosticName("Microsoft.AspNetCore.Diagnostics.UnhandledException")]
         public void DiagnosticUnhandledException([Property] HttpContext httpContext, [Property] Exception exception)
         {
-            _segmentContextAccessor.Context?.Span?.ErrorOccurred(exception, _tracingConfig);
+            _tracingContext.CurrentEntry?.Span?.ErrorOccurred(exception, _tracingConfig);
         }
 
         [DiagnosticName("Microsoft.AspNetCore.Hosting.UnhandledException")]
         public void HostingUnhandledException([Property] HttpContext httpContext, [Property] Exception exception)
         {
-            _segmentContextAccessor.Context?.Span?.ErrorOccurred(exception, _tracingConfig);
+            _tracingContext.CurrentEntry?.Span?.ErrorOccurred(exception, _tracingConfig);
         }
 
         //[DiagnosticName("Microsoft.AspNetCore.Mvc.BeforeAction")]

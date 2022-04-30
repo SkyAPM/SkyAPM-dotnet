@@ -17,52 +17,65 @@
  */
 
 using Grpc.Core;
+using SkyApm.Common;
 using SkyApm.Config;
 using SkyApm.Tracing;
+using SkyApm.Tracing.Segments;
 using System;
 
 namespace SkyApm.Diagnostics.Grpc.Server
 {
-    public class ServerDiagnosticProcessor : BaseServerDiagnosticProcessor, IServerDiagnosticProcessor
+    public class ServerDiagnosticProcessor
     {
         private readonly ITracingContext _tracingContext;
-        private readonly IEntrySegmentContextAccessor _segmentContextAccessor;
         private readonly TracingConfig _tracingConfig;
 
-        public ServerDiagnosticProcessor(IEntrySegmentContextAccessor segmentContextAccessor,
-            ITracingContext tracingContext, IConfigAccessor configAccessor)
+        public ServerDiagnosticProcessor(ITracingContext tracingContext, IConfigAccessor configAccessor)
         {
             _tracingContext = tracingContext;
-            _segmentContextAccessor = segmentContextAccessor;
             _tracingConfig = configAccessor.Get<TracingConfig>();
         }
 
         public void BeginRequest(ServerCallContext grpcContext)
         {
-            var context = _tracingContext.CreateEntrySegmentContext(grpcContext.Method, new GrpcCarrierHeaderCollection(grpcContext.RequestHeaders));
-            BeginRequestSetupSpan(context.Span, grpcContext);
+            var spanOrSegment = _tracingContext.CreateEntry(grpcContext.Method, new GrpcCarrierHeaderCollection(grpcContext.RequestHeaders));
+            spanOrSegment.Span.SpanLayer = SpanLayer.RPC_FRAMEWORK;
+            spanOrSegment.Span.Component = Components.GRPC; 
+            spanOrSegment.Span.Peer = new StringOrIntValue(grpcContext.Peer);
+            spanOrSegment.Span.AddTag(Tags.GRPC_METHOD_NAME, grpcContext.Method);
+            spanOrSegment.Span.AddLog(
+                LogEvent.Event("Grpc Server BeginRequest"),
+                LogEvent.Message($"Request starting {grpcContext.Method}"));
         }
 
         public void EndRequest(ServerCallContext grpcContext)
         {
-            var context = _segmentContextAccessor.Context;
+            var context = _tracingContext.CurrentEntry;
             if (context == null)
             {
                 return;
             }
+            var statusCode = grpcContext.Status.StatusCode;
+            if (statusCode != StatusCode.OK)
+            {
+                context.Span.ErrorOccurred();
+            }
 
-            EndRequestSetupSpan(context.Span, grpcContext);
+            context.Span.AddTag(Tags.GRPC_STATUS, statusCode.ToString());
+            context.Span.AddLog(
+                LogEvent.Event("Grpc Server EndRequest"),
+                LogEvent.Message($"Request finished {statusCode} "));
 
-            _tracingContext.Release(context);
+            _tracingContext.Finish(context);
         }
 
         public void DiagnosticUnhandledException(Exception exception)
         {
-            var context = _segmentContextAccessor.Context;
-            if (context != null)
+            var spanOrSegment = _tracingContext.CurrentEntry;
+            if (spanOrSegment != null)
             {
-                DiagnosticUnhandledExceptionSetupSpan(_tracingConfig, context.Span, exception);
-                _tracingContext.Release(context);
+                spanOrSegment.Span?.ErrorOccurred(exception, _tracingConfig);
+                _tracingContext.Finish(spanOrSegment);
             }
         }
     }

@@ -16,53 +16,80 @@
  *
  */
 
+using System;
+using System.Diagnostics;
+using System.Linq;
 using System.Net.Http;
+using Grpc.Core;
+using SkyApm.Common;
 using SkyApm.Config;
 using SkyApm.Diagnostics.HttpClient;
 using SkyApm.Tracing;
+using SkyApm.Tracing.Segments;
 
 namespace SkyApm.Diagnostics.Grpc.Net.Client
 {
-    public class GrpcClientDiagnosticProcessor : BaseGrpcClientDiagnosticProcessor, IGrpcClientDiagnosticProcessor
+    public class GrpcClientDiagnosticProcessor : ITracingDiagnosticProcessor
     {
         public string ListenerName => GrpcDiagnostics.ListenerName;
 
         //private readonly IContextCarrierFactory _contextCarrierFactory;
         private readonly ITracingContext _tracingContext;
 
-        private readonly IExitSegmentContextAccessor _contextAccessor;
         private readonly TracingConfig _tracingConfig;
 
-        public GrpcClientDiagnosticProcessor(ITracingContext tracingContext,
-            IExitSegmentContextAccessor contextAccessor, IConfigAccessor configAccessor)
+        public GrpcClientDiagnosticProcessor(ITracingContext tracingContext, IConfigAccessor configAccessor)
         {
             _tracingContext = tracingContext;
-            _contextAccessor = contextAccessor;
             _tracingConfig = configAccessor.Get<TracingConfig>();
         }
 
         [DiagnosticName(GrpcDiagnostics.ActivityStartKey)]
         public void InitializeCall([Property(Name = "Request")] HttpRequestMessage request)
         {
-            var context = _tracingContext.CreateExitSegmentContext(GetOperationName(request),
-                GetHost(request),
+            var spanOrSegment = _tracingContext.CreateExit(request.RequestUri.ToString(),
+                $"{request.RequestUri.Host}:{request.RequestUri.Port}",
                 new GrpcNetClientICarrierHeaderCollection(request));
 
-            InitializeCallSetupSpan(context.Span, request);
+            spanOrSegment.Span.SpanLayer = SpanLayer.RPC_FRAMEWORK;
+            spanOrSegment.Span.Component = Common.Components.GRPC;
+            spanOrSegment.Span.AddTag(Tags.URL, request.RequestUri.ToString());
+
+            var activity = Activity.Current;
+            if (activity.OperationName == GrpcDiagnostics.ActivityName)
+            {
+                var method = activity.Tags.FirstOrDefault(x => x.Key == GrpcDiagnostics.GrpcMethodTagName).Value ??
+                             request.Method.ToString();
+
+                spanOrSegment.Span.AddTag(Tags.GRPC_METHOD_NAME, method);
+            }
         }
 
         [DiagnosticName(GrpcDiagnostics.ActivityStopKey)]
         public void FinishCall([Property(Name = "Response")] HttpResponseMessage response)
         {
-            var context = _contextAccessor.Context;
-            if (context == null)
+            var spanOrSegment = _tracingContext.CurrentExit;
+            if (spanOrSegment == null)
             {
                 return;
             }
 
-            FinishCallSetupSpan(_tracingConfig, context.Span, response);
+            var activity = Activity.Current;
+            if (activity.OperationName == GrpcDiagnostics.ActivityName)
+            {
+                var statusCodeTag = activity.Tags.FirstOrDefault(x => x.Key == GrpcDiagnostics.GrpcStatusCodeTagName).Value;
 
-            _tracingContext.Release(context);
+                var statusCode = int.TryParse(statusCodeTag, out var code) ? code : -1;
+                if (statusCode != 0)
+                {
+                    var err = ((StatusCode)statusCode).ToString();
+                    spanOrSegment.Span.ErrorOccurred(new Exception(err), _tracingConfig);
+                }
+
+                spanOrSegment.Span.AddTag(Tags.GRPC_STATUS, statusCode);
+            }
+
+            _tracingContext.Finish(spanOrSegment);
         }
     }
 }

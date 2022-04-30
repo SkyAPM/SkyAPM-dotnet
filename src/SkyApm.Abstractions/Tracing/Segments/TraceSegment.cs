@@ -4,6 +4,8 @@ namespace SkyApm.Tracing.Segments
 {
     public class TraceSegment
     {
+        private SegmentSpan _firstSpan;
+
         public string SegmentId { get; set; }
 
         public string TraceId { get; set; }
@@ -18,7 +20,15 @@ namespace SkyApm.Tracing.Segments
 
         public bool IsSizeLimited { get; set; } = false;
 
-        public SegmentSpan FirstSpan { get; set; }
+        public SegmentSpan FirstSpan
+        {
+            get => _firstSpan;
+            set
+            {
+                _firstSpan = value;
+                _firstSpan.Segment = this;
+            }
+        }
 
         public TraceSegment(string traceId, string segmentId, bool sampled, string serviceId, string serviceInstanceId)
         {

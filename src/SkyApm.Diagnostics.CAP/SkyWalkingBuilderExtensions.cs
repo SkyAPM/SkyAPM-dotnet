@@ -31,10 +31,8 @@ namespace SkyApm.Diagnostics.CAP
                 throw new ArgumentNullException(nameof(extensions));
             }
 
-            extensions.Services.AddSingleton<ITracingDiagnosticProcessor, CapTracingDiagnosticProcessorAdapter>();
-            extensions.Services.AddSingleton<CapTracingDiagnosticProcessor>();
-            extensions.Services.AddSingleton<SpanCapTracingDiagnosticProcessor>();
-
+            extensions.Services.AddSingleton<ITracingDiagnosticProcessor, CapTracingDiagnosticProcessor>();
+            
             return extensions;
         }
     }

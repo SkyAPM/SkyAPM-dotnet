@@ -20,6 +20,9 @@ using System;
 using System.Collections.Concurrent;
 using DotNetCore.CAP.Diagnostics;
 using DotNetCore.CAP.Messages;
+using DotNetCore.CAP.Transport;
+using Newtonsoft.Json;
+using SkyApm.Common;
 using SkyApm.Config;
 using SkyApm.Tracing;
 using SkyApm.Tracing.Segments;
@@ -30,169 +33,237 @@ namespace SkyApm.Diagnostics.CAP
     /// <summary>
     ///  Diagnostics processor for listen and process events of CAP.
     /// </summary>
-    public class CapTracingDiagnosticProcessor : BaseCapDiagnosticProcessor, ICapDiagnosticProcessor
+    public class CapTracingDiagnosticProcessor : ITracingDiagnosticProcessor
     {
-        private readonly ConcurrentDictionary<string, SegmentContext> _contexts = new ConcurrentDictionary<string, SegmentContext>();
+        private readonly ConcurrentDictionary<string, CrossThreadCarrier> _carriers = new ConcurrentDictionary<string, CrossThreadCarrier>();
         public string ListenerName => CapEvents.DiagnosticListenerName;
 
+        private const string OperateNamePrefix = "CAP/";
+        private const string ProducerOperateNameSuffix = "/Publisher";
+        private const string ConsumerOperateNameSuffix = "/Subscriber";
+
         private readonly ITracingContext _tracingContext;
-        private readonly IEntrySegmentContextAccessor _entrySegmentContextAccessor;
-        private readonly IExitSegmentContextAccessor _exitSegmentContextAccessor;
-        private readonly ILocalSegmentContextAccessor _localSegmentContextAccessor;
         private readonly TracingConfig _tracingConfig;
 
         public CapTracingDiagnosticProcessor(ITracingContext tracingContext,
-            IEntrySegmentContextAccessor entrySegmentContextAccessor,
-            IExitSegmentContextAccessor exitSegmentContextAccessor,
-            ILocalSegmentContextAccessor localSegmentContextAccessor,
             IConfigAccessor configAccessor)
         {
             _tracingContext = tracingContext;
-            _exitSegmentContextAccessor = exitSegmentContextAccessor;
-            _localSegmentContextAccessor = localSegmentContextAccessor;
-            _entrySegmentContextAccessor = entrySegmentContextAccessor;
             _tracingConfig = configAccessor.Get<TracingConfig>();
         }
 
         [DiagnosticName(CapEvents.BeforePublishMessageStore)]
         public void BeforePublishStore([Object] CapEventDataPubStore eventData)
         {
-            _contexts[eventData.Message.GetId()] = _entrySegmentContextAccessor.Context;
+            var spanOrSegment = _tracingContext.CreateLocal("Event Persistence: " + eventData.Operation);
+            spanOrSegment.Span.SpanLayer = SpanLayer.DB;
+            spanOrSegment.Span.Component = Components.CAP;
+            spanOrSegment.Span.AddTag(Tags.DB_TYPE, "Sql");
+            spanOrSegment.Span.AddLog(LogEvent.Event("Event Persistence Start"));
+            spanOrSegment.Span.AddLog(LogEvent.Message("CAP message persistence start..."));
 
-            var operationName = GetBeforePublishStoreOpName(eventData);
-            var context = _tracingContext.CreateLocalSegmentContext(operationName);
-            BeforePublishStoreSetupSpan(context.Span, eventData);
+            _carriers[eventData.Message.GetId()] = spanOrSegment.GetCrossThreadCarrier();
         }
 
         [DiagnosticName(CapEvents.AfterPublishMessageStore)]
         public void AfterPublishStore([Object] CapEventDataPubStore eventData)
         {
-            var context = _localSegmentContextAccessor.Context;
-            if (context == null) return;
+            var spanOrSegment = _tracingContext.CurrentLocal;
+            if (spanOrSegment == null) return;
 
-            AfterPublishStoreSetupSpan(context.Span, eventData);
+            spanOrSegment.Span.AddLog(LogEvent.Event("Event Persistence End"));
+            spanOrSegment.Span.AddLog(LogEvent.Message($"CAP message persistence succeeded!{Environment.NewLine}" +
+                                                 $"--> Spend Time: { eventData.ElapsedTimeMs }ms.{Environment.NewLine}" +
+                                                 $"--> Message Id: { eventData.Message.GetId() } , Name: { eventData.Operation} "));
 
-            _tracingContext.Release(context);
+            _tracingContext.Finish(spanOrSegment);
         }
 
         [DiagnosticName(CapEvents.ErrorPublishMessageStore)]
         public void ErrorPublishStore([Object] CapEventDataPubStore eventData)
         {
-            var context = _localSegmentContextAccessor.Context;
-            if (context == null) return;
+            var spanOrSegment = _tracingContext.CurrentLocal;
+            if (spanOrSegment == null) return;
 
-            ErrorPublishStoreSetupSpan(_tracingConfig, context.Span, eventData);
-            _tracingContext.Release(context);
+            spanOrSegment.Span.AddLog(LogEvent.Event("Event Persistence Error"));
+            spanOrSegment.Span.AddLog(LogEvent.Message($"CAP message persistence failed!{Environment.NewLine}" +
+                                                 $"--> Message Info:{Environment.NewLine}" +
+                                                 $"{ JsonConvert.SerializeObject(eventData.Message, Formatting.Indented)}"));
+
+            spanOrSegment.Span.ErrorOccurred(eventData.Exception, _tracingConfig);
+            _tracingContext.Finish(spanOrSegment);
         }
 
         [DiagnosticName(CapEvents.BeforePublish)]
         public void BeforePublish([Object] CapEventDataPubSend eventData)
         {
-            _localSegmentContextAccessor.Context = _contexts[eventData.TransportMessage.GetId()];
+            var carrier = _carriers[eventData.TransportMessage.GetId()];
 
-            var host = GetHost(eventData);
-            var operationName = GetBeforePublishOpName(eventData);
-            var context = _tracingContext.CreateExitSegmentContext(operationName, host, new CapCarrierHeaderCollection(eventData.TransportMessage));
+            var host = eventData.BrokerAddress.Endpoint.Replace("-1", "5672");
+            var spanOrSegment = _tracingContext.CreateExit(OperateNamePrefix + eventData.Operation + ProducerOperateNameSuffix,
+                host, carrier, new CapCarrierHeaderCollection(eventData.TransportMessage));
 
-            BeforePublishSetupSpan(context.Span, eventData, host);
+            spanOrSegment.Span.SpanLayer = SpanLayer.MQ;
+            spanOrSegment.Span.Component = GetComponent(eventData.BrokerAddress, true);
+            spanOrSegment.Span.Peer = host;
+            spanOrSegment.Span.AddTag(Tags.MQ_TOPIC, eventData.Operation);
+            spanOrSegment.Span.AddTag(Tags.MQ_BROKER, eventData.BrokerAddress.Endpoint);
+            spanOrSegment.Span.AddLog(LogEvent.Event("Event Publishing Start"));
+            spanOrSegment.Span.AddLog(LogEvent.Message("CAP message publishing start..."));
         }
 
         [DiagnosticName(CapEvents.AfterPublish)]
         public void AfterPublish([Object] CapEventDataPubSend eventData)
         {
-            var context = _exitSegmentContextAccessor.Context;
-            if (context == null) return;
+            var spanOrSegment = _tracingContext.CurrentExit;
+            if (spanOrSegment == null) return;
 
-            AfterPublishSetupSpan(context.Span, eventData);
+            spanOrSegment.Span.AddLog(LogEvent.Event("Event Publishing End"));
+            spanOrSegment.Span.AddLog(LogEvent.Message($"CAP message publishing succeeded!{Environment.NewLine}" +
+                                                 $"--> Spend Time: { eventData.ElapsedTimeMs }ms.  {Environment.NewLine}" +
+                                                 $"--> Message Id: { eventData.TransportMessage.GetId() }, Name: {eventData.Operation}"));
 
-            _tracingContext.Release(context);
+            _tracingContext.Finish(spanOrSegment);
 
-            _contexts.TryRemove(eventData.TransportMessage.GetId(), out _);
+            _carriers.TryRemove(eventData.TransportMessage.GetId(), out _);
         }
 
         [DiagnosticName(CapEvents.ErrorPublish)]
         public void ErrorPublish([Object] CapEventDataPubSend eventData)
         {
-            var context = _exitSegmentContextAccessor.Context;
-            if (context == null) return;
+            var spanOrSegment = _tracingContext.CurrentExit;
+            if (spanOrSegment == null) return;
 
-            ErrorPublishSetupSpan(_tracingConfig, context.Span, eventData);
+            spanOrSegment.Span.AddLog(LogEvent.Event("Event Publishing Error"));
+            spanOrSegment.Span.AddLog(LogEvent.Message($"CAP message publishing failed!{Environment.NewLine}" +
+                                                 $"--> Spend Time: { eventData.ElapsedTimeMs }ms.  {Environment.NewLine}" +
+                                                 $"--> Message Id: { eventData.TransportMessage.GetId() }, Name: {eventData.Operation}"));
+            spanOrSegment.Span.ErrorOccurred(eventData.Exception, _tracingConfig);
 
-            _tracingContext.Release(context);
+            _tracingContext.Finish(spanOrSegment);
 
-            _contexts.TryRemove(eventData.TransportMessage.GetId(), out _);
+            _carriers.TryRemove(eventData.TransportMessage.GetId(), out _);
         }
+
 
         [DiagnosticName(CapEvents.BeforeConsume)]
         public void CapBeforeConsume([Object] CapEventDataSubStore eventData)
         {
             var carrierHeader = new CapCarrierHeaderCollection(eventData.TransportMessage);
-            var operationName = GetCapBeforeConsumeOpName(eventData);
-            var context = _tracingContext.CreateEntrySegmentContext(operationName, carrierHeader);
+            var eventName = eventData.TransportMessage.GetGroup() + "/" + eventData.Operation;
+            var operationName = OperateNamePrefix + eventName + ConsumerOperateNameSuffix;
+            var spanOrSegment = _tracingContext.CreateEntry(operationName, carrierHeader);
+            spanOrSegment.Span.SpanLayer = SpanLayer.DB;
+            spanOrSegment.Span.Component = GetComponent(eventData.BrokerAddress, false);
+            spanOrSegment.Span.Peer = eventData.BrokerAddress.Endpoint.Replace("-1", "5672");
+            spanOrSegment.Span.AddTag(Tags.MQ_TOPIC, eventData.Operation);
+            spanOrSegment.Span.AddTag(Tags.MQ_BROKER, eventData.BrokerAddress.Endpoint);
+            spanOrSegment.Span.AddLog(LogEvent.Event("Event Persistence Start"));
+            spanOrSegment.Span.AddLog(LogEvent.Message("CAP message persistence start..."));
 
-            CapBeforeConsumeSetupSpan(context.Span, eventData);
-
-            _contexts[eventData.TransportMessage.GetId() + eventData.TransportMessage.GetGroup()] = context;
+            _carriers[eventData.TransportMessage.GetId() + eventData.TransportMessage.GetGroup()] = spanOrSegment.GetCrossThreadCarrier();
         }
 
         [DiagnosticName(CapEvents.AfterConsume)]
         public void CapAfterConsume([Object] CapEventDataSubStore eventData)
         {
-            var context = _contexts[eventData.TransportMessage.GetId() + eventData.TransportMessage.GetGroup()];
-            if (context == null) return;
+            var spanOrSegment = _tracingContext.CurrentEntry;
+            if (spanOrSegment == null) return;
 
-            CapAfterConsumeSetupSpan(context.Span, eventData);
+            spanOrSegment.Span.AddLog(LogEvent.Event("Event Persistence End"));
+            spanOrSegment.Span.AddLog(LogEvent.Message($"CAP message persistence succeeded!{Environment.NewLine}" +
+                                                 $"--> Spend Time: { eventData.ElapsedTimeMs }ms. {Environment.NewLine}" +
+                                                 $"--> Message Id: { eventData.TransportMessage.GetId() }, Group: {eventData.TransportMessage.GetGroup()}, Name: {eventData.Operation}"));
 
-            _tracingContext.Release(context);
+            _tracingContext.Finish(spanOrSegment);
         }
 
         [DiagnosticName(CapEvents.ErrorConsume)]
         public void CapErrorConsume([Object] CapEventDataSubStore eventData)
         {
-            var context = _contexts[eventData.TransportMessage.GetId() + eventData.TransportMessage.GetGroup()];
-            if (context == null) return;
+            var spanOrSegment = _tracingContext.CurrentEntry;
+            if (spanOrSegment == null) return;
 
-            CapErrorConsumeSetupSpan(_tracingConfig, context.Span, eventData);
+            spanOrSegment.Span.AddLog(LogEvent.Event("Event Persistence Error"));
+            spanOrSegment.Span.AddLog(LogEvent.Message($"CAP message publishing failed! {Environment.NewLine}" +
+                                                 $"--> Spend Time: { eventData.ElapsedTimeMs }ms.  {Environment.NewLine}" +
+                                                 $"--> Message Id: { eventData.TransportMessage.GetId() }, Group: {eventData.TransportMessage.GetGroup()}, Name: {eventData.Operation}"));
+            spanOrSegment.Span.ErrorOccurred(eventData.Exception, _tracingConfig);
 
-            _tracingContext.Release(context);
+            _tracingContext.Finish(spanOrSegment);
         }
 
         [DiagnosticName(CapEvents.BeforeSubscriberInvoke)]
         public void CapBeforeSubscriberInvoke([Object] CapEventDataSubExecute eventData)
         {
-            _entrySegmentContextAccessor.Context = _contexts[eventData.Message.GetId() + eventData.Message.GetGroup()];
+            var carrier = _carriers[eventData.Message.GetId() + eventData.Message.GetGroup()];
 
-            var operationName = GetCapBeforeSubscriberInvokeOpName(eventData);
-            var context = _tracingContext.CreateLocalSegmentContext(operationName);
-            CapBeforeSubscriberInvokeSetupSpan(context.Span, eventData);
-
-            _contexts[eventData.Message.GetId() + eventData.Message.GetGroup()] = context;
+            var spanOrSegment = _tracingContext.CreateLocal("Subscriber Invoke: " + eventData.MethodInfo.Name, carrier);
+            spanOrSegment.Span.SpanLayer = SpanLayer.MQ;
+            spanOrSegment.Span.Component = Components.CAP;
+            spanOrSegment.Span.AddLog(LogEvent.Event("Subscriber Invoke Start"));
+            spanOrSegment.Span.AddLog(LogEvent.Message($"Begin invoke the subscriber: {eventData.MethodInfo} {Environment.NewLine}" +
+                                                 $"--> Message Id: { eventData.Message.GetId()}, Group: {eventData.Message.GetGroup()}, Name: {eventData.Operation}"));
         }
 
         [DiagnosticName(CapEvents.AfterSubscriberInvoke)]
         public void CapAfterSubscriberInvoke([Object] CapEventDataSubExecute eventData)
         {
-            var context = _contexts[eventData.Message.GetId() + eventData.Message.GetGroup()];
-            if (context == null) return;
+            var spanOrSegment = _tracingContext.CurrentLocal;
+            if (spanOrSegment == null) return;
 
-            CapAfterSubscriberInvokeSetupSpan(context.Span, eventData);
+            spanOrSegment.Span.AddLog(LogEvent.Event("Subscriber Invoke End"));
+            spanOrSegment.Span.AddLog(LogEvent.Message("Subscriber invoke succeeded!"));
+            spanOrSegment.Span.AddLog(LogEvent.Message($"Subscriber invoke spend time: { eventData.ElapsedTimeMs}ms. {Environment.NewLine}" +
+                                                 $"--> Method Info: {eventData.MethodInfo}"));
 
-            _tracingContext.Release(context);
+            _tracingContext.Finish(spanOrSegment);
 
-            _contexts.TryRemove(eventData.Message.GetId() + eventData.Message.GetGroup(), out _);
+            _carriers.TryRemove(eventData.Message.GetId() + eventData.Message.GetGroup(), out _);
         }
 
         [DiagnosticName(CapEvents.ErrorSubscriberInvoke)]
         public void CapErrorSubscriberInvoke([Object] CapEventDataSubExecute eventData)
         {
-            var context = _contexts[eventData.Message.GetId() + eventData.Message.GetGroup()];
-            if (context == null) return;
+            var spanOrSegment = _tracingContext.CurrentLocal;
+            if (spanOrSegment == null) return;
 
-            CapErrorSubscriberInvokeSetupSpan(_tracingConfig, context.Span, eventData);
+            spanOrSegment.Span.AddLog(LogEvent.Event("Subscriber Invoke Error"));
+            spanOrSegment.Span.AddLog(LogEvent.Message($"Subscriber invoke failed! {Environment.NewLine}" +
+                                                 $"--> Method Info: { eventData.MethodInfo} {Environment.NewLine}" +
+                                                 $"--> Message Info: {Environment.NewLine}" +
+                                                 $"{ JsonConvert.SerializeObject(eventData.Message, Formatting.Indented)}"));
 
-            _tracingContext.Release(context);
+            spanOrSegment.Span.ErrorOccurred(eventData.Exception, _tracingConfig);
 
-            _contexts.TryRemove(eventData.Message.GetId() + eventData.Message.GetGroup(), out _);
+            _tracingContext.Finish(spanOrSegment);
+
+            _carriers.TryRemove(eventData.Message.GetId() + eventData.Message.GetGroup(), out _);
+        }
+
+        private StringOrIntValue GetComponent(BrokerAddress address, bool isPub)
+        {
+            if (isPub)
+            {
+                switch (address.Name)
+                {
+                    case "RabbitMQ":
+                        return 52;  // "rabbitmq-producer";
+                    case "Kafka":
+                        return 40;  //"kafka-producer";
+                }
+            }
+            else
+            {
+                switch (address.Name)
+                {
+                    case "RabbitMQ":
+                        return 53; // "rabbitmq-consumer";
+                    case "Kafka":
+                        return 41; // "kafka-consumer";
+                }
+            }
+            return Components.CAP;
         }
     }
 }
