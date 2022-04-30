@@ -31,7 +31,7 @@ namespace SkyApm.Diagnostics
             _methods = new List<TracingDiagnosticMethod>();
             foreach (var method in tracingDiagnosticProcessor.GetType().GetMethods())
             {
-                var diagnosticName = method.GetCustomAttribute<DiagnosticName>();
+                var diagnosticName = method.GetCustomAttribute<DiagnosticNameAttribute>();
                 if(diagnosticName==null)
                     continue;
                 _methods.Add(new TracingDiagnosticMethod(tracingDiagnosticProcessor, method, diagnosticName.Name));

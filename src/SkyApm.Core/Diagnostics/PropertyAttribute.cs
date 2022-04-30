@@ -20,7 +20,7 @@ using AspectCore.Extensions.Reflection;
 
 namespace SkyApm.Diagnostics
 {
-    public class PropertyAttribute : ParameterBinder
+    public class PropertyAttribute : ParameterBinderAttribute
     {
         public string Name { get; set; }
 
