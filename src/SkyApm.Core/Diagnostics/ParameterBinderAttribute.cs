@@ -20,13 +20,8 @@ using System;
 
 namespace SkyApm.Diagnostics
 {
-    public class DiagnosticName :Attribute
+    public abstract class ParameterBinderAttribute : Attribute, IParameterResolver
     {
-        public string Name { get; }
-
-        public DiagnosticName(string name)
-        {
-            Name = name;
-        }
+        public abstract object Resolve(object value);
     }
 }
