@@ -12,6 +12,12 @@
             SegmentContext = segment;
         }
 
+        public SpanOrSegmentContext(SegmentSpan span, SegmentContext segment)
+        {
+            SegmentSpan = span;
+            SegmentContext = segment;
+        }
+
         public SegmentSpan SegmentSpan { get; }
 
         public SegmentContext SegmentContext { get; }

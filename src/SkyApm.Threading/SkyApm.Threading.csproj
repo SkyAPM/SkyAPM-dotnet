@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="..\..\build\common.props" />
+  <PropertyGroup>
+    <Description>$(Product) threading components.</Description>
+    <AssemblyTitle>$(PackagePrefix).Threading</AssemblyTitle>
+    <TargetFrameworks>netcoreapp3.1;net5.0;net6.0</TargetFrameworks>
+    <AssemblyName>$(PackagePrefix).Threading</AssemblyName>
+    <PackageId>$(PackagePrefix).Threading</PackageId>
+    <PackageTags>SkyWalking;APM;Diagnostics</PackageTags>
+    <PackageReleaseNotes>
+    </PackageReleaseNotes>
+    <RootNamespace />
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SkyApm.Core\SkyApm.Core.csproj" />
+    <ProjectReference Include="..\SkyApm.Utilities.StaticAccessor\SkyApm.Utilities.StaticAccessor.csproj" />
+  </ItemGroup>
+
+</Project>
