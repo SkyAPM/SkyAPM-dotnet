@@ -16,12 +16,13 @@
  *
  */
 
-using System;
-
 namespace SkyApm.Diagnostics
 {
-    public abstract class ParameterBinder : Attribute, IParameterResolver
+    public class AnonymousObjectAttribute : ParameterBinderAttribute
     {
-        public abstract object Resolve(object value);
+        public override object Resolve(object value)
+        {
+            return value;
+        }
     }
 }

@@ -20,7 +20,7 @@ using System;
 
 namespace SkyApm.Diagnostics
 {
-    public class ObjectAttribute : ParameterBinder
+    public class ObjectAttribute : ParameterBinderAttribute
     {
         public Type TargetType { get; set; }
 

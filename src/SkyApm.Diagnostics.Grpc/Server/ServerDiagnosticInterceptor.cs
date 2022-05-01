@@ -36,7 +36,7 @@ namespace SkyApm.Diagnostics.Grpc.Server
         {
              _processor.BeginRequest(context);
 
-            return await Handler<TRequest, TResponse>(context, async () =>
+            return await Handler(context, async () =>
             {
                 return await continuation(request, context);
             });
@@ -44,7 +44,7 @@ namespace SkyApm.Diagnostics.Grpc.Server
 
         public override async Task<TResponse> ClientStreamingServerHandler<TRequest, TResponse>(IAsyncStreamReader<TRequest> requestStream, ServerCallContext context, ClientStreamingServerMethod<TRequest, TResponse> continuation)
         {
-            return await Handler<TRequest, TResponse>(context, async () =>
+            return await Handler(context, async () =>
             {
                 return await continuation(requestStream, context);
             });
@@ -52,7 +52,7 @@ namespace SkyApm.Diagnostics.Grpc.Server
 
         public override async Task ServerStreamingServerHandler<TRequest, TResponse>(TRequest request, IServerStreamWriter<TResponse> responseStream, ServerCallContext context, ServerStreamingServerMethod<TRequest, TResponse> continuation)
         {
-            await Handler<TRequest>(context, async () =>
+            await Handler(context, async () =>
             {
                 await continuation(request, responseStream, context);
             });
@@ -60,14 +60,13 @@ namespace SkyApm.Diagnostics.Grpc.Server
 
         public override async Task DuplexStreamingServerHandler<TRequest, TResponse>(IAsyncStreamReader<TRequest> requestStream, IServerStreamWriter<TResponse> responseStream, ServerCallContext context, DuplexStreamingServerMethod<TRequest, TResponse> continuation)
         {
-            await Handler<TRequest>(context, async () =>
+            await Handler(context, async () =>
             {
                 await continuation(requestStream, responseStream, context);
             });
         }
 
-        private async Task Handler<TRequest>(ServerCallContext context, Func<Task> func) 
-            where TRequest : class
+        private async Task Handler(ServerCallContext context, Func<Task> func)
         {
             _processor.BeginRequest(context);
             try
@@ -78,12 +77,11 @@ namespace SkyApm.Diagnostics.Grpc.Server
             catch (Exception ex)
             {
                 _processor.DiagnosticUnhandledException(ex);
-                throw ex;
+                throw;
             }
         }
 
-        private async Task<TResponse> Handler<TRequest, TResponse>(ServerCallContext context, Func<Task<TResponse>> func)
-            where TRequest : class
+        private async Task<TResponse> Handler<TResponse>(ServerCallContext context, Func<Task<TResponse>> func)
             where TResponse : class
         {
             _processor.BeginRequest(context);
@@ -96,7 +94,7 @@ namespace SkyApm.Diagnostics.Grpc.Server
             catch (Exception ex)
             {
                 _processor.DiagnosticUnhandledException(ex);
-                throw ex;
+                throw;
             }
         }
     }

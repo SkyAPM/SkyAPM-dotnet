@@ -105,7 +105,7 @@ namespace SkyApm.Diagnostics.FreeSql
             var context = _localSegmentContextAccessor.Context;
             if (context != null)
             {
-                if (string.IsNullOrEmpty(eventData.Sql) == false)
+                if (!string.IsNullOrEmpty(eventData.Sql))
                     context.Span.AddTag(Common.Tags.DB_STATEMENT, eventData.Sql);
                 if (eventData?.Exception != null)
                     context.Span.ErrorOccurred(eventData.Exception, _tracingConfig);
@@ -127,7 +127,7 @@ namespace SkyApm.Diagnostics.FreeSql
             var context = _localSegmentContextAccessor.Context;
             if (context != null)
             {
-                if (string.IsNullOrEmpty(eventData.Log) == false)
+                if (!string.IsNullOrEmpty(eventData.Log))
                     context.Span.AddTag(Common.Tags.DB_STATEMENT, eventData.Log);
                 if (eventData?.Exception != null)
                     context.Span.ErrorOccurred(eventData.Exception, _tracingConfig);
@@ -149,7 +149,7 @@ namespace SkyApm.Diagnostics.FreeSql
             var context = _localSegmentContextAccessor.Context;
             if (context != null)
             {
-                if (string.IsNullOrEmpty(eventData.Remark) == false)
+                if (!string.IsNullOrEmpty(eventData.Remark))
                     context.Span.AddTag(Common.Tags.DB_STATEMENT, eventData.Remark);
                 if (eventData?.Exception != null)
                     context.Span.ErrorOccurred(eventData.Exception, _tracingConfig);
