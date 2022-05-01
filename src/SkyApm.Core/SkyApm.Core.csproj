@@ -12,11 +12,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <DefineConstants Condition="'$(TargetFramework)' == 'netcoreapp2.1'">$(DefineConstants);SPAN</DefineConstants>
   </PropertyGroup>
-  <!--<ItemGroup>
-    <Compile Remove="SkyLogging\**" />
-    <EmbeddedResource Remove="SkyLogging\**" />
-    <None Remove="SkyLogging\**" />
-  </ItemGroup>-->
+	
   <ItemGroup>
     <PackageReference Include="AspectCore.Extensions.Reflection" Version="1.2.0" />
     <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="4.5.1" />

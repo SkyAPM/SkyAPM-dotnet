@@ -23,6 +23,6 @@ namespace SkyApm.Logging
     public interface ILoggerFactory
     {
         ILogger CreateLogger(Type type);
-        SkyApm.Logging.ILogger CreateSkyApmLogger(Type type);
+        ILogger CreateSkyApmLogger(Type type);
     }
 }

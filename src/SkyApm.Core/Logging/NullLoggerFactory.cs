@@ -29,7 +29,7 @@ namespace SkyApm.Logging
 
         public ILogger CreateSkyApmLogger(Type type)
         {
-            throw new NotImplementedException();
+            return new NullLogger();
         }
     }
 }
