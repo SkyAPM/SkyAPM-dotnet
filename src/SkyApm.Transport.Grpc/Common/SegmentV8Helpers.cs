@@ -20,7 +20,11 @@ using System;
 using System.Linq;
 using Google.Protobuf;
 using SkyApm.Common;
+using SkyApm.Tracing.Segments;
 using SkyWalking.NetworkProtocol.V3;
+using SegmentReference = SkyWalking.NetworkProtocol.V3.SegmentReference;
+using SpanLayer = SkyWalking.NetworkProtocol.V3.SpanLayer;
+using SpanType = SkyWalking.NetworkProtocol.V3.SpanType;
 
 namespace SkyApm.Transport.Grpc.Common
 {
@@ -67,7 +71,7 @@ namespace SkyApm.Transport.Grpc.Common
 
         private static SegmentReference MapToSegmentReference(SegmentReferenceRequest referenceRequest)
         {
-            var reference = new SegmentReference
+            var reference = new SkyWalking.NetworkProtocol.V3.SegmentReference
             {
                 TraceId = referenceRequest.TraceId, 
                 ParentService = referenceRequest.ParentServiceId, 
