@@ -36,6 +36,7 @@ namespace SkyApm.Transport
             {
                 Logs = loggerContext.Logs,
                 SegmentRequest = segmentRequest,
+                Date = loggerContext.Date,
             };
         }
     }

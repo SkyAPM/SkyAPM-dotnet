@@ -16,6 +16,7 @@
  *
  */
 
+using System;
 using System.Collections.Generic;
 
 namespace SkyApm.Tracing.Segments
@@ -25,5 +26,7 @@ namespace SkyApm.Tracing.Segments
         public Dictionary<string, object> Logs { get; set; }
 
         public SegmentContext SegmentContext { get; set; }
+
+        public long Date { get; set; }
     }
 }
