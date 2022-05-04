@@ -62,6 +62,7 @@ namespace SkyApm.Diagnostics.Logging
                 {
                     Logs = logs,
                     SegmentContext = _entrySegmentContextAccessor.Context,
+                    Date = DateTimeOffset.UtcNow.Offset.Ticks
                 };
                 _skyApmLogDispatcher.Dispatch(logContext);
             }

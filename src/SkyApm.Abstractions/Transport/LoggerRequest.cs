@@ -27,5 +27,7 @@ namespace SkyApm.Transport
         public Dictionary<string, object> Logs { get; set; }
 
         public SegmentRequest SegmentRequest { get; set; }
+
+        public long Date { get; set; }
     }
 }

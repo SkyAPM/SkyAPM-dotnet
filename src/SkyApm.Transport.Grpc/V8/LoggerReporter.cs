@@ -73,7 +73,7 @@ namespace SkyApm.Transport.Grpc
                                 TraceSegmentId = loggerRequest.SegmentRequest.Segment.SegmentId,
                                 //SpanId=item.Segment
                             },
-                            Timestamp = DateTimeOffset.UtcNow.Ticks,
+                            Timestamp = loggerRequest.Date,
                             Service = loggerRequest.SegmentRequest.Segment.ServiceId,
                             ServiceInstance = loggerRequest.SegmentRequest.Segment.ServiceInstanceId,
                             Endpoint = "",
