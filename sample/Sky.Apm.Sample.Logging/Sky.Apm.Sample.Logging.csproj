@@ -19,6 +19,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\SkyApm.Agent.AspNetCore\SkyApm.Agent.AspNetCore.csproj" />
+    <ProjectReference Include="..\..\src\SkyApm.Diagnostics.Logging\SkyApm.Diagnostics.Logging.csproj" />
   </ItemGroup>
 
 </Project>

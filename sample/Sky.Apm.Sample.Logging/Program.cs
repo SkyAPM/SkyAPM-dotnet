@@ -26,7 +26,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<Test>();
-builder.Services.AddPushSkyApmLogger(x => x.Enable = false);
+builder.Services.AddPushSkyApmLogger(x => x.Enable = true);
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

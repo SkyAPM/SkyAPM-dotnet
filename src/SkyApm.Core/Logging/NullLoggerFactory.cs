@@ -26,10 +26,5 @@ namespace SkyApm.Logging
         {
             return new NullLogger();
         }
-
-        public ILogger CreateSkyApmLogger(Type type)
-        {
-            return new NullLogger();
-        }
     }
 }

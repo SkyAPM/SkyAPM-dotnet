@@ -17,6 +17,7 @@
  */
 
 using Microsoft.AspNetCore.Mvc;
+using SkyApm.Diagnostics.Logging;
 using SkyApm.Tracing;
 
 namespace Sky.Apm.Sample.Logging.Controllers
@@ -31,10 +32,10 @@ namespace Sky.Apm.Sample.Logging.Controllers
     };
 
         private readonly Test _test;
-        private readonly SkyApm.Logging.ILogger _loggerFactory;
-        public WeatherForecastController(SkyApm.Logging.ILoggerFactory loggerFactory, Test test)
+        private readonly ISkyApmLogger<WeatherForecastController> _skyApmLogger;
+        public WeatherForecastController(ISkyApmLogger<WeatherForecastController> skyApmLogger, Test test)
         {
-            _loggerFactory = loggerFactory.CreateSkyApmLogger(GetType());
+            _skyApmLogger = skyApmLogger;
             _test = test;
         }
 
@@ -42,7 +43,7 @@ namespace Sky.Apm.Sample.Logging.Controllers
         public IEnumerable<WeatherForecast> Get()
         {
             //Console.WriteLine(_entrySegmentContextAccessor.Context?.TraceId);
-            _loggerFactory.Information("qiwnkasdnaskndlaknd laksndk asndkas ndl nsald nlasdn la������������������������");
+            _skyApmLogger.Information("下订单成功！");
             _test.Create();
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast
             {

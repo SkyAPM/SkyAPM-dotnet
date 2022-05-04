@@ -24,7 +24,6 @@ using SkyApm.Config;
 using ILogger = SkyApm.Logging.ILogger;
 using ILoggerFactory = SkyApm.Logging.ILoggerFactory;
 using MSLoggerFactory = Microsoft.Extensions.Logging.LoggerFactory;
-using Microsoft.Extensions.Options;
 
 namespace SkyApm.Utilities.Logging
 {
@@ -35,13 +34,10 @@ namespace SkyApm.Utilities.Logging
 
         private readonly MSLoggerFactory _loggerFactory;
         private readonly LoggingConfig _loggingConfig;
-        private readonly IServiceProvider _serviceProvider;
-        private readonly IOptions<LogPushSkywalkingConfig> _logPushSkywalkingConfig;
-        public DefaultLoggerFactory(IConfigAccessor configAccessor, IServiceProvider serviceProvider, IOptions<LogPushSkywalkingConfig> logPushSkywalkingConfig)
+
+        public DefaultLoggerFactory(IConfigAccessor configAccessor)
         {
-            _serviceProvider= serviceProvider;
             _loggingConfig = configAccessor.Get<LoggingConfig>();
-            _logPushSkywalkingConfig = logPushSkywalkingConfig;
             _loggerFactory = new MSLoggerFactory();
             var instrumentationConfig = configAccessor.Get<InstrumentConfig>();
 
@@ -58,11 +54,6 @@ namespace SkyApm.Utilities.Logging
         public SkyApm.Logging.ILogger CreateLogger(Type type)
         {
             return new DefaultLogger(_loggerFactory.CreateLogger(type));
-        }
-
-        public SkyApm.Logging.ILogger CreateSkyApmLogger(Type type)
-        {
-            return new SkyApmLogger(type, _serviceProvider, _logPushSkywalkingConfig.Value.Enable);
         }
 
         private static LogEventLevel EventLevel(string level)
