@@ -16,24 +16,19 @@
  *
  */
 
-using AspectCore.Extensions.Reflection;
+using SkyApm.Tracing.Segments;
+using System.Threading;
+using System.Threading.Tasks;
 
-namespace SkyApm.Diagnostics
+namespace SkyApm.Transport
 {
-    public class PropertyAttribute : ParameterBinderAttribute
+    public interface ISkyApmLogDispatcher
     {
-        public string Name { get; set; }
+        bool Dispatch(LoggerContext loggerContext);
 
-        public override object Resolve(object value)
-        {
-            if (value == null || Name == null)
-            {
-                return null;
-            }
+        Task Flush(CancellationToken token = default(CancellationToken));
 
-            var property = value.GetType().GetProperty(Name);
+        void Close();
 
-            return property?.GetReflector()?.GetValue(value);
-        }
     }
 }

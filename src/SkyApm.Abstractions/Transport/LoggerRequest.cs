@@ -16,13 +16,18 @@
  *
  */
 
-namespace SkyApm.Diagnostics
+using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace SkyApm.Transport
 {
-    public class AnonymousObject : ParameterBinder
+    public class LoggerRequest
     {
-        public override object Resolve(object value)
-        {
-            return value;
-        }
+        public Dictionary<string, object> Logs { get; set; }
+
+        public SegmentRequest SegmentRequest { get; set; }
+
+        public long Date { get; set; }
     }
 }

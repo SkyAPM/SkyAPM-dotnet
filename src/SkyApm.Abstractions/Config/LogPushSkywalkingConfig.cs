@@ -16,17 +16,10 @@
  *
  */
 
-using System;
-
-namespace SkyApm.Diagnostics
+namespace SkyApm.Config
 {
-    public class DiagnosticName :Attribute
+    public class LogPushSkywalkingConfig
     {
-        public string Name { get; }
-
-        public DiagnosticName(string name)
-        {
-            Name = name;
-        }
+        public bool Enable { get; set; }
     }
 }

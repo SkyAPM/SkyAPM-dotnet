@@ -61,7 +61,7 @@ namespace SkyApm.Diagnostics
         {
             foreach (var parameter in methodInfo.GetParameters())
             {
-                var binder = parameter.GetCustomAttribute<ParameterBinder>();
+                var binder = parameter.GetCustomAttribute<ParameterBinderAttribute>();
                 if (binder != null)
                 {
                     if(binder is ObjectAttribute objectBinder)

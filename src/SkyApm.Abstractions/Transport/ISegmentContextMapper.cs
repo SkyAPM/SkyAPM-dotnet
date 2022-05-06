@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Licensed to the SkyAPM under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -16,24 +16,16 @@
  *
  */
 
-using AspectCore.Extensions.Reflection;
+using SkyApm.Tracing.Segments;
 
-namespace SkyApm.Diagnostics
+namespace SkyApm.Transport
 {
-    public class PropertyAttribute : ParameterBinderAttribute
+    public interface ISegmentContextMapper
     {
-        public string Name { get; set; }
+        SegmentRequest Map(SegmentContext segmentContext);
 
-        public override object Resolve(object value)
-        {
-            if (value == null || Name == null)
-            {
-                return null;
-            }
+        SegmentRequest Map(TraceSegment traceSegment);
 
-            var property = value.GetType().GetProperty(Name);
-
-            return property?.GetReflector()?.GetValue(value);
-        }
+        SegmentRequest MapIfNoAsync(TraceSegment traceSegment);
     }
 }

@@ -35,7 +35,7 @@ namespace SkyApm.Transport
         private readonly TransportConfig _config;
         private readonly SpanStructureConfig _spanConfig;
         private readonly ISegmentReporter _segmentReporter;
-        private readonly ISegmentMapper _segmentContextMapper;
+        private readonly ISegmentContextMapper _segmentContextMapper;
         private readonly IAsyncSpanCombiner _asyncSpanCombiner;
         private readonly ConcurrentQueue<SegmentRequest> _segmentQueue;
         private readonly ConcurrentQueue<TraceSegment> _mergeQueue;
@@ -48,7 +48,7 @@ namespace SkyApm.Transport
 
         public AsyncQueueSegmentDispatcher(IConfigAccessor configAccessor, IAsyncSpanCombiner asasyncSpanCombiner,
             ISegmentReporter segmentReporter, IRuntimeEnvironment runtimeEnvironment,
-            ISegmentMapper segmentContextMapper, ILoggerFactory loggerFactory)
+            ISegmentContextMapper segmentContextMapper, ILoggerFactory loggerFactory)
         {
             _segmentReporter = segmentReporter;
             _segmentContextMapper = segmentContextMapper;

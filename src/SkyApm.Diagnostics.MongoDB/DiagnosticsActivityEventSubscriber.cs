@@ -27,7 +27,7 @@ namespace SkyApm.Diagnostics.MongoDB
 {
     public class DiagnosticsActivityEventSubscriber : IEventSubscriber
     {
-        public static DiagnosticSource diagnosticSource = new DiagnosticListener("MongoSourceListener");
+        private static DiagnosticSource diagnosticSource = new DiagnosticListener("MongoSourceListener");
         internal static readonly AssemblyName AssemblyName = typeof(DiagnosticsActivityEventSubscriber).Assembly.GetName();
         internal static readonly string ActivitySourceName = AssemblyName.Name;
         internal static readonly Version Version = AssemblyName.Version;
@@ -71,10 +71,7 @@ namespace SkyApm.Diagnostics.MongoDB
                 return;
             }
             var activity = new Activity("MongoActivity");
-            if (activity == null)
-            {
-                return;
-            }
+            
             _activityMap.TryAdd(@event.RequestId, activity);
             diagnosticSource.StartActivity(activity, @event);
         }

@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Licensed to the SkyAPM under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -16,24 +16,16 @@
  *
  */
 
-using AspectCore.Extensions.Reflection;
-
-namespace SkyApm.Diagnostics
+namespace Sky.Apm.Sample.Logging
 {
-    public class PropertyAttribute : ParameterBinderAttribute
+    public class WeatherForecast
     {
-        public string Name { get; set; }
+        public DateTime Date { get; set; }
 
-        public override object Resolve(object value)
-        {
-            if (value == null || Name == null)
-            {
-                return null;
-            }
+        public int TemperatureC { get; set; }
 
-            var property = value.GetType().GetProperty(Name);
+        public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
 
-            return property?.GetReflector()?.GetValue(value);
-        }
+        public string? Summary { get; set; }
     }
 }

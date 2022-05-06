@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Licensed to the SkyAPM under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -16,16 +16,13 @@
  *
  */
 
-using SkyApm.Tracing.Segments;
-
-namespace SkyApm.Transport
+namespace SkyApm.Diagnostics
 {
-    public interface ISegmentMapper
+    public class AnonymousObjectAttribute : ParameterBinderAttribute
     {
-        SegmentRequest Map(SegmentContext segmentContext);
-
-        SegmentRequest Map(TraceSegment traceSegment);
-
-        SegmentRequest MapIfNoAsync(TraceSegment traceSegment);
+        public override object Resolve(object value)
+        {
+            return value;
+        }
     }
 }
