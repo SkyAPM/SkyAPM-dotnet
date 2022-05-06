@@ -1,9 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
-using SkyApm.Config;
 using SkyApm.Tracing;
-using SkyApm.Tracing.Segments;
 using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -16,116 +15,60 @@ namespace SkyApm.Sample.Backend.Controllers
     {
         private readonly ITracingContext _tracingContext;
         private readonly IHttpClientFactory _httpClientFactory;
-        private readonly IConfiguration _configuration;
 
         public TestController(ITracingContext tracingContext, IHttpClientFactory httpClientFactory, IConfiguration configuration)
         {
             _tracingContext = tracingContext;
             _httpClientFactory = httpClientFactory;
-            _configuration = configuration;
         }
 
+        #region Basic
         [HttpGet]
         [Route("")]
-        public async Task<string> Get()
+        public async Task<string> Get(string flag)
         {
-            var outer = _tracingContext.CreateLocal("GetOuter");
-            var inner = _tracingContext.CreateLocal("GetInner");
-            await Delay("inner");
-            _tracingContext.Finish(inner);
-            _tracingContext.Finish(_tracingContext.CreateLocal("GetInner-2"));
-            WrapDelay();
-            _tracingContext.Finish(outer);
+            await Step1();
+            await Step2();
 
-            var result = await PutAsync(1);
-            WrapRequest();
+            return $"get-{flag}";
 
-            return $"get -> {result}";
-        }
+            async Task Step1()
+            {
+                var step1 = _tracingContext.CreateLocal("get-step1");
 
-        [HttpGet]
-        [Route("delay")]
-        public async Task<int> Delay(int millisecond)
-        {
-            await Task.Delay(millisecond);
-            return millisecond;
-        }
+                _tracingContext.Finish(_tracingContext.CreateLocal("get-step11"));
 
-        [HttpGet]
-        [Route("multiReq")]
-        public async Task<string> MultiRequest()
-        {
-            await PutAsync(1);
-            await PostAsync(2);
-            await PutAsync(3);
-            await PutAsync(4);
-            await PostAsync(5);
-            await PutAsync(6);
-            await PutAsync(7);
-            await PutAsync(8);
-            await PutAsync(9);
+                await HttpDelayAsync(100);
 
-            return "123456789";
-        }
+                _tracingContext.Finish(step1);
+            }
 
-        [HttpGet]
-        [Route("asyncNoLocal")]
-        public string AsyncNoLocal()
-        {
-            DelayAsync(6000);
-            return "ok";
-        }
+            async Task Step2()
+            {
+                var step2 = _tracingContext.CreateLocal("get-step2");
 
-        [HttpGet]
-        [Route("asyncInAsync")]
-        public string AsyncInAsync()
-        {
-            Async1();
-            return "ok";
-        }
+                await HttpDelayAsync(150);
 
-        private async Task Async1()
-        {
-            var context = _tracingContext.CreateLocal("async1");
-            await Task.Delay(6000);
-            Async2();
-            _tracingContext.Finish(context);
-        }
+                _tracingContext.Finish(_tracingContext.CreateLocal("get-step22"));
 
-        private async Task Async2()
-        {
-            var context = _tracingContext.CreateLocal("async2");
-            await Task.Delay(10000);
-            _tracingContext.Finish(context);
+                _tracingContext.Finish(step2);
+            }
         }
 
         [HttpPost]
         [Route("")]
-        public string Post([FromQuery] int flag)
+        public string Post([FromQuery] string flag)
         {
-            Task.Run(() =>
-            {
-                var outer = _tracingContext.CreateLocal($"PostBackgroundTask-{flag}");
-                Task.Run(() =>
-                {
-                    var inner = _tracingContext.CreateLocal($"PostBackgroundTaskInner-{flag}");
-                    Thread.Sleep(2000);
-                    _tracingContext.Finish(_tracingContext.CreateLocal($"PostBackgroundTaskInner-{flag}.Instantaneous"));
-                    _tracingContext.Finish(inner);
-                });
-                Thread.Sleep(1000);
-                _tracingContext.Finish(outer);
-            });
-            Thread.Sleep(500);
+            _tracingContext.Finish(_tracingContext.CreateLocal($"Post-{flag}"));
             return $"post-{flag}";
         }
 
-        [HttpPut]
-        [Route("")]
-        public string Put([FromQuery] int flag)
+        [HttpGet]
+        [Route("delay")]
+        public async Task<int> Delay(int milliseconds)
         {
-            _tracingContext.Finish(_tracingContext.CreateLocal($"Put-{flag}"));
-            return $"put-{flag}";
+            await Task.Delay(milliseconds);
+            return milliseconds;
         }
 
         [HttpGet]
@@ -134,53 +77,222 @@ namespace SkyApm.Sample.Backend.Controllers
         {
             throw new InvalidOperationException("invalid");
         }
+        #endregion Basic
 
-        private async Task<string> WrapRequest()
+        [HttpGet]
+        [Route("multiRequest")]
+        public async Task<string> MultiRequest()
         {
-            var sos1 = _tracingContext.CreateLocal("WrapRequest-Outer");
-            var sos2 = _tracingContext.CreateLocal("WrapRequest-Inner");
-            _tracingContext.Finish(_tracingContext.CreateLocal("WrapRequest-1"));
-            var result = await DelayAsync(2000);
-            _tracingContext.Finish(_tracingContext.CreateLocal("WrapRequest-2"));
-            _tracingContext.Finish(sos2);
-            _tracingContext.Finish(sos1);
-            return result;
+            await HttpPostAsync(1);
+            await HttpPostAsync(2);
+            await HttpPostAsync(3);
+            await HttpExceptionAsync();
+            await HttpPostAsync(5);
+
+            return "12345";
         }
 
-        private async Task<string> PostAsync(int flag)
+        [HttpGet]
+        [Route("batchAwait")]
+        public async Task<string> BatchAwait()
+        {
+            var tasks = new List<Task>();
+            tasks.Add(HttpPostAsync(1));
+            tasks.Add(HttpDelayAsync(1500));
+            tasks.Add(HttpExceptionAsync());
+            tasks.Add(HttpPostAsync(2));
+            tasks.Add(HttpDelayAsync(2500));
+
+            await Task.WhenAll(tasks);
+
+            return $"BatchAwait-{tasks.Count}";
+        }
+
+        [HttpGet]
+        [Route("notAwaitedOnTime")]
+        public async Task<string> NotAwaitedOnTime()
+        {
+            WrappedHttpDelayAsync(1000);
+
+            await DelayAsync(nameof(NotAwaitedOnTime), 500);
+
+            await WrapDelay(1000);
+
+            return nameof(NotAwaitedOnTime);
+        }
+
+        [HttpGet]
+        [Route("notAwaitedOutofTime")]
+        public async Task<string> NotAwaitedOutofTime()
+        {
+            WrappedHttpDelayAsync(2000);
+
+            await WrapDelay(100);
+
+            await DelayAsync(string.Empty, 200);
+
+            return nameof(NotAwaitedOutofTime);
+        }
+
+        [HttpGet]
+        [Route("notAwaitedOutofMergeTime")]
+        public async Task<string> NotAwaitedOutofMergeTime()
+        {
+            WrappedHttpDelayAsync(10000);
+
+            await WrapDelay(700);
+
+            await DelayAsync(string.Empty, 200);
+
+            return nameof(NotAwaitedOutofMergeTime);
+        }
+
+        [HttpGet]
+        [Route("notAwaitedNoWrapLocal")]
+        public string NotAwaitedNoWrapLocal()
+        {
+            RichHttpDelayAsync(100);
+            return nameof(NotAwaitedNoWrapLocal);
+        }
+
+        [HttpGet]
+        [Route("notAwaitedNoWrapLocalOutOfMergeTime")]
+        public string NotAwaitedNoWrapLocalOutOfMergeTime()
+        {
+            RichHttpDelayAsync(10000);
+            return nameof(NotAwaitedNoWrapLocalOutOfMergeTime);
+        }
+
+        [HttpGet]
+        [Route("deeplyNotAwaited")]
+        public string DeeplyNotAwaited()
+        {
+            OuterAsync();
+            return nameof(DeeplyNotAwaited);
+
+            async Task OuterAsync()
+            {
+                var outer = _tracingContext.CreateLocal("outer");
+
+                await DelayAsync(nameof(OuterAsync), 1000);
+                InnerAsync();
+
+                _tracingContext.Finish(outer);
+            }
+
+            async Task InnerAsync()
+            {
+                var inner = _tracingContext.CreateLocal("inner");
+
+                await DelayAsync(nameof(InnerAsync), 10000);
+                _tracingContext.Finish(_tracingContext.CreateLocal("inner-step1"));
+                await HttpDelayAsync(100);
+
+                _tracingContext.Finish(inner);
+            }
+        }
+
+        [HttpGet]
+        [Route("backgroundTask")]
+        public string BackgroundTask()
+        {
+            Task.Run(() =>
+            {
+                var outer = _tracingContext.CreateLocal("BackgroundTask-outer");
+                Task.Run(() =>
+                {
+                    var inner = _tracingContext.CreateLocal("BackgroundTask-inner");
+                    Thread.Sleep(1000);
+                    _tracingContext.Finish(_tracingContext.CreateLocal("BackgroundTask-Instantaneous"));
+                    _tracingContext.Finish(inner);
+                });
+                Thread.Sleep(1000);
+                _tracingContext.Finish(outer);
+            });
+            Thread.Sleep(500);
+            return nameof(BackgroundTask);
+        }
+
+        [HttpGet]
+        [Route("backgroundSkyApmTask")]
+        public string BackgroundSkyApmTask()
+        {
+            SkyApmTask.Run(() =>
+            {
+                var outer = _tracingContext.CreateLocal($"BackgroundSkyApmTask-outer");
+                SkyApmTask.Run(() =>
+                {
+                    var inner = _tracingContext.CreateLocal($"BackgroundSkyApmTask-inner");
+                    Thread.Sleep(1000);
+                    _tracingContext.Finish(_tracingContext.CreateLocal($"BackgroundSkyApmTask-.Instantaneous"));
+                    _tracingContext.Finish(inner);
+                });
+                Thread.Sleep(1000);
+                _tracingContext.Finish(outer);
+            });
+            Thread.Sleep(500);
+            return nameof(BackgroundSkyApmTask);
+        }
+
+        #region Private
+        private async Task WrapDelay(int milliseconds)
+        {
+            var preDelay = milliseconds / 3;
+            var wrapDelay = _tracingContext.CreateLocal("WrapDelay");
+            await Task.Delay(preDelay);
+            await DelayAsync("wrap", milliseconds - preDelay);
+            _tracingContext.Finish(wrapDelay);
+        }
+
+        private async Task DelayAsync(string suffix, int milliseconds)
+        {
+            var disposable = _tracingContext.CreateLocal($"Delay.{suffix}");
+            await Task.Delay(milliseconds);
+            _tracingContext.Finish(disposable);
+        }
+        private async Task WrappedHttpDelayAsync(int milliseconds)
+        {
+            var delayWrap = _tracingContext.CreateLocal("HttpDelayWrap");
+            await RichHttpDelayAsync(milliseconds);
+            _tracingContext.Finish(delayWrap);
+        }
+
+        private async Task RichHttpDelayAsync(int milliseconds)
+        {
+            _tracingContext.Finish(_tracingContext.CreateLocal("WrappedHttpDelayAsync-before"));
+            await HttpDelayAsync(milliseconds);
+            _tracingContext.Finish(_tracingContext.CreateLocal("WrappedHttpDelayAsync-after"));
+        }
+        #endregion Private
+
+        #region Http
+        private async Task<string> HttpGetAsync(int flag)
+        {
+            var httpClient = _httpClientFactory.CreateClient();
+            var response = await httpClient.GetAsync($"http://127.0.0.1:5001/test?flag={flag}");
+            return await response.Content.ReadAsStringAsync();
+        }
+
+        private async Task<string> HttpPostAsync(int flag)
         {
             var httpClient = _httpClientFactory.CreateClient();
             var response = await httpClient.PostAsync($"http://127.0.0.1:5001/test?flag={flag}", new StringContent(string.Empty));
             return await response.Content.ReadAsStringAsync();
         }
 
-        private async Task<string> PutAsync(int flag)
+        private async Task<string> HttpExceptionAsync()
         {
             var httpClient = _httpClientFactory.CreateClient();
-            var response = await httpClient.PutAsync($"http://127.0.0.1:5001/test?flag={flag}", new StringContent(string.Empty));
+            var response = await httpClient.GetAsync($"http://127.0.0.1:5001/test/exception");
             return await response.Content.ReadAsStringAsync();
         }
 
-        private async Task<string> DelayAsync(int millisecond)
+        private async Task<string> HttpDelayAsync(int milliseconds)
         {
             var httpClient = _httpClientFactory.CreateClient();
-            var response = await httpClient.GetAsync($"http://127.0.0.1:5001/test/delay?millisecond={millisecond}");
+            var response = await httpClient.GetAsync($"http://127.0.0.1:5001/test/delay?milliseconds={milliseconds}");
             return await response.Content.ReadAsStringAsync();
         }
-
-        private async Task WrapDelay()
-        {
-            var wrapDelay = _tracingContext.CreateLocal("WrapDelay");
-            await Task.Delay(3000);
-            await Delay("wrap");
-            _tracingContext.Finish(wrapDelay);
-        }
-
-        private async Task Delay(string suffix)
-        {
-            var disposable = _tracingContext.CreateLocal($"Delay.{suffix}");
-            await Task.Delay(500);
-            _tracingContext.Finish(disposable);
-        }
+        #endregion Http
     }
 }

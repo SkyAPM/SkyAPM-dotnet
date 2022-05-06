@@ -47,9 +47,6 @@ namespace SkyApm.Tracing
         [Obsolete("Span structure only")]
         SegmentSpan ActiveSpan { get; }
 
-        [Obsolete("Span structure only")]
-        TraceSegment ActiveSegment { get; }
-
         [Obsolete("Use CreateEntry instead of this method")]
         SegmentSpan CreateEntrySpan(string operationName, ICarrierHeaderCollection carrierHeader, long startTimeMilliseconds = default);
 

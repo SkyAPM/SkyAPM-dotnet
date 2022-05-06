@@ -52,8 +52,6 @@ namespace SkyApm.Tracing
 
         public SegmentSpan ActiveSpan => _traceSegmentManager.ActiveSpan;
 
-        public TraceSegment ActiveSegment => _traceSegmentManager.ActiveSegment;
-
         public SpanOrSegmentContext CurrentEntry => _isSpanStructure ? (SpanOrSegmentContext)ActiveSpan : _segmentContextFactory.CurrentEntryContext;
 
         public SpanOrSegmentContext CurrentLocal => _isSpanStructure ? (SpanOrSegmentContext)ActiveSpan : _segmentContextFactory.CurrentLocalContext;
@@ -133,16 +131,14 @@ namespace SkyApm.Tracing
         public SegmentSpan CreateExitSpan(string operationName, string networkAddress, ICarrierHeaderCollection carrierHeader = null, long startTimeMilliseconds = 0)
         {
             var span = _traceSegmentManager.CreateExitSpan(operationName, new StringOrIntValue(networkAddress), startTimeMilliseconds);
-            var segment = _traceSegmentManager.ActiveSegment;
-            if (carrierHeader != null) _carrierPropagator.Inject(segment, span, carrierHeader);
+            if (carrierHeader != null) _carrierPropagator.Inject(span, carrierHeader);
             return span;
         }
 
         public SegmentSpan CreateExitSpan(string operationName, string networkAddress, CrossThreadCarrier carrier, ICarrierHeaderCollection carrierHeader = null, long startTimeMilliseconds = 0)
         {
             var span = _traceSegmentManager.CreateExitSpan(operationName, new StringOrIntValue(networkAddress), carrier, startTimeMilliseconds);
-            var segment = _traceSegmentManager.ActiveSegment;
-            if (carrierHeader != null) _carrierPropagator.Inject(segment, span, carrierHeader);
+            if (carrierHeader != null) _carrierPropagator.Inject(span, carrierHeader);
             return span;
         }
 

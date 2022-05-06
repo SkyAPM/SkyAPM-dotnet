@@ -7,8 +7,6 @@ namespace SkyApm.Tracing
     {
         SegmentSpan ActiveSpan { get; }
 
-        TraceSegment ActiveSegment { get; }
-
         SegmentSpan CreateEntrySpan(string operationName, ICarrier carrier, long startTimeMilliseconds = default);
 
         SegmentSpan CreateLocalSpan(string operationName, long startTimeMilliseconds = default);

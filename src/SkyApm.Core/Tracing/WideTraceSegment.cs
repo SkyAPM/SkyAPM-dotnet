@@ -33,6 +33,9 @@ namespace SkyApm.Tracing
             _uniqueIdGenerator = uniqueIdGenerator;
         }
 
+        /// <summary>
+        /// return null if parent span has been completed.
+        /// </summary>
         public SegmentSpan CreateEntrySpan(string operationName, long startTimeMilliseconds = default)
         {
             var spanId = NextSpanId();
@@ -41,6 +44,9 @@ namespace SkyApm.Tracing
             return CreateSpan(spanId, operationName, spanType, startTimeMilliseconds);
         }
 
+        /// <summary>
+        /// return null if parent span has been completed.
+        /// </summary>
         public SegmentSpan CreateLocalSpan(string operationName, long startTimeMilliseconds = default)
         {
             var spanId = NextSpanId();
@@ -48,6 +54,9 @@ namespace SkyApm.Tracing
             return CreateSpan(spanId, operationName, SpanType.Local, startTimeMilliseconds);
         }
 
+        /// <summary>
+        /// return null if parent span has been completed.
+        /// </summary>
         public SegmentSpan CreateExitSpan(string operationName, long startTimeMilliseconds = default)
         {
             var spanId = NextSpanId();
@@ -57,16 +66,19 @@ namespace SkyApm.Tracing
 
         private SegmentSpan CreateSpan(int spanId, string operationName, SpanType spanType, long startTimeMilliseconds = default)
         {
-            var span = new SegmentSpan(operationName, spanType, startTimeMilliseconds);
-            span.SpanId = spanId;
+            SegmentSpan parentSpan = null;
             if (_spanTree.Value.HasValue)
             {
                 var parentSpanId = _spanTree.Value.Value;
-                if (_spans.TryGetValue(parentSpanId, out var parentSpan))
-                {
-                    span.Parent = parentSpan;
-                    parentSpan.Children.TryAdd(spanId, span);
-                }
+                if (!_spans.TryGetValue(parentSpanId, out parentSpan)) return null;
+            }
+
+            var span = new SegmentSpan(operationName, spanType, startTimeMilliseconds);
+            span.SpanId = spanId;
+            if (parentSpan != null)
+            {
+                span.Parent = parentSpan;
+                parentSpan.Children.TryAdd(spanId, span);
             }
             _spans.TryAdd(spanId, span);
             _spanTree.Value = spanId;
@@ -92,7 +104,7 @@ namespace SkyApm.Tracing
 
         public TraceSegment Finish(SegmentSpan span, long endTimeMilliseconds = default)
         {
-            if (!_spans.TryGetValue(span.SpanId, out var storedSpan) || span != storedSpan) return null; // 获取不对对应spanid的span 
+            if (!_spans.TryGetValue(span.SpanId, out var storedSpan) || span != storedSpan) return null;
             if (!_spans.TryRemove(span.SpanId, out _)) return null;
 
             TraceSegment segment;
@@ -111,7 +123,7 @@ namespace SkyApm.Tracing
                         childSegment.FirstSpan = child;
                         child.AsyncDepth = segment.FirstSpan.AsyncDepth;
                         AsyncDeepCopyAndUpdateSpans(child, span, segment.Spans, childSegment.Spans);
-                        child.SpanType = SpanType.Local;
+                        child.SpanType = SpanType.Local; // 实际的spanType已经在上面copy一份了，由于服务端对特殊span有额外的处理逻辑，为了避免重复处理，这里设置为local
                         var reference = new SegmentReference
                         {
                             Reference = Reference.CrossThread,

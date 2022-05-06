@@ -1,4 +1,6 @@
-﻿namespace SkyApm.Tracing.Segments
+﻿using SkyApm.Common;
+
+namespace SkyApm.Tracing.Segments
 {
     public static class SkySegmentsExtensions
     {
@@ -15,7 +17,8 @@
                 ParentServiceId = span.Segment.ServiceId,
                 ParentServiceInstanceId = span.Segment.ServiceInstanceId,
                 ParentEndpoint = span.Segment.FirstSpan.OperationName,
-                Sampled = span.Segment.Sampled
+                Sampled = span.Segment.Sampled,
+                NetworkAddress = DnsHelpers.GetIpV4OrHostName()
             };
         }
 
@@ -32,7 +35,8 @@
                 ParentServiceId = segmentContext.ServiceId,
                 ParentServiceInstanceId = segmentContext.ServiceInstanceId,
                 ParentEndpoint = segmentContext.Span.OperationName,
-                Sampled = segmentContext.Sampled
+                Sampled = segmentContext.Sampled,
+                NetworkAddress = DnsHelpers.GetIpV4OrHostName()
             };
         }
 

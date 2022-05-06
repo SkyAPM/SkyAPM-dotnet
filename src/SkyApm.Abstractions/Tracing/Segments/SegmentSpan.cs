@@ -61,7 +61,7 @@ namespace SkyApm.Tracing.Segments
         /// </summary>
         public TraceSegment Segment
         {
-            get => Parent == null ? _segment : Parent.Segment;
+            get => _segment ?? Parent.Segment;
             set => _segment = value;
         }
 

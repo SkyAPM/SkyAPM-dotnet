@@ -21,6 +21,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\SkyApm.Agent.AspNetCore\SkyApm.Agent.AspNetCore.csproj" />
+    <ProjectReference Include="..\..\src\SkyApm.Threading\SkyApm.Threading.csproj" />
     <ProjectReference Include="..\grpc\SkyApm.Sample.GrpcProto\SkyApm.Sample.GrpcProto.csproj" />
   </ItemGroup>
 </Project>

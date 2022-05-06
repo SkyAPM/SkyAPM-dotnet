@@ -26,10 +26,6 @@ namespace SkyApm.Sample.Frontend
                 {
                     builder.UseStartup<Startup>();
                 })
-                .ConfigureAppConfiguration(builder =>
-                {
-                    builder.AddJsonFile("skyapm.json");
-                })
                 .Build();
 
 #endif

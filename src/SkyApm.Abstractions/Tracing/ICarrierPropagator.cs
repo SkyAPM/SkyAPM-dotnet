@@ -24,7 +24,7 @@ namespace SkyApm.Tracing
     {
         void Inject(SegmentContext segmentContext, ICarrierHeaderCollection carrier);
 
-        void Inject(TraceSegment segment, SegmentSpan span, ICarrierHeaderCollection carrier);
+        void Inject(SegmentSpan span, ICarrierHeaderCollection carrier);
 
         ICarrier Extract(ICarrierHeaderCollection carrier);
     }

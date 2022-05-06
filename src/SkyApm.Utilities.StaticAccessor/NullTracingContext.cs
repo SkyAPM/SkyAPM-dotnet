@@ -7,8 +7,6 @@ namespace SkyApm.Utilities.StaticAccessor
     {
         public SegmentSpan ActiveSpan => NullInstances.SegmentSpan;
 
-        public TraceSegment ActiveSegment => NullInstances.TraceSegment;
-
         public SpanOrSegmentContext CurrentEntry => NullInstances.SpanOrSegmentContext;
 
         public SpanOrSegmentContext CurrentLocal => NullInstances.SpanOrSegmentContext;

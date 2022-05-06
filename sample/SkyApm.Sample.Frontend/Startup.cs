@@ -33,6 +33,8 @@ namespace SkyApm.Sample.Frontend
 #endif
             services.AddHttpClient();
 
+            services.AddSkyAPMStaticAccessor();
+
             // DI grpc service
             services.AddSingleton<GreeterGrpcService>();
         }

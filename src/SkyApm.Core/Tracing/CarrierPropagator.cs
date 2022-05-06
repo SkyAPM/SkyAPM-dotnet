@@ -55,8 +55,9 @@ namespace SkyApm.Tracing
             }
         }
 
-        public void Inject(TraceSegment segment, SegmentSpan span, ICarrierHeaderCollection headerCollection)
+        public void Inject(SegmentSpan span, ICarrierHeaderCollection headerCollection)
         {
+            var segment = span.Segment;
             var carrier = new Carrier(segment.TraceId, segment.SegmentId, span.SpanId,
                 segment.ServiceInstanceId, null,
                 segment.ServiceId)
