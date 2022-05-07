@@ -16,12 +16,28 @@
  *
  */
 
-using System;
+using SkyApm.Tracing.Segments;
 
-namespace SkyApm.Diagnostics
+namespace SkyApm.Transport
 {
-    public abstract class ParameterBinder : Attribute, IParameterResolver
+    public class LoggerContextContextMapper : ILoggerContextContextMapper
     {
-        public abstract object Resolve(object value);
+        private readonly ISegmentContextMapper _segmentContextMapper;
+
+        public LoggerContextContextMapper(ISegmentContextMapper segmentContextMapper)
+        {
+            _segmentContextMapper = segmentContextMapper;
+        }
+
+        public LoggerRequest Map(LoggerContext loggerContext)
+        {
+            var segmentRequest = _segmentContextMapper.Map(loggerContext.SegmentContext);
+            return new LoggerRequest
+            {
+                Logs = loggerContext.Logs,
+                SegmentRequest = segmentRequest,
+                Date = loggerContext.Date,
+            };
+        }
     }
 }

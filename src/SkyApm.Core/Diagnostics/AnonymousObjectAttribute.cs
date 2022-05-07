@@ -16,17 +16,13 @@
  *
  */
 
-using System;
-
 namespace SkyApm.Diagnostics
 {
-    public class DiagnosticName :Attribute
+    public class AnonymousObjectAttribute : ParameterBinderAttribute
     {
-        public string Name { get; }
-
-        public DiagnosticName(string name)
+        public override object Resolve(object value)
         {
-            Name = name;
+            return value;
         }
     }
 }

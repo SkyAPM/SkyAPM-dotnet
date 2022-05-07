@@ -16,24 +16,20 @@
  *
  */
 
-using AspectCore.Extensions.Reflection;
-
-namespace SkyApm.Diagnostics
+namespace Sky.Apm.Sample.Logging
 {
-    public class PropertyAttribute : ParameterBinderAttribute
+    public class Test
     {
-        public string Name { get; set; }
+        private readonly ILogger _logger;
 
-        public override object Resolve(object value)
+        public Test(ILogger<Test> logger)
         {
-            if (value == null || Name == null)
-            {
-                return null;
-            }
+            _logger = logger;
+        }
 
-            var property = value.GetType().GetProperty(Name);
-
-            return property?.GetReflector()?.GetValue(value);
+        public void Create()
+        {
+            _logger.LogError("创建了一个用户对象",new List<string> { "asdasdas","3ewqeqdad","q34asdase2qq"});
         }
     }
 }

@@ -16,13 +16,10 @@
  *
  */
 
-namespace SkyApm.Diagnostics
+namespace SkyApm.Config
 {
-    public class AnonymousObject : ParameterBinder
+    public class LogPushSkywalkingConfig
     {
-        public override object Resolve(object value)
-        {
-            return value;
-        }
+        public bool Enable { get; set; }
     }
 }

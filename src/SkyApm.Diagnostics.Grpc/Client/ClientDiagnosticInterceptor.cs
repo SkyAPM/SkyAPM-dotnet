@@ -54,7 +54,7 @@ namespace SkyApm.Diagnostics.Grpc.Client
                     catch (Exception ex)
                     {
                         _processor.DiagnosticUnhandledException(ex);
-                        throw ex;
+                        throw;
                     }
                 });
                 return new AsyncUnaryCall<TResponse>(responseAsync, response.ResponseHeadersAsync, response.GetStatus, response.GetTrailers, response.Dispose);
@@ -101,7 +101,7 @@ namespace SkyApm.Diagnostics.Grpc.Client
             catch (Exception ex)
             {
                 _processor.DiagnosticUnhandledException(ex);
-                throw ex;
+                throw;
             }
         }
     }

@@ -16,24 +16,17 @@
  *
  */
 
-using AspectCore.Extensions.Reflection;
+using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
-namespace SkyApm.Diagnostics
+namespace SkyApm.Transport
 {
-    public class PropertyAttribute : ParameterBinderAttribute
+    public interface ILoggerReporter
     {
-        public string Name { get; set; }
-
-        public override object Resolve(object value)
-        {
-            if (value == null || Name == null)
-            {
-                return null;
-            }
-
-            var property = value.GetType().GetProperty(Name);
-
-            return property?.GetReflector()?.GetValue(value);
-        }
+        Task ReportAsync(IReadOnlyCollection<LoggerRequest> loggerRequests,
+           CancellationToken cancellationToken = default(CancellationToken));
     }
 }

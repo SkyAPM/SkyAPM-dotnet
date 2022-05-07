@@ -64,7 +64,6 @@ namespace SkyApm.Transport.Grpc.V8
                     await asyncClientStreamingCall.RequestStream.CompleteAsync();
                     await asyncClientStreamingCall.ResponseAsync;
                 }
-
                 stopwatch.Stop();
                 _logger.Information($"Report {segmentRequests.Count} trace segment. cost: {stopwatch.Elapsed}s");
             }
