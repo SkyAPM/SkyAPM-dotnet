@@ -18,6 +18,7 @@
 
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using SkyApm.Common;
@@ -26,19 +27,21 @@ namespace SkyApm.Tracing.Segments
 {
     public class SegmentSpan
     {
-        public int SpanId { get; } = 0;
+        private TraceSegment _segment;
 
-        public int ParentSpanId { get; } = -1;
+        public int SpanId { get; set; } = 0;
 
-        public long StartTime { get; }
+        public int ParentSpanId => Parent == null ? -1 : Parent.SpanId;
 
-        public long EndTime { get; private set; }
+        public long StartTime { get; set; }
 
-        public StringOrIntValue OperationName { get; }
+        public long EndTime { get; set; }
+
+        public StringOrIntValue OperationName { get; set; }
 
         public StringOrIntValue Peer { get; set; }
 
-        public SpanType SpanType { get; }
+        public SpanType SpanType { get; set; }
 
         public SpanLayer SpanLayer { get; set; }
 
@@ -48,6 +51,28 @@ namespace SkyApm.Tracing.Segments
         public TagCollection Tags { get; } = new TagCollection();
 
         public LogCollection Logs { get; } = new LogCollection();
+
+        public int AsyncDepth { get; set; } = -1;
+
+        public string SpanPath => Parent == null ? SpanId.ToString() : $"{Parent.SpanPath},{SpanId}";
+
+        /// <summary>
+        /// Should only be set by first span of segment
+        /// </summary>
+        public TraceSegment Segment
+        {
+            get => _segment ?? Parent.Segment;
+            set => _segment = value;
+        }
+
+        public SegmentReferenceCollection References { get; } = new SegmentReferenceCollection();
+
+        /// <summary>
+        /// A lot of logic uses Parent, think carefully before changing this value
+        /// </summary>
+        public SegmentSpan Parent { get; set; }
+
+        public ConcurrentDictionary<int, SegmentSpan> Children { get; } = new ConcurrentDictionary<int, SegmentSpan>();
 
         public SegmentSpan(string operationName, SpanType spanType, long startTimeMilliseconds = default)
         {
@@ -77,6 +102,11 @@ namespace SkyApm.Tracing.Segments
         public void AddLog(params LogEvent[] events)
         {
             var log = new SpanLog(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(), events);
+            AddLog(log);
+        }
+
+        public void AddLog(SpanLog log)
+        {
             Logs.AddLog(log);
         }
 

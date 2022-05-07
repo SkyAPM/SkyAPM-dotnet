@@ -17,7 +17,10 @@
  */
 
 using System;
+using System.Linq;
 using SkyApm.Common;
+using SkyApm.Config;
+using SkyApm.Logging;
 using SkyApm.Tracing.Segments;
 using SkyApm.Transport;
 
@@ -26,17 +29,26 @@ namespace SkyApm.Tracing
     public class TracingContext : ITracingContext
     {
         private readonly ISegmentContextFactory _segmentContextFactory;
+        private readonly ITraceSegmentManager _traceSegmentManager;
         private readonly ICarrierPropagator _carrierPropagator;
         private readonly ISegmentDispatcher _segmentDispatcher;
+        private readonly ILogger _logger;
 
-        public TracingContext(ISegmentContextFactory segmentContextFactory, ICarrierPropagator carrierPropagator,
-            ISegmentDispatcher segmentDispatcher)
+        public TracingContext(ISegmentContextFactory segmentContextFactory,
+            ITraceSegmentManager traceSegmentManager,
+            ICarrierPropagator carrierPropagator,
+            ISegmentDispatcher segmentDispatcher,
+            ILoggerFactory loggerFactory)
         {
             _segmentContextFactory = segmentContextFactory;
+            _traceSegmentManager = traceSegmentManager;
             _carrierPropagator = carrierPropagator;
             _segmentDispatcher = segmentDispatcher;
+            _logger = loggerFactory.CreateLogger(typeof(TracingContext));
         }
 
+        public SegmentSpan ActiveSpan => _traceSegmentManager.ActiveSpan;
+        #region SegmentContext
         public SegmentContext CreateEntrySegmentContext(string operationName, ICarrierHeaderCollection carrierHeader, long startTimeMilliseconds = default)
         {
             if (operationName == null) throw new ArgumentNullException(nameof(operationName));
@@ -71,5 +83,62 @@ namespace SkyApm.Tracing
             if (segmentContext.Sampled)
                 _segmentDispatcher.Dispatch(segmentContext);
         }
+        #endregion SegmentContext
+
+        #region SegmentSpan
+
+        public SegmentSpan CreateEntrySpan(string operationName, ICarrierHeaderCollection carrierHeader, long startTimeMilliseconds = 0)
+        {
+            if (operationName == null) throw new ArgumentNullException(nameof(operationName));
+            var carrier = _carrierPropagator.Extract(carrierHeader);
+            return _traceSegmentManager.CreateEntrySpan(operationName, carrier, startTimeMilliseconds);
+        }
+
+        public SegmentSpan CreateLocalSpan(string operationName, long startTimeMilliseconds = 0)
+        {
+            if (operationName == null) throw new ArgumentNullException(nameof(operationName));
+            return _traceSegmentManager.CreateLocalSpan(operationName, startTimeMilliseconds);
+        }
+
+        public SegmentSpan CreateLocalSpan(string operationName, CrossThreadCarrier carrier, long startTimeMilliseconds = 0)
+        {
+            if (operationName == null) throw new ArgumentNullException(nameof(operationName));
+            return _traceSegmentManager.CreateLocalSpan(operationName, carrier, startTimeMilliseconds);
+        }
+
+        public SegmentSpan CreateExitSpan(string operationName, string networkAddress, ICarrierHeaderCollection carrierHeader = null, long startTimeMilliseconds = 0)
+        {
+            var span = _traceSegmentManager.CreateExitSpan(operationName, new StringOrIntValue(networkAddress), startTimeMilliseconds);
+            if (carrierHeader != null) _carrierPropagator.Inject(span, carrierHeader);
+            return span;
+        }
+
+        public SegmentSpan CreateExitSpan(string operationName, string networkAddress, CrossThreadCarrier carrier, ICarrierHeaderCollection carrierHeader = null, long startTimeMilliseconds = 0)
+        {
+            var span = _traceSegmentManager.CreateExitSpan(operationName, new StringOrIntValue(networkAddress), carrier, startTimeMilliseconds);
+            if (carrierHeader != null) _carrierPropagator.Inject(span, carrierHeader);
+            return span;
+        }
+
+        public void StopSpan(SegmentSpan span)
+        {
+            var segment = _traceSegmentManager.StopSpan(span);
+
+            if (segment != null && segment.Sampled)
+            {
+                _segmentDispatcher.Dispatch(segment);
+            }
+        }
+
+        public void StopSpan()
+        {
+            (var segment, _) = _traceSegmentManager.StopSpan();
+
+            if (segment != null && segment.Sampled)
+            {
+                _segmentDispatcher.Dispatch(segment);
+            }
+        }
+        #endregion SegmentSpan
     }
 }

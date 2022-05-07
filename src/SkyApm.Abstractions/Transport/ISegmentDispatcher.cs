@@ -26,6 +26,8 @@ namespace SkyApm.Transport
     {
         bool Dispatch(SegmentContext segmentContext);
 
+        bool Dispatch(TraceSegment traceSegment);
+
         Task Flush(CancellationToken token = default(CancellationToken));
 
         void Close();

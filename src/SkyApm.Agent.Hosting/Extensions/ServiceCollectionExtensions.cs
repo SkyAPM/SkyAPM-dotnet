@@ -87,6 +87,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<ITracingContext, TracingContext>();
             services.AddSingleton<ICarrierPropagator, CarrierPropagator>();
             services.AddSingleton<ICarrierFormatter, Sw8CarrierFormatter>();
+            services.AddSingleton<ITraceSegmentManager, TraceSegmentManager>();
             services.AddSingleton<ISegmentContextFactory, SegmentContextFactory>();
             services.AddSingleton<IEntrySegmentContextAccessor, EntrySegmentContextAccessor>();
             services.AddSingleton<ILocalSegmentContextAccessor, LocalSegmentContextAccessor>();

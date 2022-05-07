@@ -16,12 +16,15 @@
  *
  */
 
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using SkyApm.Config;
 using SkyApm.Logging;
+using SkyApm.Tracing;
 using SkyApm.Tracing.Segments;
 
 namespace SkyApm.Transport
@@ -33,6 +36,7 @@ namespace SkyApm.Transport
         private readonly ISegmentReporter _segmentReporter;
         private readonly ISegmentContextMapper _segmentContextMapper;
         private readonly ConcurrentQueue<SegmentRequest> _segmentQueue;
+        private readonly ConcurrentDictionary<string, ConcurrentDictionary<string, TraceSegment>> _mergeDictionary;
         private readonly IRuntimeEnvironment _runtimeEnvironment;
         private readonly CancellationTokenSource _cancellation;
         private int _offset;
@@ -47,6 +51,7 @@ namespace SkyApm.Transport
             _logger = loggerFactory.CreateLogger(typeof(AsyncQueueSegmentDispatcher));
             _config = configAccessor.Get<TransportConfig>();
             _segmentQueue = new ConcurrentQueue<SegmentRequest>();
+            _mergeDictionary = new ConcurrentDictionary<string, ConcurrentDictionary<string, TraceSegment>>();
             _cancellation = new CancellationTokenSource();
         }
 
@@ -64,11 +69,27 @@ namespace SkyApm.Transport
             if (segment == null)
                 return false;
 
-            _segmentQueue.Enqueue(segment);
+            Enqueue(segment);
 
-            Interlocked.Increment(ref _offset);
+            return true;
+        }
 
-            _logger.Debug($"Dispatch trace segment. [SegmentId]={segmentContext.SegmentId}.");
+        public bool Dispatch(TraceSegment traceSegment)
+        {
+            if (!_runtimeEnvironment.Initialized || traceSegment == null || !traceSegment.Sampled)
+                return false;
+
+            // todo performance optimization for ConcurrentQueue
+            if (_config.QueueSize < _offset || _cancellation.IsCancellationRequested)
+                return false;
+
+            var segment = _segmentContextMapper.Map(traceSegment);
+
+            if (segment == null)
+                return false;
+
+            Enqueue(segment);
+
             return true;
         }
 
@@ -98,6 +119,15 @@ namespace SkyApm.Transport
         public void Close()
         {
             _cancellation.Cancel();
+        }
+
+        private void Enqueue(SegmentRequest segment)
+        {
+            _segmentQueue.Enqueue(segment);
+
+            Interlocked.Increment(ref _offset);
+
+            _logger.Debug($"Dispatch trace segment. [SegmentId]={segment.Segment.SegmentId}.");
         }
     }
 }
