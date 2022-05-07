@@ -47,6 +47,8 @@ namespace Microsoft.Extensions.DependencyInjection
             return services;
         }
 
+        
+
         internal static IServiceCollection AddSkyAPMCore(this IServiceCollection services, Action<SkyApmExtensions> extensionsSetup = null)
         {
             if (services == null)
@@ -56,6 +58,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services.AddSingleton<ISegmentDispatcher, AsyncQueueSegmentDispatcher>();
             services.AddSingleton<IExecutionService, RegisterService>();
+            services.AddSingleton<IExecutionService, LogReportService>();
             services.AddSingleton<IExecutionService, PingService>();
             services.AddSingleton<IExecutionService, SegmentReportService>();
             services.AddSingleton<IExecutionService, CLRStatsService>();
@@ -66,7 +69,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IConfigurationFactory, ConfigurationFactory>();
             services.AddSingleton<IHostedService, InstrumentationHostedService>();
             services.AddSingleton<IEnvironmentProvider, HostingEnvironmentProvider>();
-            services.AddTracing().AddSampling().AddGrpcTransport().AddSkyApmLogging();
+            services.AddTracing().AddSkyApmLogger().AddSampling().AddGrpcTransport().AddSkyApmLogging();
             var extensions = services.AddSkyApmExtensions()
                  .AddHttpClient()
                  .AddGrpcClient()
@@ -95,6 +98,13 @@ namespace Microsoft.Extensions.DependencyInjection
             return services;
         }
 
+        public static IServiceCollection AddSkyApmLogger(this IServiceCollection services)
+        {
+            services.AddSingleton<ISkyApmLogDispatcher, AsyncQueueSkyApmLogDispatcher>();
+            services.AddSingleton<ILoggerContextContextMapper, LoggerContextContextMapper>();
+            return services;
+        }
+
         private static IServiceCollection AddSampling(this IServiceCollection services)
         {
             services.AddSingleton<SimpleCountSamplingInterceptor>();
@@ -108,6 +118,7 @@ namespace Microsoft.Extensions.DependencyInjection
         private static IServiceCollection AddGrpcTransport(this IServiceCollection services)
         {
             services.AddSingleton<ISegmentReporter, SegmentReporter>();
+            services.AddSingleton<ILoggerReporter, LoggerReporter>();
             services.AddSingleton<ICLRStatsReporter, CLRStatsReporter>();
             services.AddSingleton<ConnectionManager>();
             services.AddSingleton<IPingCaller, PingCaller>();
@@ -121,5 +132,6 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<ILoggerFactory, DefaultLoggerFactory>();
             return services;
         }
+
     }
 }

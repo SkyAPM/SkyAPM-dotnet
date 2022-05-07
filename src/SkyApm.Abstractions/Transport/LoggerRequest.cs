@@ -16,24 +16,18 @@
  *
  */
 
-using AspectCore.Extensions.Reflection;
+using System;
+using System.Collections.Generic;
+using System.Text;
 
-namespace SkyApm.Diagnostics
+namespace SkyApm.Transport
 {
-    public class PropertyAttribute : ParameterBinderAttribute
+    public class LoggerRequest
     {
-        public string Name { get; set; }
+        public Dictionary<string, object> Logs { get; set; }
 
-        public override object Resolve(object value)
-        {
-            if (value == null || Name == null)
-            {
-                return null;
-            }
+        public SegmentRequest SegmentRequest { get; set; }
 
-            var property = value.GetType().GetProperty(Name);
-
-            return property?.GetReflector()?.GetValue(value);
-        }
+        public long Date { get; set; }
     }
 }

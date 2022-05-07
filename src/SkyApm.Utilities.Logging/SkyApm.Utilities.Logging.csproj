@@ -12,6 +12,9 @@
         </PackageReleaseNotes>
         <RootNamespace>SkyApm.Utilities.Logging</RootNamespace>
     </PropertyGroup>
+    <ItemGroup>
+      <Compile Remove="SkyApmLogger.cs" />
+    </ItemGroup>
 
     <ItemGroup>
         <PackageReference Include="Serilog.Extensions.Logging" Version="2.0.2" />

@@ -16,24 +16,17 @@
  *
  */
 
-using AspectCore.Extensions.Reflection;
+using System;
 
 namespace SkyApm.Diagnostics
 {
-    public class PropertyAttribute : ParameterBinderAttribute
+    public class DiagnosticNameAttribute :Attribute
     {
-        public string Name { get; set; }
+        public string Name { get; }
 
-        public override object Resolve(object value)
+        public DiagnosticNameAttribute(string name)
         {
-            if (value == null || Name == null)
-            {
-                return null;
-            }
-
-            var property = value.GetType().GetProperty(Name);
-
-            return property?.GetReflector()?.GetValue(value);
+            Name = name;
         }
     }
 }
