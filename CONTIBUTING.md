@@ -13,16 +13,20 @@ Please start a discussion on the [issue tracker](https://github.com/SkyAPM/SkyAP
 git clone https://github.com/SkyAPM/SkyAPM-dotnet.git
 ```
 
-2. clone `skywalking-data-collect-protocol` to get the protocol file
+2. Setup Submodule
 
 ```
-git clone https://github.com/apache/skywalking-data-collect-protocol.git
+git submodule update --init
 ```
 
-3. copy `skywalking-data-collect-protocol` all files to `SkyAPM-dotnet/src/SkyApm.Transport.Grpc.Protocol/protocol-v3`
-
+3. build
 ```
-cp skywalking-data-collect-protocol/* SkyAPM-dotnet/src/SkyApm.Transport.Grpc.Protocol/protocol-v3/
+// Restore dependencies
+dotnet restore
+// Build Protocol
+dotnet build src/SkyApm.Transport.Grpc.Protocol --no-restore
+// Build
+dotnet build --no-restore
+// Test
+dotnet test --no-build --verbosity normal --framework net6.0
 ```
-
-4. open `SkyAPM-dotnet/skyapm-dotnet.sln`
