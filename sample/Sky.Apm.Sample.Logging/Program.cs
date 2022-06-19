@@ -15,6 +15,8 @@
  * limitations under the License.
  *
  */
+using Serilog;
+using Serilog.Sinks.Skywalking;
 using Sky.Apm.Sample.Logging;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -27,6 +29,16 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<Test>();
 builder.Services.AddPushSkyApmLogger(x => x.Enable = true);
+
+builder.Host.UseSerilog((context, services, configuration) =>
+{
+    configuration
+       .MinimumLevel.Debug()
+       .Enrich.FromLogContext()
+       .WriteTo.Skywalking(services)
+       .WriteTo.Console();
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

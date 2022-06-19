@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
@@ -14,10 +14,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Serilog.AspNetCore" Version="5.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Serilog.Sinks.Skywalking\Serilog.Sinks.Skywalking.csproj" />
     <ProjectReference Include="..\..\src\SkyApm.Agent.AspNetCore\SkyApm.Agent.AspNetCore.csproj" />
     <ProjectReference Include="..\..\src\SkyApm.Diagnostics.Logging\SkyApm.Diagnostics.Logging.csproj" />
   </ItemGroup>
