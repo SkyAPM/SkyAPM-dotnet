@@ -16,8 +16,8 @@
  *
  */
 using Serilog;
-using Serilog.Sinks.Skywalking;
 using Sky.Apm.Sample.Logging;
+using SkyApm.Diagnostics.Logging.Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 

@@ -1,5 +1,5 @@
 # serilog-sinks-skywalking
-[![Nuget](https://img.shields.io/nuget/v/Serilog.Sinks.Skywalking)](https://www.nuget.org/packages/Serilog.Sinks.Skywalking/)
+[![Nuget](https://img.shields.io/nuget/v/SkyApm.Diagnostics.Logging.Serilog)](https://www.nuget.org/packages/SkyApm.Diagnostics.Logging.Serilog/)
 
 Write Serilog events to skywalking apm
 

@@ -1,9 +1,10 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
+using Serilog;
 using Serilog.Configuration;
 using Serilog.Formatting;
 using Serilog.Formatting.Json;
-using Serilog.Sinks.Skywalking.Sinks;
+using SkyApm.Diagnostics.Logging.Serilog.Sinks;
 using SkyApm.Transport;
 using System;
 using System.Collections.Generic;
@@ -12,7 +13,7 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Serilog.Sinks.Skywalking
+namespace SkyApm.Diagnostics.Logging.Serilog
 {
     public static class LoggerConfigurationExtensions
     {

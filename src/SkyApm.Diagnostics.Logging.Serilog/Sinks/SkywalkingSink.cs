@@ -11,7 +11,7 @@ using System.Globalization;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace Serilog.Sinks.Skywalking.Sinks
+namespace SkyApm.Diagnostics.Logging.Serilog.Sinks
 {
     public class SkywalkingSink : ILogEventSink
     {
@@ -84,7 +84,7 @@ namespace Serilog.Sinks.Skywalking.Sinks
             logs.Add("Level", logEvent.Level.ToString());
             logs.Add("logMessage", renderMessage);
 
-            var logContext = new SkyApm.Tracing.Segments.LoggerContext()
+            var logContext = new Tracing.Segments.LoggerContext()
             {
                 Logs = logs,
                 SegmentContext = _entrySegmentContextAccessor.Context,

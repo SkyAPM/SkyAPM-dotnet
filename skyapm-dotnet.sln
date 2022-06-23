@@ -113,7 +113,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sky.Apm.Sample.Logging", "s
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SkyApm.Diagnostics.Logging", "src\SkyApm.Diagnostics.Logging\SkyApm.Diagnostics.Logging.csproj", "{DDF18F43-E1D2-4854-AC97-DFC321EF6563}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Serilog.Sinks.Skywalking", "src\Serilog.Sinks.Skywalking\Serilog.Sinks.Skywalking.csproj", "{F14F3001-85F9-4654-BE6E-43EB78D63805}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SkyApm.Diagnostics.Logging.Serilog", "src\SkyApm.Diagnostics.Logging.Serilog\SkyApm.Diagnostics.Logging.Serilog.csproj", "{7CE321D4-23BB-4D62-B862-1BB7B7077FF0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -257,10 +257,10 @@ Global
 		{DDF18F43-E1D2-4854-AC97-DFC321EF6563}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DDF18F43-E1D2-4854-AC97-DFC321EF6563}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DDF18F43-E1D2-4854-AC97-DFC321EF6563}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F14F3001-85F9-4654-BE6E-43EB78D63805}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F14F3001-85F9-4654-BE6E-43EB78D63805}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F14F3001-85F9-4654-BE6E-43EB78D63805}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F14F3001-85F9-4654-BE6E-43EB78D63805}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7CE321D4-23BB-4D62-B862-1BB7B7077FF0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7CE321D4-23BB-4D62-B862-1BB7B7077FF0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7CE321D4-23BB-4D62-B862-1BB7B7077FF0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7CE321D4-23BB-4D62-B862-1BB7B7077FF0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -309,7 +309,7 @@ Global
 		{B1EF3295-4BF0-489F-8063-C9E3DAE20AA9} = {844CEACD-4C85-4B15-9E2B-892B01FDA4BB}
 		{D35905EC-EB46-4A3D-BD2B-02C4C868BC65} = {844CEACD-4C85-4B15-9E2B-892B01FDA4BB}
 		{DDF18F43-E1D2-4854-AC97-DFC321EF6563} = {B5E677CF-2920-4B0A-A056-E73F6B2CF2BC}
-		{F14F3001-85F9-4654-BE6E-43EB78D63805} = {4BD917BC-D579-4C75-9939-41BF012A4EE2}
+		{7CE321D4-23BB-4D62-B862-1BB7B7077FF0} = {B5E677CF-2920-4B0A-A056-E73F6B2CF2BC}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {94C0DA2C-CCCB-4314-93A2-9809B5DD0583}

@@ -19,8 +19,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Serilog.Sinks.Skywalking\Serilog.Sinks.Skywalking.csproj" />
     <ProjectReference Include="..\..\src\SkyApm.Agent.AspNetCore\SkyApm.Agent.AspNetCore.csproj" />
+    <ProjectReference Include="..\..\src\SkyApm.Diagnostics.Logging.Serilog\SkyApm.Diagnostics.Logging.Serilog.csproj" />
     <ProjectReference Include="..\..\src\SkyApm.Diagnostics.Logging\SkyApm.Diagnostics.Logging.csproj" />
   </ItemGroup>
 
