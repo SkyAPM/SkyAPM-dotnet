@@ -19,11 +19,11 @@ namespace SkyApm.Diagnostics.Logging.Serilog
     {
         static LoggerConfigurationExtensions() { }
 
-        public static LoggerConfiguration Skywalking(
+        public static LoggerConfiguration SkyApm(
             this LoggerSinkConfiguration loggerConfiguration, IServiceProvider serviceCollection, ITextFormatter formatter = null)
         {
             return loggerConfiguration
-                .Sink(new SkywalkingSink(serviceCollection, formatter));
+                .Sink(new SkyApmSink(serviceCollection, formatter));
         }
     }
 }

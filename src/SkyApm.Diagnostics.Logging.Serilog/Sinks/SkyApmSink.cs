@@ -13,12 +13,12 @@ using System.Threading.Tasks;
 
 namespace SkyApm.Diagnostics.Logging.Serilog.Sinks
 {
-    public class SkywalkingSink : ILogEventSink
+    public class SkyApmSink : ILogEventSink
     {
         ITextFormatter _formatter;
         IServiceProvider _serviceCollection;
 
-        public SkywalkingSink(IServiceProvider serviceCollection, ITextFormatter formatter)
+        public SkyApmSink(IServiceProvider serviceCollection, ITextFormatter formatter)
         {
             _serviceCollection = serviceCollection;
             _formatter = formatter;

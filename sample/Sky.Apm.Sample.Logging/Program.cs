@@ -35,7 +35,7 @@ builder.Host.UseSerilog((context, services, configuration) =>
     configuration
        .MinimumLevel.Debug()
        .Enrich.FromLogContext()
-       .WriteTo.Skywalking(services)
+       .WriteTo.SkyApm(services)
        .WriteTo.Console();
 });
 
