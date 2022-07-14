@@ -1,4 +1,4 @@
-# serilog-sinks-skywalking
+# SkyApm.Diagnostics.Logging.Serilog
 Write Serilog events to skywalking apm
 
 # Quick Start
@@ -44,4 +44,4 @@ use Custome Formater
 configuration
     .WriteTo.SkyApm(services, new JsonFormatter())
 ```
-nore Formatter please see Serilog Docs，or inherit `ITextFormatter`
+more Formatter please see Serilog Docs or inherit `ITextFormatter`
