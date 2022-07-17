@@ -1,16 +1,15 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
+		<Description>$(PackagePrefix).Diagnostics.Logging.Serilog Write Serilog events to skyapm.</Description>
+		<AssemblyTitle>$(PackagePrefix).Diagnostics.Logging.Serilog</AssemblyTitle>
 		<TargetFrameworks>netcoreapp3.1;net5.0;net6.0</TargetFrameworks>
-		<Version>0.1.0</Version>
-		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-		<GenerateDocumentationFile>true</GenerateDocumentationFile>
-		<PackageProjectUrl>https://github.com/SpringHgui/serilog-sinks-skywalking</PackageProjectUrl>
-		<Authors>Gui.H</Authors>
-		<Description>Write Serilog events to skywalking apm</Description>
-		<PackageReadmeFile>README.md</PackageReadmeFile>
-		<Copyright>MIT</Copyright>
-		<PackageTags>aspnetcore;serilog;skywalking</PackageTags>
+		<AssemblyName>$(PackagePrefix).Diagnostics.Logging.Serilog</AssemblyName>
+		<PackageId>$(PackagePrefix).Diagnostics.Logging.Serilog</PackageId>
+		<PackageTags>SkyWalking;APM;Diagnostics;Serilog</PackageTags>
+		<PackageReleaseNotes>
+		</PackageReleaseNotes>
+		<RootNamespace>SkyApm.Diagnostics.Logging.Serilog</RootNamespace>
 	</PropertyGroup>
 	<ItemGroup>
 		<FrameworkReference Include="Microsoft.AspNetCore.App" />
