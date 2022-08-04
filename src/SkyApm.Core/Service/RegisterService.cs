@@ -65,7 +65,7 @@ namespace SkyApm.Service
             };
             var request = new ServiceInstancePropertiesRequest
             {
-                ServiceId = _config.ServiceName ?? _config.ApplicationCode,
+                ServiceId = _config.ServiceName,
                 ServiceInstanceId = _config.ServiceInstanceName,
                 Properties = properties
             };
