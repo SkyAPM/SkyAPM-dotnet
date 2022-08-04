@@ -57,7 +57,7 @@ namespace SkyApm.Tracing
             var segmentId = GetSegmentId();
             var sampled = GetSampled(carrier, operationName);
             var segmentContext = new SegmentContext(traceId, segmentId, sampled,
-                _instrumentConfig.ServiceName ?? _instrumentConfig.ApplicationCode,
+                _instrumentConfig.ServiceName,
                 _instrumentConfig.ServiceInstanceName,
                 operationName, SpanType.Entry, startTimeMilliseconds);
 
@@ -90,7 +90,7 @@ namespace SkyApm.Tracing
             var segmentId = GetSegmentId();
             var sampled = GetSampled(parentSegmentContext, operationName);
             var segmentContext = new SegmentContext(traceId, segmentId, sampled,
-                _instrumentConfig.ServiceName ?? _instrumentConfig.ApplicationCode,
+                _instrumentConfig.ServiceName,
                 _instrumentConfig.ServiceInstanceName,
                 operationName, SpanType.Local, startTimeMilliseconds);
 
@@ -125,7 +125,7 @@ namespace SkyApm.Tracing
             var segmentId = GetSegmentId();
             var sampled = GetSampled(parentSegmentContext, operationName, networkAddress);
             var segmentContext = new SegmentContext(traceId, segmentId, sampled,
-                _instrumentConfig.ServiceName ?? _instrumentConfig.ApplicationCode,
+                _instrumentConfig.ServiceName,
                 _instrumentConfig.ServiceInstanceName,
                 operationName, SpanType.Exit, startTimeMilliseconds);
 

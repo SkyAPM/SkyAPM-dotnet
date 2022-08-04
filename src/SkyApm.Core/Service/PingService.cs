@@ -51,7 +51,7 @@ namespace SkyApm.Service
                 await _pingCaller.PingAsync(
                     new PingRequest
                     {
-                        ServiceName = _instrumentConfig.ServiceName ?? _instrumentConfig.ApplicationCode,
+                        ServiceName = _instrumentConfig.ServiceName,
                         InstanceId = _instrumentConfig.ServiceInstanceName
                     }, cancellationToken);
                 Logger.Information($"Ping server @{DateTimeOffset.UtcNow}");

@@ -46,7 +46,7 @@ namespace SkyApm.Utilities.Logging
             _loggerFactory.AddSerilog(new LoggerConfiguration().MinimumLevel.Verbose().Enrich
                 .WithProperty("SourceContext", null).Enrich
                 .WithProperty(nameof(instrumentationConfig.ServiceName),
-                    instrumentationConfig.ServiceName ?? instrumentationConfig.ApplicationCode).Enrich
+                    instrumentationConfig.ServiceName).Enrich
                 .FromLogContext().WriteTo.RollingFile(_loggingConfig.FilePath, level, outputTemplate, null, 1073741824,
                     31, null, false, false, TimeSpan.FromMilliseconds(500)).CreateLogger());
         }
