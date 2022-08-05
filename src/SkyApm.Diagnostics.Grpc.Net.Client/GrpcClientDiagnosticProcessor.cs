@@ -47,6 +47,12 @@ namespace SkyApm.Diagnostics.Grpc.Net.Client
             _tracingConfig = configAccessor.Get<TracingConfig>();
         }
 
+        [DiagnosticName(GrpcDiagnostics.ActivityName)]
+        public void DoNothing()
+        {
+
+        }
+
         [DiagnosticName(GrpcDiagnostics.ActivityStartKey)]
         public void InitializeCall([Property(Name = "Request")] HttpRequestMessage request)
         {
