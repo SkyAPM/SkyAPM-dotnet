@@ -18,21 +18,22 @@
 
 using MongoDB.Driver.Core.Events;
 using SkyApm.Tracing;
+using SkyApm.Tracing.Segments;
 using System;
+using System.Collections.Concurrent;
 
 namespace SkyApm.Diagnostics.MongoDB
 {
     public class MongoDiagnosticsProcessor : ITracingDiagnosticProcessor
     {
+        private readonly ConcurrentDictionary<int, SegmentContext> _contextMap = new ConcurrentDictionary<int, SegmentContext>();
+
         public string ListenerName => "MongoSourceListener";
         private readonly ITracingContext _tracingContext;
-        private readonly IExitSegmentContextAccessor _contextAccessor;
  
-        public MongoDiagnosticsProcessor(ITracingContext tracingContext,
-            IExitSegmentContextAccessor contextAccessor)
+        public MongoDiagnosticsProcessor(ITracingContext tracingContext)
         {
             _tracingContext = tracingContext;
-            _contextAccessor = contextAccessor;
         }
 
         [DiagnosticName("MongoActivity.Start")]
@@ -40,6 +41,8 @@ namespace SkyApm.Diagnostics.MongoDB
         {
             var operationName = DiagnosticsActivityEventSubscriber.GetCollectionName(@event);
             var context = _tracingContext.CreateExitSegmentContext(operationName, @event.ConnectionId.ServerId.EndPoint.ToString());
+            _contextMap.TryAdd(@event.RequestId, context); 
+            
             context.Span.SpanLayer = Tracing.Segments.SpanLayer.DB;
             context.Span.Component = Common.Components.MongoDBCLIENT;
             context.Span.AddTag("db.system", "mongodb");
@@ -53,24 +56,28 @@ namespace SkyApm.Diagnostics.MongoDB
 
         [DiagnosticName("MongoActivity.Stop")]
         public void AfterExecuteCommand([Object] CommandSucceededEvent @event)
-        { 
-            var context = _contextAccessor.Context;
-            context?.Span.AddTag(Common.Tags.STATUS_CODE, "ok");
+        {
+            if (_contextMap.TryRemove(@event.RequestId, out var context))
+            {
+                context?.Span.AddTag(Common.Tags.STATUS_CODE, "ok");
 
-            _tracingContext.Release(context);
+                _tracingContext.Release(context);
+            }
         }
 
         [DiagnosticName("MongoActivity.Failed")]
         public void FailedExecuteCommand([Object] CommandFailedEvent @event)
         {
-            var context = _contextAccessor.Context;
-            context?.Span.AddTag("status_description", @event.Failure.Message);
-            context?.Span.AddTag("error.type", @event.Failure.GetType().FullName);
-            context?.Span.AddTag("error.msg", @event.Failure.Message);
-            context?.Span.AddTag("error.stack", @event.Failure.StackTrace);
-            context?.Span.AddTag(Common.Tags.STATUS_CODE, "error");
+            if (_contextMap.TryRemove(@event.RequestId, out var context))
+            {
+                context?.Span.AddTag("status_description", @event.Failure.Message);
+                context?.Span.AddTag("error.type", @event.Failure.GetType().FullName);
+                context?.Span.AddTag("error.msg", @event.Failure.Message);
+                context?.Span.AddTag("error.stack", @event.Failure.StackTrace);
+                context?.Span.AddTag(Common.Tags.STATUS_CODE, "error");
 
-            _tracingContext.Release(context);
+                _tracingContext.Release(context);
+            }
         }
          
     }
