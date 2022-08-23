@@ -16,13 +16,14 @@
  *
  */
 
+using SkyApm.Common;
 using System.Data.Common;
 
 namespace SkyApm.Diagnostics.EntityFrameworkCore
 {
     public class MySqlEntityFrameworkCoreSpanMetadataProvider : IEntityFrameworkCoreSpanMetadataProvider
     {
-        public string Component { get; } = Common.Components.POMELO_ENTITYFRAMEWORKCORE_MYSQL.GetStringValue();
+        public StringOrIntValue Component { get; } = Common.Components.POMELO_ENTITYFRAMEWORKCORE_MYSQL;
         
         public bool Match(DbConnection connection)
         {
