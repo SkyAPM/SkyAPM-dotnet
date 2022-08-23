@@ -19,6 +19,7 @@
 using System;
 using SkyApm.Config;
 using Grpc.Core;
+using System.Linq;
 
 namespace SkyApm.Transport.Grpc
 {
@@ -38,6 +39,21 @@ namespace SkyApm.Transport.Grpc
 
     public static class GrpcConfigExtensions
     {
+        public static string[] GetServers(this GrpcConfig config)
+        {
+            var servers = config.Servers.Split(',').ToArray();
+            for (int i = 0; i < servers.Length; i++)
+            {
+                if (!servers[i].StartsWith("http://", StringComparison.InvariantCultureIgnoreCase)
+                        && !servers[i].StartsWith("https://", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    servers[i] = $"http://{servers[i]}";
+                }
+            } 
+
+            return servers;
+        }
+
         public static DateTime GetTimeout(this GrpcConfig config)
         {
             return DateTime.UtcNow.AddMilliseconds(config.Timeout);
