@@ -21,6 +21,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using SkyApm.Config;
 using SkyApm.Logging;
+using SkyApm.Transport.Grpc.Common;
 using SkyWalking.NetworkProtocol.V3;
 
 namespace SkyApm.Transport.Grpc.V8

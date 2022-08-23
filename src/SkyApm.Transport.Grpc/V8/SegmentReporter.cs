@@ -56,13 +56,12 @@ namespace SkyApm.Transport.Grpc.V8
 
             try
             {
-                var requests = FilterSegmentRequests(segmentRequests);
                 var stopwatch = Stopwatch.StartNew();
                 var client = new TraceSegmentReportService.TraceSegmentReportServiceClient(connection);
                 using (var asyncClientStreamingCall =
                     client.collect(_config.GetMeta(), _config.GetReportTimeout(), cancellationToken))
                 {
-                    foreach (var segment in requests)
+                    foreach (var segment in segmentRequests)
                     {
                         await asyncClientStreamingCall.RequestStream.WriteAsync(SegmentV8Helpers.Map(segment));
                     }
@@ -77,31 +76,6 @@ namespace SkyApm.Transport.Grpc.V8
                 _logger.Error("Report trace segment fail.", ex);
                 _connectionManager.Failure(ex);
             }
-        }
-
-        private IEnumerable<SegmentRequest> FilterSegmentRequests(IReadOnlyCollection<SegmentRequest> segmentRequests)
-        {
-            var result = new List<SegmentRequest>();
-            var servers = _config.GetServers();
-            foreach (var segmentRequest in segmentRequests)
-            {
-                bool isGrpcServerRequest = false;
-                foreach (var server in servers)
-                {
-                    if (segmentRequest.Segment.Spans.Any(s => s.Tags.Any(t => t.Key == Tags.URL && t.Value.StartsWith(server))))
-                    {
-                        isGrpcServerRequest = true;
-                        break;
-                    }
-                }
-
-                if (!isGrpcServerRequest)
-                {
-                    result.Add(segmentRequest);
-                }
-            }
-
-            return result;
         }
     }
 }

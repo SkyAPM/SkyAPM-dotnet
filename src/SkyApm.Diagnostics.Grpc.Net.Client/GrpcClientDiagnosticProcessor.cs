@@ -26,6 +26,7 @@ using SkyApm.Config;
 using SkyApm.Diagnostics.HttpClient;
 using SkyApm.Tracing;
 using SkyApm.Tracing.Segments;
+using SkyApm.Transport;
 
 namespace SkyApm.Diagnostics.Grpc.Net.Client
 {
@@ -38,6 +39,7 @@ namespace SkyApm.Diagnostics.Grpc.Net.Client
 
         private readonly IExitSegmentContextAccessor _contextAccessor;
         private readonly TracingConfig _tracingConfig;
+        private readonly GrpcConfig _grpcConfig;
 
         public GrpcClientDiagnosticProcessor(ITracingContext tracingContext,
             IExitSegmentContextAccessor contextAccessor, IConfigAccessor configAccessor)
@@ -45,6 +47,7 @@ namespace SkyApm.Diagnostics.Grpc.Net.Client
             _tracingContext = tracingContext;
             _contextAccessor = contextAccessor;
             _tracingConfig = configAccessor.Get<TracingConfig>();
+            _grpcConfig = configAccessor.Get<GrpcConfig>();
         }
 
         [DiagnosticName(GrpcDiagnostics.ActivityName)]
@@ -56,13 +59,19 @@ namespace SkyApm.Diagnostics.Grpc.Net.Client
         [DiagnosticName(GrpcDiagnostics.ActivityStartKey)]
         public void InitializeCall([Property(Name = "Request")] HttpRequestMessage request)
         {
-            var context = _tracingContext.CreateExitSegmentContext(request.RequestUri.ToString(),
+            var requestUri = request.RequestUri.ToString();
+            if (IsSkyWalkingRequest(requestUri))
+            {
+                return;
+            }
+
+            var context = _tracingContext.CreateExitSegmentContext(requestUri,
                 $"{request.RequestUri.Host}:{request.RequestUri.Port}",
                 new GrpcNetClientICarrierHeaderCollection(request));
 
             context.Span.SpanLayer = SpanLayer.RPC_FRAMEWORK;
             context.Span.Component = Common.Components.GRPC;
-            context.Span.AddTag(Tags.URL, request.RequestUri.ToString());
+            context.Span.AddTag(Tags.URL, requestUri);
 
             var activity = Activity.Current;
             if (activity.OperationName == GrpcDiagnostics.ActivityName)
@@ -72,6 +81,20 @@ namespace SkyApm.Diagnostics.Grpc.Net.Client
 
                 context.Span.AddTag(Tags.GRPC_METHOD_NAME, method);
             }
+        }
+
+        private bool IsSkyWalkingRequest(string requestUri)
+        {
+            var servers = _grpcConfig.GetServers();
+            foreach (var server in servers)
+            {
+                if (requestUri.StartsWith(server, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         [DiagnosticName(GrpcDiagnostics.ActivityStopKey)]
