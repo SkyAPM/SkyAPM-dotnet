@@ -16,13 +16,14 @@
  *
  */
 
+using SkyApm.Common;
 using System.Data.Common;
 
 namespace SkyApm.Diagnostics.EntityFrameworkCore
 {
     public interface IEntityFrameworkCoreSpanMetadataProvider
     {
-        string Component { get; }
+        StringOrIntValue Component { get; }
 
         bool Match(DbConnection connection);
 
