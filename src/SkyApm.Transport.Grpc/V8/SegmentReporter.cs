@@ -16,15 +16,17 @@
  *
  */
 
+using SkyApm.Common;
+using SkyApm.Config;
+using SkyApm.Logging;
+using SkyApm.Transport.Grpc.Common;
+using SkyWalking.NetworkProtocol.V3;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using SkyApm.Config;
-using SkyApm.Logging;
-using SkyWalking.NetworkProtocol.V3;
-using SkyApm.Transport.Grpc.Common;
 
 namespace SkyApm.Transport.Grpc.V8
 {
@@ -60,7 +62,9 @@ namespace SkyApm.Transport.Grpc.V8
                     client.collect(_config.GetMeta(), _config.GetReportTimeout(), cancellationToken))
                 {
                     foreach (var segment in segmentRequests)
+                    {
                         await asyncClientStreamingCall.RequestStream.WriteAsync(SegmentV8Helpers.Map(segment));
+                    }
                     await asyncClientStreamingCall.RequestStream.CompleteAsync();
                     await asyncClientStreamingCall.ResponseAsync;
                 }

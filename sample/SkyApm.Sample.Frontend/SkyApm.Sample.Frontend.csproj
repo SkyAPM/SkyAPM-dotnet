@@ -6,7 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="System.Net.Http.Json" Version="5.0.0" />
-    <PackageReference Include="Grpc.Net.Client" Version="2.26.0" />
+    <PackageReference Include="Grpc.Net.Client" Version="2.47.0" />
   </ItemGroup>
 
   <ItemGroup>

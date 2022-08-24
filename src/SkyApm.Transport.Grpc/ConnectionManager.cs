@@ -16,13 +16,13 @@
  *
  */
 
-using System;
-using System.Linq;
-using System.Threading.Tasks;
-using Grpc.Core;
+using Grpc.Net.Client;
 using SkyApm.Config;
 using SkyApm.Logging;
 using SkyApm.Transport.Grpc.Common;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace SkyApm.Transport.Grpc
 {
@@ -34,11 +34,11 @@ namespace SkyApm.Transport.Grpc
         private readonly ILogger _logger;
         private readonly GrpcConfig _config;
 
-        private volatile Channel _channel;
+        private volatile GrpcChannel _channel;
         private volatile ConnectionState _state;
         private volatile string _server;
 
-        public bool Ready => _channel != null && _state == ConnectionState.Connected && _channel.State == ChannelState.Ready;
+        public bool Ready => _channel != null && _state == ConnectionState.Connected;
 
         public ConnectionManager(ILoggerFactory loggerFactory, IConfigAccessor configAccessor)
         {
@@ -61,12 +61,13 @@ namespace SkyApm.Transport.Grpc
                 }
 
                 EnsureServerAddress();
-
-                _channel = new Channel(_server, ChannelCredentials.Insecure);
-
+                
                 try
                 {
-                    await _channel.ConnectAsync(_config.GetConnectTimeout());
+                    //https://docs.microsoft.com/en-us/aspnet/core/grpc/troubleshoot?view=aspnetcore-3.0#call-insecure-grpc-services-with-net-core-client-2
+                    AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
+                    
+                    _channel = GrpcChannel.ForAddress(_server);
                     _state = ConnectionState.Connected;
                     _logger.Information($"Connected server[{_channel.Target}].");
                 }
@@ -106,13 +107,13 @@ namespace SkyApm.Transport.Grpc
 
             if (ConnectionState.Connected == currentState)
             {
-                _logger.Warning($"Connection state changed. {_state} -> {_channel.State} . {exception.Message}");
+                _logger.Warning($"Connection state changed. {exception.Message}");
             }
 
             _state = ConnectionState.Failure;
         }
 
-        public Channel GetConnection()
+        public GrpcChannel GetConnection()
         {
             if (Ready) return _channel;
             _logger.Debug("Not found available gRPC connection.");
@@ -121,7 +122,7 @@ namespace SkyApm.Transport.Grpc
 
         private void EnsureServerAddress()
         {
-            var servers = _config.Servers.Split(',').ToArray();
+            var servers = _config.GetServers();
             if (servers.Length == 1)
             {
                 _server = servers[0];
