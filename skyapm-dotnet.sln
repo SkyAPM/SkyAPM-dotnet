@@ -109,6 +109,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SkyApm.Diagnostics.FreeSql"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SkyApm.Sample.FreeSqlSqlite", "sample\SkyApm.Sample.FreeSql\SkyApm.Sample.FreeSqlSqlite.csproj", "{B1EF3295-4BF0-489F-8063-C9E3DAE20AA9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SkyApm.Diagnostics.Logging", "src\SkyApm.Diagnostics.Logging\SkyApm.Diagnostics.Logging.csproj", "{4E3BA76C-2A30-4CAD-9F6C-08DF5DF0CE0C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -243,6 +245,10 @@ Global
 		{B1EF3295-4BF0-489F-8063-C9E3DAE20AA9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B1EF3295-4BF0-489F-8063-C9E3DAE20AA9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B1EF3295-4BF0-489F-8063-C9E3DAE20AA9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4E3BA76C-2A30-4CAD-9F6C-08DF5DF0CE0C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4E3BA76C-2A30-4CAD-9F6C-08DF5DF0CE0C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4E3BA76C-2A30-4CAD-9F6C-08DF5DF0CE0C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4E3BA76C-2A30-4CAD-9F6C-08DF5DF0CE0C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -289,6 +295,7 @@ Global
 		{8D3C5573-C282-45F5-A7F4-2E323F322CB7} = {B5E677CF-2920-4B0A-A056-E73F6B2CF2BC}
 		{82580A47-9DBC-43E8-B581-0C35147B4FAD} = {B5E677CF-2920-4B0A-A056-E73F6B2CF2BC}
 		{B1EF3295-4BF0-489F-8063-C9E3DAE20AA9} = {844CEACD-4C85-4B15-9E2B-892B01FDA4BB}
+		{4E3BA76C-2A30-4CAD-9F6C-08DF5DF0CE0C} = {B5E677CF-2920-4B0A-A056-E73F6B2CF2BC}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {94C0DA2C-CCCB-4314-93A2-9809B5DD0583}
