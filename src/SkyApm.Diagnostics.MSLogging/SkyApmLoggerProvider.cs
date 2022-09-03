@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging;
 using SkyApm.Tracing;
 using SkyApm.Transport;
 
-namespace SkyApm.Diagnostics.Logging
+namespace SkyApm.Diagnostics.MSLogging
 {
     public class SkyApmLoggerProvider: ILoggerProvider
     {
