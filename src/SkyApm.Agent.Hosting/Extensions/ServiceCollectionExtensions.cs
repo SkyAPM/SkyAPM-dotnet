@@ -24,7 +24,6 @@ using SkyApm.Diagnostics.Grpc;
 using SkyApm.Diagnostics.Grpc.Net.Client;
 using SkyApm.Diagnostics.HttpClient;
 using SkyApm.Diagnostics.SqlClient;
-using SkyApm.Logging;
 using SkyApm.Sampling;
 using SkyApm.Service;
 using SkyApm.Tracing;
@@ -34,8 +33,12 @@ using SkyApm.Utilities.Configuration;
 using SkyApm.Utilities.DependencyInjection;
 using SkyApm.Utilities.Logging;
 using System;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging;
 using SkyApm;
 using SkyApm.Agent.Hosting;
+using SkyApm.Diagnostics.MSLogging;
+using ILoggerFactory = SkyApm.Logging.ILoggerFactory;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -102,6 +105,7 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             services.AddSingleton<ISkyApmLogDispatcher, AsyncQueueSkyApmLogDispatcher>();
             services.AddSingleton<ILoggerContextContextMapper, LoggerContextContextMapper>();
+            services.TryAddEnumerable(ServiceDescriptor.Singleton<ILoggerProvider, SkyApmLoggerProvider>());
             return services;
         }
 
