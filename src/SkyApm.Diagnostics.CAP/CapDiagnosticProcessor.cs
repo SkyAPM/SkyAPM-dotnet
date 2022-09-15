@@ -106,11 +106,24 @@ namespace SkyApm.Diagnostics.CAP
         [DiagnosticName(CapEvents.BeforePublish)]
         public void BeforePublish([Object] CapEventDataPubSend eventData)
         {
-            _localSegmentContextAccessor.Context = _contexts[eventData.TransportMessage.GetId()];
-
+            SegmentContext context = null;
             var host = eventData.BrokerAddress.Endpoint.Replace("-1", "5672");
-            var context = _tracingContext.CreateExitSegmentContext(OperateNamePrefix + eventData.Operation + ProducerOperateNameSuffix,
-                host, new CapCarrierHeaderCollection(eventData.TransportMessage));
+            if (_contexts.TryGetValue(eventData.TransportMessage.GetId(),out var ctx))
+            {
+                _localSegmentContextAccessor.Context = ctx;
+                context = _tracingContext.CreateExitSegmentContext(OperateNamePrefix + eventData.Operation + ProducerOperateNameSuffix,
+                    host, new CapCarrierHeaderCollection(eventData.TransportMessage));
+
+            }
+            else
+            {
+                // may be come from retry loop
+                var carrierHeader = new CapCarrierHeaderCollection(eventData.TransportMessage);
+                var eventName = OperateNamePrefix + eventData.Operation + ProducerOperateNameSuffix;
+                var operationName = OperateNamePrefix + eventName + ConsumerOperateNameSuffix;
+                context = _tracingContext.CreateEntrySegmentContext(operationName, carrierHeader);
+            }
+
 
             context.Span.SpanLayer = SpanLayer.MQ;
             context.Span.Component = GetComponent(eventData.BrokerAddress, true);
@@ -205,9 +218,21 @@ namespace SkyApm.Diagnostics.CAP
         [DiagnosticName(CapEvents.BeforeSubscriberInvoke)]
         public void CapBeforeSubscriberInvoke([Object] CapEventDataSubExecute eventData)
         {
-            _entrySegmentContextAccessor.Context = _contexts[eventData.Message.GetId() + eventData.Message.GetGroup()];
+            SegmentContext context = null;
+            if (_contexts.TryGetValue(eventData.Message.GetId() + eventData.Message.GetGroup(),out var ctx))
+            {
+                _entrySegmentContextAccessor.Context = ctx;
+                context = _tracingContext.CreateLocalSegmentContext("Subscriber Invoke: " + eventData.MethodInfo.Name);
+            }
+            else
+            {
+                // may be come from retry loop
+                var carrierHeader = new CapCarrierHeaderCollection(eventData.Message);
+                var eventName = eventData.Message.GetGroup() + "/" + eventData.Operation;
+                var operationName = OperateNamePrefix + eventName + ConsumerOperateNameSuffix;
+                context = _tracingContext.CreateEntrySegmentContext(operationName, carrierHeader);
+            }
 
-            var context = _tracingContext.CreateLocalSegmentContext("Subscriber Invoke: " + eventData.MethodInfo.Name);
             context.Span.SpanLayer = SpanLayer.MQ;
             context.Span.Component = Components.CAP;
             context.Span.AddLog(LogEvent.Event("Subscriber Invoke Start"));
