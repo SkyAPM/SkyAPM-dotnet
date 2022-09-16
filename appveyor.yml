@@ -24,7 +24,7 @@ deploy:
   skip_symbols: true
   artifact: /artifacts\/packages\/.+\.nupkg/
   on:
-    branch: master
+    branch: main
 - provider: NuGet
   server: https://www.myget.org/F/skyapm-dotnet/api/v2/package
   api_key:
