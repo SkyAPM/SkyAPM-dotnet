@@ -45,8 +45,7 @@ namespace SkyApm.Transport.Grpc
             _instrumentConfig = configAccessor.Get<InstrumentConfig>();
             _logger = loggerFactory.CreateLogger(typeof(SegmentReporter));
         }
-
-
+        
         public async Task ReportAsync(IReadOnlyCollection<LoggerRequest> loggerRequests,
             CancellationToken cancellationToken = default)
         {
@@ -60,8 +59,8 @@ namespace SkyApm.Transport.Grpc
             {
                 var stopwatch = Stopwatch.StartNew();
                 var client = new LogReportService.LogReportServiceClient(connection);
-                using (var asyncClientStreamingCall =
-                       client.collect(_grpcConfig.GetMeta(), _grpcConfig.GetReportTimeout(), cancellationToken))
+                using (var asyncClientStreamingCall = client.collect(_grpcConfig.GetMeta(),
+                           _grpcConfig.GetReportTimeout(), cancellationToken))
                 {
                     foreach (var loggerRequest in loggerRequests)
                     {

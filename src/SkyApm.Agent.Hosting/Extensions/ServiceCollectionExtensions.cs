@@ -33,8 +33,6 @@ using SkyApm.Utilities.Configuration;
 using SkyApm.Utilities.DependencyInjection;
 using SkyApm.Utilities.Logging;
 using System;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Logging;
 using SkyApm;
 using SkyApm.Agent.Hosting;
 using SkyApm.Diagnostics.MSLogging;
@@ -49,10 +47,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSkyAPMCore(extensionsSetup);
             return services;
         }
-
         
-
-        internal static IServiceCollection AddSkyAPMCore(this IServiceCollection services, Action<SkyApmExtensions> extensionsSetup = null)
+        private static IServiceCollection AddSkyAPMCore(this IServiceCollection services, Action<SkyApmExtensions> extensionsSetup = null)
         {
             if (services == null)
             {
@@ -103,7 +99,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IBase64Formatter, Base64Formatter>();
             return services;
         }
-
+        
         private static IServiceCollection AddSampling(this IServiceCollection services)
         {
             services.AddSingleton<SimpleCountSamplingInterceptor>();
