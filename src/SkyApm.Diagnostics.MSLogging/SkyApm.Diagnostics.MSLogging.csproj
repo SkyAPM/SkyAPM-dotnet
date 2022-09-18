@@ -4,20 +4,17 @@
         <TargetFrameworks>netcoreapp3.1;net5.0;net6.0</TargetFrameworks>
         <RootNamespace>SkyApm.Diagnostics.MSLogging</RootNamespace>
     </PropertyGroup>
-    <ItemGroup>
-        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.1"/>
-    </ItemGroup>
-
     <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp3.1'">
-        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="3.1.0"/>
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="3.1.0" />
     </ItemGroup>
     <ItemGroup Condition="'$(TargetFramework)' == 'net5.0'">
-        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="5.0.0"/>
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="5.0.0" />
     </ItemGroup>
     <ItemGroup Condition="'$(TargetFramework)' == 'net6.0'">
-        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.1"/>
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.1" />
     </ItemGroup>
     <ItemGroup>
-        <ProjectReference Include="..\SkyApm.Abstractions\SkyApm.Abstractions.csproj"/>
+        <ProjectReference Include="..\SkyApm.Abstractions\SkyApm.Abstractions.csproj" />
+        <ProjectReference Include="..\SkyApm.Utilities.DependencyInjection\SkyApm.Utilities.DependencyInjection.csproj" />
     </ItemGroup>
 </Project>

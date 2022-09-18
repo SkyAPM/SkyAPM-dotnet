@@ -39,8 +39,8 @@ namespace SkyApm.Diagnostics.MSLogging
             _segmentContextAccessor = segmentContextAccessor;
         }
 
-        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception,
-            Func<TState, Exception?, string> formatter)
+        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception,
+            Func<TState, Exception, string> formatter)
         {
             var logs = new Dictionary<string, object>
             {
@@ -57,9 +57,7 @@ namespace SkyApm.Diagnostics.MSLogging
                     : new LoggerSegmentReference()
                     {
                         TraceId = segmentContext.TraceId,
-                        SegmentId = segmentContext.SegmentId,
-                        ServiceId = segmentContext.ServiceId,
-                        ServiceInstanceId = segmentContext.ServiceInstanceId
+                        SegmentId = segmentContext.SegmentId
                     },
             };
             _skyApmLogDispatcher.Dispatch(logContext);

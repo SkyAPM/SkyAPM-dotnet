@@ -23,6 +23,7 @@ using SkyWalking.NetworkProtocol.V3;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -33,13 +34,15 @@ namespace SkyApm.Transport.Grpc
     {
         private readonly ConnectionManager _connectionManager;
         private readonly ILogger _logger;
-        private readonly GrpcConfig _config;
+        private readonly GrpcConfig _grpcConfig;
+        private readonly InstrumentConfig _instrumentConfig;
 
         public LoggerReporter(ConnectionManager connectionManager, IConfigAccessor configAccessor,
             ILoggerFactory loggerFactory)
         {
             _connectionManager = connectionManager;
-            _config = configAccessor.Get<GrpcConfig>();
+            _grpcConfig = configAccessor.Get<GrpcConfig>();
+            _instrumentConfig = configAccessor.Get<InstrumentConfig>();
             _logger = loggerFactory.CreateLogger(typeof(SegmentReporter));
         }
 
@@ -58,7 +61,7 @@ namespace SkyApm.Transport.Grpc
                 var stopwatch = Stopwatch.StartNew();
                 var client = new LogReportService.LogReportServiceClient(connection);
                 using (var asyncClientStreamingCall =
-                       client.collect(_config.GetMeta(), _config.GetReportTimeout(), cancellationToken))
+                       client.collect(_grpcConfig.GetMeta(), _grpcConfig.GetReportTimeout(), cancellationToken))
                 {
                     foreach (var loggerRequest in loggerRequests)
                     {
@@ -72,13 +75,13 @@ namespace SkyApm.Transport.Grpc
                         {
                             TraceContext = new TraceContext()
                             {
-                                TraceId = loggerRequest.SegmentReference.TraceId,
-                                TraceSegmentId = loggerRequest.SegmentReference?.SegmentId,
+                                TraceId = loggerRequest.SegmentReference?.TraceId ?? string.Empty,
+                                TraceSegmentId = loggerRequest.SegmentReference?.SegmentId ?? string.Empty,
                                 //SpanId=item.Segment
                             },
                             Timestamp = loggerRequest.Date,
-                            Service = loggerRequest.SegmentReference?.ServiceId,
-                            ServiceInstance = loggerRequest.SegmentReference?.ServiceInstanceId,
+                            Service = _instrumentConfig.ServiceName,
+                            ServiceInstance = _instrumentConfig.ServiceInstanceName,
                             Endpoint = "",
                             Body = new LogDataBody()
                             {
@@ -99,10 +102,14 @@ namespace SkyApm.Transport.Grpc
                     _logger.Information($"Report {loggerRequests.Count} logs. cost: {stopwatch.Elapsed}s");
                 }
             }
-            catch (Exception ex)
+            catch (IOException ex)
             {
                 _logger.Error("Report trace segment fail.", ex);
                 _connectionManager.Failure(ex);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error("Report trace segment fail.", ex);
             }
         }
     }
