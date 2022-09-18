@@ -31,7 +31,6 @@ namespace SkyApm.Transport.Grpc
 {
     public class LoggerReporter : ILoggerReporter
     {
-
         private readonly ConnectionManager _connectionManager;
         private readonly ILogger _logger;
         private readonly GrpcConfig _config;
@@ -45,7 +44,8 @@ namespace SkyApm.Transport.Grpc
         }
 
 
-        public async Task ReportAsync(IReadOnlyCollection<LoggerRequest> loggerRequests, CancellationToken cancellationToken = default)
+        public async Task ReportAsync(IReadOnlyCollection<LoggerRequest> loggerRequests,
+            CancellationToken cancellationToken = default)
         {
             if (!_connectionManager.Ready)
             {
@@ -57,54 +57,53 @@ namespace SkyApm.Transport.Grpc
             {
                 var stopwatch = Stopwatch.StartNew();
                 var client = new LogReportService.LogReportServiceClient(connection);
-                using (var asyncClientStreamingCall = client.collect(_config.GetMeta(), _config.GetReportTimeout(), cancellationToken))
+                using (var asyncClientStreamingCall =
+                       client.collect(_config.GetMeta(), _config.GetReportTimeout(), cancellationToken))
                 {
                     foreach (var loggerRequest in loggerRequests)
                     {
-                        StringBuilder logmessage=new StringBuilder();
+                        var logMessage = new StringBuilder();
                         foreach (var log in loggerRequest.Logs)
                         {
-                            logmessage.Append($"\r\n{log.Key} : {log.Value}");
+                            logMessage.Append($"\r\n{log.Key} : {log.Value}");
                         }
-                        var logbody = new LogData()
+
+                        var logBody = new LogData()
                         {
                             TraceContext = new TraceContext()
                             {
-                                TraceId = loggerRequest.SegmentRequest.TraceId,
-                                TraceSegmentId = loggerRequest.SegmentRequest.Segment.SegmentId,
+                                TraceId = loggerRequest.SegmentReference.TraceId,
+                                TraceSegmentId = loggerRequest.SegmentReference?.SegmentId,
                                 //SpanId=item.Segment
                             },
                             Timestamp = loggerRequest.Date,
-                            Service = loggerRequest.SegmentRequest.Segment.ServiceId,
-                            ServiceInstance = loggerRequest.SegmentRequest.Segment.ServiceInstanceId,
+                            Service = loggerRequest.SegmentReference?.ServiceId,
+                            ServiceInstance = loggerRequest.SegmentReference?.ServiceInstanceId,
                             Endpoint = "",
                             Body = new LogDataBody()
                             {
                                 Type = "text",
                                 Text = new TextLog()
                                 {
-                                    Text = logmessage.ToString(),
+                                    Text = logMessage.ToString(),
                                 },
                             },
                         };
-                        await asyncClientStreamingCall.RequestStream.WriteAsync(logbody);
+                        await asyncClientStreamingCall.RequestStream.WriteAsync(logBody);
                     }
 
                     await asyncClientStreamingCall.RequestStream.CompleteAsync();
                     await asyncClientStreamingCall.ResponseAsync;
 
                     stopwatch.Stop();
-                    _logger.Information($"Report {loggerRequests.Count} logger logger. cost: {stopwatch.Elapsed}s");
+                    _logger.Information($"Report {loggerRequests.Count} logs. cost: {stopwatch.Elapsed}s");
                 }
-
             }
             catch (Exception ex)
             {
                 _logger.Error("Report trace segment fail.", ex);
                 _connectionManager.Failure(ex);
-
             }
-
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Licensed to the SkyAPM under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -18,26 +18,10 @@
 
 using SkyApm.Tracing.Segments;
 
-namespace SkyApm.Transport
+namespace SkyApm.Tracing
 {
-    public class LoggerContextContextMapper : ILoggerContextContextMapper
+    public interface ISegmentContextAccessor
     {
-        private readonly ISegmentContextMapper _segmentContextMapper;
-
-        public LoggerContextContextMapper(ISegmentContextMapper segmentContextMapper)
-        {
-            _segmentContextMapper = segmentContextMapper;
-        }
-
-        public LoggerRequest Map(LoggerContext loggerContext)
-        {
-            var segmentRequest = _segmentContextMapper.Map(loggerContext.SegmentContext);
-            return new LoggerRequest
-            {
-                Logs = loggerContext.Logs,
-                SegmentRequest = segmentRequest,
-                Date = loggerContext.Date,
-            };
-        }
+        SegmentContext Context { get; }
     }
 }

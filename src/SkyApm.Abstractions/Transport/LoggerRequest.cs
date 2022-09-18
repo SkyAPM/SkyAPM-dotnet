@@ -16,9 +16,7 @@
  *
  */
 
-using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace SkyApm.Transport
 {
@@ -26,8 +24,19 @@ namespace SkyApm.Transport
     {
         public Dictionary<string, object> Logs { get; set; }
 
-        public SegmentRequest SegmentRequest { get; set; }
+        public LoggerSegmentReference SegmentReference { get; set; }
 
         public long Date { get; set; }
+    }
+    
+    public class LoggerSegmentReference
+    {
+        public string SegmentId { get; set; }
+
+        public string TraceId { get; set; }
+
+        public string ServiceId { get; set; }
+
+        public string ServiceInstanceId { get; set; }
     }
 }

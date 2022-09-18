@@ -104,7 +104,6 @@ namespace Microsoft.Extensions.DependencyInjection
         public static IServiceCollection AddSkyApmLogger(this IServiceCollection services)
         {
             services.AddSingleton<ISkyApmLogDispatcher, AsyncQueueSkyApmLogDispatcher>();
-            services.AddSingleton<ILoggerContextContextMapper, LoggerContextContextMapper>();
             services.TryAddEnumerable(ServiceDescriptor.Singleton<ILoggerProvider, SkyApmLoggerProvider>());
             return services;
         }
