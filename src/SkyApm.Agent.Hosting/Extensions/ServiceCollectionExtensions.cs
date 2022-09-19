@@ -33,8 +33,6 @@ using SkyApm.Utilities.Configuration;
 using SkyApm.Utilities.DependencyInjection;
 using SkyApm.Utilities.Logging;
 using System;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Logging;
 using SkyApm;
 using SkyApm.Agent.Hosting;
 using SkyApm.Diagnostics.MSLogging;
@@ -49,10 +47,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSkyAPMCore(extensionsSetup);
             return services;
         }
-
         
-
-        internal static IServiceCollection AddSkyAPMCore(this IServiceCollection services, Action<SkyApmExtensions> extensionsSetup = null)
+        private static IServiceCollection AddSkyAPMCore(this IServiceCollection services, Action<SkyApmExtensions> extensionsSetup = null)
         {
             if (services == null)
             {
@@ -72,13 +68,15 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IConfigurationFactory, ConfigurationFactory>();
             services.AddSingleton<IHostedService, InstrumentationHostedService>();
             services.AddSingleton<IEnvironmentProvider, HostingEnvironmentProvider>();
-            services.AddTracing().AddSkyApmLogger().AddSampling().AddGrpcTransport().AddSkyApmLogging();
+            services.AddSingleton<ISkyApmLogDispatcher, AsyncQueueSkyApmLogDispatcher>();
+            services.AddTracing().AddSampling().AddGrpcTransport().AddSkyApmLogging();
             var extensions = services.AddSkyApmExtensions()
-                 .AddHttpClient()
-                 .AddGrpcClient()
-                 .AddSqlClient()
-                 .AddGrpc()
-                 .AddEntityFrameworkCore(c => c.AddPomeloMysql().AddNpgsql().AddSqlite());
+                .AddHttpClient()
+                .AddGrpcClient()
+                .AddSqlClient()
+                .AddGrpc()
+                .AddEntityFrameworkCore(c => c.AddPomeloMysql().AddNpgsql().AddSqlite())
+                .AddMSLogging();
 
             extensionsSetup?.Invoke(extensions);
 
@@ -94,20 +92,14 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IEntrySegmentContextAccessor, EntrySegmentContextAccessor>();
             services.AddSingleton<ILocalSegmentContextAccessor, LocalSegmentContextAccessor>();
             services.AddSingleton<IExitSegmentContextAccessor, ExitSegmentContextAccessor>();
+            services.AddSingleton<ISegmentContextAccessor, SegmentContextAccessor>();
             services.AddSingleton<ISamplerChainBuilder, SamplerChainBuilder>();
             services.AddSingleton<IUniqueIdGenerator, UniqueIdGenerator>();
             services.AddSingleton<ISegmentContextMapper, SegmentContextMapper>();
             services.AddSingleton<IBase64Formatter, Base64Formatter>();
             return services;
         }
-
-        public static IServiceCollection AddSkyApmLogger(this IServiceCollection services)
-        {
-            services.AddSingleton<ISkyApmLogDispatcher, AsyncQueueSkyApmLogDispatcher>();
-            services.TryAddEnumerable(ServiceDescriptor.Singleton<ILoggerProvider, SkyApmLoggerProvider>());
-            return services;
-        }
-
+        
         private static IServiceCollection AddSampling(this IServiceCollection services)
         {
             services.AddSingleton<SimpleCountSamplingInterceptor>();

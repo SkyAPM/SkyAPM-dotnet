@@ -55,7 +55,7 @@ namespace SkyApm.Utilities.Configuration
         }
 
         /// <summary>
-        /// Try append an ip to the instancename to make it more meaningful
+        /// Try append an ip to the instanceName to make it more meaningful
         /// </summary>
         /// <returns></returns>
         private static string BuildDefaultServiceInstanceName()
@@ -64,9 +64,9 @@ namespace SkyApm.Utilities.Configuration
             try
             {
                 var hostName = Dns.GetHostName();
-                var ipAddress = Dns.GetHostAddresses(hostName)
-                    .Where(x => x.AddressFamily == AddressFamily.InterNetwork)
-                    .First().ToString();
+                var ipAddress = Dns
+                    .GetHostAddresses(hostName)
+                    .First(x => x.AddressFamily == AddressFamily.InterNetwork).ToString();
 
                 return $"{ipAddress}@{guid}";
             }

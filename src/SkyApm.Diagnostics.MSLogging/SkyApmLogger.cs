@@ -57,9 +57,7 @@ namespace SkyApm.Diagnostics.MSLogging
                     : new LoggerSegmentReference()
                     {
                         TraceId = segmentContext.TraceId,
-                        SegmentId = segmentContext.SegmentId,
-                        ServiceId = segmentContext.ServiceId,
-                        ServiceInstanceId = segmentContext.ServiceInstanceId
+                        SegmentId = segmentContext.SegmentId
                     },
             };
             _skyApmLogDispatcher.Dispatch(logContext);
