@@ -57,7 +57,6 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services.AddSingleton<ISegmentDispatcher, AsyncQueueSegmentDispatcher>();
             services.AddSingleton<IExecutionService, RegisterService>();
-            services.AddSingleton<IExecutionService, LogReportService>();
             services.AddSingleton<IExecutionService, PingService>();
             services.AddSingleton<IExecutionService, SegmentReportService>();
             services.AddSingleton<IExecutionService, CLRStatsService>();

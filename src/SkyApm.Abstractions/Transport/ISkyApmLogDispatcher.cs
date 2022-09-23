@@ -24,10 +24,5 @@ namespace SkyApm.Transport
     public interface ISkyApmLogDispatcher
     {
         bool Dispatch(LoggerRequest loggerRequest);
-
-        Task Flush(CancellationToken token = default(CancellationToken));
-
-        void Close();
-
     }
 }
