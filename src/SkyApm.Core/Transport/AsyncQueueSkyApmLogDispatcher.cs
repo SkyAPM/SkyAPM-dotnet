@@ -71,20 +71,27 @@ namespace SkyApm.Transport
             var loggers = new List<LoggerRequest>(_config.BatchSize);
             while (!_cancellation.IsCancellationRequested)
             {
-                if (!await _segmentChannel.Reader.WaitToReadAsync(_cancellation.Token))
+                try
                 {
-                    break;
-                }
+                    if (!await _segmentChannel.Reader.WaitToReadAsync(_cancellation.Token))
+                    {
+                        break;
+                    }
 
-                var item = await _segmentChannel.Reader.ReadAsync(_cancellation.Token);
-                loggers.Add(item);
-                if (loggers.Count >= _config.BatchSize)
-                {
-                    var tmp = new List<LoggerRequest>(loggers);
+                    var item = await _segmentChannel.Reader.ReadAsync(_cancellation.Token);
+                    loggers.Add(item);
+                    if (loggers.Count >= _config.BatchSize)
+                    {
+                        var tmp = new List<LoggerRequest>(loggers);
 #pragma warning disable CS4014 // 由于此调用不会等待，因此在调用完成前将继续执行当前方法
-                    _loggerReporter.ReportAsync(tmp, _cancellation.Token);
+                        _loggerReporter.ReportAsync(tmp, _cancellation.Token);
 #pragma warning restore CS4014 // 由于此调用不会等待，因此在调用完成前将继续执行当前方法
-                    loggers.Clear();
+                        loggers.Clear();
+                    }
+                }
+                catch
+                {
+                    //throw;
                 }
             }
             //stop writing
