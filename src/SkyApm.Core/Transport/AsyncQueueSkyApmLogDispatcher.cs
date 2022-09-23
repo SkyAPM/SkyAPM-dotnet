@@ -84,8 +84,6 @@ namespace SkyApm.Transport
                 _loggerReporter.ReportAsync(loggers, token);
             }
 
-            Interlocked.Exchange(ref _offset, _segmentQueue.Count);
-
             return Task.CompletedTask;
         }
         public void Close()
