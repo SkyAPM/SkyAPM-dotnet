@@ -18,19 +18,22 @@
 
 using SkyApm.Config;
 using SkyApm.Logging;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
+using System.Threading.Channels;
 using System.Threading.Tasks;
 
 namespace SkyApm.Transport
 {
-    public class AsyncQueueSkyApmLogDispatcher : ISkyApmLogDispatcher
+    public class AsyncQueueSkyApmLogDispatcher : ISkyApmLogDispatcher,IDisposable
     {
         private readonly ILogger _logger;
         private readonly CancellationTokenSource _cancellation;
 
-        private readonly ConcurrentQueue<LoggerRequest> _segmentQueue;
+        private readonly Channel<LoggerRequest> _segmentChannel;
 
         private readonly IRuntimeEnvironment _runtimeEnvironment;
 
@@ -38,55 +41,64 @@ namespace SkyApm.Transport
         
         private readonly TransportConfig _config;
 
-        private int _offset;
 
-        public AsyncQueueSkyApmLogDispatcher(IConfigAccessor configAccessor, ILoggerFactory loggerFactory,  ILoggerReporter loggerReporter, IRuntimeEnvironment runtimeEnvironment)
+        public AsyncQueueSkyApmLogDispatcher(IConfigAccessor configAccessor, ILoggerFactory loggerFactory, ILoggerReporter loggerReporter, IRuntimeEnvironment runtimeEnvironment)
         {
             _logger = loggerFactory.CreateLogger(typeof(AsyncQueueSkyApmLogDispatcher));
             _config = configAccessor.Get<TransportConfig>();
             _runtimeEnvironment = runtimeEnvironment;
-            _segmentQueue = new ConcurrentQueue<LoggerRequest>();
+            _segmentChannel = Channel.CreateBounded<LoggerRequest>(new BoundedChannelOptions(7) { FullMode = BoundedChannelFullMode.DropWrite });
             _cancellation = new CancellationTokenSource();
-            _loggerReporter= loggerReporter;
+            _loggerReporter = loggerReporter;
+            Task.Factory.StartNew(Loop, _cancellation.Token, TaskCreationOptions.LongRunning, TaskScheduler.Current);
         }
 
         public bool Dispatch(LoggerRequest loggerRequest)
         {
             if (!_runtimeEnvironment.Initialized || loggerRequest == null)
                 return false;
-
-            // todo performance optimization for ConcurrentQueue
-            if (_config.QueueSize < _offset || _cancellation.IsCancellationRequested)
+            if (!_segmentChannel.Writer.TryWrite(loggerRequest))
+            {
                 return false;
-            
-            _segmentQueue.Enqueue(loggerRequest);
-
-            Interlocked.Increment(ref _offset);
+            }
 
             _logger.Debug($"Dispatch trace segment. [SegmentId]={loggerRequest.SegmentReference?.SegmentId}.");
             return true;
         }
 
-        public Task Flush(CancellationToken token = default)
+        private async Task Loop()
         {
-            var limit = _config.BatchSize;
-            var index = 0;
-            var loggers = new List<LoggerRequest>(limit);
-            while (index++ < limit && _segmentQueue.TryDequeue(out var request))
+            var loggers = new List<LoggerRequest>(_config.BatchSize);
+            while (!_cancellation.IsCancellationRequested)
             {
-                loggers.Add(request);
-                Interlocked.Decrement(ref _offset);
-            }
+                if (!await _segmentChannel.Reader.WaitToReadAsync(_cancellation.Token))
+                {
+                    break;
+                }
 
-            // send async
-            if (loggers.Count > 0)
+                var item = await _segmentChannel.Reader.ReadAsync(_cancellation.Token);
+                loggers.Add(item);
+                if (loggers.Count >= _config.BatchSize)
+                {
+                    var tmp = new List<LoggerRequest>(loggers);
+#pragma warning disable CS4014 // 由于此调用不会等待，因此在调用完成前将继续执行当前方法
+                    _loggerReporter.ReportAsync(tmp, _cancellation.Token);
+#pragma warning restore CS4014 // 由于此调用不会等待，因此在调用完成前将继续执行当前方法
+                    loggers.Clear();
+                }
+            }
+            //stop writing
+            _segmentChannel.Writer.Complete();
+
+            if (loggers.Any())
             {
-                _loggerReporter.ReportAsync(loggers, token);
+#pragma warning disable CS4014 // 由于此调用不会等待，因此在调用完成前将继续执行当前方法
+                _loggerReporter.ReportAsync(loggers, _cancellation.Token);
+#pragma warning restore CS4014 // 由于此调用不会等待，因此在调用完成前将继续执行当前方法
             }
-
-            return Task.CompletedTask;
         }
-        public void Close()
+
+        public void Dispose()
         {
             _cancellation.Cancel();
         }
