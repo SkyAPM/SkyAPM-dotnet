@@ -28,17 +28,15 @@ namespace SkyApm.Diagnostics.EntityFrameworkCore
     {
         private readonly IEnumerable<IEntityFrameworkCoreSpanMetadataProvider> _spanMetadataProviders;
         private readonly ITracingContext _tracingContext;
-        private readonly ILocalSegmentContextAccessor _localSegmentContextAccessor;
         private readonly IExitSegmentContextAccessor _exitSegmentContextAccessor;
 
         public EntityFrameworkCoreSegmentContextFactory(
             IEnumerable<IEntityFrameworkCoreSpanMetadataProvider> spanMetadataProviders,
-            ITracingContext tracingContext, ILocalSegmentContextAccessor localSegmentContextAccessor,
+            ITracingContext tracingContext,
             IExitSegmentContextAccessor exitSegmentContextAccessor)
         {
             _spanMetadataProviders = spanMetadataProviders;
             _tracingContext = tracingContext;
-            _localSegmentContextAccessor = localSegmentContextAccessor;
             _exitSegmentContextAccessor = exitSegmentContextAccessor;
         }
 
@@ -48,7 +46,7 @@ namespace SkyApm.Diagnostics.EntityFrameworkCore
                 if (provider.Match(dbCommand.Connection))
                     return _exitSegmentContextAccessor.Context;
 
-            return _localSegmentContextAccessor.Context;
+            return _exitSegmentContextAccessor.Context;
         }
 
         public SegmentContext Create(string operationName, DbCommand dbCommand)
@@ -57,7 +55,7 @@ namespace SkyApm.Diagnostics.EntityFrameworkCore
                 if (provider.Match(dbCommand.Connection))
                     return CreateExitSegment(operationName, dbCommand, provider);
 
-            return CreateLocalSegment(operationName, dbCommand);
+            return CreateExitSegment(operationName, dbCommand);
         }
 
         public void Release(SegmentContext segmentContext)
@@ -74,9 +72,9 @@ namespace SkyApm.Diagnostics.EntityFrameworkCore
             return context;
         }
 
-        private SegmentContext CreateLocalSegment(string operationName, DbCommand dbCommand)
+        private SegmentContext CreateExitSegment(string operationName, DbCommand dbCommand)
         {
-            var context = _tracingContext.CreateLocalSegmentContext(operationName);
+            var context = _tracingContext.CreateExitSegmentContext(operationName, dbCommand.Connection.DataSource);
             context.Span.Component = Common.Components.ENTITYFRAMEWORKCORE;
             return context;
         }
