@@ -16,37 +16,34 @@
  *
  */
 
-using SkyApm.Common;
+namespace SkyApm.Tracing.Segments;
 
-namespace SkyApm.Tracing.Segments
+public class SegmentContext
 {
-    public class SegmentContext
+    public string SegmentId { get; }
+
+    public string TraceId { get; }
+
+    public SegmentSpan Span { get; }
+
+    public string ServiceId { get; }
+
+    public string ServiceInstanceId { get; }
+
+    public bool Sampled { get; }
+
+    public bool IsSizeLimited { get; } = false;
+
+    public SegmentReferenceCollection References { get; } = new();
+
+    public SegmentContext(string traceId, string segmentId, bool sampled, string serviceId, string serviceInstanceId,
+        string operationName, SpanType spanType, long startTimeMilliseconds = default)
     {
-        public string SegmentId { get; }
-
-        public string TraceId { get; }
-
-        public SegmentSpan Span { get; }
-
-        public string ServiceId { get; }
-
-        public string ServiceInstanceId { get; }
-
-        public bool Sampled { get; }
-
-        public bool IsSizeLimited { get; } = false;
-
-        public SegmentReferenceCollection References { get; } = new SegmentReferenceCollection();
-
-        public SegmentContext(string traceId, string segmentId, bool sampled, string serviceId, string serviceInstanceId,
-            string operationName, SpanType spanType, long startTimeMilliseconds = default)
-        {
-            TraceId = traceId;
-            Sampled = sampled;
-            SegmentId = segmentId;
-            ServiceId = serviceId;
-            ServiceInstanceId = serviceInstanceId;
-            Span = new SegmentSpan(operationName, spanType, startTimeMilliseconds);
-        }
+        TraceId = traceId;
+        Sampled = sampled;
+        SegmentId = segmentId;
+        ServiceId = serviceId;
+        ServiceInstanceId = serviceInstanceId;
+        Span = new(operationName, spanType, startTimeMilliseconds);
     }
 }

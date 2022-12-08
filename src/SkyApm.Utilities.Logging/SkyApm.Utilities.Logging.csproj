@@ -4,7 +4,7 @@
     <PropertyGroup>
         <Description>Microsoft.Utilities.Logging support for $(Product).</Description>
         <AssemblyTitle>$(PackagePrefix).Utilities.Logging</AssemblyTitle>
-        <TargetFrameworks>netcoreapp3.1;net5.0;net6.0</TargetFrameworks>
+        <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
         <AssemblyName>$(PackagePrefix).Utilities.Logging</AssemblyName>
         <PackageId>$(PackagePrefix).Utilities.Logging</PackageId>
         <PackageTags>SkyWalking;APM;Diagnostics</PackageTags>
@@ -17,17 +17,15 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Serilog.Extensions.Logging" Version="2.0.2" />
+        <PackageReference Include="Serilog.Extensions.Logging" Version="3.1.0" />
         <PackageReference Include="Serilog.Sinks.RollingFile" Version="3.3.0" />
     </ItemGroup>
-    <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp3.1'">
-        <PackageReference Include="Microsoft.Extensions.Logging" Version="3.1.0" />
-    </ItemGroup>
-    <ItemGroup Condition="'$(TargetFramework)' == 'net5.0'">
-        <PackageReference Include="Microsoft.Extensions.Logging" Version="5.0.0" />
-    </ItemGroup>
+
     <ItemGroup Condition="'$(TargetFramework)' == 'net6.0'">
         <PackageReference Include="Microsoft.Extensions.Logging" Version="6.0.0" />
+    </ItemGroup>
+    <ItemGroup Condition="'$(TargetFramework)' == 'net7.0'">
+	    <PackageReference Include="Microsoft.Extensions.Logging" Version="7.0.0" />
     </ItemGroup>
     <ItemGroup>
       <ProjectReference Include="..\SkyApm.Abstractions\SkyApm.Abstractions.csproj" />

@@ -1,28 +1,36 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <Import Project="..\..\build\common.props" />
+	<Import Project="..\..\build\common.props" />
 
-  <PropertyGroup>
-    <TargetFrameworks>netcoreapp3.1;net5.0;net6.0</TargetFrameworks>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFrameworks>net6.0;net7.0</TargetFrameworks>
+	</PropertyGroup>
 
-  <PropertyGroup>
-    <Description>$(PackagePrefix).Diagnostics.CAP notifies of CAP messages.</Description>
-    <AssemblyTitle>$(PackagePrefix).Diagnostics.CAP</AssemblyTitle>
-    <AssemblyName>$(PackagePrefix).Diagnostics.CAP</AssemblyName>
-    <PackageId>$(PackagePrefix).Diagnostics.CAP</PackageId>
-    <PackageTags>SkyWalking;APM;CAP</PackageTags>
-    <RootNamespace>SkyApm.Diagnostics.CAP</RootNamespace>
-  </PropertyGroup>
+	<PropertyGroup>
+		<Description>$(PackagePrefix).Diagnostics.CAP notifies of CAP messages.</Description>
+		<AssemblyTitle>$(PackagePrefix).Diagnostics.CAP</AssemblyTitle>
+		<AssemblyName>$(PackagePrefix).Diagnostics.CAP</AssemblyName>
+		<PackageId>$(PackagePrefix).Diagnostics.CAP</PackageId>
+		<PackageTags>SkyWalking;APM;CAP</PackageTags>
+		<RootNamespace>SkyApm.Diagnostics.CAP</RootNamespace>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<LangVersion>preview</LangVersion>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="DotNetCore.CAP" Version="3.1.2" PrivateAssets="All" />
-  </ItemGroup>
+	<ItemGroup Condition="'$(TargetFramework)' == 'net6.0'">
+		<PackageReference Include="DotNetCore.CAP" Version="6.2.1" />
+	</ItemGroup>
+	<ItemGroup Condition="'$(TargetFramework)' == 'net7.0'">
+		<PackageReference Include="DotNetCore.CAP" Version="7.0.0" />
+	</ItemGroup>
+	<ItemGroup>
+	  <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\SkyApm.Abstractions\SkyApm.Abstractions.csproj" />
-    <ProjectReference Include="..\SkyApm.Core\SkyApm.Core.csproj" />
-    <ProjectReference Include="..\SkyApm.Utilities.DependencyInjection\SkyApm.Utilities.DependencyInjection.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\SkyApm.Abstractions\SkyApm.Abstractions.csproj" />
+		<ProjectReference Include="..\SkyApm.Core\SkyApm.Core.csproj" />
+		<ProjectReference Include="..\SkyApm.Utilities.DependencyInjection\SkyApm.Utilities.DependencyInjection.csproj" />
+	</ItemGroup>
 
 </Project>

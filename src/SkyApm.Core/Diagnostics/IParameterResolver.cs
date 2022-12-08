@@ -16,10 +16,9 @@
  *
  */
 
-namespace SkyApm.Diagnostics
+namespace SkyApm.Diagnostics;
+
+public interface IParameterResolver
 {
-    public interface IParameterResolver
-    {
-        object Resolve(object value);
-    }
+    object Resolve(object value);
 }

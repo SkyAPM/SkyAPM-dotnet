@@ -16,20 +16,17 @@
  *
  */
 
-using System;
+namespace SkyApm.Logging;
 
-namespace SkyApm.Logging
+public interface ILogger
 {
-    public interface ILogger
-    {
-        void Debug(string message);
+    void Debug(string message);
 
-        void Information(string message);
+    void Information(string message);
 
-        void Warning(string message);
+    void Warning(string message);
 
-        void Error(string message, Exception exception);
+    void Error(string message, Exception exception);
 
-        void Trace(string message);
-    }
+    void Trace(string message);
 }

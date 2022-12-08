@@ -16,24 +16,22 @@
  *
  */
 
-using System;
 using Microsoft.Extensions.DependencyInjection;
 using SkyApm.Utilities.DependencyInjection;
 
-namespace SkyApm.Diagnostics.Grpc.Net.Client
+namespace SkyApm.Diagnostics.Grpc.Net.Client;
+
+public static class SkyWalkingBuilderExtensions
 {
-    public static class SkyWalkingBuilderExtensions
+    public static SkyApmExtensions AddGrpcClient(this SkyApmExtensions extensions)
     {
-        public static SkyApmExtensions AddGrpcClient(this SkyApmExtensions extensions)
+        if (extensions == null)
         {
-            if (extensions == null)
-            {
-                throw new ArgumentNullException(nameof(extensions));
-            }
-
-            extensions.Services.AddSingleton<ITracingDiagnosticProcessor, GrpcClientDiagnosticProcessor>();
-
-            return extensions;
+            throw new ArgumentNullException(nameof(extensions));
         }
+
+        _ = extensions.Services.AddSingleton<ITracingDiagnosticProcessor, GrpcClientDiagnosticProcessor>();
+
+        return extensions;
     }
 }

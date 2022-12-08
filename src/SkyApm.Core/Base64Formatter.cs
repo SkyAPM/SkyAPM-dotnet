@@ -16,21 +16,19 @@
  *
  */
 
-using System;
 using System.Text;
 
-namespace SkyApm
-{
-    public class Base64Formatter : IBase64Formatter
-    {
-        public string Decode(string value)
-        {
-            return value == null ? value : Encoding.UTF8.GetString(Convert.FromBase64String(value));
-        }
+namespace SkyApm;
 
-        public string Encode(string value)
-        {
-            return value == null ? value : Convert.ToBase64String(Encoding.UTF8.GetBytes(value));
-        }
+public class Base64Formatter : IBase64Formatter
+{
+    public string Decode(string value)
+    {
+        return value is null ? null : Encoding.UTF8.GetString(Convert.FromBase64String(value));
+    }
+
+    public string Encode(string value)
+    {
+        return value is null ? null : Convert.ToBase64String(Encoding.UTF8.GetBytes(value));
     }
 }

@@ -16,10 +16,9 @@
  *
  */
 
-namespace SkyApm.Tracing
+namespace SkyApm.Tracing;
+
+public interface ISamplerChainBuilder
 {
-    public interface ISamplerChainBuilder
-    {
-        Sampler Build();
-    }
+    Sampler Build();
 }

@@ -16,14 +16,9 @@
  *
  */
 
-using System.Threading;
-using System.Threading.Tasks;
-using SkyApm.Transport;
+namespace SkyApm.Transport;
 
-namespace SkyApm.Transport
+public interface IPingCaller
 {
-    public interface IPingCaller
-    {
-        Task PingAsync(PingRequest request, CancellationToken cancellationToken = default(CancellationToken));
-    }
+    Task PingAsync(PingRequest request, CancellationToken cancellationToken = default);
 }

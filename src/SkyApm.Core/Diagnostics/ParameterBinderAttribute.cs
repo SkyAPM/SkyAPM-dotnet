@@ -16,12 +16,9 @@
  *
  */
 
-using System;
+namespace SkyApm.Diagnostics;
 
-namespace SkyApm.Diagnostics
+public abstract class ParameterBinderAttribute : Attribute, IParameterResolver
 {
-    public abstract class ParameterBinderAttribute : Attribute, IParameterResolver
-    {
-        public abstract object Resolve(object value);
-    }
+    public abstract object Resolve(object value);
 }

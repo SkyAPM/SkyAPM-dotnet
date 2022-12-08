@@ -16,12 +16,9 @@
  *
  */
 
-using System;
+namespace SkyApm.Logging;
 
-namespace SkyApm.Logging
+public interface ILoggerFactory
 {
-    public interface ILoggerFactory
-    {
-        ILogger CreateLogger(Type type);
-    }
+    ILogger CreateLogger(Type type);
 }

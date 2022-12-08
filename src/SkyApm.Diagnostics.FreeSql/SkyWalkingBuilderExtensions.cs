@@ -16,79 +16,44 @@
  *
  */
 
-using FreeSql.Aop;
 using Microsoft.Extensions.DependencyInjection;
 using SkyApm.Utilities.DependencyInjection;
-using System;
 using System.Diagnostics;
+// ReSharper disable UnusedMethodReturnValue.Global
 
-namespace SkyApm.Diagnostics.FreeSql
+namespace SkyApm.Diagnostics.FreeSql;
+
+public static class SkyWalkingBuilderExtensions
 {
+    private static readonly DiagnosticListener dl = new("FreeSqlDiagnosticListener");
 
-    public static class SkyWalkingBuilderExtensions
+    public static SkyApmExtensions AddFreeSql(this SkyApmExtensions extensions, IFreeSql fsql)
     {
-        public static readonly DiagnosticListener dl = new DiagnosticListener("FreeSqlDiagnosticListener");
-
-        public static SkyApmExtensions AddFreeSql(this SkyApmExtensions extensions, IFreeSql fsql)
+        if (extensions == null)
         {
-            if (extensions == null)
-            {
-                throw new ArgumentNullException(nameof(extensions));
-            }
-            extensions.Services.AddSingleton<ITracingDiagnosticProcessor, FreeSqlTracingDiagnosticProcessor>();
-            if (fsql != null)
-            {
-                ConfigAop(fsql);
-            }
-            return extensions;
+            throw new ArgumentNullException(nameof(extensions));
         }
-
-       
-        public static void ConfigAop(IFreeSql fsql)
+        _ = extensions.Services.AddSingleton<ITracingDiagnosticProcessor, FreeSqlTracingDiagnosticProcessor>();
+        if (fsql != null)
         {
-            fsql.Aop.CurdBefore += new EventHandler<CurdBeforeEventArgs>((s, e) =>
-            {
-
-                dl.Write(FreeSqlTracingDiagnosticProcessor.FreeSql_CurdBefore, e);
-            });
-            fsql.Aop.CurdAfter += new EventHandler<CurdAfterEventArgs>((s, e) =>
-            {
-                dl.Write(FreeSqlTracingDiagnosticProcessor.FreeSql_CurdAfter, e);
-            });
-
-            fsql.Aop.SyncStructureBefore += new EventHandler<SyncStructureBeforeEventArgs>((s, e) =>
-            {
-
-                dl.Write(FreeSqlTracingDiagnosticProcessor.FreeSql_SyncStructureBefore, e);
-            });
-            fsql.Aop.SyncStructureAfter += new EventHandler<SyncStructureAfterEventArgs>((s, e) =>
-            {
-                dl.Write(FreeSqlTracingDiagnosticProcessor.FreeSql_SyncStructureAfter, e);
-            });
-
-            fsql.Aop.CommandBefore += new EventHandler<CommandBeforeEventArgs>((s, e) =>
-            {
-
-                dl.Write(FreeSqlTracingDiagnosticProcessor.FreeSql_CommandBefore, e);
-            });
-            fsql.Aop.CommandAfter += new EventHandler<CommandAfterEventArgs>((s, e) =>
-            {
-
-                dl.Write(FreeSqlTracingDiagnosticProcessor.FreeSql_CommandAfter, e);
-            });
-
-            fsql.Aop.TraceBefore += new EventHandler<TraceBeforeEventArgs>((s, e) =>
-            {
-
-
-                dl.Write(FreeSqlTracingDiagnosticProcessor.FreeSql_TraceBefore, e);
-            });
-            fsql.Aop.TraceAfter += new EventHandler<TraceAfterEventArgs>((s, e) =>
-            {
-
-                dl.Write(FreeSqlTracingDiagnosticProcessor.FreeSql_TraceAfter, e);
-            });
-
+            ConfigAop(fsql);
         }
+        return extensions;
+    }
+
+
+    private static void ConfigAop(IFreeSql fsql)
+    {
+        fsql.Aop.CurdBefore += (s, e) => dl.Write(FreeSqlTracingDiagnosticProcessor.FreeSql_CurdBefore, e);
+        fsql.Aop.CurdAfter += (s, e) => dl.Write(FreeSqlTracingDiagnosticProcessor.FreeSql_CurdAfter, e);
+
+        fsql.Aop.SyncStructureBefore += (s, e) => dl.Write(FreeSqlTracingDiagnosticProcessor.FreeSql_SyncStructureBefore, e);
+        fsql.Aop.SyncStructureAfter += (s, e) => dl.Write(FreeSqlTracingDiagnosticProcessor.FreeSql_SyncStructureAfter, e);
+
+        fsql.Aop.CommandBefore += (s, e) => dl.Write(FreeSqlTracingDiagnosticProcessor.FreeSql_CommandBefore, e);
+        fsql.Aop.CommandAfter += (s, e) => dl.Write(FreeSqlTracingDiagnosticProcessor.FreeSql_CommandAfter, e);
+
+        fsql.Aop.TraceBefore += (s, e) => dl.Write(FreeSqlTracingDiagnosticProcessor.FreeSql_TraceBefore, e);
+        fsql.Aop.TraceAfter += (s, e) => dl.Write(FreeSqlTracingDiagnosticProcessor.FreeSql_TraceAfter, e);
     }
 }

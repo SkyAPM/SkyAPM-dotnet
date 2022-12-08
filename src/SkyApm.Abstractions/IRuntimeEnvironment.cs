@@ -16,15 +16,11 @@
  *
  */
 
-using System;
-using SkyApm.Common;
+namespace SkyApm;
 
-namespace SkyApm
+public interface IRuntimeEnvironment
 {
-    public interface IRuntimeEnvironment
-    {
-        bool Initialized { get; }
+    bool Initialized { get; }
 
-        IEnvironmentProvider Environment { get; }
-    }
+    IEnvironmentProvider Environment { get; }
 }

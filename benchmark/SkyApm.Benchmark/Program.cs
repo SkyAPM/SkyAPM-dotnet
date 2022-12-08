@@ -3,17 +3,16 @@ using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Validators;
 
-namespace SkyApm.Benchmark
+namespace SkyApm.Benchmark;
+
+class Program
 {
-    class Program
+    public static void Main(params string[] args)
     {
-        public static void Main(params string[] args)
-        {
-            BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly)
-                .Run(args, ManualConfig
-                    .Create(DefaultConfig.Instance)
-                    .With(MemoryDiagnoser.Default)
-                    .With(ExecutionValidator.FailOnError));
-        }
+        _ = BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly)
+             .Run(args, ManualConfig
+                 .Create(DefaultConfig.Instance)
+                 .AddDiagnoser(MemoryDiagnoser.Default)
+                 .AddValidator(ExecutionValidator.FailOnError));
     }
 }

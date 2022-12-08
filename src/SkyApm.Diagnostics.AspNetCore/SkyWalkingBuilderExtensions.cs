@@ -20,16 +20,15 @@ using Microsoft.Extensions.DependencyInjection;
 using SkyApm.Diagnostics.AspNetCore.Handlers;
 using SkyApm.Utilities.DependencyInjection;
 
-namespace SkyApm.AspNetCore.Diagnostics
+namespace SkyApm.AspNetCore.Diagnostics;
+
+public static class SkyWalkingBuilderExtensions
 {
-    public static class SkyWalkingBuilderExtensions
+    public static SkyApmExtensions AddAspNetCoreHosting(this SkyApmExtensions extensions)
     {
-        public static SkyApmExtensions AddAspNetCoreHosting(this SkyApmExtensions extensions)
-        {
-            extensions.Services.AddSingleton<ITracingDiagnosticProcessor, HostingTracingDiagnosticProcessor>();
-            extensions.Services.AddSingleton<IHostingDiagnosticHandler, DefaultHostingDiagnosticHandler>();
-            extensions.Services.AddSingleton<IHostingDiagnosticHandler, GrpcHostingDiagnosticHandler>();
-            return extensions;
-        }
+        extensions.Services.AddSingleton<ITracingDiagnosticProcessor, HostingTracingDiagnosticProcessor>();
+        extensions.Services.AddSingleton<IHostingDiagnosticHandler, DefaultHostingDiagnosticHandler>();
+        extensions.Services.AddSingleton<IHostingDiagnosticHandler, GrpcHostingDiagnosticHandler>();
+        return extensions;
     }
 }

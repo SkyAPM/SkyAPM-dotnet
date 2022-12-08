@@ -46,9 +46,9 @@ namespace SkyApm.Sample.Frontend.Controllers
         public async Task<string> Get(int id)
         {
             var client = new HttpClient();
-            Task.WhenAll(client.GetAsync("http://localhost:5002/api/delay/2000"),
-                client.GetAsync("http://localhost:5002/api/values"),
-                client.GetAsync("http://localhost:5002/api/delay/200"));
+            _ = await Task.WhenAll(client.GetAsync("http://localhost:5002/api/delay/2000"),
+                 client.GetAsync("http://localhost:5002/api/values"),
+                 client.GetAsync("http://localhost:5002/api/delay/200"));
             return await client.GetStringAsync("http://localhost:5002/api/delay/100");
         }
 
@@ -104,11 +104,11 @@ namespace SkyApm.Sample.Frontend.Controllers
         }
 
         [HttpGet("setcookie")]
-        public async Task<IActionResult> SetCookie()
+        public Task<IActionResult> SetCookie()
         {
             Response.Cookies.Append("c-a", "1111");
             Response.Cookies.Append("c-b", "2222");
-            return Ok("ok");
+            return Task.FromResult<IActionResult>(Ok("ok"));
         }
 
         [HttpGet("ignore")]
@@ -126,21 +126,21 @@ namespace SkyApm.Sample.Frontend.Controllers
         }
 
         [HttpGet("throw")]
-        public async Task<IActionResult> Throw()
+        public Task<IActionResult> Throw()
         {
             throw new NotImplementedException();
         }
 
         [HttpPost("logbody")]
-        public async Task<IActionResult> LogBody([FromBody] Person person)
+        public Task<IActionResult> LogBody([FromBody] Person person)
         {
-            return Json(person);
+            return Task.FromResult<IActionResult>(Json(person));
         }
 
         [HttpPost("logformbody")]
-        public async Task<IActionResult> LogFormBody([FromForm] Person person)
+        public Task<IActionResult> LogFormBody([FromForm] Person person)
         {
-            return Json(person);
+            return Task.FromResult<IActionResult>(Json(person));
         }
 
 #if NETCOREAPP2_1

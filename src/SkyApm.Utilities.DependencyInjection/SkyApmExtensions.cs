@@ -18,15 +18,14 @@
 
 using Microsoft.Extensions.DependencyInjection;
 
-namespace SkyApm.Utilities.DependencyInjection
-{
-    public class SkyApmExtensions
-    {
-        public IServiceCollection Services { get; }
+namespace SkyApm.Utilities.DependencyInjection;
 
-        public SkyApmExtensions(IServiceCollection services)
-        {
-            Services = services;
-        }
+public class SkyApmExtensions
+{
+    public IServiceCollection Services { get; }
+
+    public SkyApmExtensions(IServiceCollection services)
+    {
+        Services = services;
     }
 }

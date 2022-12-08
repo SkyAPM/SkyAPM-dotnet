@@ -16,27 +16,24 @@
  *
  */
 
-using System.Collections.Generic;
+namespace SkyApm.Config;
 
-namespace SkyApm.Config
+[Config("SkyWalking", "Sampling")]
+public class SamplingConfig
 {
-    [Config("SkyWalking", "Sampling")]
-    public class SamplingConfig
-    {
-        public int SamplePer3Secs { get; set; } = -1;
+    public int SamplePer3Secs { get; set; } = -1;
 
-        public double Percentage { get; set; } = -1d;
+    public double Percentage { get; set; } = -1d;
 
-        /// <summary>
-        /// Paths to ignore, support wildchar match.
-        /// Usage: a/b/c => a/b/c, a/* => a/b, a/** => a/b/c/d, a/?/c => a/b/c
-        /// </summary>
-        public List<string> IgnorePaths { get; set; }
+    /// <summary>
+    /// Paths to ignore, support wildchar match.
+    /// Usage: a/b/c => a/b/c, a/* => a/b, a/** => a/b/c/d, a/?/c => a/b/c
+    /// </summary>
+    public List<string> IgnorePaths { get; set; }
 
-        /// <summary>
-        /// whether or not  to record the value of sql parameter.
-        /// true:record parameter value 
-        /// </summary>
-        public bool LogSqlParameterValue { get; set; }
-    }
+    /// <summary>
+    /// whether or not  to record the value of sql parameter.
+    /// true:record parameter value 
+    /// </summary>
+    public bool LogSqlParameterValue { get; set; }
 }

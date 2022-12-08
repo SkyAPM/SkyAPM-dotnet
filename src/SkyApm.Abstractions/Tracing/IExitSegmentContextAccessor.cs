@@ -18,10 +18,9 @@
 
 using SkyApm.Tracing.Segments;
 
-namespace SkyApm.Tracing
+namespace SkyApm.Tracing;
+
+public interface IExitSegmentContextAccessor
 {
-    public interface IExitSegmentContextAccessor
-    {
-        SegmentContext Context { get; set; }
-    }
+    SegmentContext Context { get; set; }
 }

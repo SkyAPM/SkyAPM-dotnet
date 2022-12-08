@@ -16,34 +16,32 @@
  *
  */
 
-using System.Collections.Generic;
+// ReSharper disable UnusedType.Global
+namespace SkyApm.Common;
 
-namespace SkyApm.Common
+public static class StackExtensions
 {
-    public static class StackExtensions
+    public static bool TryPeek<T>(this Stack<T> stack, out T value)
     {
-        public static bool TryPeek<T>(this Stack<T> stack, out T value)
+        if (stack == null || stack.Count == 0)
         {
-            if (stack == null || stack.Count == 0)
-            {
-                value = default(T);
-                return false;
-            }
-
-            value = stack.Peek();
-            return true;
+            value = default;
+            return false;
         }
 
-        public static bool TryPop<T>(this Stack<T> stack, out T value)
-        {
-            if (stack == null || stack.Count == 0)
-            {
-                value = default(T);
-                return false;
-            }
+        value = stack.Peek();
+        return true;
+    }
 
-            value = stack.Pop();
-            return true;
+    public static bool TryPop<T>(this Stack<T> stack, out T value)
+    {
+        if (stack == null || stack.Count == 0)
+        {
+            value = default;
+            return false;
         }
+
+        value = stack.Pop();
+        return true;
     }
 }

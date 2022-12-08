@@ -18,22 +18,21 @@
 
 using AspectCore.Extensions.Reflection;
 
-namespace SkyApm.Diagnostics
+namespace SkyApm.Diagnostics;
+
+public class PropertyAttribute : ParameterBinderAttribute
 {
-    public class PropertyAttribute : ParameterBinderAttribute
+    public string Name { get; set; }
+
+    public override object Resolve(object value)
     {
-        public string Name { get; set; }
-
-        public override object Resolve(object value)
+        if (value == null || Name == null)
         {
-            if (value == null || Name == null)
-            {
-                return null;
-            }
-
-            var property = value.GetType().GetProperty(Name);
-
-            return property?.GetReflector()?.GetValue(value);
+            return null;
         }
+
+        var property = value.GetType().GetProperty(Name);
+
+        return property?.GetReflector()?.GetValue(value);
     }
 }

@@ -16,60 +16,58 @@
  *
  */
 
-using System.Collections;
-using System.Collections.Generic;
 using SkyApm.Common;
+using System.Collections;
 
-namespace SkyApm.Tracing.Segments
+namespace SkyApm.Tracing.Segments;
+
+public class SegmentReference
 {
-    public class SegmentReference
+    public Reference Reference { get; set; }
+
+    public string ParentSegmentId { get; set; }
+
+    public int ParentSpanId { get; set; }
+
+    public string TraceId { get; set; }
+
+    public string ParentServiceId { get; set; }
+
+    public string ParentServiceInstanceId { get; set; }
+
+    public string EntryServiceInstanceId { get; set; }
+
+    public StringOrIntValue NetworkAddress { get; set; }
+
+    public StringOrIntValue EntryEndpoint { get; set; }
+
+    public StringOrIntValue ParentEndpoint { get; set; }
+}
+
+public enum Reference
+{
+    CrossProcess = 0,
+    CrossThread = 1
+}
+
+public class SegmentReferenceCollection : IEnumerable<SegmentReference>
+{
+    private readonly HashSet<SegmentReference> _references = new();
+
+    public bool Add(SegmentReference reference)
     {
-        public Reference Reference { get; set; }
-
-        public string ParentSegmentId { get; set; }
-
-        public int ParentSpanId { get; set; }
-
-        public string TraceId { get; set; }
-
-        public string ParentServiceId { get; set; }
-
-        public string ParentServiceInstanceId { get; set; }
-
-        public string EntryServiceInstanceId { get; set; }
-
-        public StringOrIntValue NetworkAddress { get; set; }
-
-        public StringOrIntValue EntryEndpoint { get; set; }
-
-        public StringOrIntValue ParentEndpoint { get; set; }
+        return _references.Add(reference);
     }
-
-    public enum Reference
-    {
-        CrossProcess = 0,
-        CrossThread = 1
-    }
-
-    public class SegmentReferenceCollection : IEnumerable<SegmentReference>
-    {
-        private readonly HashSet<SegmentReference> _references = new HashSet<SegmentReference>();
-
-        public bool Add(SegmentReference reference)
-        {
-            return _references.Add(reference);
-        }
         
-        public IEnumerator<SegmentReference> GetEnumerator()
-        {
-            return _references.GetEnumerator();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return _references.GetEnumerator();
-        }
-
-        public int Count => _references.Count;
+    public IEnumerator<SegmentReference> GetEnumerator()
+    {
+        return _references.GetEnumerator();
     }
+
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return _references.GetEnumerator();
+    }
+
+    public int Count => _references.Count;
 }

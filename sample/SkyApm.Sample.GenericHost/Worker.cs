@@ -6,29 +6,28 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SkyApm.Sample.GenericHost
+namespace SkyApm.Sample.GenericHost; 
+
+public class Worker : BackgroundService
 {
-    public class Worker : BackgroundService
+    private readonly ITracingContext _tracingContext;
+
+    public Worker(ITracingContext tracingContext)
     {
-        private readonly ITracingContext _tracingContext;
+        _tracingContext = tracingContext;
+    }
 
-        public Worker(ITracingContext tracingContext)
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    {
+        while (!stoppingToken.IsCancellationRequested)
         {
-            _tracingContext = tracingContext;
-        }
+            var context = _tracingContext.CreateEntrySegmentContext(nameof(ExecuteAsync), new TextCarrierHeaderCollection(new Dictionary<string, string>()));
 
-        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
-        {
-            while (!stoppingToken.IsCancellationRequested)
-            {
-                var context = _tracingContext.CreateEntrySegmentContext(nameof(ExecuteAsync), new TextCarrierHeaderCollection(new Dictionary<string, string>()));
+            await Task.Delay(1000, stoppingToken);
 
-                await Task.Delay(1000, stoppingToken);
+            context.Span.AddLog(LogEvent.Message($"Worker running at: {DateTime.Now}"));
 
-                context.Span.AddLog(LogEvent.Message($"Worker running at: {DateTime.Now}"));
-
-                _tracingContext.Release(context);
-            }
+            _tracingContext.Release(context);
         }
     }
 }

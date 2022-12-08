@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿namespace SkyApm.Transport; 
 
-namespace SkyApm.Transport
+public class ServiceInstancePropertiesRequest
 {
-    public class ServiceInstancePropertiesRequest
-    {
-        public string ServiceId { get; set; }
+    public string ServiceId { get; set; }
 
-        public string ServiceInstanceId { get; set; }
+    public string ServiceInstanceId { get; set; }
 
-        public AgentOsInfoRequest Properties { get; set; }
-    }
+    public AgentOsInfoRequest Properties { get; set; }
 }

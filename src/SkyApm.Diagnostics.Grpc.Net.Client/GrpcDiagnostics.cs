@@ -16,19 +16,18 @@
  *
  */
 
-namespace SkyApm.Diagnostics.Grpc.Net.Client
+namespace SkyApm.Diagnostics.Grpc.Net.Client;
+
+// refer from https://github.com/grpc/grpc-dotnet/blob/637e3ec7d340bf643106187893b1331170437c2e/src/Grpc.Net.Client/Internal/GrpcDiagnostics.cs
+internal static class GrpcDiagnostics
 {
-    // refer from https://github.com/grpc/grpc-dotnet/blob/637e3ec7d340bf643106187893b1331170437c2e/src/Grpc.Net.Client/Internal/GrpcDiagnostics.cs
-    internal static class GrpcDiagnostics
-    {
-        public const string ListenerName = "Grpc.Net.Client";
+    public const string ListenerName = "Grpc.Net.Client";
 
-        public const string ActivityName = "Grpc.Net.Client.GrpcOut";
+    public const string ActivityName = "Grpc.Net.Client.GrpcOut";
 
-        public const string ActivityStartKey = ActivityName + ".Start";
-        public const string ActivityStopKey = ActivityName + ".Stop";
+    public const string ActivityStartKey = ActivityName + ".Start";
+    public const string ActivityStopKey = ActivityName + ".Stop";
 
-        public const string GrpcMethodTagName = "grpc.method";
-        public const string GrpcStatusCodeTagName = "grpc.status_code";
-    }
+    public const string GrpcMethodTagName = "grpc.method";
+    public const string GrpcStatusCodeTagName = "grpc.status_code";
 }

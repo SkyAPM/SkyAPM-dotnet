@@ -16,17 +16,14 @@
  *
  */
 
-using System;
+namespace SkyApm.Config;
 
-namespace SkyApm.Config
+public class ConfigAttribute : Attribute
 {
-    public class ConfigAttribute : Attribute
-    {
-        public string[] Sections { get; }
+    public string[] Sections { get; }
 
-        public ConfigAttribute(params string[] sections)
-        {
-            Sections = sections;
-        }
+    public ConfigAttribute(params string[] sections)
+    {
+        Sections = sections;
     }
 }

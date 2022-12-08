@@ -18,12 +18,11 @@
 
 using SkyApm.Tracing.Segments;
 
-namespace SkyApm.Tracing
-{
-    public interface ICarrierPropagator
-    {
-        void Inject(SegmentContext segmentContext, ICarrierHeaderCollection carrier);
+namespace SkyApm.Tracing;
 
-        ICarrier Extract(ICarrierHeaderCollection carrier);
-    }
+public interface ICarrierPropagator
+{
+    void Inject(SegmentContext segmentContext, ICarrierHeaderCollection carrier);
+
+    ICarrier Extract(ICarrierHeaderCollection carrier);
 }

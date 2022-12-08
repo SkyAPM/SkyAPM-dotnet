@@ -16,12 +16,11 @@
  *
  */
 
-namespace SkyApm.Transport
-{
-    public class PingRequest
-    {
-        public string ServiceName { get; set; }
+namespace SkyApm.Transport;
 
-        public string InstanceId { get; set; }
-    }
+public class PingRequest
+{
+    public string ServiceName { get; set; }
+
+    public string InstanceId { get; set; }
 }

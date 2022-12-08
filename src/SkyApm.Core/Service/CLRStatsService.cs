@@ -16,68 +16,63 @@
  *
  */
 
-using System;
-using System.Diagnostics;
-using System.Threading;
-using System.Threading.Tasks;
 using SkyApm.Common;
 using SkyApm.Logging;
 using SkyApm.Transport;
 
-namespace SkyApm.Service
+namespace SkyApm.Service;
+
+public class CLRStatsService : ExecutionService
 {
-    public class CLRStatsService : ExecutionService
+    private readonly ICLRStatsReporter _reporter;
+
+    public CLRStatsService(ICLRStatsReporter reporter, IRuntimeEnvironment runtimeEnvironment,
+        ILoggerFactory loggerFactory)
+        : base(runtimeEnvironment, loggerFactory)
     {
-        private readonly ICLRStatsReporter _reporter;
+        _reporter = reporter;
+    }
 
-        public CLRStatsService(ICLRStatsReporter reporter, IRuntimeEnvironment runtimeEnvironment,
-            ILoggerFactory loggerFactory)
-            : base(runtimeEnvironment, loggerFactory)
+    protected override TimeSpan DueTime { get; } = TimeSpan.FromSeconds(30);
+    protected override TimeSpan Period { get; } = TimeSpan.FromSeconds(30);
+
+    protected override async Task ExecuteAsync(CancellationToken cancellationToken)
+    {
+        var cpuStats = new CPUStatsRequest
         {
-            _reporter = reporter;
+            UsagePercent = CpuHelpers.UsagePercent
+        };
+        var gcStats = new GCStatsRequest
+        {
+            Gen0CollectCount = GCHelpers.Gen0CollectCount,
+            Gen1CollectCount = GCHelpers.Gen1CollectCount,
+            Gen2CollectCount = GCHelpers.Gen2CollectCount,
+            HeapMemory = GCHelpers.TotalMemory
+        };
+        ThreadPool.GetAvailableThreads(out var availableWorkerThreads, out var availableCompletionPortThreads);
+        ThreadPool.GetMaxThreads(out var maxWorkerThreads, out var maxCompletionPortThreads);
+        var threadStats = new ThreadStatsRequest
+        {
+            MaxCompletionPortThreads = maxCompletionPortThreads,
+            MaxWorkerThreads = maxWorkerThreads,
+            AvailableCompletionPortThreads = availableCompletionPortThreads,
+            AvailableWorkerThreads = availableWorkerThreads
+        };
+        var statsRequest = new CLRStatsRequest
+        {
+            CPU = cpuStats,
+            GC = gcStats,
+            Thread = threadStats
+        };
+        try
+        {
+            await _reporter.ReportAsync(statsRequest, cancellationToken);
+            Logger.Information(
+                $"Report CLR Stats. CPU UsagePercent {cpuStats.UsagePercent} GenCollectCount {gcStats.Gen0CollectCount} {gcStats.Gen1CollectCount} {gcStats.Gen2CollectCount} {gcStats.HeapMemory / (1024 * 1024)}M ThreadPool {threadStats.AvailableWorkerThreads} {threadStats.MaxWorkerThreads} {threadStats.AvailableCompletionPortThreads} {threadStats.MaxCompletionPortThreads}");
         }
-
-        protected override TimeSpan DueTime { get; } = TimeSpan.FromSeconds(30);
-        protected override TimeSpan Period { get; } = TimeSpan.FromSeconds(30);
-
-        protected override async Task ExecuteAsync(CancellationToken cancellationToken)
+        catch (Exception exception)
         {
-            var cpuStats = new CPUStatsRequest
-            {
-                UsagePercent = CpuHelpers.UsagePercent
-            };
-            var gcStats = new GCStatsRequest
-            {
-                Gen0CollectCount = GCHelpers.Gen0CollectCount,
-                Gen1CollectCount = GCHelpers.Gen1CollectCount,
-                Gen2CollectCount = GCHelpers.Gen2CollectCount,
-                HeapMemory = GCHelpers.TotalMemory
-            };
-            ThreadPool.GetAvailableThreads(out var availableWorkerThreads, out var availableCompletionPortThreads);
-            ThreadPool.GetMaxThreads(out var maxWorkerThreads, out var maxCompletionPortThreads);
-            var threadStats = new ThreadStatsRequest
-            {
-                MaxCompletionPortThreads = maxCompletionPortThreads,
-                MaxWorkerThreads = maxWorkerThreads,
-                AvailableCompletionPortThreads = availableCompletionPortThreads,
-                AvailableWorkerThreads = availableWorkerThreads
-            };
-            var statsRequest = new CLRStatsRequest
-            {
-                CPU = cpuStats,
-                GC = gcStats,
-                Thread = threadStats
-            };
-            try
-            {
-                await _reporter.ReportAsync(statsRequest, cancellationToken);
-                Logger.Information(
-                    $"Report CLR Stats. CPU UsagePercent {cpuStats.UsagePercent} GenCollectCount {gcStats.Gen0CollectCount} {gcStats.Gen1CollectCount} {gcStats.Gen2CollectCount} {gcStats.HeapMemory / (1024 * 1024)}M ThreadPool {threadStats.AvailableWorkerThreads} {threadStats.MaxWorkerThreads} {threadStats.AvailableCompletionPortThreads} {threadStats.MaxCompletionPortThreads}");
-            }
-            catch (Exception exception)
-            {
-                Logger.Error("Report CLR Stats error.", exception);
-            }
+            Logger.Error("Report CLR Stats error.", exception);
         }
     }
 }

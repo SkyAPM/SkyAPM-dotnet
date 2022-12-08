@@ -16,15 +16,11 @@
  *
  */
 
-using System.Threading;
-using System.Threading.Tasks;
+namespace SkyApm;
 
-namespace SkyApm
+public interface IExecutionService
 {
-    public interface IExecutionService
-    {
-        Task StartAsync(CancellationToken cancellationToken = default(CancellationToken));
+    Task StartAsync(CancellationToken cancellationToken = default);
 
-        Task StopAsync(CancellationToken cancellationToken = default(CancellationToken));
-    }
+    Task StopAsync(CancellationToken cancellationToken = default);
 }

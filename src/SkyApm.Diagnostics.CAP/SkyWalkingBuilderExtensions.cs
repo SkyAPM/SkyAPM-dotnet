@@ -16,24 +16,23 @@
  *
  */
 
-using System;
 using Microsoft.Extensions.DependencyInjection;
 using SkyApm.Utilities.DependencyInjection;
+// ReSharper disable UnusedType.Global
 
-namespace SkyApm.Diagnostics.CAP
+namespace SkyApm.Diagnostics.CAP;
+
+public static class SkyWalkingBuilderExtensions
 {
-    public static class SkyWalkingBuilderExtensions
+    public static SkyApmExtensions AddCap(this SkyApmExtensions extensions)
     {
-        public static SkyApmExtensions AddCap(this SkyApmExtensions extensions)
+        if (extensions == null)
         {
-            if (extensions == null)
-            {
-                throw new ArgumentNullException(nameof(extensions));
-            }
-
-            extensions.Services.AddSingleton<ITracingDiagnosticProcessor, CapTracingDiagnosticProcessor>();
-            
-            return extensions;
+            throw new ArgumentNullException(nameof(extensions));
         }
+
+        _ = extensions.Services.AddSingleton<ITracingDiagnosticProcessor, CapTracingDiagnosticProcessor>();
+            
+        return extensions;
     }
 }

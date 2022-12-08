@@ -4,25 +4,24 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace SkyApm.Sample.GenericHost
+namespace SkyApm.Sample.GenericHost; 
+
+public class LogWorker: BackgroundService
 {
-    public class LogWorker: BackgroundService
-    {
         
-        private readonly ILogger<LogWorker> _logger;
+    private readonly ILogger<LogWorker> _logger;
 
-        public LogWorker(ILogger<LogWorker> logger)
-        {
-            _logger = logger;
-        }
+    public LogWorker(ILogger<LogWorker> logger)
+    {
+        _logger = logger;
+    }
 
-        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    {
+        while (!stoppingToken.IsCancellationRequested)
         {
-            while (!stoppingToken.IsCancellationRequested)
-            {
-                await Task.Delay(1000, stoppingToken);
-                _logger.LogInformation("LogWorker running at: {}", DateTime.Now);
-            }
+            await Task.Delay(1000, stoppingToken);
+            _logger.LogInformation("LogWorker running at: {}", DateTime.Now);
         }
     }
 }

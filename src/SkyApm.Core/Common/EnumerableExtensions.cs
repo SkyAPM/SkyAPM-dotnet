@@ -16,22 +16,18 @@
  *
  */
 
-using System;
-using System.Collections.Generic;
+namespace SkyApm.Common;
 
-namespace SkyApm.Common
+internal static class EnumerableExtensions
 {
-    internal static class EnumerableExtensions
+    public static IEnumerable<T> Distinct<T, K>(this IEnumerable<T> source, Func<T, K> predicate)
     {
-        public static IEnumerable<T> Distinct<T, K>(this IEnumerable<T> source, Func<T, K> predicate)
+        var sets = new HashSet<K>();
+        foreach (var item in source)
         {
-            HashSet<K> sets = new HashSet<K>();
-            foreach (var item in source)
+            if (sets.Add(predicate(item)))
             {
-                if (sets.Add(predicate(item)))
-                {
-                    yield return item;
-                }
+                yield return item;
             }
         }
     }

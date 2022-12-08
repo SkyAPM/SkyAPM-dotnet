@@ -16,28 +16,27 @@
  *
  */
 
-namespace SkyApm.Config
+namespace SkyApm.Config;
+
+[Config("SkyWalking", "Transport")]
+public class TransportConfig
 {
-    [Config("SkyWalking", "Transport")]
-    public class TransportConfig
-    {
-        public int QueueSize { get; set; } = 30000;
+    public int QueueSize { get; set; } = 30000;
 
-        /// <summary>
-        /// Flush Interval Millisecond
-        /// </summary>
-        public int Interval { get; set; } = 3000;
+    /// <summary>
+    /// Flush Interval Millisecond
+    /// </summary>
+    public int Interval { get; set; } = 3000;
 
-        /// <summary>
-        /// Data queued beyond this time will be discarded.
-        /// </summary>
-        public int BatchSize { get; set; } = 3000;
+    /// <summary>
+    /// Data queued beyond this time will be discarded.
+    /// </summary>
+    public int BatchSize { get; set; } = 3000;
 
-        public string ProtocolVersion { get; set; } = ProtocolVersions.V8;
-    }
+    public string ProtocolVersion { get; set; } = ProtocolVersions.V8;
+}
 
-    public static class ProtocolVersions
-    {
-        public static string V8 { get; } = "v8";
-    }
+public static class ProtocolVersions
+{
+    public static string V8 { get; } = "v8";
 }

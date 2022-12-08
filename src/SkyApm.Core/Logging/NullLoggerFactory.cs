@@ -16,15 +16,13 @@
  *
  */
 
-using System;
+// ReSharper disable UnusedType.Global
+namespace SkyApm.Logging;
 
-namespace SkyApm.Logging
+public class NullLoggerFactory : ILoggerFactory
 {
-    public class NullLoggerFactory : ILoggerFactory
+    public ILogger CreateLogger(Type type)
     {
-        public ILogger CreateLogger(Type type)
-        {
-            return new NullLogger();
-        }
+        return new NullLogger();
     }
 }

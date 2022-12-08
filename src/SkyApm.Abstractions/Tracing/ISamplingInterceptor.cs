@@ -16,14 +16,11 @@
  *
  */
 
-using SkyApm.Tracing.Segments;
+namespace SkyApm.Tracing;
 
-namespace SkyApm.Tracing
+public interface ISamplingInterceptor
 {
-    public interface ISamplingInterceptor
-    {
-        int Priority { get; }
+    int Priority { get; }
         
-        bool Invoke(SamplingContext samplingContext, Sampler next);
-    }
+    bool Invoke(SamplingContext samplingContext, Sampler next);
 }

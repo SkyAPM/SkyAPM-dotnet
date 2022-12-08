@@ -20,14 +20,13 @@ using Microsoft.AspNetCore.Http;
 using SkyApm.Tracing;
 using SkyApm.Tracing.Segments;
 
-namespace SkyApm.Diagnostics.AspNetCore.Handlers
+namespace SkyApm.Diagnostics.AspNetCore.Handlers;
+
+public interface IHostingDiagnosticHandler
 {
-    public interface IHostingDiagnosticHandler
-    {
-        bool OnlyMatch(HttpContext httpContext);
+    bool OnlyMatch(HttpContext httpContext);
 
-        void BeginRequest(ITracingContext tracingContext, HttpContext httpContext);
+    void BeginRequest(ITracingContext tracingContext, HttpContext httpContext);
 
-        void EndRequest(SegmentContext segmentContext, HttpContext httpContext);
-    }
+    void EndRequest(SegmentContext segmentContext, HttpContext httpContext);
 }

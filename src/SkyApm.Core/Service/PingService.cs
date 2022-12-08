@@ -16,50 +16,45 @@
  *
  */
 
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using SkyApm.Config;
 using SkyApm.Logging;
 using SkyApm.Transport;
 
-namespace SkyApm.Service
+namespace SkyApm.Service;
+
+public class PingService : ExecutionService
 {
-    public class PingService : ExecutionService
+    private readonly IPingCaller _pingCaller;
+    private readonly TransportConfig _transportConfig;
+    private readonly InstrumentConfig _instrumentConfig;
+
+    public PingService(IConfigAccessor configAccessor, IPingCaller pingCaller,
+        IRuntimeEnvironment runtimeEnvironment,
+        ILoggerFactory loggerFactory) : base(
+        runtimeEnvironment, loggerFactory)
     {
-        private readonly IPingCaller _pingCaller;
-        private readonly TransportConfig _transportConfig;
-        private readonly InstrumentConfig _instrumentConfig;
+        _pingCaller = pingCaller;
+        _transportConfig = configAccessor.Get<TransportConfig>();
+        _instrumentConfig = configAccessor.Get<InstrumentConfig>();
+    }
 
-        public PingService(IConfigAccessor configAccessor, IPingCaller pingCaller,
-            IRuntimeEnvironment runtimeEnvironment,
-            ILoggerFactory loggerFactory) : base(
-            runtimeEnvironment, loggerFactory)
+    protected override TimeSpan DueTime { get; } = TimeSpan.FromSeconds(30);
+    protected override TimeSpan Period { get; } = TimeSpan.FromSeconds(60);
+
+    protected override async Task ExecuteAsync(CancellationToken cancellationToken)
+    {
+        try
         {
-            _pingCaller = pingCaller;
-            _transportConfig = configAccessor.Get<TransportConfig>();
-            _instrumentConfig = configAccessor.Get<InstrumentConfig>();
+            await _pingCaller.PingAsync(
+                new() {
+                    ServiceName = _instrumentConfig.ServiceName,
+                    InstanceId = _instrumentConfig.ServiceInstanceName
+                }, cancellationToken);
+            Logger.Information($"Ping server @{DateTimeOffset.UtcNow}");
         }
-
-        protected override TimeSpan DueTime { get; } = TimeSpan.FromSeconds(30);
-        protected override TimeSpan Period { get; } = TimeSpan.FromSeconds(60);
-
-        protected override async Task ExecuteAsync(CancellationToken cancellationToken)
+        catch (Exception exception)
         {
-            try
-            {
-                await _pingCaller.PingAsync(
-                    new PingRequest
-                    {
-                        ServiceName = _instrumentConfig.ServiceName,
-                        InstanceId = _instrumentConfig.ServiceInstanceName
-                    }, cancellationToken);
-                Logger.Information($"Ping server @{DateTimeOffset.UtcNow}");
-            }
-            catch (Exception exception)
-            {
-                Logger.Error($"Ping server fail @{DateTimeOffset.UtcNow}", exception);
-            }
+            Logger.Error($"Ping server fail @{DateTimeOffset.UtcNow}", exception);
         }
     }
 }

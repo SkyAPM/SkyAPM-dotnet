@@ -18,21 +18,14 @@
 
 using Microsoft.Extensions.Hosting;
 
-#if NETSTANDARD2_0
+namespace SkyApm.Agent.Hosting;
 
-using IHostEnvironment = Microsoft.Extensions.Hosting.IHostingEnvironment;
-
-#endif
-
-namespace SkyApm.Agent.Hosting
+internal class HostingEnvironmentProvider : IEnvironmentProvider
 {
-    internal class HostingEnvironmentProvider : IEnvironmentProvider
-    {
-        public string EnvironmentName { get; }
+    public string EnvironmentName { get; }
 
-        public HostingEnvironmentProvider(IHostEnvironment hostingEnvironment)
-        {
-            EnvironmentName = hostingEnvironment.EnvironmentName;
-        }
+    public HostingEnvironmentProvider(IHostEnvironment hostingEnvironment)
+    {
+        EnvironmentName = hostingEnvironment.EnvironmentName;
     }
 }

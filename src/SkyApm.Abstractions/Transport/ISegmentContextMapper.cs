@@ -18,10 +18,9 @@
 
 using SkyApm.Tracing.Segments;
 
-namespace SkyApm.Transport
+namespace SkyApm.Transport;
+
+public interface ISegmentContextMapper
 {
-    public interface ISegmentContextMapper
-    {
-        SegmentRequest Map(SegmentContext segmentContext);
-    }
+    SegmentRequest Map(SegmentContext segmentContext);
 }

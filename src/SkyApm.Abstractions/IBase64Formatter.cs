@@ -16,12 +16,11 @@
  *
  */
 
-namespace SkyApm
-{
-    public interface IBase64Formatter
-    {
-        string Decode(string value);
+namespace SkyApm;
 
-        string Encode(string value);
-    }
+public interface IBase64Formatter
+{
+    string Decode(string value);
+
+    string Encode(string value);
 }

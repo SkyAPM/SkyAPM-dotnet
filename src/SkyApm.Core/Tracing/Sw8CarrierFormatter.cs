@@ -16,83 +16,80 @@
  *
  */
 
-using System.Linq;
-using SkyApm.Common;
 using SkyApm.Config;
 
-namespace SkyApm.Tracing
+namespace SkyApm.Tracing;
+
+public class Sw8CarrierFormatter : ICarrierFormatter
 {
-    public class Sw8CarrierFormatter : ICarrierFormatter
+    private readonly IBase64Formatter _base64Formatter;
+
+    public Sw8CarrierFormatter(IBase64Formatter base64Formatter,
+        IConfigAccessor configAccessor)
     {
-        private readonly IBase64Formatter _base64Formatter;
+        _base64Formatter = base64Formatter;
+        var config = configAccessor.Get<InstrumentConfig>();
+        Key = string.IsNullOrEmpty(config.Namespace)
+            ? HeaderVersions.SW8
+            : $"{config.Namespace}-{HeaderVersions.SW8}";
+        Enable = config.HeaderVersions == null || config.HeaderVersions.Contains(HeaderVersions.SW8);
+    }
 
-        public Sw8CarrierFormatter(IBase64Formatter base64Formatter,
-            IConfigAccessor configAccessor)
+    public string Key { get; }
+
+    public bool Enable { get; }
+
+    public ICarrier Decode(string content)
+    {
+        NullableCarrier Defer()
         {
-            _base64Formatter = base64Formatter;
-            var config = configAccessor.Get<InstrumentConfig>();
-            Key = string.IsNullOrEmpty(config.Namespace)
-                ? HeaderVersions.SW8
-                : $"{config.Namespace}-{HeaderVersions.SW8}";
-            Enable = config.HeaderVersions == null || config.HeaderVersions.Contains(HeaderVersions.SW8);
+            return NullableCarrier.Instance;
         }
 
-        public string Key { get; }
+        if (string.IsNullOrEmpty(content))
+            return Defer();
 
-        public bool Enable { get; }
+        var parts = content.Split('-');
+        if (parts.Length < 8)
+            return Defer();
 
-        public ICarrier Decode(string content)
+        if (!int.TryParse(parts[0], out var sampled))
+            return Defer();
+
+        var traceId = _base64Formatter.Decode(parts[1]);
+        var segmentId = _base64Formatter.Decode(parts[2]);
+
+        if (!int.TryParse(parts[3], out var parentSpanId))
+            return Defer();
+
+        var parentService = _base64Formatter.Decode(parts[4]);
+        var parentServiceInstance = _base64Formatter.Decode(parts[5]);
+        var parentEndpoint = _base64Formatter.Decode(parts[6]);
+        var networkAddress = _base64Formatter.Decode(parts[7]);
+
+        var carrier = new Carrier(traceId, segmentId, parentSpanId, parentServiceInstance,
+            default, parentService)
         {
-            NullableCarrier Defer()
-            {
-                return NullableCarrier.Instance;
-            }
+            NetworkAddress = networkAddress,
+            ParentEndpoint = parentEndpoint,
+            Sampled = sampled != 0
+        };
 
-            if (string.IsNullOrEmpty(content))
-                return Defer();
+        return carrier;
+    }
 
-            var parts = content.Split('-');
-            if (parts.Length < 8)
-                return Defer();
-
-            if (!int.TryParse(parts[0], out var sampled))
-                return Defer();
-
-            var traceId = _base64Formatter.Decode(parts[1]);
-            var segmentId = _base64Formatter.Decode(parts[2]);
-
-            if (!int.TryParse(parts[3], out var parentSpanId))
-                return Defer();
-
-            var parentService = _base64Formatter.Decode(parts[4]);
-            var parentServiceInstance = _base64Formatter.Decode(parts[5]);
-            var parentEndpoint = _base64Formatter.Decode(parts[6]);
-            var networkAddress = _base64Formatter.Decode(parts[7]);
-
-            var carrier = new Carrier(traceId, segmentId, parentSpanId, parentServiceInstance,
-                default, parentService)
-            {
-                NetworkAddress = networkAddress,
-                ParentEndpoint = parentEndpoint,
-                Sampled = sampled != 0
-            };
-
-            return carrier;
-        }
-
-        public string Encode(ICarrier carrier)
-        {
-            if (!carrier.HasValue)
-                return string.Empty;
-            return string.Join("-",
-                carrier.Sampled != null && carrier.Sampled.Value ? "1" : "0",
-                _base64Formatter.Encode(carrier.TraceId),
-                _base64Formatter.Encode(carrier.ParentSegmentId),
-                carrier.ParentSpanId.ToString(),
-                _base64Formatter.Encode(carrier.ParentServiceId),
-                _base64Formatter.Encode(carrier.ParentServiceInstanceId),
-                _base64Formatter.Encode(carrier.ParentEndpoint.ToString()),
-                _base64Formatter.Encode(carrier.NetworkAddress.ToString()));
-        }
+    public string Encode(ICarrier carrier)
+    {
+        if (!carrier.HasValue)
+            return string.Empty;
+        return string.Join("-",
+            carrier.Sampled != null && carrier.Sampled.Value ? "1" : "0",
+            _base64Formatter.Encode(carrier.TraceId),
+            _base64Formatter.Encode(carrier.ParentSegmentId),
+            carrier.ParentSpanId.ToString(),
+            _base64Formatter.Encode(carrier.ParentServiceId),
+            _base64Formatter.Encode(carrier.ParentServiceInstanceId),
+            _base64Formatter.Encode(carrier.ParentEndpoint.ToString()),
+            _base64Formatter.Encode(carrier.NetworkAddress.ToString()));
     }
 }

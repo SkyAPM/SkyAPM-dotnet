@@ -16,17 +16,14 @@
  *
  */
 
-using System;
+namespace SkyApm.Diagnostics;
 
-namespace SkyApm.Diagnostics
+public class DiagnosticNameAttribute :Attribute
 {
-    public class DiagnosticNameAttribute :Attribute
-    {
-        public string Name { get; }
+    public string Name { get; }
 
-        public DiagnosticNameAttribute(string name)
-        {
-            Name = name;
-        }
+    public DiagnosticNameAttribute(string name)
+    {
+        Name = name;
     }
 }

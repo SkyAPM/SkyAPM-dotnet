@@ -16,15 +16,13 @@
  *
  */
 
-using System.Net.Http;
 using SkyApm.Tracing;
 
-namespace SkyApm.Diagnostics.HttpClient.Filters
-{
-    public interface IRequestDiagnosticHandler
-    {
-        bool OnlyMatch(HttpRequestMessage request);
+namespace SkyApm.Diagnostics.HttpClient.Filters;
 
-        void Handle(ITracingContext tracingContext, HttpRequestMessage request);
-    }
+public interface IRequestDiagnosticHandler
+{
+    bool OnlyMatch(HttpRequestMessage request);
+
+    void Handle(ITracingContext tracingContext, HttpRequestMessage request);
 }

@@ -16,36 +16,34 @@
  *
  */
 
-using System;
 using SkyApm.Config;
 using SkyApm.Tracing;
 
-namespace SkyApm.Sampling
+namespace SkyApm.Sampling;
+
+public class RandomSamplingInterceptor : ISamplingInterceptor
 {
-    public class RandomSamplingInterceptor : ISamplingInterceptor
+    private readonly Random _random;
+    private readonly int _samplingRate;
+    private readonly bool _sample_on;
+
+    public RandomSamplingInterceptor(IConfigAccessor configAccessor)
     {
-        private readonly Random _random;
-        private readonly int _samplingRate;
-        private readonly bool _sample_on;
-
-        public RandomSamplingInterceptor(IConfigAccessor configAccessor)
+        var percentage = configAccessor.Get<SamplingConfig>().Percentage;
+        _sample_on = percentage > 0;
+        if (_sample_on)
         {
-            var percentage = configAccessor.Get<SamplingConfig>().Percentage;
-            _sample_on = percentage > 0;
-            if (_sample_on)
-            {
-                _samplingRate = (int)(percentage * 100d);
-            }
-            _random = new Random();
+            _samplingRate = (int)(percentage * 100d);
         }
+        _random = new();
+    }
 
-        public int Priority { get; } = int.MinValue + 1000;
+    public int Priority { get; } = int.MinValue + 1000;
 
-        public bool Invoke(SamplingContext samplingContext, Sampler next)
-        {
-            if (!_sample_on) return next(samplingContext);
-            var r = _random.Next(10000);
-            return r <= _samplingRate && next(samplingContext);
-        }
+    public bool Invoke(SamplingContext samplingContext, Sampler next)
+    {
+        if (!_sample_on) return next(samplingContext);
+        var r = _random.Next(10000);
+        return r <= _samplingRate && next(samplingContext);
     }
 }

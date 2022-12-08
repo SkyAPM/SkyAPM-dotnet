@@ -18,91 +18,89 @@
 
 using Grpc.Core;
 using Grpc.Core.Interceptors;
-using System;
 
-namespace SkyApm.Diagnostics.Grpc.Client
+namespace SkyApm.Diagnostics.Grpc.Client;
+
+public class ClientDiagnosticInterceptor : Interceptor
 {
-    public class ClientDiagnosticInterceptor : Interceptor
+    private readonly ClientDiagnosticProcessor _processor;
+
+    public ClientDiagnosticInterceptor(ClientDiagnosticProcessor processor)
     {
-        private readonly ClientDiagnosticProcessor _processor;
+        _processor = processor;
+    }
 
-        public ClientDiagnosticInterceptor(ClientDiagnosticProcessor processor)
+    public override TResponse BlockingUnaryCall<TRequest, TResponse>(TRequest request, ClientInterceptorContext<TRequest, TResponse> context, BlockingUnaryCallContinuation<TRequest, TResponse> continuation)
+    {
+        return Call(context, (newContext) =>
         {
-            _processor = processor;
-        }
+            return continuation(request, newContext);
+        });
+    }
 
-        public override TResponse BlockingUnaryCall<TRequest, TResponse>(TRequest request, ClientInterceptorContext<TRequest, TResponse> context, BlockingUnaryCallContinuation<TRequest, TResponse> continuation)
+    public override AsyncUnaryCall<TResponse> AsyncUnaryCall<TRequest, TResponse>(TRequest request, ClientInterceptorContext<TRequest, TResponse> context, AsyncUnaryCallContinuation<TRequest, TResponse> continuation)
+    {
+        return Call(context, (newContext) =>
         {
-            return Call(context, (newContext) =>
+            var response = continuation(request, newContext);
+            var responseAsync = response.ResponseAsync.ContinueWith(r =>
             {
-                return continuation(request, newContext);
-            });
-        }
-
-        public override AsyncUnaryCall<TResponse> AsyncUnaryCall<TRequest, TResponse>(TRequest request, ClientInterceptorContext<TRequest, TResponse> context, AsyncUnaryCallContinuation<TRequest, TResponse> continuation)
-        {
-            return Call(context, (newContext) =>
-            {
-                var response = continuation(request, newContext);
-                var responseAsync = response.ResponseAsync.ContinueWith(r =>
+                try
                 {
-                    try
-                    {
-                        _processor.EndRequest();
-                        return r.Result;
-                    }
-                    catch (Exception ex)
-                    {
-                        _processor.DiagnosticUnhandledException(ex);
-                        throw;
-                    }
-                });
-                return new AsyncUnaryCall<TResponse>(responseAsync, response.ResponseHeadersAsync, response.GetStatus, response.GetTrailers, response.Dispose);
+                    _processor.EndRequest();
+                    return r.Result;
+                }
+                catch (Exception ex)
+                {
+                    _processor.DiagnosticUnhandledException(ex);
+                    throw;
+                }
             });
-        }
+            return new AsyncUnaryCall<TResponse>(responseAsync, response.ResponseHeadersAsync, response.GetStatus, response.GetTrailers, response.Dispose);
+        });
+    }
 
-        public override AsyncClientStreamingCall<TRequest, TResponse> AsyncClientStreamingCall<TRequest, TResponse>(ClientInterceptorContext<TRequest, TResponse> context, AsyncClientStreamingCallContinuation<TRequest, TResponse> continuation)
+    public override AsyncClientStreamingCall<TRequest, TResponse> AsyncClientStreamingCall<TRequest, TResponse>(ClientInterceptorContext<TRequest, TResponse> context, AsyncClientStreamingCallContinuation<TRequest, TResponse> continuation)
+    {
+        return Call(context, (newContext) =>
         {
-            return Call(context, (newContext) =>
-            {
-                return continuation(newContext);
-            });
-        }
+            return continuation(newContext);
+        });
+    }
 
-        public override AsyncServerStreamingCall<TResponse> AsyncServerStreamingCall<TRequest, TResponse>(TRequest request, ClientInterceptorContext<TRequest, TResponse> context, AsyncServerStreamingCallContinuation<TRequest, TResponse> continuation)
+    public override AsyncServerStreamingCall<TResponse> AsyncServerStreamingCall<TRequest, TResponse>(TRequest request, ClientInterceptorContext<TRequest, TResponse> context, AsyncServerStreamingCallContinuation<TRequest, TResponse> continuation)
+    {
+        return Call(context, (newContext) =>
         {
-            return Call(context, (newContext) =>
-            {
-                return continuation(request, newContext);
-            });
-        }
+            return continuation(request, newContext);
+        });
+    }
 
-        public override AsyncDuplexStreamingCall<TRequest, TResponse> AsyncDuplexStreamingCall<TRequest, TResponse>(ClientInterceptorContext<TRequest, TResponse> context, AsyncDuplexStreamingCallContinuation<TRequest, TResponse> continuation)
+    public override AsyncDuplexStreamingCall<TRequest, TResponse> AsyncDuplexStreamingCall<TRequest, TResponse>(ClientInterceptorContext<TRequest, TResponse> context, AsyncDuplexStreamingCallContinuation<TRequest, TResponse> continuation)
+    {
+        return Call(context, (newContext) =>
         {
-            return Call(context, (newContext) =>
-            {
-                return continuation(newContext);
-            });
-        }
+            return continuation(newContext);
+        });
+    }
 
-        public T Call<T, TRequest, TResponse>(ClientInterceptorContext<TRequest, TResponse> context, Func<ClientInterceptorContext<TRequest, TResponse>, T> func)
-            where TRequest : class
-            where TResponse : class
+    public T Call<T, TRequest, TResponse>(ClientInterceptorContext<TRequest, TResponse> context, Func<ClientInterceptorContext<TRequest, TResponse>, T> func)
+        where TRequest : class
+        where TResponse : class
+    {
+        var metadata = _processor.BeginRequest(context);
+        try
         {
-            var metadata = _processor.BeginRequest(context);
-            try
-            {
-                var options = context.Options.WithHeaders(metadata);
-                var newContext = new ClientInterceptorContext<TRequest, TResponse>(context.Method, context.Host, options);
-                var response = func(newContext);
-                _processor.EndRequest();
-                return response;
-            }
-            catch (Exception ex)
-            {
-                _processor.DiagnosticUnhandledException(ex);
-                throw;
-            }
+            var options = context.Options.WithHeaders(metadata);
+            var newContext = new ClientInterceptorContext<TRequest, TResponse>(context.Method, context.Host, options);
+            var response = func(newContext);
+            _processor.EndRequest();
+            return response;
+        }
+        catch (Exception ex)
+        {
+            _processor.DiagnosticUnhandledException(ex);
+            throw;
         }
     }
 }

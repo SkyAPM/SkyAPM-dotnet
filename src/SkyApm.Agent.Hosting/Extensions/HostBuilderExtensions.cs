@@ -19,11 +19,10 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace SkyApm.Agent.Hosting
+namespace SkyApm.Agent.Hosting;
+
+public static class HostBuilderExtensions
 {
-    public static class HostBuilderExtensions
-    {
-        public static IHostBuilder UseSkyAPM(this IHostBuilder builder) =>
-            builder.ConfigureServices((context, services) => services.AddSkyAPM());
-    }
+    public static IHostBuilder UseSkyAPM(this IHostBuilder builder) =>
+        builder.ConfigureServices((context, services) => services.AddSkyAPM());
 }

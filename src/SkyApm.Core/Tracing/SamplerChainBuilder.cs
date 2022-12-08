@@ -16,48 +16,39 @@
  *
  */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
+namespace SkyApm.Tracing;
 
-namespace SkyApm.Tracing
+public class SamplerChainBuilder : ISamplerChainBuilder
 {
-    public class SamplerChainBuilder : ISamplerChainBuilder
+    private volatile int state = 0;
+    private readonly IEnumerable<ISamplingInterceptor> _sampledInterceptors;
+    private Sampler _sampler;
+
+    public SamplerChainBuilder(IEnumerable<ISamplingInterceptor> sampledInterceptors)
     {
-        private volatile int state = 0;
-        private readonly IEnumerable<ISamplingInterceptor> _sampledInterceptors;
-        private Sampler _sampler;
+        _sampledInterceptors = sampledInterceptors;
+    }
 
-        public SamplerChainBuilder(IEnumerable<ISamplingInterceptor> sampledInterceptors)
-        {
-            _sampledInterceptors = sampledInterceptors;
-        }
-
-        public Sampler Build()
-        {
-            if (_sampler != null)
-                return _sampler;
-
-            if (Interlocked.CompareExchange(ref state, 1, 0) == 0)
-            {
-                var samplers = _sampledInterceptors.OrderBy(x => x.Priority).Select(interceptor =>
-                    (Func<Sampler, Sampler>) (next => ctx => interceptor.Invoke(ctx, next))).ToList();
-
-                Sampler sampler = ctx => true;
-                foreach (var next in samplers)
-                {
-                    sampler = next(sampler);
-                }
-
-                return _sampler = sampler;
-            }
-
-            while (_sampler == null)
-            {
-            }
-
+    public Sampler Build()
+    {
+        if (_sampler != null)
             return _sampler;
+
+        if (Interlocked.CompareExchange(ref state, 1, 0) == 0)
+        {
+            var samplers = _sampledInterceptors.OrderBy(x => x.Priority).Select(interceptor =>
+                (Func<Sampler, Sampler>) (next => ctx => interceptor.Invoke(ctx, next))).ToList();
+
+            Sampler sampler = _ => true;
+            sampler = samplers.Aggregate(sampler, (current, next) => next(current));
+
+            return _sampler = sampler;
         }
+
+        while (_sampler == null)
+        {
+        }
+
+        return _sampler;
     }
 }

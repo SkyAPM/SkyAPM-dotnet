@@ -1,15 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="..\..\build\common.props" />
-  <PropertyGroup>
-    <TargetFrameworks>netcoreapp3.1;net5.0;net6.0</TargetFrameworks>  </PropertyGroup>
+	<Import Project="..\..\build\common.props" />
+	<PropertyGroup>
+		<TargetFrameworks>net6.0;net7.0</TargetFrameworks>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<LangVersion>preview</LangVersion>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Grpc" Version="2.37.0" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Grpc" Version="2.46.5" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\SkyApm.Abstractions\SkyApm.Abstractions.csproj" />
-    <ProjectReference Include="..\SkyApm.Utilities.DependencyInjection\SkyApm.Utilities.DependencyInjection.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\SkyApm.Abstractions\SkyApm.Abstractions.csproj" />
+		<ProjectReference Include="..\SkyApm.Utilities.DependencyInjection\SkyApm.Utilities.DependencyInjection.csproj" />
+	</ItemGroup>
 
 </Project>

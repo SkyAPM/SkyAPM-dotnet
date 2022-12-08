@@ -18,17 +18,16 @@
 
 using SkyApm.Tracing.Segments;
 
-namespace SkyApm.Tracing
+namespace SkyApm.Tracing;
+
+public interface ITracingContext
 {
-    public interface ITracingContext
-    {
-        SegmentContext CreateEntrySegmentContext(string operationName, ICarrierHeaderCollection carrierHeader, long startTimeMilliseconds = default);
+    SegmentContext CreateEntrySegmentContext(string operationName, ICarrierHeaderCollection carrierHeader, long startTimeMilliseconds = default);
 
-        SegmentContext CreateLocalSegmentContext(string operationName, long startTimeMilliseconds = default);
+    SegmentContext CreateLocalSegmentContext(string operationName, long startTimeMilliseconds = default);
 
-        SegmentContext CreateExitSegmentContext(string operationName, string networkAddress,
-            ICarrierHeaderCollection carrierHeader = default, long startTimeMilliseconds = default);
+    SegmentContext CreateExitSegmentContext(string operationName, string networkAddress,
+        ICarrierHeaderCollection carrierHeader = default, long startTimeMilliseconds = default);
 
-        void Release(SegmentContext segmentContext, long endTimeMilliseconds = default);
-    }
+    void Release(SegmentContext segmentContext, long endTimeMilliseconds = default);
 }

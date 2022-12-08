@@ -16,32 +16,24 @@
  *
  */
 
-using System;
+namespace SkyApm.Diagnostics;
 
-namespace SkyApm.Diagnostics
+public class ObjectAttribute : ParameterBinderAttribute
 {
-    public class ObjectAttribute : ParameterBinderAttribute
+    public Type TargetType { get; set; }
+
+    public override object Resolve(object value)
     {
-        public Type TargetType { get; set; }
-
-        public override object Resolve(object value)
+        if (TargetType == null || value == null)
         {
-            if (TargetType == null || value == null)
-            {
-                return value;
-            }
-
-            if (TargetType == value.GetType())
-            {
-                return value;
-            }
-
-            if (TargetType.IsInstanceOfType(value))
-            {
-                return value;
-            }
-
-            return null;
+            return value;
         }
+
+        if (TargetType == value.GetType())
+        {
+            return value;
+        }
+
+        return TargetType.IsInstanceOfType(value) ? value : null;
     }
 }

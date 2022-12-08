@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿namespace SkyApm.Config; 
 
-namespace SkyApm.Config
+[Config("SkyWalking", "Tracing")]
+public class TracingConfig
 {
-    [Config("SkyWalking", "Tracing")]
-    public class TracingConfig
-    {
-        public int ExceptionMaxDepth { get; set; } = 3;
-    }
+    public int ExceptionMaxDepth { get; set; } = 3;
 }

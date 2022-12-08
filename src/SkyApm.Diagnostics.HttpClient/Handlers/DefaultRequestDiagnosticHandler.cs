@@ -16,11 +16,6 @@
  *
  */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Text;
 using SkyApm.Common;
 using SkyApm.Config;
 using SkyApm.Diagnostics.HttpClient.Config;
@@ -28,91 +23,86 @@ using SkyApm.Diagnostics.HttpClient.Extensions;
 using SkyApm.Diagnostics.HttpClient.Filters;
 using SkyApm.Tracing;
 using SkyApm.Tracing.Segments;
+using System.Text;
 
-namespace SkyApm.Diagnostics.HttpClient.Handlers
+namespace SkyApm.Diagnostics.HttpClient.Handlers;
+
+public class DefaultRequestDiagnosticHandler : IRequestDiagnosticHandler
 {
-    public class DefaultRequestDiagnosticHandler : IRequestDiagnosticHandler
+    private readonly HttpClientDiagnosticConfig _httpClientDiagnosticConfig;
+
+    public DefaultRequestDiagnosticHandler(IConfigAccessor configAccessor)
     {
-        private readonly HttpClientDiagnosticConfig _httpClientDiagnosticConfig;
+        _httpClientDiagnosticConfig = configAccessor.Get<HttpClientDiagnosticConfig>();
+    }
 
-        public DefaultRequestDiagnosticHandler(IConfigAccessor configAccessor)
+    public bool OnlyMatch(HttpRequestMessage request)
+    {
+        return true;
+    }
+
+    public void Handle(ITracingContext tracingContext, HttpRequestMessage request)
+    {
+        var operationName = request.RequestUri?.GetLeftPart(UriPartial.Path);
+
+        var ignored = _httpClientDiagnosticConfig.IgnorePaths is not null && _httpClientDiagnosticConfig.IgnorePaths.Any(pattern => FastPathMatcher.Match(pattern, operationName));
+        if (ignored)
         {
-            _httpClientDiagnosticConfig = configAccessor.Get<HttpClientDiagnosticConfig>();
+            return;
         }
 
-        public bool OnlyMatch(HttpRequestMessage request)
+        var shouldStopPropagation = _httpClientDiagnosticConfig.StopHeaderPropagationPaths is not null && _httpClientDiagnosticConfig.StopHeaderPropagationPaths.Any(pattern => FastPathMatcher.Match(pattern, operationName));
+
+        var context = tracingContext.CreateExitSegmentContext(operationName,
+            $"{request.RequestUri?.Host}:{request.RequestUri?.Port}",
+            shouldStopPropagation ? null : new HttpClientICarrierHeaderCollection(request));
+
+        context.Span.SpanLayer = SpanLayer.HTTP;
+        context.Span.Component = Common.Components.HTTPCLIENT;
+        _ = context.Span.AddTag(Tags.URL, request.RequestUri?.ToString());
+        _ = context.Span.AddTag(Tags.HTTP_METHOD, request.Method.ToString());
+
+        if (_httpClientDiagnosticConfig.CollectRequestHeaders?.Count > 0)
         {
-            return true;
+            var headers = CollectHeaders(request, _httpClientDiagnosticConfig.CollectRequestHeaders);
+            if (!string.IsNullOrEmpty(headers))
+                _ = context.Span.AddTag(Tags.HTTP_HEADERS, headers);
         }
 
-        public void Handle(ITracingContext tracingContext, HttpRequestMessage request)
+        if (request.Content is null || !(_httpClientDiagnosticConfig.CollectRequestBodyContentTypes?.Count > 0))
+            return;
+        var requestBody = request.Content.TryCollectAsString(
+            _httpClientDiagnosticConfig.CollectRequestBodyContentTypes,
+            _httpClientDiagnosticConfig.CollectBodyLengthThreshold);
+        if (!string.IsNullOrEmpty(requestBody))
+            _ = context.Span.AddTag(Tags.HTTP_REQUEST_BODY, requestBody);
+    }
+
+    private string CollectHeaders(HttpRequestMessage request, IEnumerable<string> keys)
+    {
+        var sb = new StringBuilder();
+        foreach (var key in keys)
         {
-            var operationName = request.RequestUri.GetLeftPart(UriPartial.Path);
+            if (!request.Headers.TryGetValues(key, out var values))
+                continue;
 
-            var ignored = _httpClientDiagnosticConfig.IgnorePaths != null
-                && _httpClientDiagnosticConfig.IgnorePaths
-                    .Any(pattern => FastPathMatcher.Match(pattern, operationName));
-            if (ignored)
+            if (sb.Length > 0)
+                _ = sb.Append('\n');
+
+            _ = sb.Append(key);
+            _ = sb.Append(": ");
+
+            var isFirstValue = true;
+            foreach (var value in values)
             {
-                return;
-            }
+                if (isFirstValue)
+                    isFirstValue = false;
+                else
+                    _ = sb.Append(',');
 
-            var shouldStopPropagation = _httpClientDiagnosticConfig.StopHeaderPropagationPaths != null
-                && _httpClientDiagnosticConfig.StopHeaderPropagationPaths
-                    .Any(pattern => FastPathMatcher.Match(pattern, operationName));
-
-            var context = tracingContext.CreateExitSegmentContext(operationName,
-                $"{request.RequestUri.Host}:{request.RequestUri.Port}",
-                shouldStopPropagation ? null : new HttpClientICarrierHeaderCollection(request));
-
-            context.Span.SpanLayer = SpanLayer.HTTP;
-            context.Span.Component = Common.Components.HTTPCLIENT;
-            context.Span.AddTag(Tags.URL, request.RequestUri.ToString());
-            context.Span.AddTag(Tags.HTTP_METHOD, request.Method.ToString());
-
-            if(_httpClientDiagnosticConfig.CollectRequestHeaders?.Count > 0)
-            {
-                var headers = CollectHeaders(request, _httpClientDiagnosticConfig.CollectRequestHeaders);
-                if(!string.IsNullOrEmpty(headers))
-                    context.Span.AddTag(Tags.HTTP_HEADERS, headers);
-            }
-
-            if(request.Content != null && _httpClientDiagnosticConfig.CollectRequestBodyContentTypes?.Count > 0)
-            {
-                var requestBody = request.Content.TryCollectAsString(
-                    _httpClientDiagnosticConfig.CollectRequestBodyContentTypes,
-                    _httpClientDiagnosticConfig.CollectBodyLengthThreshold);
-                if (!string.IsNullOrEmpty(requestBody))
-                    context.Span.AddTag(Tags.HTTP_REQUEST_BODY, requestBody);
+                _ = sb.Append(value);
             }
         }
-
-        private string CollectHeaders(HttpRequestMessage request, IEnumerable<string> keys)
-        {
-            var sb = new StringBuilder();
-            foreach (var key in keys)
-            {
-                if (!request.Headers.TryGetValues(key, out var values))
-                    continue;
-
-                if (sb.Length > 0)
-                    sb.Append('\n');
-
-                sb.Append(key);
-                sb.Append(": ");
-
-                var isFirstValue = true;
-                foreach (var value in values)
-                {
-                    if (isFirstValue)
-                        isFirstValue = false;
-                    else
-                        sb.Append(',');
-
-                    sb.Append(value);
-                }
-            }
-            return sb.ToString();
-        }
+        return sb.ToString();
     }
 }

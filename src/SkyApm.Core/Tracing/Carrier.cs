@@ -18,42 +18,41 @@
 
 using SkyApm.Common;
 
-namespace SkyApm.Tracing
+namespace SkyApm.Tracing;
+
+public class Carrier : ICarrier
 {
-    public class Carrier : ICarrier
+    public bool HasValue { get; } = true;
+        
+    public bool? Sampled { get; set; }
+        
+    public string TraceId { get; }
+        
+    public string ParentSegmentId { get; }
+        
+    public int ParentSpanId { get; }
+
+    public string ParentServiceId { get; }
+
+    public string ParentServiceInstanceId { get; }
+        
+    public string EntryServiceInstanceId { get; }
+        
+    public StringOrIntValue NetworkAddress { get; set; }
+        
+    public StringOrIntValue EntryEndpoint { get; set; }
+        
+    public StringOrIntValue ParentEndpoint { get; set; }
+
+
+    public Carrier(string traceId, string parentSegmentId, int parentSpanId, string parentServiceInstanceId,
+        string entryServiceInstanceId, string parentServiceId = default)
     {
-        public bool HasValue { get; } = true;
-        
-        public bool? Sampled { get; set; }
-        
-        public string TraceId { get; }
-        
-        public string ParentSegmentId { get; }
-        
-        public int ParentSpanId { get; }
-
-        public string ParentServiceId { get; }
-
-        public string ParentServiceInstanceId { get; }
-        
-        public string EntryServiceInstanceId { get; }
-        
-        public StringOrIntValue NetworkAddress { get; set; }
-        
-        public StringOrIntValue EntryEndpoint { get; set; }
-        
-        public StringOrIntValue ParentEndpoint { get; set; }
-
-
-        public Carrier(string traceId, string parentSegmentId, int parentSpanId, string parentServiceInstanceId,
-            string entryServiceInstanceId, string parentServiceId = default)
-        {
-            TraceId = traceId;
-            ParentSegmentId = parentSegmentId;
-            ParentSpanId = parentSpanId;
-            ParentServiceInstanceId = parentServiceInstanceId;
-            EntryServiceInstanceId = entryServiceInstanceId;
-            ParentServiceId = parentServiceId;
-        }
+        TraceId = traceId;
+        ParentSegmentId = parentSegmentId;
+        ParentSpanId = parentSpanId;
+        ParentServiceInstanceId = parentServiceInstanceId;
+        EntryServiceInstanceId = entryServiceInstanceId;
+        ParentServiceId = parentServiceId;
     }
 }

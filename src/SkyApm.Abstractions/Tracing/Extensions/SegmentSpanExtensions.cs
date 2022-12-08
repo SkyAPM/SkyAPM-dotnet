@@ -16,47 +16,45 @@
  *
  */
 
-using System;
-using SkyApm.Tracing.Segments;
 using SkyApm.Common;
 using SkyApm.Config;
+using SkyApm.Tracing.Segments;
 
-namespace SkyApm.Tracing
+namespace SkyApm.Tracing;
+
+public static class SegmentSpanExtensions
 {
-    public static class SegmentSpanExtensions
+    [Obsolete("Use the overload method with the TracingConfig parameter, if pass in the exception")]
+    public static void ErrorOccurred(this SegmentSpan span, Exception exception = null)
     {
-        [Obsolete("Use the overload method with the TracingConfig parameter, if pass in the exception")]
-        public static void ErrorOccurred(this SegmentSpan span, Exception exception = null)
-        {
-            span.ErrorOccurred(exception, null);
-        }
+        span.ErrorOccurred(exception, null);
+    }
 
-        public static void ErrorOccurred(this SegmentSpan span)
-        {
-            if (span == null)
-                return;
+    public static void ErrorOccurred(this SegmentSpan span)
+    {
+        if (span == null)
+            return;
 
-            span.IsError = true;
-        }
+        span.IsError = true;
+    }
 
-        public static void ErrorOccurred(this SegmentSpan span, Exception exception, TracingConfig tracingConfig)
-        {
-            if (span == null)
-                return;
+    public static void ErrorOccurred(this SegmentSpan span, Exception exception, TracingConfig tracingConfig)
+    {
+        if (span == null)
+            return;
 
-            span.IsError = true;
+        span.IsError = true;
 
-            if (exception == null)
-                return;
+        if (exception == null)
+            return;
 
-            if (tracingConfig == null)
-                tracingConfig = new TracingConfig();
+        if (tracingConfig == null)
+            tracingConfig = new();
 
-            var stackTrace = exception.HasInnerExceptions() ? exception.ToDemystifiedString(tracingConfig.ExceptionMaxDepth) : exception.StackTrace;
-            span.AddLog(LogEvent.Event("error"),
-                LogEvent.ErrorKind(exception.GetType().FullName),
-                LogEvent.Message(exception.Message),
-                LogEvent.ErrorStack(stackTrace));
-        }
+        var stackTrace = exception.HasInnerExceptions() ? exception.ToDemystifiedString(tracingConfig.ExceptionMaxDepth) : exception.StackTrace;
+        span.AddLog(LogEvent.Event("error"),
+            LogEvent.ErrorKind(exception.GetType().FullName),
+            LogEvent.Message(exception.Message),
+            LogEvent.ErrorStack(stackTrace));
     }
 }

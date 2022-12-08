@@ -16,23 +16,20 @@
  *
  */
 
-using System.Collections.Generic;
+namespace SkyApm.Transport;
 
-namespace SkyApm.Transport
+public class LoggerRequest
 {
-    public class LoggerRequest
-    {
-        public Dictionary<string, object> Logs { get; set; }
+    public Dictionary<string, object> Logs { get; set; }
 
-        public LoggerSegmentReference SegmentReference { get; set; }
+    public LoggerSegmentReference SegmentReference { get; set; }
 
-        public long Date { get; set; }
-    }
+    public long Date { get; set; }
+}
     
-    public class LoggerSegmentReference
-    {
-        public string SegmentId { get; set; }
+public class LoggerSegmentReference
+{
+    public string SegmentId { get; set; }
 
-        public string TraceId { get; set; }
-    }
+    public string TraceId { get; set; }
 }

@@ -16,95 +16,91 @@
  *
  */
 
-using System;
-using System.Diagnostics;
-using System.Threading;
-using System.Threading.Tasks;
 using SkyApm.Common;
 using SkyApm.Config;
 using SkyApm.Logging;
 using SkyApm.Transport;
+using System.Diagnostics;
 
-namespace SkyApm.Service
+namespace SkyApm.Service;
+
+public class RegisterService : ExecutionService
 {
-    public class RegisterService : ExecutionService
+    private readonly InstrumentConfig _config;
+    private readonly IServiceRegister _serviceRegister;
+    private readonly TransportConfig _transportConfig;
+
+    public RegisterService(IConfigAccessor configAccessor, IServiceRegister serviceRegister,
+        IRuntimeEnvironment runtimeEnvironment, ILoggerFactory loggerFactory) : base(runtimeEnvironment,
+        loggerFactory)
     {
-        private readonly InstrumentConfig _config;
-        private readonly IServiceRegister _serviceRegister;
-        private readonly TransportConfig _transportConfig;
+        _serviceRegister = serviceRegister;
+        _config = configAccessor.Get<InstrumentConfig>();
+        _transportConfig = configAccessor.Get<TransportConfig>();
+    }
 
-        public RegisterService(IConfigAccessor configAccessor, IServiceRegister serviceRegister,
-            IRuntimeEnvironment runtimeEnvironment, ILoggerFactory loggerFactory) : base(runtimeEnvironment,
-            loggerFactory)
+    protected override TimeSpan DueTime { get; } = TimeSpan.Zero;
+
+    protected override TimeSpan Period { get; } = TimeSpan.FromSeconds(30);
+
+    protected override bool CanExecute() => !RuntimeEnvironment.Initialized;
+
+    protected override async Task ExecuteAsync(CancellationToken cancellationToken)
+    {
+        await ReportServiceInstancePropertiesAsync(cancellationToken);
+    }
+
+    private async Task ReportServiceInstancePropertiesAsync(CancellationToken cancellationToken)
+    {
+        var properties = new AgentOsInfoRequest
         {
-            _serviceRegister = serviceRegister;
-            _config = configAccessor.Get<InstrumentConfig>();
-            _transportConfig = configAccessor.Get<TransportConfig>();
+            HostName = DnsHelpers.GetHostName(),
+            IpAddress = DnsHelpers.GetIpV4s(),
+            OsName = PlatformInformation.GetOSName(),
+            ProcessNo = Process.GetCurrentProcess().Id,
+            Language = "dotnet"
+        };
+        var request = new ServiceInstancePropertiesRequest
+        {
+            ServiceId = _config.ServiceName,
+            ServiceInstanceId = _config.ServiceInstanceName,
+            Properties = properties
+        };
+        var result = await Polling(3,
+            () => _serviceRegister.ReportInstancePropertiesAsync(request, cancellationToken),
+            cancellationToken);
+        if (result && RuntimeEnvironment is RuntimeEnvironment environment)
+        {
+            environment.Initialized = true;
+            Logger.Information($"Reported Service Instance Properties[Service={request.ServiceId},InstanceId={request.ServiceInstanceId}].");
         }
+    }
 
-        protected override TimeSpan DueTime { get; } = TimeSpan.Zero;
+    private static async Task<NullableValue> Polling(int retry, Func<Task<NullableValue>> execute, CancellationToken cancellationToken)
+    {
+        return await Polling(retry, execute, result => result.HasValue, NullableValue.Null, cancellationToken);
+    }
 
-        protected override TimeSpan Period { get; } = TimeSpan.FromSeconds(30);
+    private static async Task<bool> Polling(int retry, Func<Task<bool>> execute, CancellationToken cancellationToken)
+    {
+        return await Polling(retry, execute, result => result, false, cancellationToken);
+    }
 
-        protected override bool CanExecute() => !RuntimeEnvironment.Initialized;
-
-        protected override async Task ExecuteAsync(CancellationToken cancellationToken)
+    private static async Task<T> Polling<T>(int retry, Func<Task<T>> execute, Func<T,bool> successPredicate, T failureResult,
+        CancellationToken cancellationToken)
+    {
+        var index = 0;
+        while (index++ < retry)
         {
-            await ReportServiceInstancePropertiesAsync(cancellationToken);
-        }
-
-        private async Task ReportServiceInstancePropertiesAsync(CancellationToken cancellationToken)
-        {
-            var properties = new AgentOsInfoRequest
+            var value = await execute();
+            if (successPredicate(value))
             {
-                HostName = DnsHelpers.GetHostName(),
-                IpAddress = DnsHelpers.GetIpV4s(),
-                OsName = PlatformInformation.GetOSName(),
-                ProcessNo = Process.GetCurrentProcess().Id,
-                Language = "dotnet"
-            };
-            var request = new ServiceInstancePropertiesRequest
-            {
-                ServiceId = _config.ServiceName,
-                ServiceInstanceId = _config.ServiceInstanceName,
-                Properties = properties
-            };
-            var result = await Polling(3,
-                    () => _serviceRegister.ReportInstancePropertiesAsync(request, cancellationToken),
-                    cancellationToken);
-            if (result && RuntimeEnvironment is RuntimeEnvironment environment)
-            {
-                environment.Initialized = true;
-                Logger.Information($"Reported Service Instance Properties[Service={request.ServiceId},InstanceId={request.ServiceInstanceId}].");
-            }
-        }
-
-        private static async Task<NullableValue> Polling(int retry, Func<Task<NullableValue>> execute, CancellationToken cancellationToken)
-        {
-            return await Polling(retry, execute, result => result.HasValue, NullableValue.Null, cancellationToken);
-        }
-
-        private static async Task<bool> Polling(int retry, Func<Task<bool>> execute, CancellationToken cancellationToken)
-        {
-            return await Polling(retry, execute, result => result, false, cancellationToken);
-        }
-
-        private static async Task<T> Polling<T>(int retry, Func<Task<T>> execute, Func<T,bool> successPredicate, T failureResult,
-            CancellationToken cancellationToken)
-        {
-            var index = 0;
-            while (index++ < retry)
-            {
-                var value = await execute();
-                if (successPredicate(value))
-                {
-                    return value;
-                }
-
-                await Task.Delay(500, cancellationToken);
+                return value;
             }
 
-            return failureResult;
+            await Task.Delay(500, cancellationToken);
         }
+
+        return failureResult;
     }
 }

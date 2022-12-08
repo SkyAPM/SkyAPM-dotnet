@@ -16,18 +16,14 @@
  *
  */
 
-using System.Threading;
-using System.Threading.Tasks;
+namespace SkyApm.Transport;
 
-namespace SkyApm.Transport
+public interface ISkyApmLogDispatcher
 {
-    public interface ISkyApmLogDispatcher
-    {
-        bool Dispatch(LoggerRequest loggerRequest);
+    bool Dispatch(LoggerRequest loggerRequest);
 
-        Task Flush(CancellationToken token = default(CancellationToken));
+    Task Flush(CancellationToken token = default);
 
-        void Close();
+    void Close();
 
-    }
 }

@@ -18,13 +18,12 @@
 
 using Microsoft.Extensions.DependencyInjection;
 
-namespace SkyApm.Utilities.DependencyInjection
+namespace SkyApm.Utilities.DependencyInjection;
+
+public static class ServiceCollectionExtensions
 {
-    public static class ServiceCollectionExtensions
+    public static SkyApmExtensions AddSkyApmExtensions(this IServiceCollection services)
     {
-        public static SkyApmExtensions AddSkyApmExtensions(this IServiceCollection services)
-        {
-            return new SkyApmExtensions(services);
-        }
+        return new(services);
     }
 }

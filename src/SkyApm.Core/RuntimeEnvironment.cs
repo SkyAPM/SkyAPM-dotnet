@@ -16,17 +16,13 @@
  *
  */
 
-using System;
-using SkyApm.Common;
+namespace SkyApm;
 
-namespace SkyApm
+public class RuntimeEnvironment : IRuntimeEnvironment
 {
-    public class RuntimeEnvironment : IRuntimeEnvironment
-    {
-        public static IRuntimeEnvironment Instance { get; } = new RuntimeEnvironment();
+    public static IRuntimeEnvironment Instance { get; } = new RuntimeEnvironment();
 
-        public bool Initialized {get; internal set; }
+    public bool Initialized {get; internal set; }
 
-        public IEnvironmentProvider Environment { get; set; }
-    }
+    public IEnvironmentProvider Environment { get; set; }
 }

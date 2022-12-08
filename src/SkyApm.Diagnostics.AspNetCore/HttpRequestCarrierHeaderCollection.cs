@@ -16,43 +16,38 @@
  *
  */
 
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using Microsoft.AspNetCore.Http;
 using SkyApm.Tracing;
+using System.Collections;
 
-namespace SkyApm.AspNetCore.Diagnostics
+namespace SkyApm.AspNetCore.Diagnostics;
+
+public class HttpRequestCarrierHeaderCollection : ICarrierHeaderDictionary
 {
-    public class HttpRequestCarrierHeaderCollection : ICarrierHeaderDictionary
+    private readonly IHeaderDictionary _headers;
+
+    public HttpRequestCarrierHeaderCollection(HttpRequest httpRequest)
     {
-        private readonly IHeaderDictionary _headers;
+        _headers = httpRequest.Headers;
+    }
 
-        public HttpRequestCarrierHeaderCollection(HttpRequest httpRequest)
-        {
-            _headers = httpRequest.Headers;
-        }
+    public IEnumerator<KeyValuePair<string, string>> GetEnumerator()
+    {
+        return _headers.Select(x => new KeyValuePair<string, string>(x.Key, x.Value)).GetEnumerator();
+    }
 
-        public IEnumerator<KeyValuePair<string, string>> GetEnumerator()
-        {
-            return _headers.Select(x => new KeyValuePair<string, string>(x.Key, x.Value)).GetEnumerator();
-        }
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
+    }
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
-        
-        public void Add(string key, string value)
-        {
-            throw new System.NotImplementedException();
-        }
+    public void Add(string key, string value)
+    {
+        throw new NotImplementedException();
+    }
 
-        public string Get(string key)
-        {
-            if (_headers.TryGetValue(key, out var value))
-                return value;
-            return null;
-        }
+    public string Get(string key)
+    {
+        return _headers.TryGetValue(key, out var value) ? value : string.Empty;
     }
 }

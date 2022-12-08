@@ -17,55 +17,50 @@
  */
 
 using SkyApm.Config;
-using System;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading;
 
-namespace SkyApm.Tracing
+namespace SkyApm.Tracing;
+
+public class UniqueIdGenerator : IUniqueIdGenerator
 {
-    public class UniqueIdGenerator : IUniqueIdGenerator
+    private readonly ThreadLocal<long> sequence = new(() => 0);
+    private readonly InstrumentConfig _instrumentConfig;
+    private readonly string _instanceIdentity;
+
+    public UniqueIdGenerator(IConfigAccessor configAccessor)
     {
-        private readonly ThreadLocal<long> sequence = new ThreadLocal<long>(() => 0);
-        private readonly InstrumentConfig _instrumentConfig;
-        private readonly string _instanceIdentity;
+        _instrumentConfig = configAccessor.Get<InstrumentConfig>();
+        _instanceIdentity = GetMD5(_instrumentConfig.ServiceInstanceName);
+    }
 
-        public UniqueIdGenerator(IConfigAccessor configAccessor)
+    public string Generate()
+    {
+        var part1 = _instanceIdentity;
+        var part2 = Thread.CurrentThread.ManagedThreadId;
+        var part3 = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() * 10000 + GetSequence();
+        return $"{part1}.{part2}.{part3}";
+    }
+
+    private static string GetMD5(string data)
+    {
+        using var md5 = new MD5CryptoServiceProvider();
+        var hash = md5.ComputeHash(Encoding.UTF8.GetBytes(data));
+        var sb = new StringBuilder(32);
+        foreach (var item in hash)
         {
-            _instrumentConfig = configAccessor.Get<InstrumentConfig>();
-            _instanceIdentity = GetMD5(_instrumentConfig.ServiceInstanceName);
+            sb.Append(item.ToString("x2"));
+        }
+        return sb.ToString();
+    }
+
+    private long GetSequence()
+    {
+        if (sequence.Value++ >= 9999)
+        {
+            sequence.Value = 0;
         }
 
-        public string Generate()
-        {
-            var part1 = _instanceIdentity;
-            var part2 = Thread.CurrentThread.ManagedThreadId;
-            var part3 = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() * 10000 + GetSequence();
-            return $"{part1}.{part2}.{part3}";
-        }
-
-        private string GetMD5(string data)
-        {
-            using (var md5 = new MD5CryptoServiceProvider())
-            {
-                var hash = md5.ComputeHash(Encoding.UTF8.GetBytes(data));
-                var sb = new StringBuilder(32);
-                foreach (var item in hash)
-                {
-                    sb.Append(item.ToString("x2"));
-                }
-                return sb.ToString();
-            }
-        }
-
-        private long GetSequence()
-        {
-            if (sequence.Value++ >= 9999)
-            {
-                sequence.Value = 0;
-            }
-
-            return sequence.Value;
-        }
+        return sequence.Value;
     }
 }

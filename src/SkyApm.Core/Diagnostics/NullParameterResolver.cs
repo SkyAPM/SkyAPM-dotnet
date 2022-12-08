@@ -16,13 +16,12 @@
  *
  */
 
-namespace SkyApm.Diagnostics
+namespace SkyApm.Diagnostics;
+
+public class NullParameterResolver : IParameterResolver
 {
-    public class NullParameterResolver : IParameterResolver
+    public object Resolve(object value)
     {
-        public object Resolve(object value)
-        {
-            return null;
-        }
+        return null;
     }
 }

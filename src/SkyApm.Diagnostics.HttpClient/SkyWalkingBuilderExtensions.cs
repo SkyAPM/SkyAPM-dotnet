@@ -16,27 +16,25 @@
  *
  */
 
-using System;
 using Microsoft.Extensions.DependencyInjection;
 using SkyApm.Diagnostics.HttpClient.Filters;
 using SkyApm.Diagnostics.HttpClient.Handlers;
 using SkyApm.Utilities.DependencyInjection;
 
-namespace SkyApm.Diagnostics.HttpClient
-{
-    public static class SkyWalkingBuilderExtensions
-    {
-        public static SkyApmExtensions AddHttpClient(this SkyApmExtensions extensions)
-        {
-            if (extensions == null)
-            {
-                throw new ArgumentNullException(nameof(extensions));
-            }
+namespace SkyApm.Diagnostics.HttpClient;
 
-            extensions.Services.AddSingleton<ITracingDiagnosticProcessor, HttpClientTracingDiagnosticProcessor>();
-            extensions.Services.AddSingleton<IRequestDiagnosticHandler, DefaultRequestDiagnosticHandler>();
-            extensions.Services.AddSingleton<IRequestDiagnosticHandler, GrpcRequestDiagnosticHandler>();
-            return extensions;
+public static class SkyWalkingBuilderExtensions
+{
+    public static SkyApmExtensions AddHttpClient(this SkyApmExtensions extensions)
+    {
+        if (extensions == null)
+        {
+            throw new ArgumentNullException(nameof(extensions));
         }
+
+        _ = extensions.Services.AddSingleton<ITracingDiagnosticProcessor, HttpClientTracingDiagnosticProcessor>();
+        _ = extensions.Services.AddSingleton<IRequestDiagnosticHandler, DefaultRequestDiagnosticHandler>();
+        _ = extensions.Services.AddSingleton<IRequestDiagnosticHandler, GrpcRequestDiagnosticHandler>();
+        return extensions;
     }
 }

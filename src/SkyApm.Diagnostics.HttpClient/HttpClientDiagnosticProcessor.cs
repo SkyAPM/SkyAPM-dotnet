@@ -16,10 +16,6 @@
  *
  */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
 using SkyApm.Common;
 using SkyApm.Config;
 using SkyApm.Diagnostics.HttpClient.Config;
@@ -27,85 +23,82 @@ using SkyApm.Diagnostics.HttpClient.Extensions;
 using SkyApm.Diagnostics.HttpClient.Filters;
 using SkyApm.Tracing;
 
-namespace SkyApm.Diagnostics.HttpClient
+namespace SkyApm.Diagnostics.HttpClient;
+
+public class HttpClientTracingDiagnosticProcessor : ITracingDiagnosticProcessor
 {
-    public class HttpClientTracingDiagnosticProcessor : ITracingDiagnosticProcessor
+    public string ListenerName { get; } = "HttpHandlerDiagnosticListener";
+
+    //private readonly IContextCarrierFactory _contextCarrierFactory;
+    private readonly ITracingContext _tracingContext;
+
+    private readonly IExitSegmentContextAccessor _contextAccessor;
+
+    private readonly IEnumerable<IRequestDiagnosticHandler> _requestDiagnosticHandlers;
+
+    private readonly TracingConfig _tracingConfig;
+
+    private readonly HttpClientDiagnosticConfig _httpClientDiagnosticConfig;
+
+    public HttpClientTracingDiagnosticProcessor(ITracingContext tracingContext,
+        IExitSegmentContextAccessor contextAccessor,
+        IEnumerable<IRequestDiagnosticHandler> requestDiagnosticHandlers,
+        IConfigAccessor configAccessor)
     {
-        public string ListenerName { get; } = "HttpHandlerDiagnosticListener";
+        _tracingContext = tracingContext;
+        _contextAccessor = contextAccessor;
+        _requestDiagnosticHandlers = requestDiagnosticHandlers.Reverse();
+        _tracingConfig = configAccessor.Get<TracingConfig>();
+        _httpClientDiagnosticConfig = configAccessor.Get<HttpClientDiagnosticConfig>();
+    }
 
-        //private readonly IContextCarrierFactory _contextCarrierFactory;
-        private readonly ITracingContext _tracingContext;
-
-        private readonly IExitSegmentContextAccessor _contextAccessor;
-
-        private readonly IEnumerable<IRequestDiagnosticHandler> _requestDiagnosticHandlers;
-
-        private readonly TracingConfig _tracingConfig;
-
-        private readonly HttpClientDiagnosticConfig _httpClientDiagnosticConfig;
-
-        public HttpClientTracingDiagnosticProcessor(ITracingContext tracingContext,
-            IExitSegmentContextAccessor contextAccessor,
-            IEnumerable<IRequestDiagnosticHandler> requestDiagnosticHandlers,
-            IConfigAccessor configAccessor)
+    [DiagnosticName("System.Net.Http.Request")]
+    public void HttpRequest([Property(Name = "Request")] HttpRequestMessage request)
+    {
+        foreach (var handler in _requestDiagnosticHandlers)
         {
-            _tracingContext = tracingContext;
-            _contextAccessor = contextAccessor;
-            _requestDiagnosticHandlers = requestDiagnosticHandlers.Reverse();
-            _tracingConfig = configAccessor.Get<TracingConfig>();
-            _httpClientDiagnosticConfig = configAccessor.Get<HttpClientDiagnosticConfig>();
+            if (!handler.OnlyMatch(request)) continue;
+            handler.Handle(_tracingContext, request);
+            return;
+        }
+    }
+
+    [DiagnosticName("System.Net.Http.Response")]
+    public void HttpResponse([Property(Name = "Response")] HttpResponseMessage response)
+    {
+        var context = _contextAccessor.Context;
+        if (context == null)
+        {
+            return;
         }
 
-        [DiagnosticName("System.Net.Http.Request")]
-        public void HttpRequest([Property(Name = "Request")] HttpRequestMessage request)
+        if (response != null)
         {
-            foreach (var handler in _requestDiagnosticHandlers)
+            var statusCode = (int)response.StatusCode;
+            if (statusCode >= 400)
             {
-                if (handler.OnlyMatch(request))
-                {
-                    handler.Handle(_tracingContext, request);
-                    return;
-                }
+                context.Span.ErrorOccurred();
+            }
+
+            _ = context.Span.AddTag(Tags.STATUS_CODE, statusCode);
+
+            if (_httpClientDiagnosticConfig.CollectResponseBodyContentTypes?.Count > 0)
+            {
+                var responseBody = response.Content.TryCollectAsString(
+                    _httpClientDiagnosticConfig.CollectResponseBodyContentTypes,
+                    _httpClientDiagnosticConfig.CollectBodyLengthThreshold);
+                if (!string.IsNullOrEmpty(responseBody))
+                    _ = context.Span.AddTag(Tags.HTTP_RESPONSE_BODY, responseBody);
             }
         }
 
-        [DiagnosticName("System.Net.Http.Response")]
-        public void HttpResponse([Property(Name = "Response")] HttpResponseMessage response)
-        {
-            var context = _contextAccessor.Context;
-            if (context == null)
-            {
-                return;
-            }
+        _tracingContext.Release(context);
+    }
 
-            if (response != null)
-            {
-                var statusCode = (int)response.StatusCode;
-                if (statusCode >= 400)
-                {
-                    context.Span.ErrorOccurred();
-                }
-
-                context.Span.AddTag(Tags.STATUS_CODE, statusCode);
-
-                if(response.Content != null && _httpClientDiagnosticConfig.CollectResponseBodyContentTypes?.Count > 0)
-                {
-                    var responseBody = response.Content.TryCollectAsString(
-                        _httpClientDiagnosticConfig.CollectResponseBodyContentTypes,
-                        _httpClientDiagnosticConfig.CollectBodyLengthThreshold);
-                    if (!string.IsNullOrEmpty(responseBody))
-                        context.Span.AddTag(Tags.HTTP_RESPONSE_BODY, responseBody);
-                }
-            }
-
-            _tracingContext.Release(context);
-        }
-
-        [DiagnosticName("System.Net.Http.Exception")]
-        public void HttpException([Property(Name = "Request")] HttpRequestMessage request,
-            [Property(Name = "Exception")] Exception exception)
-        {
-            _contextAccessor.Context?.Span?.ErrorOccurred(exception, _tracingConfig);
-        }
+    [DiagnosticName("System.Net.Http.Exception")]
+    public void HttpException([Property(Name = "Request")] HttpRequestMessage request,
+        [Property(Name = "Exception")] Exception exception)
+    {
+        _contextAccessor.Context?.Span?.ErrorOccurred(exception, _tracingConfig);
     }
 }

@@ -16,46 +16,40 @@
  *
  */
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using SkyApm.Diagnostics;
 using SkyApm.Logging;
+using System.Diagnostics;
 
-namespace SkyApm
+namespace SkyApm;
+
+public class InstrumentStartup : IInstrumentStartup
 {
-    public class InstrumentStartup : IInstrumentStartup
+    private readonly TracingDiagnosticProcessorObserver _observer;
+    private readonly IEnumerable<IExecutionService> _services;
+    private readonly ILogger _logger;
+
+    public InstrumentStartup(TracingDiagnosticProcessorObserver observer, IEnumerable<IExecutionService> services, ILoggerFactory loggerFactory)
     {
-        private readonly TracingDiagnosticProcessorObserver _observer;
-        private readonly IEnumerable<IExecutionService> _services;
-        private readonly ILogger _logger;
+        _observer = observer;
+        _services = services;
+        _logger = loggerFactory.CreateLogger(typeof(InstrumentStartup));
+    }
 
-        public InstrumentStartup(TracingDiagnosticProcessorObserver observer, IEnumerable<IExecutionService> services, ILoggerFactory loggerFactory)
-        {
-            _observer = observer;
-            _services = services;
-            _logger = loggerFactory.CreateLogger(typeof(InstrumentStartup));
-        }
+    public async Task StartAsync(CancellationToken cancellationToken = default(CancellationToken))
+    {
+        _logger.Information("Initializing ...");
+        foreach (var service in _services)
+            await service.StartAsync(cancellationToken);
+        DiagnosticListener.AllListeners.Subscribe(_observer);
+        _logger.Information("Started SkyAPM .NET Core Agent.");
+    }
 
-        public async Task StartAsync(CancellationToken cancellationToken = default(CancellationToken))
-        {
-            _logger.Information("Initializing ...");
-            foreach (var service in _services)
-                await service.StartAsync(cancellationToken);
-            DiagnosticListener.AllListeners.Subscribe(_observer);
-            _logger.Information("Started SkyAPM .NET Core Agent.");
-        }
-
-        public async Task StopAsync(CancellationToken cancellationToken = default(CancellationToken))
-        {
-            foreach (var service in _services)
-                await service.StopAsync(cancellationToken);
-            _logger.Information("Stopped SkyAPM .NET Core Agent.");
-            // ReSharper disable once MethodSupportsCancellation
-            await Task.Delay(TimeSpan.FromSeconds(2));
-        }
+    public async Task StopAsync(CancellationToken cancellationToken = default(CancellationToken))
+    {
+        foreach (var service in _services)
+            await service.StopAsync(cancellationToken);
+        _logger.Information("Stopped SkyAPM .NET Core Agent.");
+        // ReSharper disable once MethodSupportsCancellation
+        await Task.Delay(TimeSpan.FromSeconds(2));
     }
 }

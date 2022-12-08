@@ -16,47 +16,41 @@
  *
  */
 
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
 using SkyApm.Tracing;
+using System.Collections;
 
-namespace SkyApm.Diagnostics.HttpClient
+namespace SkyApm.Diagnostics.HttpClient;
+
+public class HttpClientICarrierHeaderCollection : ICarrierHeaderDictionary
 {
-    public class HttpClientICarrierHeaderCollection : ICarrierHeaderDictionary
+    private readonly HttpRequestMessage _request;
+
+    public HttpClientICarrierHeaderCollection(HttpRequestMessage request)
     {
-        private readonly HttpRequestMessage _request;
+        _request = request;
+    }
 
-        public HttpClientICarrierHeaderCollection(HttpRequestMessage request)
+    public void Add(string key, string value)
+    {
+        if (_request.Headers.Contains(key))
         {
-            _request = request;
+            _ = _request.Headers.Remove(key);
         }
+        _request.Headers.Add(key, value);
+    }
 
-        public void Add(string key, string value)
-        {
-            if(_request.Headers.Contains(key))
-            {
-                _request.Headers.Remove(key);
-            }
-            _request.Headers.Add(key, value);
-        }
+    public string Get(string key)
+    {
+        return _request.Headers.TryGetValues(key, out var values) ? values.FirstOrDefault() : null;
+    }
 
-        public string Get(string key)
-        {
-            if (_request.Headers.TryGetValues(key, out var values))
-                return values.FirstOrDefault();
-            return null;
-        }
+    public IEnumerator<KeyValuePair<string, string>> GetEnumerator()
+    {
+        return _request.Headers.Select(x => new KeyValuePair<string, string>(x.Key, x.Value.FirstOrDefault())).GetEnumerator();
+    }
 
-        public IEnumerator<KeyValuePair<string, string>> GetEnumerator()
-        {
-            return _request.Headers.Select(x => new KeyValuePair<string, string>(x.Key, x.Value.FirstOrDefault())).GetEnumerator();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
     }
 }

@@ -16,10 +16,9 @@
  *
  */
 
-namespace SkyApm.Tracing
+namespace SkyApm.Tracing;
+
+public interface IUniqueIdGenerator
 {
-    public interface IUniqueIdGenerator
-    {
-        string Generate();
-    }
+    string Generate();
 }

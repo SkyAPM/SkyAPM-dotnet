@@ -16,12 +16,11 @@
  *
  */
 
-namespace SkyApm.Config
-{
-    public interface IConfigAccessor
-    {
-        T Get<T>() where T : class, new();
+namespace SkyApm.Config; 
 
-        T Value<T>(string key, params string[] sections);
-    }
+public interface IConfigAccessor
+{
+    T Get<T>() where T : class, new();
+
+    T Value<T>(string key, params string[] sections);
 }

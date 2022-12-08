@@ -18,25 +18,24 @@
 
 using SkyApm.Tracing.Segments;
 
-namespace SkyApm.Tracing
-{
-    public class SegmentContextAccessor : ISegmentContextAccessor
-    {
-        private readonly IEntrySegmentContextAccessor _entrySegmentContextAccessor;
-        private readonly ILocalSegmentContextAccessor _localSegmentContextAccessor;
-        private readonly IExitSegmentContextAccessor _exitSegmentContextAccessor;
+namespace SkyApm.Tracing;
 
-        public SegmentContextAccessor(IEntrySegmentContextAccessor entrySegmentContextAccessor,
-            ILocalSegmentContextAccessor localSegmentContextAccessor,
-            IExitSegmentContextAccessor exitSegmentContextAccessor)
-        {
-            _entrySegmentContextAccessor = entrySegmentContextAccessor;
-            _localSegmentContextAccessor = localSegmentContextAccessor;
-            _exitSegmentContextAccessor = exitSegmentContextAccessor;
-        }
-        
-        public SegmentContext Context =>
-            _entrySegmentContextAccessor.Context ??
-            _localSegmentContextAccessor.Context ?? _entrySegmentContextAccessor.Context;
+public class SegmentContextAccessor : ISegmentContextAccessor
+{
+    private readonly IEntrySegmentContextAccessor _entrySegmentContextAccessor;
+    private readonly ILocalSegmentContextAccessor _localSegmentContextAccessor;
+    private readonly IExitSegmentContextAccessor _exitSegmentContextAccessor;
+
+    public SegmentContextAccessor(IEntrySegmentContextAccessor entrySegmentContextAccessor,
+        ILocalSegmentContextAccessor localSegmentContextAccessor,
+        IExitSegmentContextAccessor exitSegmentContextAccessor)
+    {
+        _entrySegmentContextAccessor = entrySegmentContextAccessor;
+        _localSegmentContextAccessor = localSegmentContextAccessor;
+        _exitSegmentContextAccessor = exitSegmentContextAccessor;
     }
+        
+    public SegmentContext Context =>
+        _entrySegmentContextAccessor.Context ??
+        _localSegmentContextAccessor.Context ?? _entrySegmentContextAccessor.Context;
 }

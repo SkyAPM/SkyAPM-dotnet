@@ -16,24 +16,22 @@
  *
  */
 
-using System;
 using Microsoft.Extensions.DependencyInjection;
 using SkyApm.Utilities.DependencyInjection;
 
-namespace SkyApm.Diagnostics.SqlClient
-{
-    public static class SkyWalkingBuilderExtensions
-    {
-        public static SkyApmExtensions AddSqlClient(this SkyApmExtensions extensions)
-        {
-            if (extensions == null)
-            {
-                throw new ArgumentNullException(nameof(extensions));
-            }
+namespace SkyApm.Diagnostics.SqlClient;
 
-            extensions.Services.AddSingleton<ITracingDiagnosticProcessor, SqlClientTracingDiagnosticProcessor>();
-            
-            return extensions;
+public static class SkyWalkingBuilderExtensions
+{
+    public static SkyApmExtensions AddSqlClient(this SkyApmExtensions extensions)
+    {
+        if (extensions == null)
+        {
+            throw new ArgumentNullException(nameof(extensions));
         }
+
+        _ = extensions.Services.AddSingleton<ITracingDiagnosticProcessor, SqlClientTracingDiagnosticProcessor>();
+
+        return extensions;
     }
 }

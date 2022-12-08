@@ -16,10 +16,9 @@
  *
  */
 
-namespace SkyApm
+namespace SkyApm;
+
+public interface IEnvironmentProvider
 {
-    public interface IEnvironmentProvider
-    {
-        string EnvironmentName { get; }
-    }
+    string EnvironmentName { get; }
 }

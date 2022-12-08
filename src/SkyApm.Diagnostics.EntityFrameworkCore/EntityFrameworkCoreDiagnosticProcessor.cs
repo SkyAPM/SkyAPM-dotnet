@@ -43,12 +43,11 @@ namespace SkyApm.Diagnostics.EntityFrameworkCore
         {
             get
             {
-                return _operationNameResolver ??
-                       (_operationNameResolver = (data) =>
-                       {
-                           var commandType = data.Command.CommandText?.Split(' ');
-                           return "DB " + (commandType.FirstOrDefault() ?? data.ExecuteMethod.ToString());
-                       });
+                return _operationNameResolver ??= (data) =>
+                {
+                    var commandType = data.Command.CommandText?.Split(' ');
+                    return "DB " + (commandType.FirstOrDefault() ?? data.ExecuteMethod.ToString());
+                };
             }
             set => _operationNameResolver = value ??
                                             throw new ArgumentNullException(nameof(OperationNameResolver));
@@ -68,10 +67,10 @@ namespace SkyApm.Diagnostics.EntityFrameworkCore
             var operationName = OperationNameResolver(eventData);
             var context = _contextFactory.Create(operationName, eventData.Command);
             context.Span.SpanLayer = Tracing.Segments.SpanLayer.DB;
-            context.Span.AddTag(Common.Tags.DB_TYPE, "Sql");
-            context.Span.AddTag(Common.Tags.DB_INSTANCE, eventData.Command.Connection.Database);
-            context.Span.AddTag(Common.Tags.DB_STATEMENT, eventData.Command.CommandText);
-            context.Span.AddTag(Common.Tags.DB_BIND_VARIABLES, BuildParameterVariables(eventData.Command.Parameters));
+            _ = context.Span.AddTag(Common.Tags.DB_TYPE, "Sql");
+            _ = context.Span.AddTag(Common.Tags.DB_INSTANCE, eventData.Command.Connection?.Database);
+            _ = context.Span.AddTag(Common.Tags.DB_STATEMENT, eventData.Command.CommandText);
+            _ = context.Span.AddTag(Common.Tags.DB_BIND_VARIABLES, BuildParameterVariables(eventData.Command.Parameters));
         }
 
         [DiagnosticName("Microsoft.EntityFrameworkCore.Database.Command.CommandExecuted")]
@@ -92,27 +91,17 @@ namespace SkyApm.Diagnostics.EntityFrameworkCore
         [DiagnosticName("Microsoft.EntityFrameworkCore.Database.Command.CommandError")]
         public void CommandError([Object] CommandErrorEventData eventData)
         {
-            if (eventData == null)
-            {
-                return;
-            }
+            if (eventData is null) return;
 
             var context = _contextFactory.GetCurrentContext(eventData.Command);
-            if (context != null)
-            {
-                context.Span.ErrorOccurred(eventData.Exception, _tracingConfig);
-                _contextFactory.Release(context);
-            }
+            if (context is null) return;
+            context.Span.ErrorOccurred(eventData.Exception, _tracingConfig);
+            _contextFactory.Release(context);
         }
 
         private string BuildParameterVariables(DbParameterCollection dbParameters)
         {
-            if (dbParameters == null)
-            {
-                return string.Empty;
-            }
-
-            return dbParameters.FormatParameters(_logParameterValue);
+            return dbParameters == null ? string.Empty : dbParameters.FormatParameters(_logParameterValue);
         }
     }
 }

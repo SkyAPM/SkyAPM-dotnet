@@ -16,10 +16,9 @@
  *
  */
 
-namespace SkyApm.Config
+namespace SkyApm.Config;
+
+public class LogPushSkywalkingConfig
 {
-    public class LogPushSkywalkingConfig
-    {
-        public bool Enable { get; set; }
-    }
+    public bool Enable { get; set; }
 }

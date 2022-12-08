@@ -16,24 +16,21 @@
  *
  */
 
-using System.Linq;
-using System.Net.Http;
 using SkyApm.Diagnostics.HttpClient.Filters;
 using SkyApm.Tracing;
 
-namespace SkyApm.Diagnostics.HttpClient.Handlers
-{
-    internal class GrpcRequestDiagnosticHandler : IRequestDiagnosticHandler
-    {
-        public bool OnlyMatch(HttpRequestMessage request)
-        {
-            return request.Headers.TryGetValues("User-Agent", out var values) &&
-                   values.Any(x => x.Contains("grpc-dotnet"));
-        }
+namespace SkyApm.Diagnostics.HttpClient.Handlers;
 
-        public void Handle(ITracingContext tracingContext, HttpRequestMessage request)
-        {
-            //has handled in the grpc-dotnet client diagnostics
-        }
+internal class GrpcRequestDiagnosticHandler : IRequestDiagnosticHandler
+{
+    public bool OnlyMatch(HttpRequestMessage request)
+    {
+        return request.Headers.TryGetValues("User-Agent", out var values) &&
+            values.Any(x => x.Contains("grpc-dotnet"));
+    }
+
+    public void Handle(ITracingContext tracingContext, HttpRequestMessage request)
+    {
+        //has handled in the grpc-dotnet client diagnostics
     }
 }

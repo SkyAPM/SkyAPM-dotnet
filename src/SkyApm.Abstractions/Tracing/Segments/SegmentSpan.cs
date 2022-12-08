@@ -16,176 +16,172 @@
  *
  */
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using SkyApm.Common;
+using System.Collections;
 
-namespace SkyApm.Tracing.Segments
+namespace SkyApm.Tracing.Segments;
+
+public class SegmentSpan
 {
-    public class SegmentSpan
+    public int SpanId { get; } = 0;
+
+    public int ParentSpanId { get; } = -1;
+
+    public long StartTime { get; }
+
+    public long EndTime { get; private set; }
+
+    public StringOrIntValue OperationName { get; }
+
+    public StringOrIntValue Peer { get; set; }
+
+    public SpanType SpanType { get; }
+
+    public SpanLayer SpanLayer { get; set; }
+
+    /// <summary>Limiting values. Please see <see cref="Components" /> or see <seealso href="https://github.com/apache/skywalking/blob/master/oap-server/server-bootstrap/src/main/resources/component-libraries.yml"/></summary>
+    public StringOrIntValue Component { get; set; }
+    public bool IsError { get; set; }
+    public TagCollection Tags { get; } = new();
+
+    public LogCollection Logs { get; } = new();
+
+    public SegmentSpan(string operationName, SpanType spanType, long startTimeMilliseconds = default)
     {
-        public int SpanId { get; } = 0;
-
-        public int ParentSpanId { get; } = -1;
-
-        public long StartTime { get; }
-
-        public long EndTime { get; private set; }
-
-        public StringOrIntValue OperationName { get; }
-
-        public StringOrIntValue Peer { get; set; }
-
-        public SpanType SpanType { get; }
-
-        public SpanLayer SpanLayer { get; set; }
-
-        /// <summary>Limiting values. Please see <see cref="Components" /> or see <seealso href="https://github.com/apache/skywalking/blob/master/oap-server/server-bootstrap/src/main/resources/component-libraries.yml"/></summary>
-        public StringOrIntValue Component { get; set; }
-        public bool IsError { get; set; }
-        public TagCollection Tags { get; } = new TagCollection();
-
-        public LogCollection Logs { get; } = new LogCollection();
-
-        public SegmentSpan(string operationName, SpanType spanType, long startTimeMilliseconds = default)
-        {
-            OperationName = new StringOrIntValue(operationName);
-            SpanType = spanType;
-            StartTime = startTimeMilliseconds == default ? DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() : startTimeMilliseconds;
-        }
-
-        public SegmentSpan AddTag(string key, string value)
-        {
-            Tags.AddTag(key, value);
-            return this;
-        }
-
-        public SegmentSpan AddTag(string key, long value)
-        {
-            Tags.AddTag(key, value.ToString());
-            return this;
-        }
-
-        public SegmentSpan AddTag(string key, bool value)
-        {
-            Tags.AddTag(key, value.ToString());
-            return this;
-        }
-
-        public void AddLog(params LogEvent[] events)
-        {
-            var log = new SpanLog(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(), events);
-            Logs.AddLog(log);
-        }
-
-        public void Finish(long endTimeMilliseconds = default)
-        {
-            EndTime = endTimeMilliseconds == default ? DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() : endTimeMilliseconds;
-        }
+        OperationName = new(operationName);
+        SpanType = spanType;
+        StartTime = startTimeMilliseconds == default ? DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() : startTimeMilliseconds;
     }
 
-    public class TagCollection : IEnumerable<KeyValuePair<string, string>>
+    public SegmentSpan AddTag(string key, string value)
     {
-        private readonly Dictionary<string, string> tags = new Dictionary<string, string>();
-
-        internal void AddTag(string key, string value)
-        {
-            tags[key] = value;
-        }
-
-        public IEnumerator<KeyValuePair<string, string>> GetEnumerator()
-        {
-            return tags.GetEnumerator();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return tags.GetEnumerator();
-        }
+        Tags.AddTag(key, value);
+        return this;
     }
 
-    public enum SpanType
+    public SegmentSpan AddTag(string key, long value)
     {
-        Entry = 0,
-        Exit = 1,
-        Local = 2
+        Tags.AddTag(key, value.ToString());
+        return this;
     }
 
-    public enum SpanLayer
+    public SegmentSpan AddTag(string key, bool value)
     {
-        DB = 1,
-        RPC_FRAMEWORK = 2,
-        HTTP = 3,
-        MQ = 4,
-        CACHE = 5
+        Tags.AddTag(key, value.ToString());
+        return this;
     }
 
-    public class LogCollection : IEnumerable<SpanLog>
+    public void AddLog(params LogEvent[] events)
     {
-        private readonly List<SpanLog> _logs = new List<SpanLog>();
-
-        internal void AddLog(SpanLog log)
-        {
-            _logs.Add(log);
-        }
-
-        public IEnumerator<SpanLog> GetEnumerator()
-        {
-            return _logs.GetEnumerator();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return _logs.GetEnumerator();
-        }
+        var log = new SpanLog(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(), events);
+        Logs.AddLog(log);
     }
 
-    public class SpanLog
+    public void Finish(long endTimeMilliseconds = default)
     {
-        private static readonly Dictionary<string, string> Empty = new Dictionary<string, string>();
-        public long Timestamp { get; }
+        EndTime = endTimeMilliseconds == default ? DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() : endTimeMilliseconds;
+    }
+}
 
-        public IReadOnlyDictionary<string, string> Data { get; }
+public class TagCollection : IEnumerable<KeyValuePair<string, string>>
+{
+    private readonly Dictionary<string, string> tags = new();
 
-        public SpanLog(long timestamp, params LogEvent[] events)
-        {
-            Timestamp = timestamp;
-            Data = events?.ToDictionary(x => x.Key, x => x.Value) ?? Empty;
-        }
+    internal void AddTag(string key, string value)
+    {
+        tags[key] = value;
     }
 
-    public class LogEvent
+    public IEnumerator<KeyValuePair<string, string>> GetEnumerator()
     {
-        public string Key { get; }
+        return tags.GetEnumerator();
+    }
 
-        public string Value { get; }
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return tags.GetEnumerator();
+    }
+}
 
-        public LogEvent(string key, string value)
-        {
-            Key = key;
-            Value = value;
-        }
+public enum SpanType
+{
+    Entry = 0,
+    Exit = 1,
+    Local = 2
+}
 
-        public static LogEvent Event(string value)
-        {
-            return new LogEvent("event", value);
-        }
+public enum SpanLayer
+{
+    DB = 1,
+    RPC_FRAMEWORK = 2,
+    HTTP = 3,
+    MQ = 4,
+    CACHE = 5
+}
 
-        public static LogEvent Message(string value)
-        {
-            return new LogEvent("message", value);
-        }
+public class LogCollection : IEnumerable<SpanLog>
+{
+    private readonly List<SpanLog> _logs = new();
 
-        public static LogEvent ErrorKind(string value)
-        {
-            return new LogEvent("error.kind", value);
-        }
+    internal void AddLog(SpanLog log)
+    {
+        _logs.Add(log);
+    }
 
-        public static LogEvent ErrorStack(string value)
-        {
-            return new LogEvent("stack", value);
-        }
+    public IEnumerator<SpanLog> GetEnumerator()
+    {
+        return _logs.GetEnumerator();
+    }
+
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return _logs.GetEnumerator();
+    }
+}
+
+public class SpanLog
+{
+    private static readonly Dictionary<string, string> Empty = new();
+    public long Timestamp { get; }
+
+    public IReadOnlyDictionary<string, string> Data { get; }
+
+    public SpanLog(long timestamp, params LogEvent[] events)
+    {
+        Timestamp = timestamp;
+        Data = events?.ToDictionary(x => x.Key, x => x.Value) ?? Empty;
+    }
+}
+
+public class LogEvent
+{
+    public string Key { get; }
+
+    public string Value { get; }
+
+    public LogEvent(string key, string value)
+    {
+        Key = key;
+        Value = value;
+    }
+
+    public static LogEvent Event(string value)
+    {
+        return new("event", value);
+    }
+
+    public static LogEvent Message(string value)
+    {
+        return new("message", value);
+    }
+
+    public static LogEvent ErrorKind(string value)
+    {
+        return new("error.kind", value);
+    }
+
+    public static LogEvent ErrorStack(string value)
+    {
+        return new("stack", value);
     }
 }

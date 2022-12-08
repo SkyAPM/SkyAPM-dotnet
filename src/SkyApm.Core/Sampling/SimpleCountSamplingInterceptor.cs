@@ -16,53 +16,50 @@
  *
  */
 
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using SkyApm.Common;
 using SkyApm.Config;
 using SkyApm.Logging;
 using SkyApm.Tracing;
 
-namespace SkyApm.Sampling
+namespace SkyApm.Sampling;
+
+public class SimpleCountSamplingInterceptor : ExecutionService, ISamplingInterceptor
 {
-    public class SimpleCountSamplingInterceptor : ExecutionService, ISamplingInterceptor
+    private readonly bool _sample_on;
+    private readonly int _samplePer3Secs;
+    private readonly AtomicInteger _idx = new();
+
+    public SimpleCountSamplingInterceptor(IConfigAccessor configAccessor, IRuntimeEnvironment runtimeEnvironment, ILoggerFactory loggerFactory) :
+        base(runtimeEnvironment, loggerFactory)
     {
-        private readonly bool _sample_on;
-        private readonly int _samplePer3Secs;
-        private readonly AtomicInteger _idx = new AtomicInteger();
+        var samplingConfig = configAccessor.Get<SamplingConfig>();
+        _samplePer3Secs = samplingConfig.SamplePer3Secs;
+        _sample_on = _samplePer3Secs > -1;
+    }
 
-        public SimpleCountSamplingInterceptor(IConfigAccessor configAccessor,IRuntimeEnvironment runtimeEnvironment, ILoggerFactory loggerFactory) :
-            base(runtimeEnvironment, loggerFactory)
-        {
-            var samplingConfig = configAccessor.Get<SamplingConfig>();
-            _samplePer3Secs = samplingConfig.SamplePer3Secs;
-            _sample_on = _samplePer3Secs > -1;
-        }
+    public int Priority { get; } = int.MinValue + 999;
 
-        public int Priority { get; } = int.MinValue + 999;
+    public bool Invoke(SamplingContext samplingContext, Sampler next)
+    {
+        return !_sample_on
+            ? next(samplingContext)
+            : _idx.Increment() <= _samplePer3Secs && next(samplingContext);
+    }
 
-        public bool Invoke(SamplingContext samplingContext, Sampler next)
-        {
-            if (!_sample_on) return next(samplingContext);
-            return _idx.Increment() <= _samplePer3Secs && next(samplingContext);
-        }
+    protected override TimeSpan DueTime { get; } = TimeSpan.Zero;
 
-        protected override TimeSpan DueTime { get; } = TimeSpan.Zero;
+    protected override TimeSpan Period { get; } = TimeSpan.FromSeconds(3);
 
-        protected override TimeSpan Period { get; } = TimeSpan.FromSeconds(3);
+    protected override bool CanExecute() => _sample_on && base.CanExecute();
 
-        protected override bool CanExecute() => _sample_on && base.CanExecute();
+    protected override Task ExecuteAsync(CancellationToken cancellationToken)
+    {
+        Reset();
+        return Task.CompletedTask;
+    }
 
-        protected override Task ExecuteAsync(CancellationToken cancellationToken)
-        {
-            Reset();
-            return Task.CompletedTask;
-        }
-        
-        private void Reset()
-        {
-            _idx.Value = 0;
-        }
+    private void Reset()
+    {
+        _idx.Value = 0;
     }
 }

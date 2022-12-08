@@ -16,47 +16,43 @@
  *
  */
 
-using System.Collections;
-using System.Collections.Generic;
 using DotNetCore.CAP.Messages;
 using SkyApm.Tracing;
+using System.Collections;
 
-namespace SkyApm.Diagnostics.CAP
+namespace SkyApm.Diagnostics.CAP;
+
+public class CapCarrierHeaderCollection : ICarrierHeaderDictionary
 {
-    public class CapCarrierHeaderCollection : ICarrierHeaderDictionary
+    private readonly IDictionary<string, string> _messageHeaders;
+
+    public CapCarrierHeaderCollection(TransportMessage message)
     {
-        private readonly IDictionary<string,string> _messageHeaders;
+        _messageHeaders = message.Headers;
+    }
 
-        public CapCarrierHeaderCollection(TransportMessage message)
-        {
-            _messageHeaders = message.Headers;
-        }
+    public CapCarrierHeaderCollection(Message message)
+    {
+        _messageHeaders = message.Headers;
+    }
 
-        public CapCarrierHeaderCollection(Message message)
-        {
-            _messageHeaders = message.Headers;
-        }
-        
-        public IEnumerator<KeyValuePair<string, string>> GetEnumerator()
-        {
-            return _messageHeaders.GetEnumerator();
-        }
+    public IEnumerator<KeyValuePair<string, string>> GetEnumerator()
+    {
+        return _messageHeaders.GetEnumerator();
+    }
 
-        public void Add(string key, string value)
-        {
-            _messageHeaders.Add(key, value);
-        }
+    public void Add(string key, string value)
+    {
+        _messageHeaders.Add(key, value);
+    }
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
+    }
 
-        public string Get(string key)
-        {
-            if (_messageHeaders.TryGetValue(key, out var value))
-                return value;
-            return null;
-        }
+    public string Get(string key)
+    {
+        return _messageHeaders.TryGetValue(key, out var value) ? value : null;
     }
 }

@@ -16,13 +16,13 @@
  *
  */
 
-namespace SkyApm.Diagnostics
+// ReSharper disable UnusedType.Global
+namespace SkyApm.Diagnostics; 
+
+public class AnonymousObjectAttribute : ParameterBinderAttribute
 {
-    public class AnonymousObjectAttribute : ParameterBinderAttribute
+    public override object Resolve(object value)
     {
-        public override object Resolve(object value)
-        {
-            return value;
-        }
+        return value;
     }
 }

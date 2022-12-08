@@ -18,15 +18,15 @@
 
 using Microsoft.Extensions.DependencyInjection;
 using SkyApm.Utilities.DependencyInjection;
+// ReSharper disable UnusedType.Global
 
-namespace SkyApm.Diagnostics.MongoDB
+namespace SkyApm.Diagnostics.MongoDB;
+
+public static class SkyWalkingBuilderExtensions
 {
-    public static class SkyWalkingBuilderExtensions
+    public static SkyApmExtensions AddMongoDB(this SkyApmExtensions extensions)
     {
-        public static SkyApmExtensions AddMongoDB(this SkyApmExtensions extensions)
-        {              
-            extensions.Services.AddSingleton<ITracingDiagnosticProcessor, MongoDiagnosticsProcessor>();
-            return extensions;
-        }
+        _ = extensions.Services.AddSingleton<ITracingDiagnosticProcessor, MongoDiagnosticsProcessor>();
+        return extensions;
     }
 }

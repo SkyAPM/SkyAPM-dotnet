@@ -19,10 +19,9 @@
 using Microsoft.Extensions.Hosting;
 using SkyApm.Agent.Hosting;
 
-namespace SkyApm.Agent.GeneralHost
+namespace SkyApm.Agent.GeneralHost;
+
+public static class HostBuilderExtensions
 {
-    public static class HostBuilderExtensions
-    {
-        public static IHostBuilder AddSkyAPM(this IHostBuilder builder) => builder.UseSkyAPM();
-    }
+    public static IHostBuilder AddSkyAPM(this IHostBuilder builder) => builder.UseSkyAPM();
 }

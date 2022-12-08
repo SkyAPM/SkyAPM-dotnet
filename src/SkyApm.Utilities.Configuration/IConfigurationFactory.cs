@@ -18,10 +18,9 @@
 
 using Microsoft.Extensions.Configuration;
 
-namespace SkyApm.Utilities.Configuration
+namespace SkyApm.Utilities.Configuration;
+
+public interface IConfigurationFactory
 {
-    public interface IConfigurationFactory
-    {
-        IConfiguration Create();
-    }
+    IConfiguration Create();
 }

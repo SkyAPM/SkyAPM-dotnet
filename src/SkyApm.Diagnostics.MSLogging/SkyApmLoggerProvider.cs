@@ -16,34 +16,31 @@
  *
  */
 
-using System.Collections.Concurrent;
 using Microsoft.Extensions.Logging;
 using SkyApm.Tracing;
 using SkyApm.Transport;
+using System.Collections.Concurrent;
 
-namespace SkyApm.Diagnostics.MSLogging
+namespace SkyApm.Diagnostics.MSLogging;
+
+public class SkyApmLoggerProvider : ILoggerProvider
 {
-    public class SkyApmLoggerProvider : ILoggerProvider
+    private readonly ConcurrentDictionary<string, SkyApmLogger> _doveLoggers = new();
+    private readonly ISkyApmLogDispatcher _skyApmLogDispatcher;
+    private readonly ISegmentContextAccessor _segmentContextAccessor;
+
+    public SkyApmLoggerProvider(ISkyApmLogDispatcher skyApmLogDispatcher, ISegmentContextAccessor segmentContextAccessor)
     {
-        private readonly ConcurrentDictionary<string, SkyApmLogger> _doveLoggers = new ConcurrentDictionary<string, SkyApmLogger>();
-        private readonly ISkyApmLogDispatcher _skyApmLogDispatcher;
-        private readonly ISegmentContextAccessor _segmentContextAccessor;
+        _skyApmLogDispatcher = skyApmLogDispatcher;
+        _segmentContextAccessor = segmentContextAccessor;
+    }
 
-        public SkyApmLoggerProvider(ISkyApmLogDispatcher skyApmLogDispatcher,
-            ISegmentContextAccessor segmentContextAccessor)
-        {
-            _skyApmLogDispatcher = skyApmLogDispatcher;
-            _segmentContextAccessor = segmentContextAccessor;
-        }
+    public void Dispose()
+    {
+    }
 
-        public void Dispose()
-        {
-        }
-
-        public ILogger CreateLogger(string categoryName)
-        {
-            return _doveLoggers.GetOrAdd(categoryName,
-                _ => new SkyApmLogger(categoryName, _skyApmLogDispatcher, _segmentContextAccessor));
-        }
+    public ILogger CreateLogger(string categoryName)
+    {
+        return _doveLoggers.GetOrAdd(categoryName, _ => new(categoryName, _skyApmLogDispatcher, _segmentContextAccessor));
     }
 }

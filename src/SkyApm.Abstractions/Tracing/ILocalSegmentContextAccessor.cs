@@ -18,10 +18,9 @@
 
 using SkyApm.Tracing.Segments;
 
-namespace SkyApm.Tracing
+namespace SkyApm.Tracing;
+
+public interface ILocalSegmentContextAccessor
 {
-    public interface ILocalSegmentContextAccessor
-    {
-        SegmentContext Context { get; set; }
-    }
+    SegmentContext Context { get; set; }
 }

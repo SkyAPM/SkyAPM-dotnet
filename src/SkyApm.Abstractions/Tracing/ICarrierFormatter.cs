@@ -16,18 +16,15 @@
  *
  */
 
-using SkyApm.Tracing.Segments;
+namespace SkyApm.Tracing;
 
-namespace SkyApm.Tracing
+public interface ICarrierFormatter
 {
-    public interface ICarrierFormatter
-    {
-        string Key { get; }
+    string Key { get; }
 
-        bool Enable { get; }
+    bool Enable { get; }
 
-        ICarrier Decode(string content);
+    ICarrier Decode(string content);
 
-        string Encode(ICarrier carrier);
-    }
+    string Encode(ICarrier carrier);
 }

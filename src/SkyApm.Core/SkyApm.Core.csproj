@@ -1,25 +1,26 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="..\..\build\common.props" />
-  <PropertyGroup>
-    <Description>$(Product) core components.</Description>
-    <AssemblyTitle>$(PackagePrefix).Core</AssemblyTitle>
-    <AssemblyName>$(PackagePrefix).Core</AssemblyName>
-    <PackageId>$(PackagePrefix).Core</PackageId>
-    <PackageTags>SkyWalking;APM</PackageTags>
-    <PackageReleaseNotes>
-    </PackageReleaseNotes>
-    <RootNamespace>SkyApm</RootNamespace>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <DefineConstants Condition="'$(TargetFramework)' == 'netcoreapp2.1'">$(DefineConstants);SPAN</DefineConstants>
-  </PropertyGroup>
-	
-  <ItemGroup>
-    <PackageReference Include="AspectCore.Extensions.Reflection" Version="1.2.0" />
-    <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="4.5.1" />
-    <PackageReference Include="System.Memory" Version="4.5.3" />
-    <PackageReference Include="System.ValueTuple" Version="4.5.0" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\SkyApm.Abstractions\SkyApm.Abstractions.csproj" />
-  </ItemGroup>
+	<Import Project="..\..\build\common.props" />
+	<PropertyGroup>
+		<Description>$(Product) core components.</Description>
+		<AssemblyTitle>$(PackagePrefix).Core</AssemblyTitle>
+		<AssemblyName>$(PackagePrefix).Core</AssemblyName>
+		<PackageId>$(PackagePrefix).Core</PackageId>
+		<PackageTags>SkyWalking;APM</PackageTags>
+		<PackageReleaseNotes></PackageReleaseNotes>
+		<RootNamespace>SkyApm</RootNamespace>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<DefineConstants Condition="'$(TargetFramework)' == 'netcoreapp2.1'">$(DefineConstants);SPAN</DefineConstants>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<LangVersion>preview</LangVersion>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="AspectCore.Extensions.Reflection" Version="2.3.0" />
+		<PackageReference Include="System.Diagnostics.DiagnosticSource" Version="7.0.0" />
+		<PackageReference Include="System.Memory" Version="4.5.5" />
+		<PackageReference Include="System.ValueTuple" Version="4.5.0" />
+	</ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\SkyApm.Abstractions\SkyApm.Abstractions.csproj" />
+	</ItemGroup>
 </Project>

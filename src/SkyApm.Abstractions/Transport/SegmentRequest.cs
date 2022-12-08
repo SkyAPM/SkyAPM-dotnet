@@ -16,85 +16,83 @@
  *
  */
 
-using System.Collections.Generic;
 using SkyApm.Common;
 
-namespace SkyApm.Transport
+namespace SkyApm.Transport;
+
+public class SegmentRequest
 {
-    public class SegmentRequest
-    {
-        public string TraceId { get; set; }
+    public string TraceId { get; set; }
 
-        public SegmentObjectRequest Segment { get; set; }
-    }
+    public SegmentObjectRequest Segment { get; set; }
+}
 
-    public class SegmentObjectRequest
-    {
-        public string SegmentId { get; set; }
+public class SegmentObjectRequest
+{
+    public string SegmentId { get; set; }
 
-        public string ServiceId { get; set; }
+    public string ServiceId { get; set; }
 
-        public string ServiceInstanceId { get; set; }
+    public string ServiceInstanceId { get; set; }
 
-        public IList<SpanRequest> Spans { get; set; } = new List<SpanRequest>();
-    }
+    public IList<SpanRequest> Spans { get; set; } = new List<SpanRequest>();
+}
 
-    public class SpanRequest
-    {
-        public int SpanId { get; set; }
+public class SpanRequest
+{
+    public int SpanId { get; set; }
 
-        public int SpanType { get; set; }
+    public int SpanType { get; set; }
 
-        public int SpanLayer { get; set; }
+    public int SpanLayer { get; set; }
 
-        public int ParentSpanId { get; set; }
+    public int ParentSpanId { get; set; }
 
-        public long StartTime { get; set; }
+    public long StartTime { get; set; }
 
-        public long EndTime { get; set; }
+    public long EndTime { get; set; }
 
-        public StringOrIntValue Component { get; set; }
+    public StringOrIntValue Component { get; set; }
 
-        public StringOrIntValue OperationName { get; set; }
+    public StringOrIntValue OperationName { get; set; }
 
-        public StringOrIntValue Peer { get; set; }
+    public StringOrIntValue Peer { get; set; }
 
-        public bool IsError { get; set; }
+    public bool IsError { get; set; }
 
-        public IList<SegmentReferenceRequest> References { get; } = new List<SegmentReferenceRequest>();
+    public IList<SegmentReferenceRequest> References { get; } = new List<SegmentReferenceRequest>();
 
-        public IList<KeyValuePair<string, string>> Tags { get; } = new List<KeyValuePair<string, string>>();
+    public IList<KeyValuePair<string, string>> Tags { get; } = new List<KeyValuePair<string, string>>();
 
-        public IList<LogDataRequest> Logs { get; } = new List<LogDataRequest>();
-    }
+    public IList<LogDataRequest> Logs { get; } = new List<LogDataRequest>();
+}
 
-    public class SegmentReferenceRequest
-    {
-        public string TraceId { get; set; }
+public class SegmentReferenceRequest
+{
+    public string TraceId { get; set; }
 
-        public string ParentSegmentId { get; set; }
+    public string ParentSegmentId { get; set; }
 
-        public string ParentServiceId { get; set; }
+    public string ParentServiceId { get; set; }
 
-        public string ParentServiceInstanceId { get; set; }
+    public string ParentServiceInstanceId { get; set; }
 
-        public int ParentSpanId { get; set; }
+    public int ParentSpanId { get; set; }
 
-        public string EntryServiceInstanceId { get; set; }
+    public string EntryServiceInstanceId { get; set; }
 
-        public int RefType { get; set; }
+    public int RefType { get; set; }
 
-        public StringOrIntValue ParentEndpointName { get; set; }
+    public StringOrIntValue ParentEndpointName { get; set; }
 
-        public StringOrIntValue EntryEndpointName { get; set; }
+    public StringOrIntValue EntryEndpointName { get; set; }
 
-        public StringOrIntValue NetworkAddress { get; set; }
-    }
+    public StringOrIntValue NetworkAddress { get; set; }
+}
 
-    public class LogDataRequest
-    {
-        public long Timestamp { get; set; }
+public class LogDataRequest
+{
+    public long Timestamp { get; set; }
 
-        public IList<KeyValuePair<string, string>> Data { get; } = new List<KeyValuePair<string, string>>();
-    }
+    public IList<KeyValuePair<string, string>> Data { get; } = new List<KeyValuePair<string, string>>();
 }

@@ -18,31 +18,29 @@
 
 using SkyApm.Tracing.Segments;
 using System.Runtime.CompilerServices;
-using System.Threading;
 
-namespace SkyApm.Tracing
+namespace SkyApm.Tracing;
+
+public class LocalSegmentContextAccessor : ILocalSegmentContextAccessor
 {
-    public class LocalSegmentContextAccessor : ILocalSegmentContextAccessor
-    {
-        private readonly ConditionalWeakTable<SegmentContext, SegmentContext> _parent = new ConditionalWeakTable<SegmentContext, SegmentContext>();
-        private readonly AsyncLocal<SegmentContext> _segmentContext = new AsyncLocal<SegmentContext>();
+    private readonly ConditionalWeakTable<SegmentContext, SegmentContext> _parent = new();
+    private readonly AsyncLocal<SegmentContext> _segmentContext = new();
 
-        public SegmentContext Context
+    public SegmentContext Context
+    {
+        get => _segmentContext.Value;
+        set
         {
-            get => _segmentContext.Value;
-            set
+            var current = _segmentContext.Value;
+            if (value == null)
             {
-                var current = _segmentContext.Value;
-                if (value == null)
-                {
-                    if (_parent.TryGetValue(current, out var parent))
-                        _segmentContext.Value = parent;
-                }
-                else
-                {
-                    _parent.Add(value, current);
-                    _segmentContext.Value = value;
-                }
+                if (_parent.TryGetValue(current, out var parent))
+                    _segmentContext.Value = parent;
+            }
+            else
+            {
+                _parent.Add(value, current);
+                _segmentContext.Value = value;
             }
         }
     }

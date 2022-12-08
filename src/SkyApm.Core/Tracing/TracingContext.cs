@@ -16,60 +16,57 @@
  *
  */
 
-using System;
-using SkyApm.Common;
 using SkyApm.Tracing.Segments;
 using SkyApm.Transport;
 
-namespace SkyApm.Tracing
+namespace SkyApm.Tracing;
+
+public class TracingContext : ITracingContext
 {
-    public class TracingContext : ITracingContext
+    private readonly ISegmentContextFactory _segmentContextFactory;
+    private readonly ICarrierPropagator _carrierPropagator;
+    private readonly ISegmentDispatcher _segmentDispatcher;
+
+    public TracingContext(ISegmentContextFactory segmentContextFactory, ICarrierPropagator carrierPropagator,
+        ISegmentDispatcher segmentDispatcher)
     {
-        private readonly ISegmentContextFactory _segmentContextFactory;
-        private readonly ICarrierPropagator _carrierPropagator;
-        private readonly ISegmentDispatcher _segmentDispatcher;
+        _segmentContextFactory = segmentContextFactory;
+        _carrierPropagator = carrierPropagator;
+        _segmentDispatcher = segmentDispatcher;
+    }
 
-        public TracingContext(ISegmentContextFactory segmentContextFactory, ICarrierPropagator carrierPropagator,
-            ISegmentDispatcher segmentDispatcher)
+    public SegmentContext CreateEntrySegmentContext(string operationName, ICarrierHeaderCollection carrierHeader, long startTimeMilliseconds = default)
+    {
+        if (operationName == null) throw new ArgumentNullException(nameof(operationName));
+        var carrier = _carrierPropagator.Extract(carrierHeader);
+        return _segmentContextFactory.CreateEntrySegment(operationName, carrier, startTimeMilliseconds);
+    }
+
+    public SegmentContext CreateLocalSegmentContext(string operationName, long startTimeMilliseconds = default)
+    {
+        if (operationName == null) throw new ArgumentNullException(nameof(operationName));
+        return _segmentContextFactory.CreateLocalSegment(operationName, startTimeMilliseconds);
+    }
+
+    public SegmentContext CreateExitSegmentContext(string operationName, string networkAddress,
+        ICarrierHeaderCollection carrierHeader = default, long startTimeMilliseconds = default)
+    {
+        var segmentContext =
+            _segmentContextFactory.CreateExitSegment(operationName, new(networkAddress), startTimeMilliseconds);
+        if (carrierHeader != null)
+            _carrierPropagator.Inject(segmentContext, carrierHeader);
+        return segmentContext;
+    }
+
+    public void Release(SegmentContext segmentContext, long endTimeMilliseconds = default)
+    {
+        if (segmentContext == null)
         {
-            _segmentContextFactory = segmentContextFactory;
-            _carrierPropagator = carrierPropagator;
-            _segmentDispatcher = segmentDispatcher;
+            return;
         }
 
-        public SegmentContext CreateEntrySegmentContext(string operationName, ICarrierHeaderCollection carrierHeader, long startTimeMilliseconds = default)
-        {
-            if (operationName == null) throw new ArgumentNullException(nameof(operationName));
-            var carrier = _carrierPropagator.Extract(carrierHeader);
-            return _segmentContextFactory.CreateEntrySegment(operationName, carrier, startTimeMilliseconds);
-        }
-
-        public SegmentContext CreateLocalSegmentContext(string operationName, long startTimeMilliseconds = default)
-        {
-            if (operationName == null) throw new ArgumentNullException(nameof(operationName));
-            return _segmentContextFactory.CreateLocalSegment(operationName, startTimeMilliseconds);
-        }
-
-        public SegmentContext CreateExitSegmentContext(string operationName, string networkAddress,
-            ICarrierHeaderCollection carrierHeader = default, long startTimeMilliseconds = default)
-        {
-            var segmentContext =
-                _segmentContextFactory.CreateExitSegment(operationName, new StringOrIntValue(networkAddress), startTimeMilliseconds);
-            if (carrierHeader != null)
-                _carrierPropagator.Inject(segmentContext, carrierHeader);
-            return segmentContext;
-        }
-
-        public void Release(SegmentContext segmentContext, long endTimeMilliseconds = default)
-        {
-            if (segmentContext == null)
-            {
-                return;
-            }
-
-            _segmentContextFactory.Release(segmentContext, endTimeMilliseconds);
-            if (segmentContext.Sampled)
-                _segmentDispatcher.Dispatch(segmentContext);
-        }
+        _segmentContextFactory.Release(segmentContext, endTimeMilliseconds);
+        if (segmentContext.Sampled)
+            _segmentDispatcher.Dispatch(segmentContext);
     }
 }

@@ -18,10 +18,9 @@
 
 using Microsoft.Extensions.Configuration;
 
-namespace SkyApm.Utilities.Configuration
+namespace SkyApm.Utilities.Configuration;
+
+public interface IAdditionalConfigurationSource
 {
-    public interface IAdditionalConfigurationSource
-    {
-        void Load(ConfigurationBuilder builder);
-    }
+    void Load(ConfigurationBuilder builder);
 }

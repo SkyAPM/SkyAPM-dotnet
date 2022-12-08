@@ -18,30 +18,29 @@
 
 using SkyApm.Common;
 
-namespace SkyApm.Tracing
+namespace SkyApm.Tracing;
+
+public interface ICarrier
 {
-    public interface ICarrier
-    {
-        bool HasValue { get; }
+    bool HasValue { get; }
         
-        bool? Sampled { get; }
+    bool? Sampled { get; }
 
-        string TraceId { get; }
+    string TraceId { get; }
 
-        string ParentSegmentId { get; }
+    string ParentSegmentId { get; }
 
-        int ParentSpanId { get; }
+    int ParentSpanId { get; }
 
-        string ParentServiceId { get; }
+    string ParentServiceId { get; }
 
-        string ParentServiceInstanceId { get; }
+    string ParentServiceInstanceId { get; }
 
-        string EntryServiceInstanceId { get; }
+    string EntryServiceInstanceId { get; }
 
-        StringOrIntValue NetworkAddress { get; }
+    StringOrIntValue NetworkAddress { get; }
 
-        StringOrIntValue EntryEndpoint { get; }
+    StringOrIntValue EntryEndpoint { get; }
 
-        StringOrIntValue ParentEndpoint { get; }
-    }
+    StringOrIntValue ParentEndpoint { get; }
 }

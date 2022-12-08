@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿namespace SkyApm.Tracing;
 
-namespace SkyApm.Tracing
+public interface ICarrierHeaderDictionary : ICarrierHeaderCollection
 {
-    public interface ICarrierHeaderDictionary : ICarrierHeaderCollection
-    {
-        string Get(string key);
-    }
+    string Get(string key);
 }

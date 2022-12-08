@@ -16,24 +16,23 @@
  *
  */
 
-namespace SkyApm.Diagnostics.SqlClient
+namespace SkyApm.Diagnostics.SqlClient;
+
+internal static class SqlClientDiagnosticStrings
 {
-    internal static class SqlClientDiagnosticStrings
-    {
-        public const string DiagnosticListenerName = "SqlClientDiagnosticListener";
+    public const string DiagnosticListenerName = "SqlClientDiagnosticListener";
 
-        public const string SqlClientPrefix = "sqlClient ";
+    public const string SqlClientPrefix = "sqlClient ";
 
-        #region System.Data.SqlClient
-        public const string SqlBeforeExecuteCommand = "System.Data.SqlClient.WriteCommandBefore";
-        public const string SqlAfterExecuteCommand = "System.Data.SqlClient.WriteCommandAfter";
-        public const string SqlErrorExecuteCommand = "System.Data.SqlClient.WriteCommandError";
-        #endregion
+    #region System.Data.SqlClient
+    public const string SqlBeforeExecuteCommand = "System.Data.SqlClient.WriteCommandBefore";
+    public const string SqlAfterExecuteCommand = "System.Data.SqlClient.WriteCommandAfter";
+    public const string SqlErrorExecuteCommand = "System.Data.SqlClient.WriteCommandError";
+    #endregion
 
-        #region Microsoft.Data.SqlClient
-        public const string DotNetCoreSqlBeforeExecuteCommand = "Microsoft.Data.SqlClient.WriteCommandBefore";
-        public const string DotNetCoreSqlAfterExecuteCommand = "Microsoft.Data.SqlClient.WriteCommandAfter";
-        public const string DotNetCoreSqlErrorExecuteCommand = "Microsoft.Data.SqlClient.WriteCommandError";
-        #endregion
-    }
+    #region Microsoft.Data.SqlClient
+    public const string DotNetCoreSqlBeforeExecuteCommand = "Microsoft.Data.SqlClient.WriteCommandBefore";
+    public const string DotNetCoreSqlAfterExecuteCommand = "Microsoft.Data.SqlClient.WriteCommandAfter";
+    public const string DotNetCoreSqlErrorExecuteCommand = "Microsoft.Data.SqlClient.WriteCommandError";
+    #endregion
 }

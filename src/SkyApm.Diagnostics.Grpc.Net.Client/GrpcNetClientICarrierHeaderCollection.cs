@@ -16,45 +16,39 @@
  *
  */
 
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
 using SkyApm.Tracing;
+using System.Collections;
 
-namespace SkyApm.Diagnostics.HttpClient
+namespace SkyApm.Diagnostics.HttpClient;
+
+public class GrpcNetClientICarrierHeaderCollection : ICarrierHeaderDictionary
 {
-    public class GrpcNetClientICarrierHeaderCollection : ICarrierHeaderDictionary
+    private readonly HttpRequestMessage _request;
+
+    public GrpcNetClientICarrierHeaderCollection(HttpRequestMessage request)
     {
-        private readonly HttpRequestMessage _request;
+        _request = request;
+    }
 
-        public GrpcNetClientICarrierHeaderCollection(HttpRequestMessage request)
-        {
-            _request = request;
-        }
+    public void Add(string key, string value)
+    {
+        _request.Headers.Add(key, value);
+    }
 
-        public void Add(string key, string value)
-        {
-            _request.Headers.Add(key, value);
-        }
+    public string Get(string key)
+    {
+        return _request.Headers.TryGetValues(key, out var values) ? values.FirstOrDefault() : null;
+    }
 
-        public string Get(string key)
-        {
-            if (_request.Headers.TryGetValues(key, out var values))
-                return values.FirstOrDefault();
-            return null;
-        }
+    public IEnumerator<KeyValuePair<string, string>> GetEnumerator()
+    {
+        return _request.Headers.Select(x =>
+                new KeyValuePair<string, string>(x.Key, x.Value.FirstOrDefault()))
+            .GetEnumerator();
+    }
 
-        public IEnumerator<KeyValuePair<string, string>> GetEnumerator()
-        {
-            return _request.Headers.Select(x =>
-                     new KeyValuePair<string, string>(x.Key, x.Value.FirstOrDefault()))
-                  .GetEnumerator();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
     }
 }

@@ -17,12 +17,15 @@
  */
 
 using Microsoft.Extensions.Hosting;
+using SkyApm;
+using SkyApm.Agent.Hosting;
 using SkyApm.Config;
 using SkyApm.Diagnostics;
 using SkyApm.Diagnostics.EntityFrameworkCore;
 using SkyApm.Diagnostics.Grpc;
 using SkyApm.Diagnostics.Grpc.Net.Client;
 using SkyApm.Diagnostics.HttpClient;
+using SkyApm.Diagnostics.MSLogging;
 using SkyApm.Diagnostics.SqlClient;
 using SkyApm.Sampling;
 using SkyApm.Service;
@@ -33,100 +36,96 @@ using SkyApm.Utilities.Configuration;
 using SkyApm.Utilities.DependencyInjection;
 using SkyApm.Utilities.Logging;
 using System;
-using SkyApm;
-using SkyApm.Agent.Hosting;
-using SkyApm.Diagnostics.MSLogging;
 using ILoggerFactory = SkyApm.Logging.ILoggerFactory;
 
-namespace Microsoft.Extensions.DependencyInjection
+namespace Microsoft.Extensions.DependencyInjection;
+
+public static class ServiceCollectionExtensions
 {
-    public static class ServiceCollectionExtensions
+    public static IServiceCollection AddSkyAPM(this IServiceCollection services, Action<SkyApmExtensions> extensionsSetup = null)
     {
-        public static IServiceCollection AddSkyAPM(this IServiceCollection services, Action<SkyApmExtensions> extensionsSetup = null)
-        {
-            services.AddSkyAPMCore(extensionsSetup);
-            return services;
-        }
-        
-        private static IServiceCollection AddSkyAPMCore(this IServiceCollection services, Action<SkyApmExtensions> extensionsSetup = null)
-        {
-            if (services == null)
-            {
-                throw new ArgumentNullException(nameof(services));
-            }
-
-            services.AddSingleton<ISegmentDispatcher, AsyncQueueSegmentDispatcher>();
-            services.AddSingleton<IExecutionService, RegisterService>();
-            services.AddSingleton<IExecutionService, LogReportService>();
-            services.AddSingleton<IExecutionService, PingService>();
-            services.AddSingleton<IExecutionService, SegmentReportService>();
-            services.AddSingleton<IExecutionService, CLRStatsService>();
-            services.AddSingleton<IInstrumentStartup, InstrumentStartup>();
-            services.AddSingleton<IRuntimeEnvironment>(RuntimeEnvironment.Instance);
-            services.AddSingleton<TracingDiagnosticProcessorObserver>();
-            services.AddSingleton<IConfigAccessor, ConfigAccessor>();
-            services.AddSingleton<IConfigurationFactory, ConfigurationFactory>();
-            services.AddSingleton<IHostedService, InstrumentationHostedService>();
-            services.AddSingleton<IEnvironmentProvider, HostingEnvironmentProvider>();
-            services.AddSingleton<ISkyApmLogDispatcher, AsyncQueueSkyApmLogDispatcher>();
-            services.AddTracing().AddSampling().AddGrpcTransport().AddSkyApmLogging();
-            var extensions = services.AddSkyApmExtensions()
-                .AddHttpClient()
-                .AddGrpcClient()
-                .AddSqlClient()
-                .AddGrpc()
-                .AddEntityFrameworkCore(c => c.AddPomeloMysql().AddNpgsql().AddSqlite())
-                .AddMSLogging();
-
-            extensionsSetup?.Invoke(extensions);
-
-            return services;
-        }
-
-        private static IServiceCollection AddTracing(this IServiceCollection services)
-        {
-            services.AddSingleton<ITracingContext, TracingContext>();
-            services.AddSingleton<ICarrierPropagator, CarrierPropagator>();
-            services.AddSingleton<ICarrierFormatter, Sw8CarrierFormatter>();
-            services.AddSingleton<ISegmentContextFactory, SegmentContextFactory>();
-            services.AddSingleton<IEntrySegmentContextAccessor, EntrySegmentContextAccessor>();
-            services.AddSingleton<ILocalSegmentContextAccessor, LocalSegmentContextAccessor>();
-            services.AddSingleton<IExitSegmentContextAccessor, ExitSegmentContextAccessor>();
-            services.AddSingleton<ISegmentContextAccessor, SegmentContextAccessor>();
-            services.AddSingleton<ISamplerChainBuilder, SamplerChainBuilder>();
-            services.AddSingleton<IUniqueIdGenerator, UniqueIdGenerator>();
-            services.AddSingleton<ISegmentContextMapper, SegmentContextMapper>();
-            services.AddSingleton<IBase64Formatter, Base64Formatter>();
-            return services;
-        }
-        
-        private static IServiceCollection AddSampling(this IServiceCollection services)
-        {
-            services.AddSingleton<SimpleCountSamplingInterceptor>();
-            services.AddSingleton<ISamplingInterceptor>(p => p.GetService<SimpleCountSamplingInterceptor>());
-            services.AddSingleton<IExecutionService>(p => p.GetService<SimpleCountSamplingInterceptor>());
-            services.AddSingleton<ISamplingInterceptor, RandomSamplingInterceptor>();
-            services.AddSingleton<ISamplingInterceptor, IgnorePathSamplingInterceptor>();
-            return services;
-        }
-
-        private static IServiceCollection AddGrpcTransport(this IServiceCollection services)
-        {
-            services.AddSingleton<ISegmentReporter, SegmentReporter>();
-            services.AddSingleton<ILoggerReporter, LoggerReporter>();
-            services.AddSingleton<ICLRStatsReporter, CLRStatsReporter>();
-            services.AddSingleton<ConnectionManager>();
-            services.AddSingleton<IPingCaller, PingCaller>();
-            services.AddSingleton<IServiceRegister, ServiceRegister>();
-            services.AddSingleton<IExecutionService, ConnectService>();
-            return services;
-        }
-
-        private static IServiceCollection AddSkyApmLogging(this IServiceCollection services)
-        {
-            services.AddSingleton<ILoggerFactory, DefaultLoggerFactory>();
-            return services;
-        }
-
+        _ = services.AddSkyAPMCore(extensionsSetup);
+        return services;
     }
+
+    private static IServiceCollection AddSkyAPMCore(this IServiceCollection services, Action<SkyApmExtensions> extensionsSetup = null)
+    {
+        if (services == null)
+        {
+            throw new ArgumentNullException(nameof(services));
+        }
+
+        _ = services.AddSingleton<ISegmentDispatcher, AsyncQueueSegmentDispatcher>();
+        _ = services.AddSingleton<IExecutionService, RegisterService>();
+        _ = services.AddSingleton<IExecutionService, LogReportService>();
+        _ = services.AddSingleton<IExecutionService, PingService>();
+        _ = services.AddSingleton<IExecutionService, SegmentReportService>();
+        _ = services.AddSingleton<IExecutionService, CLRStatsService>();
+        _ = services.AddSingleton<IInstrumentStartup, InstrumentStartup>();
+        _ = services.AddSingleton(RuntimeEnvironment.Instance);
+        _ = services.AddSingleton<TracingDiagnosticProcessorObserver>();
+        _ = services.AddSingleton<IConfigAccessor, ConfigAccessor>();
+        _ = services.AddSingleton<IConfigurationFactory, ConfigurationFactory>();
+        _ = services.AddSingleton<IHostedService, InstrumentationHostedService>();
+        _ = services.AddSingleton<IEnvironmentProvider, HostingEnvironmentProvider>();
+        _ = services.AddSingleton<ISkyApmLogDispatcher, AsyncQueueSkyApmLogDispatcher>();
+        _ = services.AddTracing().AddSampling().AddGrpcTransport().AddSkyApmLogging();
+        var extensions = services.AddSkyApmExtensions()
+            .AddHttpClient()
+            .AddGrpcClient()
+            .AddSqlClient()
+            .AddGrpc()
+            .AddEntityFrameworkCore(c => c.AddPomeloMysql().AddNpgsql().AddSqlite())
+            .AddMSLogging();
+
+        extensionsSetup?.Invoke(extensions);
+
+        return services;
+    }
+
+    private static IServiceCollection AddTracing(this IServiceCollection services)
+    {
+        _ = services.AddSingleton<ITracingContext, TracingContext>();
+        _ = services.AddSingleton<ICarrierPropagator, CarrierPropagator>();
+        _ = services.AddSingleton<ICarrierFormatter, Sw8CarrierFormatter>();
+        _ = services.AddSingleton<ISegmentContextFactory, SegmentContextFactory>();
+        _ = services.AddSingleton<IEntrySegmentContextAccessor, EntrySegmentContextAccessor>();
+        _ = services.AddSingleton<ILocalSegmentContextAccessor, LocalSegmentContextAccessor>();
+        _ = services.AddSingleton<IExitSegmentContextAccessor, ExitSegmentContextAccessor>();
+        _ = services.AddSingleton<ISegmentContextAccessor, SegmentContextAccessor>();
+        _ = services.AddSingleton<ISamplerChainBuilder, SamplerChainBuilder>();
+        _ = services.AddSingleton<IUniqueIdGenerator, UniqueIdGenerator>();
+        _ = services.AddSingleton<ISegmentContextMapper, SegmentContextMapper>();
+        _ = services.AddSingleton<IBase64Formatter, Base64Formatter>();
+        return services;
+    }
+
+    private static IServiceCollection AddSampling(this IServiceCollection services)
+    {
+        _ = services.AddSingleton<SimpleCountSamplingInterceptor>();
+        _ = services.AddSingleton<ISamplingInterceptor>(p => p.GetService<SimpleCountSamplingInterceptor>());
+        _ = services.AddSingleton<IExecutionService>(p => p.GetService<SimpleCountSamplingInterceptor>());
+        _ = services.AddSingleton<ISamplingInterceptor, RandomSamplingInterceptor>();
+        _ = services.AddSingleton<ISamplingInterceptor, IgnorePathSamplingInterceptor>();
+        return services;
+    }
+
+    private static IServiceCollection AddGrpcTransport(this IServiceCollection services)
+    {
+        _ = services.AddSingleton<ISegmentReporter, SegmentReporter>();
+        _ = services.AddSingleton<ILoggerReporter, LoggerReporter>();
+        _ = services.AddSingleton<ICLRStatsReporter, CLRStatsReporter>();
+        _ = services.AddSingleton<ConnectionManager>();
+        _ = services.AddSingleton<IPingCaller, PingCaller>();
+        _ = services.AddSingleton<IServiceRegister, ServiceRegister>();
+        _ = services.AddSingleton<IExecutionService, ConnectService>();
+        return services;
+    }
+
+    private static IServiceCollection AddSkyApmLogging(this IServiceCollection services)
+    {
+        _ = services.AddSingleton<ILoggerFactory, DefaultLoggerFactory>();
+        return services;
+    }
+
 }

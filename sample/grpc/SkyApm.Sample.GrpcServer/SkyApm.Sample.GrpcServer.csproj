@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
-        <TargetFrameworks>netcoreapp3.1;net5.0;net6.0</TargetFrameworks>
+        <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
     </PropertyGroup>
 
     <ItemGroup>
@@ -11,15 +11,13 @@
             <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
         </Content>
     </ItemGroup>
-    <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp3.1'">
-        <PackageReference Include="Microsoft.Extensions.Hosting" Version="3.1.0" PrivateAssets="All"/>
-    </ItemGroup>
-    <ItemGroup Condition="'$(TargetFramework)' == 'net5.0'">
-        <PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0"/>
-    </ItemGroup>
+
     <ItemGroup Condition="'$(TargetFramework)' == 'net6.0'">
         <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.0"/>
     </ItemGroup>
+	<ItemGroup Condition="'$(TargetFramework)' == 'net7.0'">
+		<PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.0"/>
+	</ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\..\..\src\SkyApm.Agent.GeneralHost\SkyApm.Agent.GeneralHost.csproj"/>
         <ProjectReference Include="..\SkyApm.Sample.GrpcProto\SkyApm.Sample.GrpcProto.csproj"/>

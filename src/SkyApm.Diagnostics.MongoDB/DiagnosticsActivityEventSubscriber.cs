@@ -17,124 +17,112 @@
  */
 
 using MongoDB.Driver.Core.Events;
-using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
+// ReSharper disable UnusedMember.Local
 
-namespace SkyApm.Diagnostics.MongoDB
+namespace SkyApm.Diagnostics.MongoDB;
+
+public class DiagnosticsActivityEventSubscriber : IEventSubscriber
 {
-    public class DiagnosticsActivityEventSubscriber : IEventSubscriber
+    private static readonly DiagnosticSource diagnosticSource = new DiagnosticListener("MongoSourceListener");
+    private static readonly AssemblyName AssemblyName = typeof(DiagnosticsActivityEventSubscriber).Assembly.GetName();
+    internal static readonly string ActivitySourceName = AssemblyName.Name;
+    internal static readonly Version Version = AssemblyName.Version;
+
+    private readonly ReflectionEventSubscriber _subscriber;
+    private readonly ConcurrentDictionary<int, Activity> _activityMap = new();
+
+    private static readonly HashSet<string> CommandsWithCollectionNameAsValue =
+        new() {
+            "aggregate",
+            "count",
+            "distinct",
+            "mapReduce",
+            "geoSearch",
+            "delete",
+            "find",
+            "killCursors",
+            "findAndModify",
+            "insert",
+            "update",
+            "create",
+            "drop",
+            "createIndexes",
+            "listIndexes"
+        };
+
+    public DiagnosticsActivityEventSubscriber()
     {
-        private static DiagnosticSource diagnosticSource = new DiagnosticListener("MongoSourceListener");
-        internal static readonly AssemblyName AssemblyName = typeof(DiagnosticsActivityEventSubscriber).Assembly.GetName();
-        internal static readonly string ActivitySourceName = AssemblyName.Name;
-        internal static readonly Version Version = AssemblyName.Version;
-         
-        private readonly ReflectionEventSubscriber _subscriber;
-        private readonly ConcurrentDictionary<int, Activity> _activityMap = new ConcurrentDictionary<int, Activity>();
+        _subscriber = new(this, bindingFlags: BindingFlags.Instance | BindingFlags.NonPublic);
+    }
 
-        private static readonly HashSet<string> CommandsWithCollectionNameAsValue =
-            new HashSet<string>
-            {
-                "aggregate",
-                "count",
-                "distinct",
-                "mapReduce",
-                "geoSearch",
-                "delete",
-                "find",
-                "killCursors",
-                "findAndModify",
-                "insert",
-                "update",
-                "create",
-                "drop",
-                "createIndexes",
-                "listIndexes"
-            };
+    public bool TryGetEventHandler<TEvent>(out Action<TEvent> handler) => _subscriber.TryGetEventHandler(out handler);
 
-        public DiagnosticsActivityEventSubscriber()
-        { 
-            _subscriber = new ReflectionEventSubscriber(this, bindingFlags: BindingFlags.Instance | BindingFlags.NonPublic);
-        }
-
-        public bool TryGetEventHandler<TEvent>(out Action<TEvent> handler)
-            => _subscriber.TryGetEventHandler(out handler);
-
-        private void Handle(CommandStartedEvent @event)
+    private void Handle(CommandStartedEvent @event)
+    {
+        var collectionName = GetCollectionName(@event);
+        if (string.IsNullOrWhiteSpace(collectionName))
         {
-            var collectionName = GetCollectionName(@event);
-            if (string.IsNullOrWhiteSpace(collectionName))
+            return;
+        }
+        var activity = new Activity("MongoActivity");
+
+        _ = _activityMap.TryAdd(@event.RequestId, activity);
+        _ = diagnosticSource.StartActivity(activity, @event);
+    }
+
+    private void Handle(CommandSucceededEvent @event)
+    {
+        if (_activityMap.TryRemove(@event.RequestId, out var activity))
+        {
+            WithReplacedActivityCurrent(activity, () => diagnosticSource.StopActivity(activity, @event));
+        }
+    }
+
+    private void Handle(CommandFailedEvent @event)
+    {
+        if (_activityMap.TryRemove(@event.RequestId, out var activity))
+        {
+            WithReplacedActivityCurrent(activity, () => diagnosticSource.Write("MongoActivity.Failed", @event));
+        }
+    }
+
+    public static string GetCollectionName(CommandStartedEvent @event)
+    {
+        if (@event.CommandName == "getMore")
+        {
+            if (!@event.Command.Contains("collection")) return null;
+            var collectionValue = @event.Command.GetValue("collection");
+            if (collectionValue.IsString)
             {
-                return;
+                return collectionValue.AsString;
             }
-            var activity = new Activity("MongoActivity");
-            
-            _activityMap.TryAdd(@event.RequestId, activity);
-            diagnosticSource.StartActivity(activity, @event);
         }
-
-        private void Handle(CommandSucceededEvent @event)
+        else if (CommandsWithCollectionNameAsValue.Contains(@event.CommandName))
         {
-            if (_activityMap.TryRemove(@event.RequestId, out var activity))
+            var commandValue = @event.Command.GetValue(@event.CommandName);
+            if (commandValue is not null && commandValue.IsString)
             {
-                WithReplacedActivityCurrent(activity, () =>
-                {
-                    diagnosticSource.StopActivity(activity, @event);
-                });
+                return commandValue.AsString;
             }
         }
 
-        private void Handle(CommandFailedEvent @event)
+        return null;
+    }
+
+    private static void WithReplacedActivityCurrent(Activity activity, Action action)
+    {
+        var current = Activity.Current;
+        try
         {
-            if (_activityMap.TryRemove(@event.RequestId, out var activity))
-            {
-                WithReplacedActivityCurrent(activity, () =>
-                {                    
-                    diagnosticSource.Write("MongoActivity.Failed", @event);                  
-                });
-            }
+            Activity.Current = activity;
+            action();
         }
-
-        public static string GetCollectionName(CommandStartedEvent @event)
+        finally
         {
-            if (@event.CommandName == "getMore")
-            {
-                if (@event.Command.Contains("collection"))
-                {
-                    var collectionValue = @event.Command.GetValue("collection");
-                    if (collectionValue.IsString)
-                    {
-                        return collectionValue.AsString;
-                    }
-                }
-            }
-            else if (CommandsWithCollectionNameAsValue.Contains(@event.CommandName))
-            {
-                var commandValue = @event.Command.GetValue(@event.CommandName);
-                if (commandValue != null && commandValue.IsString)
-                {
-                    return commandValue.AsString;
-                }
-            }
-
-            return null;
-        }
-
-        private static void WithReplacedActivityCurrent(Activity activity, Action action)
-        {
-            var current = Activity.Current;
-            try
-            {
-                Activity.Current = activity;
-                action();
-            }
-            finally
-            {
-                Activity.Current = current;
-            }
+            Activity.Current = current;
         }
     }
 }

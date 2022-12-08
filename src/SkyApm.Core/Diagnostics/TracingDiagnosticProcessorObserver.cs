@@ -16,55 +16,48 @@
  *
  */
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using SkyApm.Logging;
 using SkyApm.Common;
+using SkyApm.Logging;
+using System.Diagnostics;
 
-namespace SkyApm.Diagnostics
+namespace SkyApm.Diagnostics;
+
+public class TracingDiagnosticProcessorObserver : IObserver<DiagnosticListener>
 {
-    public class TracingDiagnosticProcessorObserver : IObserver<DiagnosticListener>
+    private readonly ILogger _logger;
+    private readonly ILoggerFactory _loggerFactory;
+    private readonly IEnumerable<ITracingDiagnosticProcessor> _tracingDiagnosticProcessors;
+
+    public TracingDiagnosticProcessorObserver(IEnumerable<ITracingDiagnosticProcessor> tracingDiagnosticProcessors,
+        ILoggerFactory loggerFactory)
     {
-        private readonly ILogger _logger;
-        private readonly ILoggerFactory _loggerFactory;
-        private readonly IEnumerable<ITracingDiagnosticProcessor> _tracingDiagnosticProcessors;
+        _logger = loggerFactory.CreateLogger(typeof(TracingDiagnosticProcessorObserver));
+        _loggerFactory = loggerFactory;
+        _tracingDiagnosticProcessors = tracingDiagnosticProcessors ??
+            throw new ArgumentNullException(nameof(tracingDiagnosticProcessors));
+    }
 
-        public TracingDiagnosticProcessorObserver(IEnumerable<ITracingDiagnosticProcessor> tracingDiagnosticProcessors,
-            ILoggerFactory loggerFactory)
-        {
-            _logger = loggerFactory.CreateLogger(typeof(TracingDiagnosticProcessorObserver));
-            _loggerFactory = loggerFactory;
-            _tracingDiagnosticProcessors = tracingDiagnosticProcessors ??
-                                           throw new ArgumentNullException(nameof(tracingDiagnosticProcessors));
-        }
+    public void OnCompleted()
+    {
+    }
 
-        public void OnCompleted()
-        {
-        }
+    public void OnError(Exception error)
+    {
+    }
 
-        public void OnError(Exception error)
+    public void OnNext(DiagnosticListener listener)
+    {
+        foreach (var diagnosticProcessor in _tracingDiagnosticProcessors.Distinct(x => x.ListenerName))
         {
+            if (listener.Name != diagnosticProcessor.ListenerName) continue;
+            Subscribe(listener, diagnosticProcessor);
+            _logger.Information($"Loaded diagnostic listener [{diagnosticProcessor.ListenerName}].");
         }
+    }
 
-        public void OnNext(DiagnosticListener listener)
-        {
-            foreach (var diagnosticProcessor in _tracingDiagnosticProcessors.Distinct(x => x.ListenerName))
-            {
-                if (listener.Name == diagnosticProcessor.ListenerName)
-                {
-                    Subscribe(listener, diagnosticProcessor);
-                    _logger.Information(
-                        $"Loaded diagnostic listener [{diagnosticProcessor.ListenerName}].");
-                }
-            }
-        }
-
-        protected virtual void Subscribe(DiagnosticListener listener,
-            ITracingDiagnosticProcessor tracingDiagnosticProcessor)
-        {
-            var diagnosticProcessor = new TracingDiagnosticObserver(tracingDiagnosticProcessor, _loggerFactory);
-            listener.Subscribe(diagnosticProcessor, diagnosticProcessor.IsEnabled);
-        }
+    protected virtual void Subscribe(DiagnosticListener listener, ITracingDiagnosticProcessor tracingDiagnosticProcessor)
+    {
+        var diagnosticProcessor = new TracingDiagnosticObserver(tracingDiagnosticProcessor, _loggerFactory);
+        listener.Subscribe(diagnosticProcessor, diagnosticProcessor.IsEnabled);
     }
 }

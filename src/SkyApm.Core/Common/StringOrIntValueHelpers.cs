@@ -16,15 +16,13 @@
  *
  */
 
-using System;
+// ReSharper disable UnusedType.Global
+namespace SkyApm.Common;
 
-namespace SkyApm.Common
+public static class StringOrIntValueHelpers
 {
-    public static class StringOrIntValueHelpers
+    public static StringOrIntValue ParseStringOrIntValue(string value)
     {
-        public static StringOrIntValue ParseStringOrIntValue(string value)
-        {
-            return value.StartsWith("#") ? new StringOrIntValue(new string(value.AsSpan().Slice(1, value.Length - 1).ToArray())) : new StringOrIntValue(int.Parse(value));
-        }
+        return value.StartsWith("#") ? new(new string(value.AsSpan().Slice(1, value.Length - 1).ToArray())) : new StringOrIntValue(int.Parse(value));
     }
 }

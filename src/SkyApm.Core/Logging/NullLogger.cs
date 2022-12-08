@@ -16,30 +16,27 @@
  *
  */
 
-using System;
+namespace SkyApm.Logging;
 
-namespace SkyApm.Logging
+internal class NullLogger : ILogger
 {
-    internal class NullLogger : ILogger
+    public void Debug(string message)
     {
-        public void Debug(string message)
-        {
-        }
+    }
 
-        public void Information(string message)
-        {
-        }
+    public void Information(string message)
+    {
+    }
 
-        public void Warning(string message)
-        {
-        }
+    public void Warning(string message)
+    {
+    }
 
-        public void Error(string message, Exception exception)
-        {
-        }
+    public void Error(string message, Exception exception)
+    {
+    }
 
-        public void Trace(string message)
-        {
-        }
+    public void Trace(string message)
+    {
     }
 }

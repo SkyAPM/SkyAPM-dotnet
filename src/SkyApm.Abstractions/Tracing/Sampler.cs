@@ -17,29 +17,27 @@
  */
 
 using SkyApm.Common;
-using SkyApm.Tracing.Segments;
 
-namespace SkyApm.Tracing
+namespace SkyApm.Tracing;
+
+public delegate bool Sampler(SamplingContext samplingContext);
+
+public class SamplingContext
 {
-    public delegate bool Sampler(SamplingContext samplingContext);
+    public string OperationName { get; }
 
-    public class SamplingContext
+    public StringOrIntValue Peer { get; }
+
+    public StringOrIntValue EntryEndpoint { get; }
+
+    public StringOrIntValue ParentEndpoint { get; }
+
+    public SamplingContext(string operationName, StringOrIntValue peer, StringOrIntValue entryEndpoint,
+        StringOrIntValue parentEndpoint)
     {
-        public string OperationName { get; }
-
-        public StringOrIntValue Peer { get; }
-
-        public StringOrIntValue EntryEndpoint { get; }
-
-        public StringOrIntValue ParentEndpoint { get; }
-
-        public SamplingContext(string operationName, StringOrIntValue peer, StringOrIntValue entryEndpoint,
-            StringOrIntValue parentEndpoint)
-        {
-            OperationName = operationName;
-            Peer = peer;
-            EntryEndpoint = entryEndpoint;
-            ParentEndpoint = parentEndpoint;
-        }
+        OperationName = operationName;
+        Peer = peer;
+        EntryEndpoint = entryEndpoint;
+        ParentEndpoint = parentEndpoint;
     }
 }

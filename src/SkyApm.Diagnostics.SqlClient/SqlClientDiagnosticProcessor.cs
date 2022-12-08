@@ -16,92 +16,87 @@
  *
  */
 
-using System;
-using System.Data.Common;
-using System.Linq;
-using SkyApm.Tracing;
 using SkyApm.Config;
+using SkyApm.Tracing;
+using System.Data.Common;
 
-namespace SkyApm.Diagnostics.SqlClient
+namespace SkyApm.Diagnostics.SqlClient;
+
+public class SqlClientTracingDiagnosticProcessor : ITracingDiagnosticProcessor
 {
-    public class SqlClientTracingDiagnosticProcessor : ITracingDiagnosticProcessor
+    private readonly ITracingContext _tracingContext;
+    private readonly IExitSegmentContextAccessor _contextAccessor;
+    private readonly TracingConfig _tracingConfig;
+
+    public SqlClientTracingDiagnosticProcessor(ITracingContext tracingContext,
+        IExitSegmentContextAccessor contextAccessor, IConfigAccessor configAccessor)
     {
-        private readonly ITracingContext _tracingContext;
-        private readonly IExitSegmentContextAccessor _contextAccessor;
-        private readonly TracingConfig _tracingConfig;
-
-        public SqlClientTracingDiagnosticProcessor(ITracingContext tracingContext,
-            IExitSegmentContextAccessor contextAccessor, IConfigAccessor configAccessor)
-        {
-            _tracingContext = tracingContext;
-            _contextAccessor = contextAccessor;
-            _tracingConfig = configAccessor.Get<TracingConfig>();
-        }
-
-
-        public string ListenerName { get; } = SqlClientDiagnosticStrings.DiagnosticListenerName;
-
-        private static string ResolveOperationName(DbCommand sqlCommand)
-        {
-            var commandType = sqlCommand.CommandText?.Split(' ');
-            return $"{SqlClientDiagnosticStrings.SqlClientPrefix}{commandType?.FirstOrDefault()}";
-        }
-
-        #region System.Data.SqlClient
-        [DiagnosticName(SqlClientDiagnosticStrings.SqlBeforeExecuteCommand)]
-        public void BeforeExecuteCommand([Property(Name = "Command")] DbCommand sqlCommand)
-        {
-            var context = _tracingContext.CreateExitSegmentContext(ResolveOperationName(sqlCommand),
-                sqlCommand.Connection.DataSource);
-            context.Span.SpanLayer = Tracing.Segments.SpanLayer.DB;
-            context.Span.Component = Common.Components.SQLCLIENT;
-            context.Span.AddTag(Common.Tags.DB_TYPE, "sql");
-            context.Span.AddTag(Common.Tags.DB_INSTANCE, sqlCommand.Connection.Database);
-            context.Span.AddTag(Common.Tags.DB_STATEMENT, sqlCommand.CommandText);
-        }
-
-
-        [DiagnosticName(SqlClientDiagnosticStrings.SqlAfterExecuteCommand)]
-        public void AfterExecuteCommand()
-        {
-            var context = _contextAccessor.Context;
-            if (context != null)
-            {
-                _tracingContext.Release(context);
-            }
-        }
-
-        [DiagnosticName(SqlClientDiagnosticStrings.SqlErrorExecuteCommand)]
-        public void ErrorExecuteCommand([Property(Name = "Exception")] Exception ex)
-        {
-            var context = _contextAccessor.Context;
-            if (context != null)
-            {
-                context.Span.ErrorOccurred(ex, _tracingConfig);
-                _tracingContext.Release(context);
-            }
-        }
-        #endregion
-
-
-        #region Microsoft.Data.SqlClient
-        [DiagnosticName(SqlClientDiagnosticStrings.DotNetCoreSqlBeforeExecuteCommand)]
-        public void DotNetCoreBeforeExecuteCommand([Property(Name = "Command")] DbCommand sqlCommand)
-        {
-            this.BeforeExecuteCommand(sqlCommand);
-        }
-
-        [DiagnosticName(SqlClientDiagnosticStrings.DotNetCoreSqlAfterExecuteCommand)]
-        public void DotNetCoreAfterExecuteCommand()
-        {
-            this.AfterExecuteCommand();
-        }
-
-        [DiagnosticName(SqlClientDiagnosticStrings.DotNetCoreSqlErrorExecuteCommand)]
-        public void DotNetCoreErrorExecuteCommand([Property(Name = "Exception")] Exception ex)
-        {
-            this.ErrorExecuteCommand(ex);
-        }
-        #endregion
+        _tracingContext = tracingContext;
+        _contextAccessor = contextAccessor;
+        _tracingConfig = configAccessor.Get<TracingConfig>();
     }
+
+
+    public string ListenerName { get; } = SqlClientDiagnosticStrings.DiagnosticListenerName;
+
+    private static string ResolveOperationName(DbCommand sqlCommand)
+    {
+        var commandType = sqlCommand.CommandText?.Split(' ');
+        return $"{SqlClientDiagnosticStrings.SqlClientPrefix}{commandType?.FirstOrDefault()}";
+    }
+
+    #region System.Data.SqlClient
+    [DiagnosticName(SqlClientDiagnosticStrings.SqlBeforeExecuteCommand)]
+    public void BeforeExecuteCommand([Property(Name = "Command")] DbCommand sqlCommand)
+    {
+        var context = _tracingContext.CreateExitSegmentContext(ResolveOperationName(sqlCommand),
+            sqlCommand.Connection?.DataSource);
+        context.Span.SpanLayer = Tracing.Segments.SpanLayer.DB;
+        context.Span.Component = Common.Components.SQLCLIENT;
+        _ = context.Span.AddTag(Common.Tags.DB_TYPE, "sql");
+        _ = context.Span.AddTag(Common.Tags.DB_INSTANCE, sqlCommand.Connection?.Database);
+        _ = context.Span.AddTag(Common.Tags.DB_STATEMENT, sqlCommand.CommandText);
+    }
+
+
+    [DiagnosticName(SqlClientDiagnosticStrings.SqlAfterExecuteCommand)]
+    public void AfterExecuteCommand()
+    {
+        var context = _contextAccessor.Context;
+        if (context is not null)
+        {
+            _tracingContext.Release(context);
+        }
+    }
+
+    [DiagnosticName(SqlClientDiagnosticStrings.SqlErrorExecuteCommand)]
+    public void ErrorExecuteCommand([Property(Name = "Exception")] Exception ex)
+    {
+        var context = _contextAccessor.Context;
+        if (context is null) return;
+        context.Span.ErrorOccurred(ex, _tracingConfig);
+        _tracingContext.Release(context);
+    }
+    #endregion
+
+
+    #region Microsoft.Data.SqlClient
+    [DiagnosticName(SqlClientDiagnosticStrings.DotNetCoreSqlBeforeExecuteCommand)]
+    public void DotNetCoreBeforeExecuteCommand([Property(Name = "Command")] DbCommand sqlCommand)
+    {
+        this.BeforeExecuteCommand(sqlCommand);
+    }
+
+    [DiagnosticName(SqlClientDiagnosticStrings.DotNetCoreSqlAfterExecuteCommand)]
+    public void DotNetCoreAfterExecuteCommand()
+    {
+        this.AfterExecuteCommand();
+    }
+
+    [DiagnosticName(SqlClientDiagnosticStrings.DotNetCoreSqlErrorExecuteCommand)]
+    public void DotNetCoreErrorExecuteCommand([Property(Name = "Exception")] Exception ex)
+    {
+        this.ErrorExecuteCommand(ex);
+    }
+    #endregion
 }

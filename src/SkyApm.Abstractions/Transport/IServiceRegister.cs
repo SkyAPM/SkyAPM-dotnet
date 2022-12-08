@@ -16,17 +16,9 @@
  *
  */
 
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-using SkyApm.Common;
-using SkyApm.Transport;
+namespace SkyApm.Transport;
 
-namespace SkyApm.Transport
+public interface IServiceRegister
 {
-    public interface IServiceRegister
-    {
-        Task<bool> ReportInstancePropertiesAsync(ServiceInstancePropertiesRequest serviceInstancePropertiesRequest,
-            CancellationToken cancellationToken = default(CancellationToken));
-    }
+    Task<bool> ReportInstancePropertiesAsync(ServiceInstancePropertiesRequest serviceInstancePropertiesRequest, CancellationToken cancellationToken = default);
 }

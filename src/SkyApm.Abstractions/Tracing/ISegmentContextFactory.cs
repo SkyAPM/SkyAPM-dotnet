@@ -19,16 +19,15 @@
 using SkyApm.Common;
 using SkyApm.Tracing.Segments;
 
-namespace SkyApm.Tracing
+namespace SkyApm.Tracing;
+
+public interface ISegmentContextFactory
 {
-    public interface ISegmentContextFactory
-    {
-        SegmentContext CreateEntrySegment(string operationName, ICarrier carrier, long startTimeMilliseconds = default);
+    SegmentContext CreateEntrySegment(string operationName, ICarrier carrier, long startTimeMilliseconds = default);
 
-        SegmentContext CreateLocalSegment(string operationName, long startTimeMilliseconds = default);
+    SegmentContext CreateLocalSegment(string operationName, long startTimeMilliseconds = default);
 
-        SegmentContext CreateExitSegment(string operationName, StringOrIntValue networkAddress, long startTimeMilliseconds = default);
+    SegmentContext CreateExitSegment(string operationName, StringOrIntValue networkAddress, long startTimeMilliseconds = default);
 
-        void Release(SegmentContext segmentContext, long endTimeMilliseconds = default);
-    }
+    void Release(SegmentContext segmentContext, long endTimeMilliseconds = default);
 }

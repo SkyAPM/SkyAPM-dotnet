@@ -16,112 +16,96 @@
  *
  */
 
-using System;
-using System.Diagnostics;
-using System.Linq;
-using System.Net.Http;
 using Grpc.Core;
 using SkyApm.Common;
 using SkyApm.Config;
 using SkyApm.Diagnostics.HttpClient;
 using SkyApm.Tracing;
 using SkyApm.Tracing.Segments;
-using SkyApm.Transport;
+using System.Diagnostics;
 
-namespace SkyApm.Diagnostics.Grpc.Net.Client
+namespace SkyApm.Diagnostics.Grpc.Net.Client;
+
+public class GrpcClientDiagnosticProcessor : ITracingDiagnosticProcessor
 {
-    public class GrpcClientDiagnosticProcessor : ITracingDiagnosticProcessor
+    public string ListenerName => GrpcDiagnostics.ListenerName;
+
+    //private readonly IContextCarrierFactory _contextCarrierFactory;
+    private readonly ITracingContext _tracingContext;
+
+    private readonly IExitSegmentContextAccessor _contextAccessor;
+    private readonly TracingConfig _tracingConfig;
+    private readonly GrpcConfig _grpcConfig;
+
+    public GrpcClientDiagnosticProcessor(ITracingContext tracingContext,
+        IExitSegmentContextAccessor contextAccessor, IConfigAccessor configAccessor)
     {
-        public string ListenerName => GrpcDiagnostics.ListenerName;
+        _tracingContext = tracingContext;
+        _contextAccessor = contextAccessor;
+        _tracingConfig = configAccessor.Get<TracingConfig>();
+        _grpcConfig = configAccessor.Get<GrpcConfig>();
+    }
 
-        //private readonly IContextCarrierFactory _contextCarrierFactory;
-        private readonly ITracingContext _tracingContext;
+    [DiagnosticName(GrpcDiagnostics.ActivityName)]
+    public void DoNothing()
+    {
 
-        private readonly IExitSegmentContextAccessor _contextAccessor;
-        private readonly TracingConfig _tracingConfig;
-        private readonly GrpcConfig _grpcConfig;
+    }
 
-        public GrpcClientDiagnosticProcessor(ITracingContext tracingContext,
-            IExitSegmentContextAccessor contextAccessor, IConfigAccessor configAccessor)
+    [DiagnosticName(GrpcDiagnostics.ActivityStartKey)]
+    public void InitializeCall([Property(Name = "Request")] HttpRequestMessage request)
+    {
+        var requestUri = request.RequestUri.ToString();
+        if (IsSkyWalkingRequest(requestUri))
         {
-            _tracingContext = tracingContext;
-            _contextAccessor = contextAccessor;
-            _tracingConfig = configAccessor.Get<TracingConfig>();
-            _grpcConfig = configAccessor.Get<GrpcConfig>();
+            return;
         }
 
-        [DiagnosticName(GrpcDiagnostics.ActivityName)]
-        public void DoNothing()
-        {
+        var context = _tracingContext.CreateExitSegmentContext(requestUri,
+            $"{request.RequestUri.Host}:{request.RequestUri.Port}",
+            new GrpcNetClientICarrierHeaderCollection(request));
 
+        context.Span.SpanLayer = SpanLayer.RPC_FRAMEWORK;
+        context.Span.Component = Components.GRPC;
+        _ = context.Span.AddTag(Tags.URL, requestUri);
+
+        var activity = Activity.Current;
+        if (activity.OperationName != GrpcDiagnostics.ActivityName) return;
+        var method = activity.Tags.FirstOrDefault(x => x.Key == GrpcDiagnostics.GrpcMethodTagName).Value ?? request.Method.ToString();
+
+        _ = context.Span.AddTag(Tags.GRPC_METHOD_NAME, method);
+    }
+
+    private bool IsSkyWalkingRequest(string requestUri)
+    {
+        var servers = _grpcConfig.GetServers();
+        return servers.Any(server => requestUri.StartsWith(server, StringComparison.InvariantCultureIgnoreCase));
+    }
+
+    [DiagnosticName(GrpcDiagnostics.ActivityStopKey)]
+    public void FinishCall([Property(Name = "Response")] HttpResponseMessage response)
+    {
+        var context = _contextAccessor.Context;
+        if (context == null)
+        {
+            return;
         }
 
-        [DiagnosticName(GrpcDiagnostics.ActivityStartKey)]
-        public void InitializeCall([Property(Name = "Request")] HttpRequestMessage request)
+        var activity = Activity.Current;
+        if (activity.OperationName == GrpcDiagnostics.ActivityName)
         {
-            var requestUri = request.RequestUri.ToString();
-            if (IsSkyWalkingRequest(requestUri))
+            var statusCodeTag = activity.Tags.FirstOrDefault(x => x.Key == GrpcDiagnostics.GrpcStatusCodeTagName).Value;
+
+            var statusCode = int.TryParse(statusCodeTag, out var code) ? code : -1;
+            if (statusCode != 0)
             {
-                return;
+                var err = ((StatusCode)statusCode).ToString();
+                context.Span.ErrorOccurred(new Exception(err), _tracingConfig);
             }
 
-            var context = _tracingContext.CreateExitSegmentContext(requestUri,
-                $"{request.RequestUri.Host}:{request.RequestUri.Port}",
-                new GrpcNetClientICarrierHeaderCollection(request));
-
-            context.Span.SpanLayer = SpanLayer.RPC_FRAMEWORK;
-            context.Span.Component = Common.Components.GRPC;
-            context.Span.AddTag(Tags.URL, requestUri);
-
-            var activity = Activity.Current;
-            if (activity.OperationName == GrpcDiagnostics.ActivityName)
-            {
-                var method = activity.Tags.FirstOrDefault(x => x.Key == GrpcDiagnostics.GrpcMethodTagName).Value ??
-                             request.Method.ToString();
-
-                context.Span.AddTag(Tags.GRPC_METHOD_NAME, method);
-            }
+            _ = context.Span.AddTag(Tags.GRPC_STATUS, statusCode);
         }
 
-        private bool IsSkyWalkingRequest(string requestUri)
-        {
-            var servers = _grpcConfig.GetServers();
-            foreach (var server in servers)
-            {
-                if (requestUri.StartsWith(server, StringComparison.InvariantCultureIgnoreCase))
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        [DiagnosticName(GrpcDiagnostics.ActivityStopKey)]
-        public void FinishCall([Property(Name = "Response")] HttpResponseMessage response)
-        {
-            var context = _contextAccessor.Context;
-            if (context == null)
-            {
-                return;
-            }
-
-            var activity = Activity.Current;
-            if (activity.OperationName == GrpcDiagnostics.ActivityName)
-            {
-                var statusCodeTag = activity.Tags.FirstOrDefault(x => x.Key == GrpcDiagnostics.GrpcStatusCodeTagName).Value;
-
-                var statusCode = int.TryParse(statusCodeTag, out var code) ? code : -1;
-                if (statusCode != 0)
-                {
-                    var err = ((StatusCode)statusCode).ToString();
-                    context.Span.ErrorOccurred(new Exception(err), _tracingConfig);
-                }
-
-                context.Span.AddTag(Tags.GRPC_STATUS, statusCode);
-            }
-
-            _tracingContext.Release(context);
-        }
+        _tracingContext.Release(context);
     }
 }

@@ -16,14 +16,10 @@
  *
  */
 
-using System.Threading;
-using System.Threading.Tasks;
+namespace SkyApm.Transport;
 
-namespace SkyApm.Transport
+public interface ICLRStatsReporter
 {
-    public interface ICLRStatsReporter
-    {
-        Task ReportAsync(CLRStatsRequest statsRequest,
-            CancellationToken cancellationToken = default(CancellationToken));
-    }
+    Task ReportAsync(CLRStatsRequest statsRequest,
+        CancellationToken cancellationToken = default);
 }

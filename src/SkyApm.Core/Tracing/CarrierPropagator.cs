@@ -16,84 +16,81 @@
  *
  */
 
-using System.Collections.Generic;
-using System.Linq;
 using SkyApm.Tracing.Segments;
 
-namespace SkyApm.Tracing
+namespace SkyApm.Tracing;
+
+public class CarrierPropagator : ICarrierPropagator
 {
-    public class CarrierPropagator : ICarrierPropagator
+    private readonly IEnumerable<ICarrierFormatter> _carrierFormatters;
+    private readonly ISegmentContextFactory _segmentContextFactory;
+
+    public CarrierPropagator(IEnumerable<ICarrierFormatter> carrierFormatters,
+        ISegmentContextFactory segmentContextFactory)
     {
-        private readonly IEnumerable<ICarrierFormatter> _carrierFormatters;
-        private readonly ISegmentContextFactory _segmentContextFactory;
+        _carrierFormatters = carrierFormatters;
+        _segmentContextFactory = segmentContextFactory;
+    }
 
-        public CarrierPropagator(IEnumerable<ICarrierFormatter> carrierFormatters,
-            ISegmentContextFactory segmentContextFactory)
+    public void Inject(SegmentContext segmentContext, ICarrierHeaderCollection headerCollection)
+    {
+        var reference = segmentContext.References.FirstOrDefault();
+
+        var carrier = new Carrier(segmentContext.TraceId, segmentContext.SegmentId, segmentContext.Span.SpanId,
+            segmentContext.ServiceInstanceId, reference?.EntryServiceInstanceId ?? segmentContext.ServiceInstanceId,
+            segmentContext.ServiceId)
         {
-            _carrierFormatters = carrierFormatters;
-            _segmentContextFactory = segmentContextFactory;
+            NetworkAddress = segmentContext.Span.Peer,
+            EntryEndpoint = reference?.EntryEndpoint ?? segmentContext.Span.OperationName,
+            ParentEndpoint = segmentContext.Span.OperationName,
+            Sampled = segmentContext.Sampled
+        };
+
+        foreach (var formatter in _carrierFormatters)
+        {
+            if (formatter.Enable)
+                headerCollection.Add(formatter.Key, formatter.Encode(carrier));
         }
+    }
 
-        public void Inject(SegmentContext segmentContext, ICarrierHeaderCollection headerCollection)
+    public ICarrier Extract(ICarrierHeaderCollection headerCollection)
+    {
+        ICarrier carrier = NullableCarrier.Instance;
+        if (headerCollection == null)
         {
-            var reference = segmentContext.References.FirstOrDefault();
-
-            var carrier = new Carrier(segmentContext.TraceId, segmentContext.SegmentId, segmentContext.Span.SpanId,
-                segmentContext.ServiceInstanceId, reference?.EntryServiceInstanceId ?? segmentContext.ServiceInstanceId,
-                segmentContext.ServiceId)
-            {
-                NetworkAddress = segmentContext.Span.Peer,
-                EntryEndpoint = reference?.EntryEndpoint ?? segmentContext.Span.OperationName,
-                ParentEndpoint = segmentContext.Span.OperationName,
-                Sampled = segmentContext.Sampled
-            };
-
-            foreach (var formatter in _carrierFormatters)
-            {
-                if (formatter.Enable)
-                    headerCollection.Add(formatter.Key, formatter.Encode(carrier));
-            }
-        }
-
-        public ICarrier Extract(ICarrierHeaderCollection headerCollection)
-        {
-            ICarrier carrier = NullableCarrier.Instance;
-            if (headerCollection == null)
-            {
-                return carrier;
-            }
-            foreach (var formatter in _carrierFormatters.OrderByDescending(x => x.Key))
-            {
-                if (!formatter.Enable)
-                {
-                    continue;
-                }
-
-                string headerValue = null;
-                if(headerCollection is ICarrierHeaderDictionary headerDictionary)
-                {
-                    headerValue = headerDictionary.Get(formatter.Key);
-                }
-                else
-                {
-                    headerValue = headerCollection.FirstOrDefault(header => header.Key == formatter.Key).Value;
-                }
-                if (headerValue == null)
-                    continue;
-
-                carrier = formatter.Decode(headerValue);
-                if (carrier.HasValue)
-                {
-                    if (formatter.Key.EndsWith("sw3") && carrier is Carrier c)
-                    {
-                        c.Sampled = true;
-                    }
-
-                    return carrier;
-                }
-            }
-
             return carrier;
         }
+        foreach (var formatter in _carrierFormatters.OrderByDescending(x => x.Key))
+        {
+            if (!formatter.Enable)
+            {
+                continue;
+            }
+
+            string headerValue = null;
+            if(headerCollection is ICarrierHeaderDictionary headerDictionary)
+            {
+                headerValue = headerDictionary.Get(formatter.Key);
+            }
+            else
+            {
+                headerValue = headerCollection.FirstOrDefault(header => header.Key == formatter.Key).Value;
+            }
+            if (headerValue == null)
+                continue;
+
+            carrier = formatter.Decode(headerValue);
+            if (carrier.HasValue)
+            {
+                if (formatter.Key.EndsWith("sw3") && carrier is Carrier c)
+                {
+                    c.Sampled = true;
+                }
+
+                return carrier;
+            }
+        }
+
+        return carrier;
     }
 }

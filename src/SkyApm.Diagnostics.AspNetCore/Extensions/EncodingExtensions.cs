@@ -1,24 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Text;
 
-namespace SkyApm.Diagnostics.AspNetCore.Extensions
+namespace SkyApm.Diagnostics.AspNetCore.Extensions;
+
+internal static class EncodingExtensions
 {
-    internal static class EncodingExtensions
+    public static Encoding ToEncoding(this string charset, Encoding fallbackDefault)
     {
-        public static Encoding ToEncoding(this string charset, Encoding fallbackDefault)
+        try {
+            return string.IsNullOrEmpty(charset) ? fallbackDefault : Encoding.GetEncoding(charset);
+        }
+        catch (Exception)
         {
-            try
-            {
-                if (string.IsNullOrEmpty(charset))
-                    return fallbackDefault;
-
-                return Encoding.GetEncoding(charset);
-            }
-            catch (Exception)
-            {
-                return fallbackDefault;
-            }
+            return fallbackDefault;
         }
     }
 }

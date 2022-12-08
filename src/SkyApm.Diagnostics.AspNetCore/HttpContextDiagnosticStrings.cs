@@ -16,10 +16,9 @@
  *
  */
 
-namespace SkyApm.AspNetCore.Diagnostics
+namespace SkyApm.AspNetCore.Diagnostics; 
+
+internal static class HttpContextDiagnosticStrings
 {
-    internal static class HttpContextDiagnosticStrings
-    {
-        public const string SpanKey = "sw3-http";
-    }
+    public const string SpanKey = "sw3-http";
 }

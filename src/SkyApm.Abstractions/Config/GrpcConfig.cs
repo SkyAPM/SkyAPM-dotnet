@@ -16,55 +16,51 @@
  *
  */
 
-using System;
-using System.Linq;
+namespace SkyApm.Config;
 
-namespace SkyApm.Config
+[Config("SkyWalking", "Transport", "gRPC")]
+public class GrpcConfig
 {
-    [Config("SkyWalking", "Transport", "gRPC")]
-    public class GrpcConfig
+    public string Servers { get; set; }
+
+    public int ConnectTimeout { get; set; }
+
+    public int Timeout { get; set; }
+
+    public int ReportTimeout { get; set; }
+
+    public string Authentication { get; set; }
+}
+
+public static class GrpcConfigExtensions
+{
+    public static string[] GetServers(this GrpcConfig config)
     {
-        public string Servers { get; set; }
+        var servers = config.Servers.Split(',').ToArray();
+        for (var i = 0; i < servers.Length; i++)
+        {
+            if (!servers[i].StartsWith("http://", StringComparison.InvariantCultureIgnoreCase)
+                && !servers[i].StartsWith("https://", StringComparison.InvariantCultureIgnoreCase))
+            {
+                servers[i] = $"http://{servers[i]}";
+            }
+        } 
 
-        public int ConnectTimeout { get; set; }
-
-        public int Timeout { get; set; }
-
-        public int ReportTimeout { get; set; }
-
-        public string Authentication { get; set; }
+        return servers;
     }
 
-    public static class GrpcConfigExtensions
+    public static DateTime GetTimeout(this GrpcConfig config)
     {
-        public static string[] GetServers(this GrpcConfig config)
-        {
-            var servers = config.Servers.Split(',').ToArray();
-            for (int i = 0; i < servers.Length; i++)
-            {
-                if (!servers[i].StartsWith("http://", StringComparison.InvariantCultureIgnoreCase)
-                        && !servers[i].StartsWith("https://", StringComparison.InvariantCultureIgnoreCase))
-                {
-                    servers[i] = $"http://{servers[i]}";
-                }
-            } 
-
-            return servers;
-        }
-
-        public static DateTime GetTimeout(this GrpcConfig config)
-        {
-            return DateTime.UtcNow.AddMilliseconds(config.Timeout);
-        }
+        return DateTime.UtcNow.AddMilliseconds(config.Timeout);
+    }
         
-        public static DateTime GetConnectTimeout(this GrpcConfig config)
-        {
-            return DateTime.UtcNow.AddMilliseconds(config.ConnectTimeout);
-        }
+    public static DateTime GetConnectTimeout(this GrpcConfig config)
+    {
+        return DateTime.UtcNow.AddMilliseconds(config.ConnectTimeout);
+    }
         
-        public static DateTime GetReportTimeout(this GrpcConfig config)
-        {
-            return DateTime.UtcNow.AddMilliseconds(config.ReportTimeout);
-        }
+    public static DateTime GetReportTimeout(this GrpcConfig config)
+    {
+        return DateTime.UtcNow.AddMilliseconds(config.ReportTimeout);
     }
 }

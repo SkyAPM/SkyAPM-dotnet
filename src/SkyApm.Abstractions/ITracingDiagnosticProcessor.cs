@@ -16,10 +16,9 @@
  *
  */
 
-namespace SkyApm
+namespace SkyApm;
+
+public interface ITracingDiagnosticProcessor
 {
-    public interface ITracingDiagnosticProcessor
-    {
-        string ListenerName { get; }
-    }
+    string ListenerName { get; }
 }

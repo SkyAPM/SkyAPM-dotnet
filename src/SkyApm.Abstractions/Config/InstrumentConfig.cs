@@ -16,28 +16,25 @@
  *
  */
 
-using System;
+namespace SkyApm.Config;
 
-namespace SkyApm.Config
+[Config("SkyWalking")]
+public class InstrumentConfig
 {
-    [Config("SkyWalking")]
-    public class InstrumentConfig
-    {
-        public string Namespace { get; set; }
+    public string Namespace { get; set; }
 
-        [Obsolete("Use ServiceName.")]
-        public string ApplicationCode { get; set; }
+    [Obsolete("Use ServiceName.")]
+    public string ApplicationCode { get; set; }
         
-        public string ServiceName { get; set; }
+    public string ServiceName { get; set; }
 
-        public string ServiceInstanceName { get; set; }
+    public string ServiceInstanceName { get; set; }
 
 
-        public string[] HeaderVersions { get; set; }
-    }
+    public string[] HeaderVersions { get; set; }
+}
 
-    public static class HeaderVersions
-    {
-        public static string SW8 { get; } = "sw8";
-    }
+public static class HeaderVersions
+{
+    public static string SW8 { get; } = "sw8";
 }
