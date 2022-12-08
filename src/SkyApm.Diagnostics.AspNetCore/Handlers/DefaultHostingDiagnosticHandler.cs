@@ -54,7 +54,7 @@ public class DefaultHostingDiagnosticHandler : IHostingDiagnosticHandler
             new HttpRequestCarrierHeaderCollection(httpContext.Request));
         context.Span.SpanLayer = SpanLayer.HTTP;
         context.Span.Component = Components.ASPNETCORE;
-        context.Span.Peer = new(httpContext.Connection.RemoteIpAddress.ToString());
+        context.Span.Peer = new(httpContext.Connection.RemoteIpAddress?.ToString());
         context.Span.AddTag(Tags.URL, httpContext.Request.GetDisplayUrl());
         context.Span.AddTag(Tags.PATH, httpContext.Request.Path);
         context.Span.AddTag(Tags.HTTP_METHOD, httpContext.Request.Method);

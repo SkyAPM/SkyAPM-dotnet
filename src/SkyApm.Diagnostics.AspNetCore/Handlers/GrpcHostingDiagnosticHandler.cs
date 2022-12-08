@@ -43,7 +43,7 @@ public class GrpcHostingDiagnosticHandler : IHostingDiagnosticHandler
             new HttpRequestCarrierHeaderCollection(httpContext.Request));
         context.Span.SpanLayer = SpanLayer.RPC_FRAMEWORK;
         context.Span.Component = Components.GRPC;
-        context.Span.Peer = new(httpContext.Connection.RemoteIpAddress.ToString());
+        context.Span.Peer = new(httpContext.Connection.RemoteIpAddress?.ToString());
         context.Span.AddTag(Tags.URL, httpContext.Request.GetDisplayUrl());
     }
 
