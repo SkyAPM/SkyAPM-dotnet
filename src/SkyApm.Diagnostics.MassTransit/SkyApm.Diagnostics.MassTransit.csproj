@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFrameworks>netcoreapp3.1;net5.0</TargetFrameworks>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="MassTransit.Abstractions" Version="8.0.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" Version="2.0.0" />
+		<PackageReference Include="SkyAPM.Agent.Hosting" Version="2.0.0" />
+		<PackageReference Include="SkyAPM.Diagnostics.AspNetCore" Version="2.0.0" />
+		<PackageReference Include="SkyAPM.Utilities.DependencyInjection" Version="2.0.0" />
+		<PackageReference Include="System.Diagnostics.DiagnosticSource" Version="5.0.1" />
+	</ItemGroup>
+
+</Project>
