@@ -8,11 +8,13 @@ using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Text.Json;
+using System.Collections.Concurrent;
 
 namespace SkyApm.Diagnostics.MassTransit.Observers
 {
     public class MasstransitPublishObserver : IPublishObserver
     {
+        private readonly ConcurrentDictionary<Guid, SegmentContext> _contexts = new ConcurrentDictionary<Guid, SegmentContext>();
         private const string OperateNamePrefix = "Masstransit Publishing/";
 
         private readonly ITracingContext _tracingContext;
@@ -35,7 +37,7 @@ namespace SkyApm.Diagnostics.MassTransit.Observers
         }
         public Task PrePublish<T>(PublishContext<T> pubContext) where T : class
         {
-            ObserverSegmentContextDictionary.Contexts[pubContext.ConversationId.Value] = _entrySegmentContextAccessor.Context;
+            _contexts[pubContext.ConversationId.Value] = _entrySegmentContextAccessor.Context;
 
             var host = $"{pubContext.DestinationAddress.Host}";
             var activity = Activity.Current ?? default;
@@ -63,7 +65,10 @@ namespace SkyApm.Diagnostics.MassTransit.Observers
             if (context == null) return Task.CompletedTask;
 
             var activity = Activity.Current ?? default;
-
+            foreach (var tags in activity.Tags)
+            {
+                context.Span.AddTag(tags.Key, tags.Value);
+            }
             context.Span.AddLog(LogEvent.Event("Masstransit Message Publishing End"));
             context.Span.AddLog(LogEvent.Message($"Masstransit message published successfully!{Environment.NewLine}" +
                                                  $"--> Spend Time: { activity.Duration.TotalMilliseconds }ms.  {Environment.NewLine}" +
@@ -71,7 +76,7 @@ namespace SkyApm.Diagnostics.MassTransit.Observers
                                                  $"--> Message Type: {pubContext.Message.GetType()} {Environment.NewLine}" + 
                                                  $"--> Message Json: {JsonSerializer.Serialize(pubContext.Message)}"));
             _tracingContext.Release(context);
-            ObserverSegmentContextDictionary.Contexts.TryRemove(pubContext.ConversationId.Value, out _);
+            _contexts.TryRemove(pubContext.ConversationId.Value, out _);
             return Task.CompletedTask;
         }
 
@@ -82,6 +87,10 @@ namespace SkyApm.Diagnostics.MassTransit.Observers
 
             var activity = Activity.Current ?? default;
 
+            foreach (var tags in activity.Tags)
+            {
+                context.Span.AddTag(tags.Key, tags.Value);
+            }
             context.Span.AddLog(LogEvent.Event("Masstransit Message Publishing Error"));
             context.Span.AddLog(LogEvent.Message($"Masstransit message publishing failed!{Environment.NewLine}" +
                                                  $"--> Spend Time: { activity.Duration }ms.  {Environment.NewLine}" +
@@ -91,7 +100,7 @@ namespace SkyApm.Diagnostics.MassTransit.Observers
             context.Span.ErrorOccurred(exception, _tracingConfig);
 
             _tracingContext.Release(context);
-            ObserverSegmentContextDictionary.Contexts.TryRemove(pubContext.ConversationId.Value, out _);
+            _contexts.TryRemove(pubContext.ConversationId.Value, out _);
             return Task.CompletedTask;
         }
     }

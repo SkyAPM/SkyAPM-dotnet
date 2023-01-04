@@ -5,6 +5,7 @@ using SkyApm.Diagnostics.MassTransit.Common;
 using SkyApm.Tracing;
 using SkyApm.Tracing.Segments;
 using System;
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -13,6 +14,7 @@ namespace SkyApm.Diagnostics.MassTransit.Observers
 {
     public class MasstransitConsumerObserver : IConsumeObserver
     {
+        private readonly ConcurrentDictionary<Guid, SegmentContext> _contexts = new ConcurrentDictionary<Guid, SegmentContext>();
         private const string OperateNamePrefix = "Masstransit Consumer/";
 
         private readonly ITracingContext _tracingContext;
@@ -37,20 +39,29 @@ namespace SkyApm.Diagnostics.MassTransit.Observers
             context.Span.Peer = $"{consumeContext.DestinationAddress.Host}";
             context.Span.AddTag(Tags.MQ_TOPIC, activity.OperationName);
             context.Span.AddTag(Tags.MQ_BROKER, consumeContext.DestinationAddress.Host);
-            context.Span.AddTag(MassTags.ExpirationTime, consumeContext.ExpirationTime?.ToString("yyyy-MM-dd HH:mm:ss-fff"));
+            //ExpirationTime is a high cardinality tag, best to use logging
+            //context.Span.AddTag(MassTags.ExpirationTime, consumeContext.ExpirationTime?.ToString("yyyy-MM-dd HH:mm:ss-fff"));
             context.Span.AddLog(LogEvent.Event("Masstransit Message Consumed Start"));
             context.Span.AddLog(LogEvent.Message("Masstransit message consumed start..."));
+            if (consumeContext.ExpirationTime.HasValue)
+            {
+                context.Span.AddLog(LogEvent.Message($"Masstransit message will be expirated at {consumeContext.ExpirationTime?.ToString("yyyy-MM-dd HH:mm:ss-fff")}"));
+            }
 
-            ObserverSegmentContextDictionary.Contexts[consumeContext.MessageId.Value] = context;
+            _contexts[consumeContext.MessageId.Value] = context;
             return Task.CompletedTask;
         }
         public Task PostConsume<T>(ConsumeContext<T> consumeContext) where T : class
         {
-            var context = ObserverSegmentContextDictionary.Contexts[consumeContext.MessageId.Value];
+            var context = _contexts[consumeContext.MessageId.Value];
             if (context == null) return Task.CompletedTask;
 
             var activity = Activity.Current ?? default;
 
+            foreach (var tags in activity.Tags)
+            {
+                context.Span.AddTag(tags.Key, tags.Value);
+            }
             context.Span.AddLog(LogEvent.Event("Masstransit Message Consumed End"));
             context.Span.AddLog(LogEvent.Message($"Masstransit message consumed succeeded!{Environment.NewLine}" +
                                                  $"--> Spend Time: { activity.Duration.TotalMilliseconds }ms. {Environment.NewLine}" +
@@ -59,17 +70,21 @@ namespace SkyApm.Diagnostics.MassTransit.Observers
                                                  $"--> Message Json: {JsonSerializer.Serialize(consumeContext.Message)}"));
 
             _tracingContext.Release(context);
-            ObserverSegmentContextDictionary.Contexts.TryRemove(consumeContext.MessageId.Value, out _);
+            _contexts.TryRemove(consumeContext.MessageId.Value, out _);
             return Task.CompletedTask;
         }
 
         public Task ConsumeFault<T>(ConsumeContext<T> consumeContext, Exception exception) where T : class
         {
-            var context = ObserverSegmentContextDictionary.Contexts[consumeContext.MessageId.Value];
+            var context = _contexts[consumeContext.MessageId.Value];
             if (context == null) return Task.CompletedTask;
 
             var activity = Activity.Current ?? default;
 
+            foreach (var tags in activity.Tags)
+            {
+                context.Span.AddTag(tags.Key, tags.Value);
+            }
             context.Span.AddLog(LogEvent.Event("Masstransit Message Consumed Error"));
             context.Span.AddLog(LogEvent.Message($"Masstransit message consumed failed!{Environment.NewLine}" +
                                                  $"--> Spend Time: { activity.Duration.TotalMilliseconds }ms. {Environment.NewLine}" +
@@ -78,7 +93,7 @@ namespace SkyApm.Diagnostics.MassTransit.Observers
                                                  $"--> Message Json: {JsonSerializer.Serialize(consumeContext.Message)} "));
             context.Span.ErrorOccurred(exception, _tracingConfig);
             _tracingContext.Release(context);
-            ObserverSegmentContextDictionary.Contexts.TryRemove(consumeContext.MessageId.Value, out _);
+            _contexts.TryRemove(consumeContext.MessageId.Value, out _);
             return Task.CompletedTask;
         }
     }

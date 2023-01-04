@@ -5,6 +5,7 @@ using SkyApm.Diagnostics.MassTransit.Common;
 using SkyApm.Tracing;
 using SkyApm.Tracing.Segments;
 using System;
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Threading.Tasks;
 
@@ -12,6 +13,8 @@ namespace SkyApm.Diagnostics.MassTransit.Observers
 {
     public class MasstransitReceiveObserver : IReceiveObserver
     {
+        private readonly ConcurrentDictionary<Guid, SegmentContext> _contexts = new ConcurrentDictionary<Guid, SegmentContext>();
+
         private readonly ITracingContext _tracingContext;
         private IEntrySegmentContextAccessor _entrySegmentContextAccessor;
         private TracingConfig _tracingConfig;
@@ -33,7 +36,8 @@ namespace SkyApm.Diagnostics.MassTransit.Observers
 
             var segContext = _tracingContext.CreateEntrySegmentContext("Masstransit Receiving/ " + activity.OperationName,
                 new MasstransitCarrierHeaderCollection(context.TransportHeaders));
-            segContext.Span.SpanLayer = SpanLayer.DB;
+            //Mostly the receive point is from MQ
+            segContext.Span.SpanLayer = SpanLayer.MQ;
             segContext.Span.Component = Components.ASPNETCORE;
             segContext.Span.Peer = context.InputAddress?.Host;
             segContext.Span.AddTag(Tags.DB_TYPE, "Sql");
@@ -41,7 +45,7 @@ namespace SkyApm.Diagnostics.MassTransit.Observers
             segContext.Span.AddLog(LogEvent.Event("Masstransit Message Receiving Start"));
             segContext.Span.AddLog(LogEvent.Message("Masstransit message received start..."));
 
-            ObserverSegmentContextDictionary.Contexts[context.GetMessageId().Value] = _entrySegmentContextAccessor.Context;
+            _contexts[context.GetMessageId().Value] = _entrySegmentContextAccessor.Context;
             return Task.CompletedTask;
         }
 
@@ -52,13 +56,17 @@ namespace SkyApm.Diagnostics.MassTransit.Observers
 
             var activity = Activity.Current ?? default;
 
+            foreach (var tags in activity.Tags)
+            {
+                segContext.Span.AddTag(tags.Key, tags.Value);
+            }
             segContext.Span.AddLog(LogEvent.Event("Masstransit Message Received End"));
             segContext.Span.AddLog(LogEvent.Message($"Masstransit message Received succeeded!{Environment.NewLine}" +
                                                  $"--> Spend Time: { activity.Duration.TotalMilliseconds }ms.{Environment.NewLine}" +
                                                  $"--> Message Id: { context.GetMessageId() } , Name: { activity.OperationName}"));
 
             _tracingContext.Release(segContext);
-            ObserverSegmentContextDictionary.Contexts.TryRemove(context.GetMessageId().Value, out _);
+            _contexts.TryRemove(context.GetMessageId().Value, out _);
             return Task.CompletedTask;
         }
 
@@ -69,13 +77,17 @@ namespace SkyApm.Diagnostics.MassTransit.Observers
 
             var activity = Activity.Current ?? default;
 
+            foreach (var tags in activity.Tags)
+            {
+                segContext.Span.AddTag(tags.Key, tags.Value);
+            }
             segContext.Span.AddLog(LogEvent.Event("Masstransit Message Received Error"));
             segContext.Span.AddLog(LogEvent.Message($"Masstransit message received failed!{Environment.NewLine}" +
                                                  $"--> Spend Time: { activity.Duration.TotalMilliseconds }ms.{Environment.NewLine}" +
                                                  $"--> Message Id: { context.GetMessageId() } , Name: { activity.OperationName}"));
             segContext.Span.ErrorOccurred(exception, _tracingConfig);
             _tracingContext.Release(segContext);
-            ObserverSegmentContextDictionary.Contexts.TryRemove(context.GetMessageId().Value, out _);
+            _contexts.TryRemove(context.GetMessageId().Value, out _);
             return Task.CompletedTask;
         }
 
