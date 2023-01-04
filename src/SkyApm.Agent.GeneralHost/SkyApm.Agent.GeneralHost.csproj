@@ -9,11 +9,11 @@
         <PackageReleaseNotes>
         </PackageReleaseNotes>
         <RootNamespace>SkyApm.Agent.GeneralHost</RootNamespace>
-        <TargetFrameworks>netcoreapp3.1;net5.0;net6.0</TargetFrameworks>
+        <TargetFrameworks>netcoreapp3.1;net5.0;net6.0;net7.0</TargetFrameworks>
     </PropertyGroup>
     
     <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp3.1'">
-        <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="3.1.0" PrivateAssets="All"/>
+        <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="3.1.32" PrivateAssets="All"/>
     </ItemGroup>
 
     <ItemGroup Condition="'$(TargetFramework)' == 'net5.0'">
@@ -21,6 +21,9 @@
     </ItemGroup>
     <ItemGroup Condition="'$(TargetFramework)' == 'net6.0'">
         <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="6.0.0"/>
+    </ItemGroup>
+    <ItemGroup Condition="'$(TargetFramework)' == 'net7.0'">
+	    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="7.0.0"/>
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\SkyApm.Agent.Hosting\SkyApm.Agent.Hosting.csproj"/>

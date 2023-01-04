@@ -12,8 +12,8 @@ namespace SkyApm.Benchmark
             BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly)
                 .Run(args, ManualConfig
                     .Create(DefaultConfig.Instance)
-                    .With(MemoryDiagnoser.Default)
-                    .With(ExecutionValidator.FailOnError));
+                    .AddDiagnoser(MemoryDiagnoser.Default)
+                    .AddValidator(ExecutionValidator.FailOnError));
         }
     }
 }

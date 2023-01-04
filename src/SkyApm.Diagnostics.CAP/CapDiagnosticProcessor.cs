@@ -16,16 +16,16 @@
  *
  */
 
-using System;
-using System.Collections.Concurrent;
 using DotNetCore.CAP.Diagnostics;
 using DotNetCore.CAP.Messages;
 using DotNetCore.CAP.Transport;
-using Newtonsoft.Json;
 using SkyApm.Common;
 using SkyApm.Config;
 using SkyApm.Tracing;
 using SkyApm.Tracing.Segments;
+using System;
+using System.Collections.Concurrent;
+using System.Text.Json;
 using CapEvents = DotNetCore.CAP.Diagnostics.CapDiagnosticListenerNames;
 
 namespace SkyApm.Diagnostics.CAP
@@ -97,7 +97,7 @@ namespace SkyApm.Diagnostics.CAP
             context.Span.AddLog(LogEvent.Event("Event Persistence Error"));
             context.Span.AddLog(LogEvent.Message($"CAP message persistence failed!{Environment.NewLine}" +
                                                  $"--> Message Info:{Environment.NewLine}" +
-                                                 $"{ JsonConvert.SerializeObject(eventData.Message, Formatting.Indented)}"));
+                                                 $"{ JsonSerializer.Serialize(eventData.Message)}"));
 
             context.Span.ErrorOccurred(eventData.Exception, _tracingConfig);
             _tracingContext.Release(context);
@@ -107,7 +107,7 @@ namespace SkyApm.Diagnostics.CAP
         public void BeforePublish([Object] CapEventDataPubSend eventData)
         {
             SegmentContext context = null;
-            var host = eventData.BrokerAddress.Endpoint.Replace("-1", "5672");
+            var host = eventData.BrokerAddress.Endpoint?.Replace("-1", "5672");
             if (_contexts.TryGetValue(eventData.TransportMessage.GetId(),out var ctx))
             {
                 _localSegmentContextAccessor.Context = ctx;
@@ -177,7 +177,7 @@ namespace SkyApm.Diagnostics.CAP
             var context = _tracingContext.CreateEntrySegmentContext(operationName, carrierHeader);
             context.Span.SpanLayer = SpanLayer.DB;
             context.Span.Component = GetComponent(eventData.BrokerAddress, false);
-            context.Span.Peer = eventData.BrokerAddress.Endpoint.Replace("-1", "5672");
+            context.Span.Peer = eventData.BrokerAddress.Endpoint?.Replace("-1", "5672");
             context.Span.AddTag(Tags.MQ_TOPIC, eventData.Operation);
             context.Span.AddTag(Tags.MQ_BROKER, eventData.BrokerAddress.Endpoint);
             context.Span.AddLog(LogEvent.Event("Event Persistence Start"));
@@ -268,7 +268,7 @@ namespace SkyApm.Diagnostics.CAP
             context.Span.AddLog(LogEvent.Message($"Subscriber invoke failed! {Environment.NewLine}" +
                                                  $"--> Method Info: { eventData.MethodInfo} {Environment.NewLine}" +
                                                  $"--> Message Info: {Environment.NewLine}" +
-                                                 $"{ JsonConvert.SerializeObject(eventData.Message, Formatting.Indented)}"));
+                                                 $"{ JsonSerializer.Serialize(eventData.Message)}"));
 
             context.Span.ErrorOccurred(eventData.Exception, _tracingConfig);
 

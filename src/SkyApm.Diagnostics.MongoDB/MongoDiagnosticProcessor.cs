@@ -50,7 +50,7 @@ namespace SkyApm.Diagnostics.MongoDB
             context.Span.AddTag("db.mongodb.collection", operationName);
             context.Span.AddTag("db.operation", operationName + @event.CommandName);
             context.Span.AddTag(Common.Tags.DB_TYPE, "sql");
-            context.Span.AddTag(Common.Tags.DB_INSTANCE, @event.DatabaseNamespace.DatabaseName);
+            context.Span.AddTag(Common.Tags.DB_INSTANCE, @event.DatabaseNamespace?.DatabaseName);
             context.Span.AddTag(Common.Tags.DB_STATEMENT, @event.Command.ToString());
         }
 

@@ -65,7 +65,6 @@ namespace SkyApm.Diagnostics.MSLogging
 
         public bool IsEnabled(LogLevel logLevel) => true;
 
-
         public IDisposable BeginScope<TState>(TState state) => default!;
     }
 }
