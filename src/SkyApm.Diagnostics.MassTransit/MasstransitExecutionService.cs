@@ -15,7 +15,6 @@ namespace SkyApm.Diagnostics.MassTransit
         }
         public Task StartAsync(CancellationToken cancellationToken = default)
         {
-            //busConnectHandle = _busFactory.ConnectPublishObserver(publishObserver);
             return Task.CompletedTask;
         }
 

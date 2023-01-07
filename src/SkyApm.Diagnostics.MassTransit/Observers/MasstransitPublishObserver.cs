@@ -12,7 +12,10 @@ using System.Collections.Concurrent;
 
 namespace SkyApm.Diagnostics.MassTransit.Observers
 {
-    public class MasstransitPublishObserver : IPublishObserver
+    /// <summary>
+    /// Publishing and Sending endpoint has same logic.
+    /// </summary>
+    public class MasstransitPublishObserver : IPublishObserver, ISendObserver
     {
         private readonly ConcurrentDictionary<Guid, SegmentContext> _contexts = new ConcurrentDictionary<Guid, SegmentContext>();
         private const string OperateNamePrefix = "Masstransit Publishing/";
@@ -37,29 +40,59 @@ namespace SkyApm.Diagnostics.MassTransit.Observers
         }
         public Task PrePublish<T>(PublishContext<T> pubContext) where T : class
         {
-            _contexts[pubContext.ConversationId.Value] = _entrySegmentContextAccessor.Context;
+            return PreHandleSendEndpoint(pubContext);
+        }
 
-            var host = $"{pubContext.DestinationAddress.Host}";
+        public Task PreSend<T>(SendContext<T> sendContext) where T : class
+        {
+            return PreHandleSendEndpoint(sendContext, "Masstransit Sending/");
+        }
+
+        public Task PostPublish<T>(PublishContext<T> pubContext) where T : class
+        {
+            return PostHandleSendEndpoint(pubContext);
+        }
+
+        public Task PostSend<T>(SendContext<T> sendContext) where T : class
+        {
+            return PostHandleSendEndpoint(sendContext);
+        }
+
+        public Task PublishFault<T>(PublishContext<T> pubContext, Exception exception) where T : class
+        {
+            return FaultHandleSendEndpoint(pubContext, exception);
+        }
+
+        public Task SendFault<T>(SendContext<T> sendContext, Exception exception) where T : class
+        {
+            return FaultHandleSendEndpoint(sendContext, exception);
+        }
+
+        private Task PreHandleSendEndpoint<T>(SendContext<T> sendContext, string isSendEndpoint = null) where T : class
+        {
+            _contexts[sendContext.ConversationId.Value] = _entrySegmentContextAccessor.Context;
+
+            var host = $"{sendContext.DestinationAddress.Host}";
             var activity = Activity.Current ?? default;
 
-            var context = _tracingContext.CreateExitSegmentContext(OperateNamePrefix + activity.OperationName,
-                host, new MasstransitCarrierHeaderCollection(pubContext.Headers));
+            var context = _tracingContext.CreateExitSegmentContext((isSendEndpoint ?? OperateNamePrefix) + activity.OperationName,
+                host, new MasstransitCarrierHeaderCollection(sendContext.Headers));
 
             context.Span.SpanLayer = SpanLayer.MQ;
-            context.Span.Component = _getComponentID.GetPublishComponentID(pubContext);
+            context.Span.Component = _getComponentID.GetPublishComponentID(sendContext);
             context.Span.Peer = host;
             context.Span.AddTag(Tags.MQ_TOPIC, activity.OperationName);
-            context.Span.AddTag(Tags.MQ_BROKER, pubContext.DestinationAddress.Host);
-            context.Span.AddTag(MassTags.Durable, pubContext.Durable);
-            context.Span.AddTag(MassTags.FaultAddress, pubContext.FaultAddress?.AbsolutePath);
-            context.Span.AddTag(MassTags.SentTime, pubContext.SentTime.Value.ToString("yyyy-MM-dd hh:mm:ss-fff")); 
+            context.Span.AddTag(Tags.MQ_BROKER, sendContext.DestinationAddress.Host);
+            context.Span.AddTag(MassTags.Durable, sendContext.Durable);
+            context.Span.AddTag(MassTags.FaultAddress, sendContext.FaultAddress?.AbsolutePath);
+            context.Span.AddTag(MassTags.SentTime, sendContext.SentTime.Value.ToString("yyyy-MM-dd hh:mm:ss-fff"));
 
             context.Span.AddLog(LogEvent.Event("Masstransit Message Publishing Start"));
             context.Span.AddLog(LogEvent.Message("Masstransit message publishing start..."));
             return Task.CompletedTask;
         }
 
-        public Task PostPublish<T>(PublishContext<T> pubContext) where T : class
+        private Task PostHandleSendEndpoint<T>(SendContext<T> sendContect) where T : class
         {
             var context = _exitSegmentContextAccessor.Context;
             if (context == null) return Task.CompletedTask;
@@ -72,15 +105,15 @@ namespace SkyApm.Diagnostics.MassTransit.Observers
             context.Span.AddLog(LogEvent.Event("Masstransit Message Publishing End"));
             context.Span.AddLog(LogEvent.Message($"Masstransit message published successfully!{Environment.NewLine}" +
                                                  $"--> Spend Time: { activity.Duration.TotalMilliseconds }ms.  {Environment.NewLine}" +
-                                                 $"--> Message Id: { pubContext.MessageId }, Name: {activity.OperationName} {Environment.NewLine}" + 
-                                                 $"--> Message Type: {pubContext.Message.GetType()} {Environment.NewLine}" + 
-                                                 $"--> Message Json: {JsonSerializer.Serialize(pubContext.Message)}"));
+                                                 $"--> Message Id: { sendContect.MessageId }, Name: {activity.OperationName} {Environment.NewLine}" +
+                                                 $"--> Message Type: {sendContect.Message.GetType()} {Environment.NewLine}" +
+                                                 $"--> Message Json: {JsonSerializer.Serialize(sendContect.Message)}"));
             _tracingContext.Release(context);
-            _contexts.TryRemove(pubContext.ConversationId.Value, out _);
+            _contexts.TryRemove(sendContect.ConversationId.Value, out _);
             return Task.CompletedTask;
         }
 
-        public Task PublishFault<T>(PublishContext<T> pubContext, Exception exception) where T : class
+        private Task FaultHandleSendEndpoint<T>(SendContext<T> sendContect, Exception exception) where T : class
         {
             var context = _exitSegmentContextAccessor.Context;
             if (context == null) return Task.CompletedTask;
@@ -94,13 +127,13 @@ namespace SkyApm.Diagnostics.MassTransit.Observers
             context.Span.AddLog(LogEvent.Event("Masstransit Message Publishing Error"));
             context.Span.AddLog(LogEvent.Message($"Masstransit message publishing failed!{Environment.NewLine}" +
                                                  $"--> Spend Time: { activity.Duration }ms.  {Environment.NewLine}" +
-                                                 $"--> Message Id: { pubContext.MessageId }, Name: {activity.OperationName} {Environment.NewLine}" +
-                                                 $"--> Message Type: {pubContext.Message.GetType()} {Environment.NewLine}" +
-                                                 $"--> Message Json: {JsonSerializer.Serialize(pubContext.Message)}"));
+                                                 $"--> Message Id: { sendContect.MessageId }, Name: {activity.OperationName} {Environment.NewLine}" +
+                                                 $"--> Message Type: {sendContect.Message.GetType()} {Environment.NewLine}" +
+                                                 $"--> Message Json: {JsonSerializer.Serialize(sendContect.Message)}"));
             context.Span.ErrorOccurred(exception, _tracingConfig);
 
             _tracingContext.Release(context);
-            _contexts.TryRemove(pubContext.ConversationId.Value, out _);
+            _contexts.TryRemove(sendContect.ConversationId.Value, out _);
             return Task.CompletedTask;
         }
     }

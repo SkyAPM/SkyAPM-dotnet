@@ -13,7 +13,7 @@ namespace SkyApm.Diagnostics.MassTransit.Common
         {
             this.checkers = checkers;
         }
-        public StringOrIntValue GetPublishComponentID<T>(T context) where T : PublishContext
+        public StringOrIntValue GetPublishComponentID<T>(T context) where T : SendContext
         {
             var host = context.DestinationAddress.AbsoluteUri;
             foreach (var checker in checkers)

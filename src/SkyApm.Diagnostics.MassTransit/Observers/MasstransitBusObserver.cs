@@ -7,10 +7,12 @@ namespace SkyApm.Diagnostics.MassTransit.Observers
     public class MasstransitBusObserver : IBusObserver
     {
         private readonly IPublishObserver publishObserver;
+        private readonly ISendObserver sendObserver;
 
-        public MasstransitBusObserver(IPublishObserver publishObserver)
+        public MasstransitBusObserver(IPublishObserver publishObserver, ISendObserver sendObserver)
         {
             this.publishObserver = publishObserver;
+            this.sendObserver = sendObserver;
         }
 
 
@@ -22,6 +24,7 @@ namespace SkyApm.Diagnostics.MassTransit.Observers
         public void PostCreate(IBus bus)
         {
             bus.ConnectPublishObserver(this.publishObserver);
+            bus.ConnectSendObserver(this.sendObserver);
         }
 
         public Task PostStart(IBus bus, Task<BusReady> busReady)

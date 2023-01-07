@@ -39,6 +39,7 @@ namespace SkyApm.Diagnostics.MassTransit
             extensions.Services.AddSingleton<IPublishObserver, MasstransitPublishObserver>();
             extensions.Services.AddSingleton<IReceiveObserver, MasstransitReceiveObserver>();
             extensions.Services.AddSingleton<IConsumeObserver, MasstransitConsumerObserver>();
+            extensions.Services.AddSingleton<ISendObserver, MasstransitPublishObserver>();
             //AddComponentIdChecker
             extensions.AddComponentIdChecker();
             // Masstransit < 8.0.0
