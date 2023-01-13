@@ -1,4 +1,4 @@
-name: CI AND IT
+name: Net7 CI
 
 on:
   push:
