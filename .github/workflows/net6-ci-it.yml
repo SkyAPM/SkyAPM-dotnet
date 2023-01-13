@@ -1,4 +1,4 @@
-name: Net7 CI
+name: NET6 CI AND IT
 
 on:
   push:
@@ -10,14 +10,14 @@ on:
   pull_request:
 
 jobs:
-  net7:
+  net6:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
     - name: Setup .NET
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 7.0.100
+        dotnet-version: 6.0.101
     - name: Setup Submodule
       run: git submodule update --init
     - name: Restore dependencies
@@ -27,4 +27,4 @@ jobs:
     - name: Build
       run: dotnet build --no-restore
     - name: Test
-      run: dotnet test --no-build --verbosity normal --framework net7.0
+      run: dotnet test --no-build --verbosity normal --framework net6.0
