@@ -47,8 +47,10 @@ namespace SkyApm.Utilities.Logging
                 .WithProperty("SourceContext", null).Enrich
                 .WithProperty(nameof(instrumentationConfig.ServiceName),
                     instrumentationConfig.ServiceName).Enrich
-                .FromLogContext().WriteTo.RollingFile(_loggingConfig.FilePath, level, outputTemplate, null, 1073741824,
-                    31, null, false, false, TimeSpan.FromMilliseconds(500)).CreateLogger());
+                //_loggingConfig.FilePath, level, outputTemplate, null, 1073741824,31, null, false, false, TimeSpan.FromMilliseconds(500)
+                .FromLogContext().WriteTo.Async(o =>
+                    o.File(_loggingConfig.FilePath, level, outputTemplate, flushToDiskInterval: TimeSpan.FromMilliseconds(500), rollingInterval: RollingInterval.Month))
+                .CreateLogger());
         }
 
         public SkyApm.Logging.ILogger CreateLogger(Type type)
@@ -58,7 +60,7 @@ namespace SkyApm.Utilities.Logging
 
         private static LogEventLevel EventLevel(string level)
         {
-            return LogEventLevel.TryParse<LogEventLevel>(level, out var logEventLevel)
+            return Enum.TryParse<LogEventLevel>(level, out var logEventLevel)
                 ? logEventLevel
                 : LogEventLevel.Error;
         }

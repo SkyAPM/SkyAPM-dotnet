@@ -27,8 +27,8 @@ namespace SkyApm.Diagnostics.MongoDB
 {
     public class DiagnosticsActivityEventSubscriber : IEventSubscriber
     {
-        private static DiagnosticSource diagnosticSource = new DiagnosticListener("MongoSourceListener");
-        internal static readonly AssemblyName AssemblyName = typeof(DiagnosticsActivityEventSubscriber).Assembly.GetName();
+        private static readonly DiagnosticSource diagnosticSource = new DiagnosticListener("MongoSourceListener");
+        private static readonly AssemblyName AssemblyName = typeof(DiagnosticsActivityEventSubscriber).Assembly.GetName();
         internal static readonly string ActivitySourceName = AssemblyName.Name;
         internal static readonly Version Version = AssemblyName.Version;
          
