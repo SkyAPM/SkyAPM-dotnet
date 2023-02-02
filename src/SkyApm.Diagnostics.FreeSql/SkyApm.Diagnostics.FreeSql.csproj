@@ -12,7 +12,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="FreeSql" Version="3.2.685" />
+    <PackageReference Include="FreeSql" Version="3.2.687" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SkyApm.Abstractions\SkyApm.Abstractions.csproj" />

@@ -4,8 +4,8 @@
   </PropertyGroup>
   <ItemGroup>
     <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="2.0.3" />
-    <PackageReference Include="FreeSql" Version="3.2.685" />
-    <PackageReference Include="FreeSql.Provider.Sqlite" Version="3.2.685" />
+    <PackageReference Include="FreeSql" Version="3.2.687" />
+    <PackageReference Include="FreeSql.Provider.Sqlite" Version="3.2.687" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\SkyApm.Agent.AspNetCore\SkyApm.Agent.AspNetCore.csproj" />

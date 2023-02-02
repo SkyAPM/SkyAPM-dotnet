@@ -17,13 +17,14 @@
  */
 
 using Microsoft.Extensions.Hosting;
+using SkyApm;
+using SkyApm.Agent.Hosting;
 using SkyApm.Config;
 using SkyApm.Diagnostics;
-using SkyApm.Diagnostics.EntityFrameworkCore;
 using SkyApm.Diagnostics.Grpc;
 using SkyApm.Diagnostics.Grpc.Net.Client;
 using SkyApm.Diagnostics.HttpClient;
-using SkyApm.Diagnostics.SqlClient;
+using SkyApm.Diagnostics.MSLogging;
 using SkyApm.Sampling;
 using SkyApm.Service;
 using SkyApm.Tracing;
@@ -33,10 +34,8 @@ using SkyApm.Utilities.Configuration;
 using SkyApm.Utilities.DependencyInjection;
 using SkyApm.Utilities.Logging;
 using System;
-using SkyApm;
-using SkyApm.Agent.Hosting;
-using SkyApm.Diagnostics.MSLogging;
 using ILoggerFactory = SkyApm.Logging.ILoggerFactory;
+// ReSharper disable UnusedMethodReturnValue.Global
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -62,7 +61,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IExecutionService, SegmentReportService>();
             services.AddSingleton<IExecutionService, CLRStatsService>();
             services.AddSingleton<IInstrumentStartup, InstrumentStartup>();
-            services.AddSingleton<IRuntimeEnvironment>(RuntimeEnvironment.Instance);
+            services.AddSingleton(RuntimeEnvironment.Instance);
             services.AddSingleton<TracingDiagnosticProcessorObserver>();
             services.AddSingleton<IConfigAccessor, ConfigAccessor>();
             services.AddSingleton<IConfigurationFactory, ConfigurationFactory>();
@@ -73,9 +72,7 @@ namespace Microsoft.Extensions.DependencyInjection
             var extensions = services.AddSkyApmExtensions()
                 .AddHttpClient()
                 .AddGrpcClient()
-                .AddSqlClient()
                 .AddGrpc()
-                .AddEntityFrameworkCore(c => c.AddPomeloMysql().AddNpgsql().AddSqlite())
                 .AddMSLogging();
 
             extensionsSetup?.Invoke(extensions);
