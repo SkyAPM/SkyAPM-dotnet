@@ -250,7 +250,6 @@ namespace SkyApm.Diagnostics.SmartSql
             var context = CreateSmartSqlLocalSegmentContext(eventData.Operation);
             if (eventData.ExecutionContext.Request.RealSql != null)
             {
-                //context.Span.AddTag(Common.Tags.DB_STATEMENT, eventData.ExecutionContext.Request.RealSql);
                 var sql = eventData.ExecutionContext.FormatSql(true);
                 var spliter = "Sql with parameter value: ";
                 var startIndex = sql.IndexOf(spliter) + spliter.Length;
