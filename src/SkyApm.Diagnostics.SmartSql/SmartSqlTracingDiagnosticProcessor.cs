@@ -26,6 +26,7 @@ using SkyApm.Tracing;
 using SkyApm.Tracing.Segments;
 using SmartSql;
 using SmartSql.Diagnostics;
+using SmartSql.Utils;
 
 namespace SkyApm.Diagnostics.SmartSql
 {
@@ -249,7 +250,11 @@ namespace SkyApm.Diagnostics.SmartSql
             var context = CreateSmartSqlLocalSegmentContext(eventData.Operation);
             if (eventData.ExecutionContext.Request.RealSql != null)
             {
-                context.Span.AddTag(Common.Tags.DB_STATEMENT, eventData.ExecutionContext.Request.RealSql);
+                var sql = eventData.ExecutionContext.FormatSql(true);
+                var spliter = "Sql with parameter value: ";
+                var startIndex = sql.IndexOf(spliter) + spliter.Length;
+                sql = sql.Substring(startIndex);
+                context.Span.AddTag(Common.Tags.DB_STATEMENT, sql);
             }
         }
         [DiagnosticName(SmartSqlDiagnosticListenerExtensions.SMART_SQL_AFTER_COMMAND_EXECUTER_EXECUTE)]
