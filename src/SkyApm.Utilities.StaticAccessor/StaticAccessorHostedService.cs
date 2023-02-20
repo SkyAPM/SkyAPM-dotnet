@@ -1,6 +1,8 @@
-﻿using Microsoft.Extensions.Hosting;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using SkyApm.Config;
 using SkyApm.Tracing;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -11,16 +13,19 @@ namespace SkyApm.Utilities.StaticAccessor
         private readonly ITracingContext _tracingContext;
         private readonly IConfigAccessor _configAccessor;
 
-        public StaticAccessorHostedService(ITracingContext tracingContext, IConfigAccessor configAccessor)
+        public StaticAccessorHostedService(IServiceProvider provider)
         {
-            _tracingContext = tracingContext;
-            _configAccessor = configAccessor;
+            _tracingContext = provider.GetService<ITracingContext>();
+            _configAccessor = provider.GetService<IConfigAccessor>();
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            SkyApmInstances.TracingContext = _tracingContext;
-            SkyApmInstances.ConfigAccessor = _configAccessor;
+            if (_tracingContext != null && _configAccessor != null)
+            {
+                SkyApmInstances.TracingContext = _tracingContext;
+                SkyApmInstances.ConfigAccessor = _configAccessor;
+            }
 
             return Task.CompletedTask;
         }
