@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.33027.164
+# Visual Studio Version 17
+VisualStudioVersion = 17.2.32616.157
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{05BF0D4E-C824-4EC8-8330-36C1FC49910E}"
 EndProject
@@ -114,6 +114,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SkyApm.Sample.Logging", "sample\SkyApm.Sample.Logging\SkyApm.Sample.Logging.csproj", "{136EAD07-A501-4308-9972-82E44F655735}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SkyApm.Diagnostics.MassTransit", "src\SkyApm.Diagnostics.MassTransit\SkyApm.Diagnostics.MassTransit.csproj", "{1C6A8B34-BB6A-44E0-A395-05ADFB094367}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SkyApm.Utilities.StaticAccessor", "src\SkyApm.Utilities.StaticAccessor\SkyApm.Utilities.StaticAccessor.csproj", "{F82B5819-0CED-4C9B-9305-7E62DBFB1219}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -261,6 +263,10 @@ Global
 		{1C6A8B34-BB6A-44E0-A395-05ADFB094367}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1C6A8B34-BB6A-44E0-A395-05ADFB094367}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1C6A8B34-BB6A-44E0-A395-05ADFB094367}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F82B5819-0CED-4C9B-9305-7E62DBFB1219}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F82B5819-0CED-4C9B-9305-7E62DBFB1219}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F82B5819-0CED-4C9B-9305-7E62DBFB1219}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F82B5819-0CED-4C9B-9305-7E62DBFB1219}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -310,6 +316,7 @@ Global
 		{4E3BA76C-2A30-4CAD-9F6C-08DF5DF0CE0C} = {B5E677CF-2920-4B0A-A056-E73F6B2CF2BC}
 		{136EAD07-A501-4308-9972-82E44F655735} = {844CEACD-4C85-4B15-9E2B-892B01FDA4BB}
 		{1C6A8B34-BB6A-44E0-A395-05ADFB094367} = {B5E677CF-2920-4B0A-A056-E73F6B2CF2BC}
+		{F82B5819-0CED-4C9B-9305-7E62DBFB1219} = {4BD917BC-D579-4C75-9939-41BF012A4EE2}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {94C0DA2C-CCCB-4314-93A2-9809B5DD0583}
