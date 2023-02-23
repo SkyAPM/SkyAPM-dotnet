@@ -10,7 +10,7 @@
     <PackageReleaseNotes>
     </PackageReleaseNotes>
     <RootNamespace>SkyApm.PeerFormatters.SqlClient</RootNamespace>
-    <TargetFrameworks>netcoreapp3.1;net5.0;net6.0</TargetFrameworks>
+    <TargetFrameworks>netcoreapp3.1;net5.0;net6.0;net7.0</TargetFrameworks>
   </PropertyGroup>
 
   <ItemGroup>
