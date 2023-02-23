@@ -38,7 +38,7 @@ namespace SkyApm.Tracing
 
         public string GetDbPeer(DbConnection connection)
         {
-            if (!_tracingConfig.JavaDbPeerFormat) return connection.DataSource;
+            if (!_tracingConfig.DbPeerSimpleFormat) return connection.DataSource;
 
             return _peerMap.GetOrAdd($"{connection.GetType()}_{connection.DataSource}", k =>
             {

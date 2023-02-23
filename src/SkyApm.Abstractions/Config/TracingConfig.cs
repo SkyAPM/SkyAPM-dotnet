@@ -9,6 +9,6 @@ namespace SkyApm.Config
     {
         public int ExceptionMaxDepth { get; set; } = 3;
 
-        public bool JavaDbPeerFormat { get; set; } = false;
+        public bool DbPeerSimpleFormat { get; set; } = false;
     }
 }
