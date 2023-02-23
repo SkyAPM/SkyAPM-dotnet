@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\..\build\common.props" />
+	
+  <PropertyGroup>
+    <Description>$(Product) System.Data.SqlClient and Microsoft.Data.SqlClient peer formatter.</Description>
+    <AssemblyTitle>$(PackagePrefix).PeerFormatters.SqlClient</AssemblyTitle>
+    <AssemblyName>$(PackagePrefix).PeerFormatters.SqlClient</AssemblyName>
+    <PackageId>$(PackagePrefix).PeerFormatters.SqlClient</PackageId>
+    <PackageTags>SkyWalking;APM;SqlClient</PackageTags>
+    <PackageReleaseNotes>
+    </PackageReleaseNotes>
+    <RootNamespace>SkyApm.PeerFormatters.SqlClient</RootNamespace>
+    <TargetFrameworks>netcoreapp3.1;net5.0;net6.0</TargetFrameworks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SkyApm.Abstractions\SkyApm.Abstractions.csproj" />
+    <ProjectReference Include="..\SkyApm.Utilities.DependencyInjection\SkyApm.Utilities.DependencyInjection.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -117,6 +117,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SkyApm.Diagnostics.MassTran
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SkyApm.Utilities.StaticAccessor", "src\SkyApm.Utilities.StaticAccessor\SkyApm.Utilities.StaticAccessor.csproj", "{F82B5819-0CED-4C9B-9305-7E62DBFB1219}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PeerFormatters", "PeerFormatters", "{D122E6AE-6FE7-4C1A-826F-5964ABBF2C9D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SkyApm.PeerFormatters.SqlClient", "src\SkyApm.PeerFormatters.SqlClient\SkyApm.PeerFormatters.SqlClient.csproj", "{5DBE2053-EBAE-404F-A7B3-9CE3CD2152D9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SkyApm.PeerFormatters.MySqlConnector", "src\SkyApm.PeerFormatters.MySqlConnector\SkyApm.PeerFormatters.MySqlConnector.csproj", "{2A313B7E-CC41-4556-8055-D87266C398BF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -267,6 +273,14 @@ Global
 		{F82B5819-0CED-4C9B-9305-7E62DBFB1219}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F82B5819-0CED-4C9B-9305-7E62DBFB1219}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F82B5819-0CED-4C9B-9305-7E62DBFB1219}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5DBE2053-EBAE-404F-A7B3-9CE3CD2152D9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5DBE2053-EBAE-404F-A7B3-9CE3CD2152D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5DBE2053-EBAE-404F-A7B3-9CE3CD2152D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5DBE2053-EBAE-404F-A7B3-9CE3CD2152D9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2A313B7E-CC41-4556-8055-D87266C398BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2A313B7E-CC41-4556-8055-D87266C398BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2A313B7E-CC41-4556-8055-D87266C398BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2A313B7E-CC41-4556-8055-D87266C398BF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -317,6 +331,9 @@ Global
 		{136EAD07-A501-4308-9972-82E44F655735} = {844CEACD-4C85-4B15-9E2B-892B01FDA4BB}
 		{1C6A8B34-BB6A-44E0-A395-05ADFB094367} = {B5E677CF-2920-4B0A-A056-E73F6B2CF2BC}
 		{F82B5819-0CED-4C9B-9305-7E62DBFB1219} = {4BD917BC-D579-4C75-9939-41BF012A4EE2}
+		{D122E6AE-6FE7-4C1A-826F-5964ABBF2C9D} = {05BF0D4E-C824-4EC8-8330-36C1FC49910E}
+		{5DBE2053-EBAE-404F-A7B3-9CE3CD2152D9} = {D122E6AE-6FE7-4C1A-826F-5964ABBF2C9D}
+		{2A313B7E-CC41-4556-8055-D87266C398BF} = {D122E6AE-6FE7-4C1A-826F-5964ABBF2C9D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {94C0DA2C-CCCB-4314-93A2-9809B5DD0583}

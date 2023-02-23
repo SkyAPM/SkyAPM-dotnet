@@ -35,6 +35,8 @@
         <ProjectReference Include="..\SkyApm.Diagnostics.HttpClient\SkyApm.Diagnostics.HttpClient.csproj" />
         <ProjectReference Include="..\SkyApm.Diagnostics.MSLogging\SkyApm.Diagnostics.MSLogging.csproj" />
         <ProjectReference Include="..\SkyApm.Diagnostics.SqlClient\SkyApm.Diagnostics.SqlClient.csproj" />
+		<ProjectReference Include="..\SkyApm.PeerFormatters.MySqlConnector\SkyApm.PeerFormatters.MySqlConnector.csproj" />
+		<ProjectReference Include="..\SkyApm.PeerFormatters.SqlClient\SkyApm.PeerFormatters.SqlClient.csproj" />
         <ProjectReference Include="..\SkyApm.Transport.Grpc\SkyApm.Transport.Grpc.csproj" />
         <ProjectReference Include="..\SkyApm.Utilities.Configuration\SkyApm.Utilities.Configuration.csproj" />
         <ProjectReference Include="..\SkyApm.Utilities.DependencyInjection\SkyApm.Utilities.DependencyInjection.csproj" />

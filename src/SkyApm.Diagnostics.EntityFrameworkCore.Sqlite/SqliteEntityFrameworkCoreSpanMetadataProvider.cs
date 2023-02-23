@@ -17,12 +17,20 @@
  */
 
 using SkyApm.Common;
+using SkyApm.Tracing;
 using System.Data.Common;
 
 namespace SkyApm.Diagnostics.EntityFrameworkCore
 {
     public class SqliteEntityFrameworkCoreSpanMetadataProvider : IEntityFrameworkCoreSpanMetadataProvider
     {
+        private readonly IPeerFormatter _peerFormatter;
+
+        public SqliteEntityFrameworkCoreSpanMetadataProvider(IPeerFormatter peerFormatter)
+        {
+            _peerFormatter = peerFormatter;
+        }
+
         public StringOrIntValue Component { get; } = Common.Components.ENTITYFRAMEWORKCORE_SQLITE;
 
         public bool Match(DbConnection connection)
@@ -32,18 +40,13 @@ namespace SkyApm.Diagnostics.EntityFrameworkCore
 
         public string GetPeer(DbConnection connection)
         {
-            string dataSource;
             switch (connection.DataSource)
             {
                 case "":
-                    dataSource = "sqlite:memory:db";
-                    break;
+                    return "sqlite:memory:db";
                 default:
-                    dataSource = connection.DataSource;
-                    break;
+                    return _peerFormatter.GetDbPeer(connection);
             }
-
-            return $"{dataSource}";
         }
     }
 }

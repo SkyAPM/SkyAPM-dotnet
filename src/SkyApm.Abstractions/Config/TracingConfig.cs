@@ -8,5 +8,7 @@ namespace SkyApm.Config
     public class TracingConfig
     {
         public int ExceptionMaxDepth { get; set; } = 3;
+
+        public bool JavaDbPeerFormat { get; set; } = false;
     }
 }

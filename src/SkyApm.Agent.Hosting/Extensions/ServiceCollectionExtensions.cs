@@ -36,6 +36,8 @@ using System;
 using SkyApm;
 using SkyApm.Agent.Hosting;
 using SkyApm.Diagnostics.MSLogging;
+using SkyApm.PeerFormatters.SqlClient;
+using SkyApm.PeerFormatters.MySqlConnector;
 using ILoggerFactory = SkyApm.Logging.ILoggerFactory;
 
 namespace Microsoft.Extensions.DependencyInjection
@@ -69,6 +71,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IHostedService, InstrumentationHostedService>();
             services.AddSingleton<IEnvironmentProvider, HostingEnvironmentProvider>();
             services.AddSingleton<ISkyApmLogDispatcher, AsyncQueueSkyApmLogDispatcher>();
+            services.AddSingleton<IPeerFormatter, PeerFormatter>();
             services.AddTracing().AddSampling().AddGrpcTransport().AddSkyApmLogging();
             var extensions = services.AddSkyApmExtensions()
                 .AddHttpClient()
@@ -76,7 +79,9 @@ namespace Microsoft.Extensions.DependencyInjection
                 .AddSqlClient()
                 .AddGrpc()
                 .AddEntityFrameworkCore(c => c.AddPomeloMysql().AddNpgsql().AddSqlite())
-                .AddMSLogging();
+                .AddMSLogging()
+                .AddSqlClientPeerFormatter()
+                .AddMySqlConnectorPeerFormatter();
 
             extensionsSetup?.Invoke(extensions);
 
