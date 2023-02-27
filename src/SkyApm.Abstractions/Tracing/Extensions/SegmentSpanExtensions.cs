@@ -25,6 +25,8 @@ namespace SkyApm.Tracing
 {
     public static class SegmentSpanExtensions
     {
+        private const string TAG_WEAK_PARENT_REFERENCE = "weak_parent";
+
         [Obsolete("Use the overload method with the TracingConfig parameter, if pass in the exception")]
         public static void ErrorOccurred(this SegmentSpan span, Exception exception = null)
         {
@@ -57,6 +59,11 @@ namespace SkyApm.Tracing
                 LogEvent.ErrorKind(exception.GetType().FullName),
                 LogEvent.Message(exception.Message),
                 LogEvent.ErrorStack(stackTrace));
+        }
+
+        public static void WeakParentRef(this SegmentSpan span, string traceId)
+        {
+            span.AddTag(TAG_WEAK_PARENT_REFERENCE, traceId);
         }
     }
 }

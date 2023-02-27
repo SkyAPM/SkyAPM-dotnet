@@ -33,5 +33,15 @@ namespace SkyApm.Utilities.StaticAccessor
         {
 
         }
+
+        public void ClearContext()
+        {
+
+        }
+
+        public void WeakenContext()
+        {
+
+        }
     }
 }

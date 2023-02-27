@@ -71,5 +71,15 @@ namespace SkyApm.Tracing
             if (segmentContext.Sampled)
                 _segmentDispatcher.Dispatch(segmentContext);
         }
+
+        public void ClearContext()
+        {
+            _segmentContextFactory.ClearContext();
+        }
+
+        public void WeakenContext()
+        {
+            _segmentContextFactory.WeakenContext();
+        }
     }
 }

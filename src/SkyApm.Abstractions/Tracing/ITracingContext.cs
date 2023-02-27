@@ -30,5 +30,9 @@ namespace SkyApm.Tracing
             ICarrierHeaderCollection carrierHeader = default, long startTimeMilliseconds = default);
 
         void Release(SegmentContext segmentContext, long endTimeMilliseconds = default);
+
+        void ClearContext();
+
+        void WeakenContext();
     }
 }

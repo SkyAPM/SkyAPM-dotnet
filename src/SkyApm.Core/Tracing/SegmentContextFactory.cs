@@ -18,6 +18,7 @@
 
 using System;
 using System.Linq;
+using System.Threading;
 using SkyApm.Common;
 using SkyApm.Config;
 using SkyApm.Tracing.Segments;
@@ -26,6 +27,7 @@ namespace SkyApm.Tracing
 {
     public class SegmentContextFactory : ISegmentContextFactory
     {
+        private readonly AsyncLocal<string> _weakParent = new AsyncLocal<string>();
         private readonly IEntrySegmentContextAccessor _entrySegmentContextAccessor;
         private readonly ILocalSegmentContextAccessor _localSegmentContextAccessor;
         private readonly IExitSegmentContextAccessor _exitSegmentContextAccessor;
@@ -113,6 +115,10 @@ namespace SkyApm.Tracing
                 };
                 segmentContext.References.Add(reference);
             }
+            else if(_weakParent.Value != null)
+            {
+                segmentContext.Span.WeakParentRef(_weakParent.Value);
+            }
 
             _localSegmentContextAccessor.Context = segmentContext;
             return segmentContext;
@@ -148,6 +154,10 @@ namespace SkyApm.Tracing
                 };
                 segmentContext.References.Add(reference);
             }
+            else if (_weakParent.Value != null)
+            {
+                segmentContext.Span.WeakParentRef(_weakParent.Value);
+            }
 
             segmentContext.Span.Peer = networkAddress;
             _exitSegmentContextAccessor.Context = segmentContext;
@@ -171,6 +181,23 @@ namespace SkyApm.Tracing
                 default:
                     throw new ArgumentOutOfRangeException(nameof(SpanType), segmentContext.Span.SpanType, "Invalid SpanType.");
             }
+        }
+
+        public void ClearContext()
+        {
+            if (_entrySegmentContextAccessor.Context != null) _entrySegmentContextAccessor.Context = null;
+            if (_localSegmentContextAccessor.Context != null) _localSegmentContextAccessor.Context = null;
+            if (_exitSegmentContextAccessor.Context != null) _exitSegmentContextAccessor.Context = null;
+        }
+
+        public void WeakenContext()
+        {
+            var context = _localSegmentContextAccessor.Context ?? _entrySegmentContextAccessor.Context;
+            if (context != null)
+            {
+                _weakParent.Value = $"{context.TraceId}|{context.SegmentId}";
+            }
+            ClearContext();
         }
 
         private string GetTraceId(ICarrier carrier)
