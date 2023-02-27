@@ -17,12 +17,20 @@
  */
 
 using SkyApm.Common;
+using SkyApm.Tracing;
 using System.Data.Common;
 
 namespace SkyApm.Diagnostics.EntityFrameworkCore
 {
     public class MySqlEntityFrameworkCoreSpanMetadataProvider : IEntityFrameworkCoreSpanMetadataProvider
     {
+        private readonly IPeerFormatter _peerFormatter;
+
+        public MySqlEntityFrameworkCoreSpanMetadataProvider(IPeerFormatter peerFormatter)
+        {
+            _peerFormatter = peerFormatter;
+        }
+
         public StringOrIntValue Component { get; } = Common.Components.POMELO_ENTITYFRAMEWORKCORE_MYSQL;
         
         public bool Match(DbConnection connection)
@@ -32,7 +40,7 @@ namespace SkyApm.Diagnostics.EntityFrameworkCore
 
         public string GetPeer(DbConnection connection)
         {
-            return connection.DataSource;
+            return _peerFormatter.GetDbPeer(connection);
         }
     }
 }

@@ -16,31 +16,14 @@
  *
  */
 
-using SkyApm.Common;
-using SkyApm.Tracing;
 using System.Data.Common;
 
-namespace SkyApm.Diagnostics.EntityFrameworkCore
+namespace SkyApm.Tracing
 {
-    public class NpgsqlEntityFrameworkCoreSpanMetadataProvider : IEntityFrameworkCoreSpanMetadataProvider
+    public interface IDbPeerFormatter
     {
-        private readonly IPeerFormatter _peerFormatter;
+        bool Match(DbConnection connection);
 
-        public NpgsqlEntityFrameworkCoreSpanMetadataProvider(IPeerFormatter peerFormatter)
-        {
-            _peerFormatter = peerFormatter;
-        }
-
-        public StringOrIntValue Component { get; } = Common.Components.NPGSQL_ENTITYFRAMEWORKCORE_POSTGRESQL;
-
-        public bool Match(DbConnection connection)
-        {
-            return connection.GetType().FullName == "Npgsql.NpgsqlConnection";
-        }
-
-        public string GetPeer(DbConnection connection)
-        {
-            return _peerFormatter.GetDbPeer(connection);
-        }
+        string GetPeer(DbConnection connection);
     }
 }

@@ -29,13 +29,16 @@ namespace SkyApm.Diagnostics.SqlClient
         private readonly ITracingContext _tracingContext;
         private readonly IExitSegmentContextAccessor _contextAccessor;
         private readonly TracingConfig _tracingConfig;
+        private readonly IPeerFormatter _peerFormatter;
 
         public SqlClientTracingDiagnosticProcessor(ITracingContext tracingContext,
-            IExitSegmentContextAccessor contextAccessor, IConfigAccessor configAccessor)
+            IExitSegmentContextAccessor contextAccessor, IConfigAccessor configAccessor,
+            IPeerFormatter peerFormatter)
         {
             _tracingContext = tracingContext;
             _contextAccessor = contextAccessor;
             _tracingConfig = configAccessor.Get<TracingConfig>();
+            _peerFormatter = peerFormatter;
         }
 
 
@@ -52,7 +55,7 @@ namespace SkyApm.Diagnostics.SqlClient
         public void BeforeExecuteCommand([Property(Name = "Command")] DbCommand sqlCommand)
         {
             var context = _tracingContext.CreateExitSegmentContext(ResolveOperationName(sqlCommand),
-                sqlCommand.Connection.DataSource);
+                _peerFormatter.GetDbPeer(sqlCommand.Connection));
             context.Span.SpanLayer = Tracing.Segments.SpanLayer.DB;
             context.Span.Component = Common.Components.SQLCLIENT;
             context.Span.AddTag(Common.Tags.DB_TYPE, "sql");

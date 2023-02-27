@@ -16,31 +16,26 @@
  *
  */
 
-using SkyApm.Common;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using SkyApm.Tracing;
-using System.Data.Common;
+using SkyApm.Utilities.DependencyInjection;
+using System;
 
-namespace SkyApm.Diagnostics.EntityFrameworkCore
+namespace SkyApm.PeerFormatters.MySqlConnector
 {
-    public class NpgsqlEntityFrameworkCoreSpanMetadataProvider : IEntityFrameworkCoreSpanMetadataProvider
+    public static class MySqlConnectorPeerFormatterExtensions
     {
-        private readonly IPeerFormatter _peerFormatter;
-
-        public NpgsqlEntityFrameworkCoreSpanMetadataProvider(IPeerFormatter peerFormatter)
+        public static SkyApmExtensions AddMySqlConnectorPeerFormatter(this SkyApmExtensions extensions)
         {
-            _peerFormatter = peerFormatter;
-        }
+            if (extensions == null)
+            {
+                throw new ArgumentNullException(nameof(extensions));
+            }
 
-        public StringOrIntValue Component { get; } = Common.Components.NPGSQL_ENTITYFRAMEWORKCORE_POSTGRESQL;
+            extensions.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IDbPeerFormatter, MySqlConnectorPeerFormatter>());
 
-        public bool Match(DbConnection connection)
-        {
-            return connection.GetType().FullName == "Npgsql.NpgsqlConnection";
-        }
-
-        public string GetPeer(DbConnection connection)
-        {
-            return _peerFormatter.GetDbPeer(connection);
+            return extensions;
         }
     }
 }

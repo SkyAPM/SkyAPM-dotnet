@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\..\build\common.props" />
+	
+  <PropertyGroup>
+    <Description>$(Product) MySqlConnector peer formatter.</Description>
+    <AssemblyTitle>$(PackagePrefix).PeerFormatters.MySqlConnector</AssemblyTitle>
+    <AssemblyName>$(PackagePrefix).PeerFormatters.MySqlConnector</AssemblyName>
+    <PackageId>$(PackagePrefix).PeerFormatters.MySqlConnector</PackageId>
+    <PackageTags>SkyWalking;APM;MySqlConnector</PackageTags>
+    <PackageReleaseNotes>
+    </PackageReleaseNotes>
+    <RootNamespace>SkyApm.PeerFormatters.MySqlConnector</RootNamespace>
+    <TargetFrameworks>netcoreapp3.1;net5.0;net6.0;net7.0</TargetFrameworks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SkyApm.Abstractions\SkyApm.Abstractions.csproj" />
+    <ProjectReference Include="..\SkyApm.Utilities.DependencyInjection\SkyApm.Utilities.DependencyInjection.csproj" />
+  </ItemGroup>
+
+</Project>
