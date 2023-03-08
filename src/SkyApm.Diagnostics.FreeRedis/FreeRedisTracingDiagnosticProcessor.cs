@@ -8,6 +8,7 @@ using SkyApm.Tracing.Segments;
 using System;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace SkyApm.Diagnostics.FreeRedis
 {
@@ -40,34 +41,26 @@ namespace SkyApm.Diagnostics.FreeRedis
             _tracingConfig = configAccessor.Get<TracingConfig>();
         }
 
-        private SegmentContext CreateFreeRedisLocalSegmentContext(string operation)
-        {
-            var context = _tracingContext.CreateLocalSegmentContext(operation);
-            context.Span.SpanLayer = SpanLayer.CACHE;
-            context.Span.Component = Components.Free_Redis;
-            context.Span.AddTag(Tags.CACHE_TYPE, "FreeRedis");
-            return context;
-        }
 
         #region Notice
         [DiagnosticName(FreeRedis_Notice)]
         public void Notice([Object] NoticeEventArgs eventData)
         {
-            var context = CreateFreeRedisLocalSegmentContext(eventData.NoticeType.ToString());
-            context.Span.Peer = AnalysisDomain(eventData.Log);
-            string cmd = AnalysisCmd(eventData.Log);
-            context.Span.AddTag(Tags.CACHE_OP, parseOperation(cmd));
-            context.Span.AddTag(Tags.CACHE_CMD, eventData.Log);
+            var ans = Analysis(eventData.Log);
+            if (ans == null) return;
+            var context = _tracingContext.CreateExitSegmentContext(ans[2], ans[0]);
+            context.Span.SpanLayer = SpanLayer.CACHE;
+            context.Span.Component = Components.Free_Redis;
+            context.Span.AddTag(Tags.CACHE_TYPE, "FreeRedis");
+            context.Span.AddTag(Tags.CACHE_OP, parseOperation(ans[2]));
+            context.Span.AddTag(Tags.CACHE_CMD, ans[1]);
+            context.Span.AddTag("result", ans[3]);
+            context.Span.AddTag("exec_time", ans[4]);
             if (eventData?.Exception != null)
                 context.Span.ErrorOccurred(eventData.Exception, _tracingConfig);
             _tracingContext.Release(context);
         }
         #endregion
-        /// <summary>
-        /// 解析读写
-        /// </summary>
-        /// <param name="cmd"></param>
-        /// <returns></returns>
         private static String parseOperation(String cmd)
         {
             if (FreeRedisPluginConfig.OPERATION_MAPPING_READ.Contains(cmd))
@@ -80,44 +73,32 @@ namespace SkyApm.Diagnostics.FreeRedis
             }
             return string.Empty;
         }
+        private static Regex anRex = new Regex("(.+)\\s>\\s(([A-Z]+)\\s*.*?)\\r\\n(.*?)\\r\\n\\((\\d+)ms\\)\\r\\n");
         /// <summary>
-        /// 解析命令
+        /// Analysis
         /// </summary>
         /// <param name="cmd"></param>
-        /// <returns></returns>
-        private static string AnalysisCmd(string cmd)
+        /// <returns>[address,cmd,op,result,exectime]</returns>
+        public static string[] Analysis(string cmd)
         {
-            if (cmd == null) return string.Empty;
-            cmd.Replace("\r\n", " ");
-            char[] cmds = cmd.ToArray();
-            StringBuilder stringBuilder = new StringBuilder();
-            bool beginAn = false;
-            for (var i = 0; i < cmds.Length; i++)
+            if (!(cmd == null || !cmd.Contains(">")))
             {
-                if (cmds[i] == '>')
+                if (anRex.IsMatch(cmd))
                 {
-                    beginAn = true;
-                }
-                else if (beginAn && ((cmds[i] >= 'a' && cmds[i] <= 'z') || (cmds[i] >= 'A' && cmds[i] <= 'Z')))
-                {
-                    stringBuilder.Append(cmds[i]);
-                }
-                else if (stringBuilder.Length > 0)
-                {
-                    return stringBuilder.ToString();
+                    var matchs = anRex.Match(cmd);
+                    if (matchs.Success && matchs.Groups.Count > 5)
+                    {
+                        return new string[] {
+                            matchs.Groups[1].Value,
+                            matchs.Groups[2].Value,
+                            matchs.Groups[3].Value,
+                            matchs.Groups[4].Value,
+                            matchs.Groups[5].Value,
+                        };
+                    }
                 }
             }
-            return string.Empty;
-        }
-        /// <summary>
-        /// 解析地址
-        /// </summary>
-        /// <param name="cmd"></param>
-        /// <returns></returns>
-        private static string AnalysisDomain(string cmd)
-        {
-            if (cmd == null || !cmd.Contains(">")) return string.Empty;
-            return cmd.Substring(0, cmd.IndexOf(">")).Trim();
+            return null;
         }
     }
 }
