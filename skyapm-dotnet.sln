@@ -119,9 +119,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SkyApm.Utilities.StaticAcce
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PeerFormatters", "PeerFormatters", "{D122E6AE-6FE7-4C1A-826F-5964ABBF2C9D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SkyApm.PeerFormatters.SqlClient", "src\SkyApm.PeerFormatters.SqlClient\SkyApm.PeerFormatters.SqlClient.csproj", "{5DBE2053-EBAE-404F-A7B3-9CE3CD2152D9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SkyApm.PeerFormatters.SqlClient", "src\SkyApm.PeerFormatters.SqlClient\SkyApm.PeerFormatters.SqlClient.csproj", "{5DBE2053-EBAE-404F-A7B3-9CE3CD2152D9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SkyApm.PeerFormatters.MySqlConnector", "src\SkyApm.PeerFormatters.MySqlConnector\SkyApm.PeerFormatters.MySqlConnector.csproj", "{2A313B7E-CC41-4556-8055-D87266C398BF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SkyApm.PeerFormatters.MySqlConnector", "src\SkyApm.PeerFormatters.MySqlConnector\SkyApm.PeerFormatters.MySqlConnector.csproj", "{2A313B7E-CC41-4556-8055-D87266C398BF}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SkyApm.Diagnostics.FreeRedis", "src\SkyApm.Diagnostics.FreeRedis\SkyApm.Diagnostics.FreeRedis.csproj", "{829F7955-3138-4CA2-8AA3-3E4D72C97599}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -281,6 +283,10 @@ Global
 		{2A313B7E-CC41-4556-8055-D87266C398BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2A313B7E-CC41-4556-8055-D87266C398BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2A313B7E-CC41-4556-8055-D87266C398BF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{829F7955-3138-4CA2-8AA3-3E4D72C97599}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{829F7955-3138-4CA2-8AA3-3E4D72C97599}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{829F7955-3138-4CA2-8AA3-3E4D72C97599}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{829F7955-3138-4CA2-8AA3-3E4D72C97599}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -334,6 +340,7 @@ Global
 		{D122E6AE-6FE7-4C1A-826F-5964ABBF2C9D} = {05BF0D4E-C824-4EC8-8330-36C1FC49910E}
 		{5DBE2053-EBAE-404F-A7B3-9CE3CD2152D9} = {D122E6AE-6FE7-4C1A-826F-5964ABBF2C9D}
 		{2A313B7E-CC41-4556-8055-D87266C398BF} = {D122E6AE-6FE7-4C1A-826F-5964ABBF2C9D}
+		{829F7955-3138-4CA2-8AA3-3E4D72C97599} = {B5E677CF-2920-4B0A-A056-E73F6B2CF2BC}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {94C0DA2C-CCCB-4314-93A2-9809B5DD0583}
