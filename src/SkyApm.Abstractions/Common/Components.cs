@@ -42,6 +42,8 @@ namespace SkyApm.Common
 
         public static readonly StringOrIntValue Free_SQL = new StringOrIntValue(3017, "FreeSql");
 
+        public static readonly StringOrIntValue Free_Redis = new StringOrIntValue(3018, "FreeRedis");
+
         public static readonly StringOrIntValue GRPC = new StringOrIntValue(23, "GRPC");
 
         public static readonly StringOrIntValue MongoDBCLIENT = new StringOrIntValue(42, "MongoDB.Driver");
