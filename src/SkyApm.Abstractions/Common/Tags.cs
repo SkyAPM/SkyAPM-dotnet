@@ -52,5 +52,11 @@ namespace SkyApm.Common
         public static readonly string GRPC_METHOD_NAME = "grpc.method";
 
         public static readonly string GRPC_STATUS = "grpc.status";
+
+        public static readonly string CACHE_TYPE = "cache.type";
+
+        public static readonly string CACHE_OP = "cache.op";
+
+        public static readonly string CACHE_CMD = "cache.cmd";
     }
 }
