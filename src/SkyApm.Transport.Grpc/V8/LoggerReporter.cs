@@ -64,33 +64,38 @@ namespace SkyApm.Transport.Grpc
                 {
                     foreach (var loggerRequest in loggerRequests)
                     {
-                        var logMessage = new StringBuilder();
-                        foreach (var log in loggerRequest.Logs)
-                        {
-                            logMessage.Append($"\r\n{log.Key} : {log.Value}");
-                        }
-
                         var logBody = new LogData()
                         {
-                            TraceContext = new TraceContext()
-                            {
-                                TraceId = loggerRequest.SegmentReference?.TraceId ?? string.Empty,
-                                TraceSegmentId = loggerRequest.SegmentReference?.SegmentId ?? string.Empty,
-                                //SpanId=item.Segment
-                            },
                             Timestamp = loggerRequest.Date,
                             Service = _instrumentConfig.ServiceName,
                             ServiceInstance = _instrumentConfig.ServiceInstanceName,
-                            Endpoint = "",
+                            Endpoint = loggerRequest.Endpoint,
                             Body = new LogDataBody()
                             {
                                 Type = "text",
                                 Text = new TextLog()
                                 {
-                                    Text = logMessage.ToString(),
+                                    Text = loggerRequest.Message,
                                 },
                             },
+                            Tags = new LogTags(),
                         };
+                        if (loggerRequest.SegmentReference != null)
+                        {
+                            logBody.TraceContext = new TraceContext()
+                            {
+                                TraceId = loggerRequest.SegmentReference.TraceId,
+                                TraceSegmentId = loggerRequest.SegmentReference.SegmentId,
+                            };
+                        }
+                        foreach (var tag in loggerRequest.Tags)
+                        {
+                            logBody.Tags.Data.Add(new KeyStringValuePair()
+                            {
+                                Key = tag.Key,
+                                Value = tag.Value.ToString(),
+                            });
+                        }
                         await asyncClientStreamingCall.RequestStream.WriteAsync(logBody);
                     }
 

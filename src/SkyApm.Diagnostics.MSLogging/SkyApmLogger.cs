@@ -18,6 +18,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using Microsoft.Extensions.Logging;
 using SkyApm.Tracing;
 using SkyApm.Tracing.Segments;
@@ -30,36 +31,48 @@ namespace SkyApm.Diagnostics.MSLogging
         private readonly string _categoryName;
         private readonly ISkyApmLogDispatcher _skyApmLogDispatcher;
         private readonly ISegmentContextAccessor _segmentContextAccessor;
+        private readonly IEntrySegmentContextAccessor _entrySegmentContextAccessor;
 
         public SkyApmLogger(string categoryName, ISkyApmLogDispatcher skyApmLogDispatcher,
-            ISegmentContextAccessor segmentContextAccessor)
+            ISegmentContextAccessor segmentContextAccessor,
+            IEntrySegmentContextAccessor entrySegmentContextAccessor)
         {
             _categoryName = categoryName;
             _skyApmLogDispatcher = skyApmLogDispatcher;
             _segmentContextAccessor = segmentContextAccessor;
+            _entrySegmentContextAccessor = entrySegmentContextAccessor;
         }
 
         public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception,
             Func<TState, Exception?, string> formatter)
         {
-            var logs = new Dictionary<string, object>
+            var tags = new Dictionary<string, object>
             {
-                { "className", _categoryName },
+                { "logger", _categoryName },
                 { "Level", logLevel },
-                { "logMessage", state.ToString() ?? "" }
+                { "thread", Thread.CurrentThread.ManagedThreadId },
             };
+            if (exception != null)
+            {
+                tags["errorType"] = exception.GetType().ToString();
+            }
             SegmentContext segmentContext = _segmentContextAccessor.Context;
             var logContext = new LoggerRequest()
             {
-                Logs = logs,
+                Message = state.ToString() ?? string.Empty,
+                Tags = tags,
                 SegmentReference = segmentContext == null
                     ? null
                     : new LoggerSegmentReference()
                     {
                         TraceId = segmentContext.TraceId,
-                        SegmentId = segmentContext.SegmentId
+                        SegmentId = segmentContext.SegmentId,
                     },
             };
+            if (_entrySegmentContextAccessor.Context != null)
+            {
+                logContext.Endpoint = _entrySegmentContextAccessor.Context.Span.OperationName.ToString();
+            }
             _skyApmLogDispatcher.Dispatch(logContext);
         }
 

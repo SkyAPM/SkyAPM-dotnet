@@ -22,11 +22,15 @@ namespace SkyApm.Transport
 {
     public class LoggerRequest
     {
-        public Dictionary<string, object> Logs { get; set; }
+        public string Message { get; set; }
+
+        public Dictionary<string, object> Tags { get; set; }
 
         public LoggerSegmentReference SegmentReference { get; set; }
 
         public long Date { get; set; }
+
+        public string Endpoint { get; set; }
     }
     
     public class LoggerSegmentReference

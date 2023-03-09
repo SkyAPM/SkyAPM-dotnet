@@ -28,12 +28,15 @@ namespace SkyApm.Diagnostics.MSLogging
         private readonly ConcurrentDictionary<string, SkyApmLogger> _doveLoggers = new ConcurrentDictionary<string, SkyApmLogger>();
         private readonly ISkyApmLogDispatcher _skyApmLogDispatcher;
         private readonly ISegmentContextAccessor _segmentContextAccessor;
+        private readonly IEntrySegmentContextAccessor _entrySegmentContextAccessor;
 
         public SkyApmLoggerProvider(ISkyApmLogDispatcher skyApmLogDispatcher,
-            ISegmentContextAccessor segmentContextAccessor)
+            ISegmentContextAccessor segmentContextAccessor,
+            IEntrySegmentContextAccessor entrySegmentContextAccessor)
         {
             _skyApmLogDispatcher = skyApmLogDispatcher;
             _segmentContextAccessor = segmentContextAccessor;
+            _entrySegmentContextAccessor = entrySegmentContextAccessor;
         }
 
         public void Dispose()
@@ -43,7 +46,7 @@ namespace SkyApm.Diagnostics.MSLogging
         public ILogger CreateLogger(string categoryName)
         {
             return _doveLoggers.GetOrAdd(categoryName,
-                _ => new SkyApmLogger(categoryName, _skyApmLogDispatcher, _segmentContextAccessor));
+                _ => new SkyApmLogger(categoryName, _skyApmLogDispatcher, _segmentContextAccessor, _entrySegmentContextAccessor));
         }
     }
 }
