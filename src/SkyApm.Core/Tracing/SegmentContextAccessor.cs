@@ -36,7 +36,7 @@ namespace SkyApm.Tracing
         }
         
         public SegmentContext Context =>
-            _entrySegmentContextAccessor.Context ??
-            _localSegmentContextAccessor.Context ?? _entrySegmentContextAccessor.Context;
+            _localSegmentContextAccessor.Context ??
+            _entrySegmentContextAccessor.Context ?? _entrySegmentContextAccessor.Context;
     }
 }
