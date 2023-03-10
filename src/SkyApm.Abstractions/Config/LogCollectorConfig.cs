@@ -18,8 +18,20 @@
 
 namespace SkyApm.Config
 {
-    public class LogPushSkywalkingConfig
+    [Config("SkyWalking", "LogCollector")]
+    public class LogCollectorConfig
     {
-        public bool Enable { get; set; }
+        public LogCollectLevel Level { get; set; } = LogCollectLevel.Information;
+    }
+
+    public enum LogCollectLevel
+    {
+        Trace = 0,
+        Debug = 1,
+        Information = 2,
+        Warning = 3,
+        Error = 4,
+        Critical = 5,
+        None = 6
     }
 }

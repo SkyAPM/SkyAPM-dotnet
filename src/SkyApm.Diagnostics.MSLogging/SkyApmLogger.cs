@@ -35,6 +35,7 @@ namespace SkyApm.Diagnostics.MSLogging
         private readonly ISegmentContextAccessor _segmentContextAccessor;
         private readonly IEntrySegmentContextAccessor _entrySegmentContextAccessor;
         private readonly TracingConfig _tracingConfig;
+        private readonly LogCollectorConfig _logCollectorConfig;
 
         public SkyApmLogger(string categoryName, ISkyApmLogDispatcher skyApmLogDispatcher,
             ISegmentContextAccessor segmentContextAccessor,
@@ -46,11 +47,14 @@ namespace SkyApm.Diagnostics.MSLogging
             _segmentContextAccessor = segmentContextAccessor;
             _entrySegmentContextAccessor = entrySegmentContextAccessor;
             _tracingConfig = configAccessor.Get<TracingConfig>();
+            _logCollectorConfig = configAccessor.Get<LogCollectorConfig>();
         }
 
         public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception,
             Func<TState, Exception?, string> formatter)
         {
+            if (!IsEnabled(logLevel)) return;
+
             var tags = new Dictionary<string, object>
             {
                 { "logger", _categoryName },
@@ -86,7 +90,7 @@ namespace SkyApm.Diagnostics.MSLogging
             _skyApmLogDispatcher.Dispatch(logContext);
         }
 
-        public bool IsEnabled(LogLevel logLevel) => true;
+        public bool IsEnabled(LogLevel logLevel) => (int)logLevel >= (int)_logCollectorConfig.Level;
 
         public IDisposable BeginScope<TState>(TState state) => default!;
     }
