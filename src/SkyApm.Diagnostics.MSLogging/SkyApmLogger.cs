@@ -58,7 +58,7 @@ namespace SkyApm.Diagnostics.MSLogging
             var tags = new Dictionary<string, object>
             {
                 { "logger", _categoryName },
-                { "Level", logLevel },
+                { "level", logLevel },
                 { "thread", Thread.CurrentThread.ManagedThreadId },
             };
             if (exception != null)
