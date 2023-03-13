@@ -18,10 +18,10 @@
 
 namespace SkyApm.Config
 {
-    [Config("SkyWalking", "LogCollector")]
-    public class LogCollectorConfig
+    [Config("SkyWalking", "Diagnostics", "Logging")]
+    public class DiagnosticsLoggingConfig
     {
-        public LogCollectLevel Level { get; set; } = LogCollectLevel.Information;
+        public LogCollectLevel CollectLevel { get; set; } = LogCollectLevel.Information;
     }
 
     public enum LogCollectLevel
