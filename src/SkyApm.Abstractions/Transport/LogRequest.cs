@@ -20,20 +20,20 @@ using System.Collections.Generic;
 
 namespace SkyApm.Transport
 {
-    public class LoggerRequest
+    public class LogRequest
     {
         public string Message { get; set; }
 
         public Dictionary<string, object> Tags { get; set; }
 
-        public LoggerSegmentReference SegmentReference { get; set; }
+        public LogSegmentReference SegmentReference { get; set; }
 
         public long Date { get; set; }
 
         public string Endpoint { get; set; }
     }
-    
-    public class LoggerSegmentReference
+
+    public class LogSegmentReference
     {
         public string SegmentId { get; set; }
 
