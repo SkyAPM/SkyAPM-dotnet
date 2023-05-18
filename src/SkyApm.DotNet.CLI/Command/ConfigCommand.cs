@@ -105,7 +105,7 @@ namespace SkyApm.DotNet.CLI.Command
             if (! GRPC.Equals(reporter, StringComparison.OrdinalIgnoreCase) &&
                 ! KAFKA.Equals(reporter, StringComparison.OrdinalIgnoreCase))
             {
-                Console.WriteLine("Invalid reporter type {0}. Use default value.", reporter);
+                Console.WriteLine("Invalid reporter type {0}. Use default type.", reporter);
                 reporter = GRPC;
             }
 
@@ -115,7 +115,7 @@ namespace SkyApm.DotNet.CLI.Command
                 { "ProtocolVersion", "v8" },
                 { "QueueSize", 30000 },
                 { "BatchSize", 3000 },
-                { "reporter", reporter.ToLower() },
+                { "Reporter", reporter.ToLower() },
             };
 
             {
@@ -150,14 +150,14 @@ namespace SkyApm.DotNet.CLI.Command
 
             var loggingConfig = new Dictionary<string, dynamic>
             {
-                {"Level", "Information"},
-                {"FilePath", Path.Combine("logs", "skyapm-{Date}.log")}
+                { "Level", "Information" },
+                { "FilePath", Path.Combine("logs", "skyapm-{Date}.log") }
             };
 
             var samplingConfig = new Dictionary<string, dynamic>
             {
-                {"SamplePer3Secs", -1},
-                {"Percentage", -1d}
+                { "SamplePer3Secs", -1 },
+                { "Percentage", -1d }
             };
 
             var HeaderVersionsConfig = new string[]
@@ -167,17 +167,23 @@ namespace SkyApm.DotNet.CLI.Command
 
             var skyAPMConfig = new Dictionary<string, dynamic>
             {
-                {"ServiceName", serviceName},
-                {"Namespace", string.Empty},
-                {"HeaderVersions", HeaderVersionsConfig},
-                {"Sampling", samplingConfig},
-                {"Logging", loggingConfig},
-                {"Transport", transportConfig}
+                { "ServiceName", serviceName },
+                { "Namespace", string.Empty },
+                { "HeaderVersions", HeaderVersionsConfig },
+                { "Sampling", samplingConfig },
+                { "Logging", loggingConfig },
+                { "MeterActive", true },
+                { "MetricActive", true },
+                { "SegmentActive", true },
+                { "ProfilingActive", true },
+                { "ManagementActive", true },
+                { "LogActive", true },
+                { "Transport", transportConfig }
             };
 
             var rootConfig = new Dictionary<string, dynamic>
             {
-                {"SkyWalking", skyAPMConfig}
+                { "SkyWalking", skyAPMConfig }
             };
 
             using (var writer = configFile.CreateText())

@@ -1,0 +1,50 @@
+/*
+ * Licensed to the SkyAPM under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The SkyAPM licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
+using System.Threading;
+using System.Threading.Tasks;
+
+using SkyApm.Config;
+using SkyApm.Logging;
+
+namespace SkyApm.Transport.Kafka.V8
+{
+    internal class ServiceRegister : IServiceRegister
+    {
+        private const string OS_NAME = "os_name";
+        private const string HOST_NAME = "host_name";
+        private const string IPV4 = "ipv4";
+        private const string PROCESS_NO = "process_no";
+        private const string LANGUAGE = "language";
+
+        private readonly ILogger _logger;
+        private readonly KafkaConfig _config;
+
+        public ServiceRegister(ILoggerFactory loggerFactory,
+            IConfigAccessor configAccessor)
+        {
+            _logger = loggerFactory.CreateLogger(typeof(ServiceRegister));
+            _config = configAccessor.Get<KafkaConfig>();
+        }
+
+        public async Task<bool> ReportInstancePropertiesAsync(ServiceInstancePropertiesRequest serviceInstancePropertiesRequest, CancellationToken cancellationToken = default)
+        {
+            return true;
+        }
+    }
+}

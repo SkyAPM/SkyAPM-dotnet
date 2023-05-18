@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Licensed to the SkyAPM under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -16,20 +16,29 @@
  *
  */
 
-using System;
+using System.Threading;
+using System.Threading.Tasks;
 
-namespace SkyApm.Logging
+using SkyApm.Config;
+using SkyApm.Logging;
+
+namespace SkyApm.Transport.Kafka.V8
 {
-    public interface ILogger
+    internal class PingCaller : IPingCaller
     {
-        void Debug(string message);
+        private readonly ILogger _logger;
+        private readonly KafkaConfig _config;
 
-        void Information(string message);
+        public PingCaller(ILoggerFactory loggerFactory,
+            IConfigAccessor configAccessor)
+        {
+            _logger = loggerFactory.CreateLogger(typeof(PingCaller));
+            _config = configAccessor.Get<KafkaConfig>();
+        }
 
-        void Warning(string message);
-
-        void Error(string message, Exception exception);
-
-        void Trace(string message);
+        public Task PingAsync(PingRequest request, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return Task.CompletedTask;
+        }
     }
-} 
+}
