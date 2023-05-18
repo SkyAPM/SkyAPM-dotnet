@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Licensed to the SkyAPM under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -49,7 +49,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSkyAPMCore(extensionsSetup);
             return services;
         }
-        
+
         private static IServiceCollection AddSkyAPMCore(this IServiceCollection services, Action<SkyApmExtensions> extensionsSetup = null)
         {
             if (services == null)
@@ -104,7 +104,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IBase64Formatter, Base64Formatter>();
             return services;
         }
-        
+
         private static IServiceCollection AddSampling(this IServiceCollection services)
         {
             services.AddSingleton<SimpleCountSamplingInterceptor>();

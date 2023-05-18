@@ -30,6 +30,10 @@ namespace SkyApm.DotNet.CLI.Command
 {
     public class ConfigCommand : IAppCommand
     {
+        private const string GRPC = "grpc";
+
+        private const string KAFKA = "kafka";
+
         public string Name { get; } = "config";
 
         public void Execute(CommandLineApplication command)
@@ -38,11 +42,22 @@ namespace SkyApm.DotNet.CLI.Command
             command.HelpOption();
 
             var serviceNameArgument = command.Argument(
-                "service", "[Required] The ServiceName in SkyAPM");
-            var serversArgument = command.Argument(
-                "servers", "[Optional] The servers address, default 'localhost:11800'");
-
-            var environmentOption = command.Option("-e|--Environment",
+                "service",
+                "[Required] The ServiceName in SkyAPM");
+            var reporterOption = command.Option(
+                "--reporter",
+                "[Optional] The reporter type, default 'grpc'",
+                CommandOptionType.SingleValue);
+            var grpcServersOption = command.Option(
+                "--grpcservers",
+                "[Optional] The grpc servers address, default 'localhost:11800'",
+                CommandOptionType.SingleValue);
+            var kafkaServersOption = command.Option(
+                "--kafkaservers",
+                "[Optional] The kafka servers address, default 'localhost:9092'",
+                CommandOptionType.SingleValue);
+            var environmentOption = command.Option(
+                "-e|--Environment",
                 "Follow the app's environment.Framework-defined values include Development, Staging, and Production",
                 CommandOptionType.SingleValue);
 
@@ -54,13 +69,25 @@ namespace SkyApm.DotNet.CLI.Command
                     return 1;
                 }
 
-                Generate(serviceNameArgument.Value, serversArgument.Value, environmentOption.Value());
+                Generate
+                (
+                    serviceNameArgument.Value,
+                    reporterOption.Value(),
+                    grpcServersOption.Value(),
+                    kafkaServersOption.Value(),
+                    environmentOption.Value());
 
                 return 0;
             });
         }
 
-        private void Generate(string serviceName, string servers, string environment)
+        private void Generate
+        (
+            string serviceName,
+            string reporter,
+            string grpcServers,
+            string kafkaServers,
+            string environment)
         {
             Func<string, string> configFileName =
                 env => string.IsNullOrEmpty(env) ? "skyapm.json" : $"skyapm.{env}.json";
@@ -75,25 +102,51 @@ namespace SkyApm.DotNet.CLI.Command
                 return;
             }
 
-            servers = servers ?? "localhost:11800";
-
-            var gRPCConfig = new Dictionary<string, dynamic>
+            if (! GRPC.Equals(reporter, StringComparison.OrdinalIgnoreCase) &&
+                ! KAFKA.Equals(reporter, StringComparison.OrdinalIgnoreCase))
             {
-                {"Servers", servers},
-                {"Timeout", 10000},
-                {"ConnectTimeout", 10000},
-                {"ReportTimeout", 600000},
-                {"Authentication", ""}
-            };
+                Console.WriteLine("Invalid reporter type {0}. Use default value.", reporter);
+                reporter = GRPC;
+            }
 
             var transportConfig = new Dictionary<string, dynamic>
             {
-                {"Interval", 3000},
-                {"ProtocolVersion", "v8"},
-                {"QueueSize", 30000},
-                {"BatchSize", 3000},
-                {"gRPC", gRPCConfig}
+                { "Interval", 3000 },
+                { "ProtocolVersion", "v8" },
+                { "QueueSize", 30000 },
+                { "BatchSize", 3000 },
+                { "reporter", reporter.ToLower() },
             };
+
+            {
+                grpcServers = grpcServers ?? "localhost:11800";
+                var grpcConfig = new Dictionary<string, dynamic>
+                {
+                    { "Servers", grpcServers },
+                    { "Timeout", 10000 },
+                    { "ConnectTimeout", 10000 },
+                    { "ReportTimeout", 600000 },
+                    { "Authentication", "" }
+                };
+                transportConfig.Add("gRPC", grpcConfig);
+            }
+
+            {
+                kafkaServers = kafkaServers ?? "localhost:9092";
+                var kafkaConfig = new Dictionary<string, dynamic>
+                {
+                    { "BootstrapServers", kafkaServers },
+                    { "ProducerConfig", "" },
+                    { "GetTopicTimeout", 3000 },
+                    { "TopicMeters", "skywalking-meters" },
+                    { "TopicMetrics", "skywalking-metrics" },
+                    { "TopicSegments", "skywalking-segments" },
+                    { "TopicProfilings", "skywalking-profilings" },
+                    { "TopicManagements", "skywalking-managements" },
+                    { "TopicLogs", "skywalking-logs" }
+                };
+                transportConfig.Add("Kafka", kafkaConfig);
+            }
 
             var loggingConfig = new Dictionary<string, dynamic>
             {
