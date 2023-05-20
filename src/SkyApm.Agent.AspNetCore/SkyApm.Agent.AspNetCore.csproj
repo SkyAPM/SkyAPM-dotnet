@@ -1,5 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <Import Project="..\..\build\common.props" />
+
     <PropertyGroup>
         <Description>$(Product) ASP.NET Core Agent.</Description>
         <AssemblyTitle>$(PackagePrefix).Agent.AspNetCore</AssemblyTitle>
@@ -11,6 +12,7 @@
         <RootNamespace>SkyApm.Agent.AspNetCore</RootNamespace>
         <TargetFrameworks>netcoreapp3.1;net5.0;net6.0;net7.0</TargetFrameworks>
     </PropertyGroup>
+
     <ItemGroup>
         <ProjectReference Include="..\SkyApm.Agent.Hosting\SkyApm.Agent.Hosting.csproj" />
         <ProjectReference Include="..\SkyApm.Diagnostics.AspNetCore\SkyApm.Diagnostics.AspNetCore.csproj" />

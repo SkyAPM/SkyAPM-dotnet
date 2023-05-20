@@ -1,22 +1,22 @@
 ﻿<Project>
-  <Import Project="sign.props" />
-  <Import Project="version.props" />
-  <PropertyGroup>
-    <Authors>SkyAPM Team</Authors>
-    <Product>SkyAPM</Product>
-    <owners>SkyAPM</owners>
-    <PackagePrefix>SkyAPM</PackagePrefix>
-    <PackageIconUrl>https://avatars2.githubusercontent.com/u/32165127</PackageIconUrl>
-    <PackageProjectUrl>https://github.com/SkyAPM/SkyAPM-dotnet</PackageProjectUrl>
-    <PackageLicenseUrl>https://github.com/SkyAPM/SkyAPM-dotnet/blob/master/LICENSE</PackageLicenseUrl>
-    <RepositoryType>git</RepositoryType>
-    <RepositoryUrl>https://github.com/SkyAPM/SkyAPM-dotnet</RepositoryUrl>
-    <GenerateAssemblyConfigurationAttribute>True</GenerateAssemblyConfigurationAttribute>
-    <GenerateAssemblyCompanyAttribute>True</GenerateAssemblyCompanyAttribute>
-    <GenerateAssemblyProductAttribute>True</GenerateAssemblyProductAttribute>
-    <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
-    <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <NoWarn>1591</NoWarn>
-  </PropertyGroup>
+    <Import Project="sign.props" />
+    <Import Project="version.props" />
+    <PropertyGroup>
+        <Authors>SkyAPM Team</Authors>
+        <Product>SkyAPM</Product>
+        <owners>SkyAPM</owners>
+        <PackagePrefix>SkyAPM</PackagePrefix>
+        <PackageIconUrl>https://avatars2.githubusercontent.com/u/32165127</PackageIconUrl>
+        <PackageProjectUrl>https://github.com/SkyAPM/SkyAPM-dotnet</PackageProjectUrl>
+        <PackageLicenseUrl>https://github.com/SkyAPM/SkyAPM-dotnet/blob/master/LICENSE</PackageLicenseUrl>
+        <RepositoryType>git</RepositoryType>
+        <RepositoryUrl>https://github.com/SkyAPM/SkyAPM-dotnet</RepositoryUrl>
+        <GenerateAssemblyConfigurationAttribute>True</GenerateAssemblyConfigurationAttribute>
+        <GenerateAssemblyCompanyAttribute>True</GenerateAssemblyCompanyAttribute>
+        <GenerateAssemblyProductAttribute>True</GenerateAssemblyProductAttribute>
+        <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+        <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <NoWarn>1591</NoWarn>
+    </PropertyGroup>
 </Project>

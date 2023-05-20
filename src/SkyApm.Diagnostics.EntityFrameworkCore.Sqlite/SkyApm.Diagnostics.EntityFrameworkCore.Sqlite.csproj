@@ -1,20 +1,20 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="..\..\build\common.props" />
-  <PropertyGroup>
-    <TargetFrameworks>netcoreapp3.1;net5.0;net6.0;net7.0</TargetFrameworks>
-  </PropertyGroup>
-  <PropertyGroup>
-    <AssemblyName>$(PackagePrefix).Diagnostics.EntityFrameworkCore.Sqlite</AssemblyName>
-    <AssemblyTitle>$(PackagePrefix).Diagnostics.EntityFrameworkCore.Sqlite</AssemblyTitle>
-    <PackageId>$(PackagePrefix).Diagnostics.EntityFrameworkCore.Sqlite</PackageId>
-    <PackageTags>SkyWalking;APM;EntityFrameworkCore;EF</PackageTags>
-    <Description>$(PackagePrefix).Diagnostics.EntityFrameworkCore.Sqlite notifies of EF requests.</Description>
-    <RootNamespace>SkyApm.Diagnostics.EntityFrameworkCore</RootNamespace>
-  </PropertyGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\SkyApm.Abstractions\SkyApm.Abstractions.csproj" />
-    <ProjectReference Include="..\SkyApm.Diagnostics.EntityFrameworkCore\SkyApm.Diagnostics.EntityFrameworkCore.csproj" />
-    <ProjectReference Include="..\SkyApm.Core\SkyApm.Core.csproj" />
-    <ProjectReference Include="..\SkyApm.Utilities.DependencyInjection\SkyApm.Utilities.DependencyInjection.csproj" />
-  </ItemGroup>
+    <Import Project="..\..\build\common.props" />
+
+    <PropertyGroup>
+        <AssemblyName>$(PackagePrefix).Diagnostics.EntityFrameworkCore.Sqlite</AssemblyName>
+        <AssemblyTitle>$(PackagePrefix).Diagnostics.EntityFrameworkCore.Sqlite</AssemblyTitle>
+        <PackageId>$(PackagePrefix).Diagnostics.EntityFrameworkCore.Sqlite</PackageId>
+        <PackageTags>SkyWalking;APM;EntityFrameworkCore;EF</PackageTags>
+        <Description>$(PackagePrefix).Diagnostics.EntityFrameworkCore.Sqlite notifies of EF requests.</Description>
+        <RootNamespace>SkyApm.Diagnostics.EntityFrameworkCore</RootNamespace>
+        <TargetFrameworks>netcoreapp3.1;net5.0;net6.0;net7.0</TargetFrameworks>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\SkyApm.Abstractions\SkyApm.Abstractions.csproj" />
+        <ProjectReference Include="..\SkyApm.Diagnostics.EntityFrameworkCore\SkyApm.Diagnostics.EntityFrameworkCore.csproj" />
+        <ProjectReference Include="..\SkyApm.Core\SkyApm.Core.csproj" />
+        <ProjectReference Include="..\SkyApm.Utilities.DependencyInjection\SkyApm.Utilities.DependencyInjection.csproj" />
+    </ItemGroup>
 </Project>
