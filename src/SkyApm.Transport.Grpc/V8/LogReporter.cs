@@ -30,23 +30,23 @@ using System.Threading.Tasks;
 
 namespace SkyApm.Transport.Grpc
 {
-    public class LoggerReporter : ILoggerReporter
+    public class LogReporter : ILogReporter
     {
         private readonly ConnectionManager _connectionManager;
         private readonly ILogger _logger;
         private readonly GrpcConfig _grpcConfig;
         private readonly InstrumentConfig _instrumentConfig;
 
-        public LoggerReporter(ConnectionManager connectionManager, IConfigAccessor configAccessor,
+        public LogReporter(ConnectionManager connectionManager, IConfigAccessor configAccessor,
             ILoggerFactory loggerFactory)
         {
             _connectionManager = connectionManager;
             _grpcConfig = configAccessor.Get<GrpcConfig>();
             _instrumentConfig = configAccessor.Get<InstrumentConfig>();
-            _logger = loggerFactory.CreateLogger(typeof(SegmentReporter));
+            _logger = loggerFactory.CreateLogger(typeof(LogReporter));
         }
         
-        public async Task ReportAsync(IReadOnlyCollection<LoggerRequest> loggerRequests,
+        public async Task ReportAsync(IReadOnlyCollection<LogRequest> logRequests,
             CancellationToken cancellationToken = default)
         {
             if (!_connectionManager.Ready)
@@ -62,33 +62,33 @@ namespace SkyApm.Transport.Grpc
                 using (var asyncClientStreamingCall = client.collect(_grpcConfig.GetMeta(),
                            _grpcConfig.GetReportTimeout(), cancellationToken))
                 {
-                    foreach (var loggerRequest in loggerRequests)
+                    foreach (var logRequest in logRequests)
                     {
                         var logBody = new LogData()
                         {
-                            Timestamp = loggerRequest.Date,
+                            Timestamp = logRequest.Date,
                             Service = _instrumentConfig.ServiceName,
                             ServiceInstance = _instrumentConfig.ServiceInstanceName,
-                            Endpoint = loggerRequest.Endpoint,
+                            Endpoint = logRequest.Endpoint,
                             Body = new LogDataBody()
                             {
                                 Type = "text",
                                 Text = new TextLog()
                                 {
-                                    Text = loggerRequest.Message,
+                                    Text = logRequest.Message,
                                 },
                             },
                             Tags = new LogTags(),
                         };
-                        if (loggerRequest.SegmentReference != null)
+                        if (logRequest.SegmentReference != null)
                         {
                             logBody.TraceContext = new TraceContext()
                             {
-                                TraceId = loggerRequest.SegmentReference.TraceId,
-                                TraceSegmentId = loggerRequest.SegmentReference.SegmentId,
+                                TraceId = logRequest.SegmentReference.TraceId,
+                                TraceSegmentId = logRequest.SegmentReference.SegmentId,
                             };
                         }
-                        foreach (var tag in loggerRequest.Tags)
+                        foreach (var tag in logRequest.Tags)
                         {
                             logBody.Tags.Data.Add(new KeyStringValuePair()
                             {
@@ -103,17 +103,17 @@ namespace SkyApm.Transport.Grpc
                     await asyncClientStreamingCall.ResponseAsync;
 
                     stopwatch.Stop();
-                    _logger.Information($"Report {loggerRequests.Count} logs. cost: {stopwatch.Elapsed}s");
+                    _logger.Information($"Report {logRequests.Count} logs. cost: {stopwatch.Elapsed}s");
                 }
             }
             catch (IOException ex)
             {
-                _logger.Error("Report trace segment fail.", ex);
+                _logger.Error("Report log fail.", ex);
                 _connectionManager.Failure(ex);
             }
             catch (Exception ex)
             {
-                _logger.Error("Report trace segment fail.", ex);
+                _logger.Error("Report log fail.", ex);
             }
         }
     }

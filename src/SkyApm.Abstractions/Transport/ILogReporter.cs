@@ -24,9 +24,9 @@ using System.Threading.Tasks;
 
 namespace SkyApm.Transport
 {
-    public interface ILoggerReporter
+    public interface ILogReporter
     {
-        Task ReportAsync(IReadOnlyCollection<LoggerRequest> loggerRequests,
+        Task ReportAsync(IReadOnlyCollection<LogRequest> logRequests,
            CancellationToken cancellationToken = default(CancellationToken));
     }
 }

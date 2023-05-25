@@ -23,7 +23,7 @@ namespace SkyApm.Transport
 {
     public interface ISkyApmLogDispatcher
     {
-        bool Dispatch(LoggerRequest loggerRequest);
+        bool Dispatch(LogRequest logRequest);
 
         Task Flush(CancellationToken token = default(CancellationToken));
 

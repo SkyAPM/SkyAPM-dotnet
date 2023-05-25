@@ -28,42 +28,43 @@ namespace SkyApm.Transport
     public class AsyncQueueSkyApmLogDispatcher : ISkyApmLogDispatcher
     {
         private readonly ILogger _logger;
+
         private readonly CancellationTokenSource _cancellation;
 
-        private readonly ConcurrentQueue<LoggerRequest> _segmentQueue;
+        private readonly ConcurrentQueue<LogRequest> _segmentQueue;
 
         private readonly IRuntimeEnvironment _runtimeEnvironment;
 
-        private readonly ILoggerReporter _loggerReporter;
+        private readonly ILogReporter _logReporter;
         
         private readonly TransportConfig _config;
 
         private int _offset;
 
-        public AsyncQueueSkyApmLogDispatcher(IConfigAccessor configAccessor, ILoggerFactory loggerFactory,  ILoggerReporter loggerReporter, IRuntimeEnvironment runtimeEnvironment)
+        public AsyncQueueSkyApmLogDispatcher(IConfigAccessor configAccessor, ILoggerFactory loggerFactory,  ILogReporter logReporter, IRuntimeEnvironment runtimeEnvironment)
         {
             _logger = loggerFactory.CreateLogger(typeof(AsyncQueueSkyApmLogDispatcher));
             _config = configAccessor.Get<TransportConfig>();
             _runtimeEnvironment = runtimeEnvironment;
-            _segmentQueue = new ConcurrentQueue<LoggerRequest>();
+            _segmentQueue = new ConcurrentQueue<LogRequest>();
             _cancellation = new CancellationTokenSource();
-            _loggerReporter= loggerReporter;
+            _logReporter= logReporter;
         }
 
-        public bool Dispatch(LoggerRequest loggerRequest)
+        public bool Dispatch(LogRequest logRequest)
         {
-            if (!_runtimeEnvironment.Initialized || loggerRequest == null)
+            if (!_runtimeEnvironment.Initialized || logRequest == null)
                 return false;
 
             // todo performance optimization for ConcurrentQueue
             if (_config.QueueSize < _offset || _cancellation.IsCancellationRequested)
                 return false;
             
-            _segmentQueue.Enqueue(loggerRequest);
+            _segmentQueue.Enqueue(logRequest);
 
             Interlocked.Increment(ref _offset);
 
-            _logger.Debug($"Dispatch trace segment. [SegmentId]={loggerRequest.SegmentReference?.SegmentId}.");
+            _logger.Debug($"Dispatch trace segment. [SegmentId]={logRequest.SegmentReference?.SegmentId}.");
             return true;
         }
 
@@ -71,17 +72,17 @@ namespace SkyApm.Transport
         {
             var limit = _config.BatchSize;
             var index = 0;
-            var loggers = new List<LoggerRequest>(limit);
+            var logs = new List<LogRequest>(limit);
             while (index++ < limit && _segmentQueue.TryDequeue(out var request))
             {
-                loggers.Add(request);
+                logs.Add(request);
                 Interlocked.Decrement(ref _offset);
             }
 
             // send async
-            if (loggers.Count > 0)
+            if (logs.Count > 0)
             {
-                _loggerReporter.ReportAsync(loggers, token);
+                _logReporter.ReportAsync(logs, token);
             }
 
             return Task.CompletedTask;

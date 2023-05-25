@@ -118,7 +118,7 @@ namespace Microsoft.Extensions.DependencyInjection
         private static IServiceCollection AddGrpcTransport(this IServiceCollection services)
         {
             services.AddSingleton<ISegmentReporter, SegmentReporter>();
-            services.AddSingleton<ILoggerReporter, LoggerReporter>();
+            services.AddSingleton<ILogReporter, LogReporter>();
             services.AddSingleton<ICLRStatsReporter, CLRStatsReporter>();
             services.AddSingleton<ConnectionManager>();
             services.AddSingleton<IPingCaller, PingCaller>();

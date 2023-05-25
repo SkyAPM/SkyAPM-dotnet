@@ -71,13 +71,13 @@ namespace SkyApm.Diagnostics.MSLogging
                 message += "\r\n" + (exception.HasInnerExceptions() ? exception.ToDemystifiedString(_tracingConfig.ExceptionMaxDepth) : exception.ToString());
             }
             SegmentContext segmentContext = _segmentContextAccessor.Context;
-            var logContext = new LoggerRequest()
+            var logContext = new LogRequest()
             {
                 Message = message ?? string.Empty,
                 Tags = tags,
                 SegmentReference = segmentContext == null
                     ? null
-                    : new LoggerSegmentReference()
+                    : new LogSegmentReference()
                     {
                         TraceId = segmentContext.TraceId,
                         SegmentId = segmentContext.SegmentId,
