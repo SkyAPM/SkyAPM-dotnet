@@ -1,5 +1,4 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
     <Import Project="..\..\build\common.props" />
 
     <PropertyGroup>
@@ -18,17 +17,20 @@
         <ProjectReference Include="..\SkyApm.Abstractions\SkyApm.Abstractions.csproj" />
         <ProjectReference Include="..\SkyApm.Utilities.DependencyInjection\SkyApm.Utilities.DependencyInjection.csproj" />
     </ItemGroup>
-    
+
     <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp3.1'">
         <FrameworkReference Include="Microsoft.AspNetCore.App" />
     </ItemGroup>
+
     <ItemGroup Condition="'$(TargetFramework)' == 'net5.0'">
         <FrameworkReference Include="Microsoft.AspNetCore.App" />
     </ItemGroup>
+
     <ItemGroup Condition="'$(TargetFramework)' == 'net6.0'">
         <FrameworkReference Include="Microsoft.AspNetCore.App" />
     </ItemGroup>
+
     <ItemGroup Condition="'$(TargetFramework)' == 'net7.0'">
-	    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+        <FrameworkReference Include="Microsoft.AspNetCore.App" />
     </ItemGroup>
 </Project>

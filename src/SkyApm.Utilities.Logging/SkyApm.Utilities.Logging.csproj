@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
     <Import Project="..\..\build\common.props" />
+
     <PropertyGroup>
         <Description>Microsoft.Utilities.Logging support for $(Product).</Description>
         <AssemblyTitle>$(PackagePrefix).Utilities.Logging</AssemblyTitle>
@@ -12,8 +12,9 @@
         </PackageReleaseNotes>
         <RootNamespace>SkyApm.Utilities.Logging</RootNamespace>
     </PropertyGroup>
+
     <ItemGroup>
-      <Compile Remove="SkyApmLogger.cs" />
+        <Compile Remove="SkyApmLogger.cs" />
     </ItemGroup>
 
     <ItemGroup>
@@ -21,20 +22,24 @@
         <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
         <PackageReference Include="Serilog.Sinks.Async" Version="1.5.0" />
     </ItemGroup>
+
     <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp3.1'">
         <PackageReference Include="Microsoft.Extensions.Logging" Version="3.1.32" />
     </ItemGroup>
+
     <ItemGroup Condition="'$(TargetFramework)' == 'net5.0'">
         <PackageReference Include="Microsoft.Extensions.Logging" Version="5.0.0" />
     </ItemGroup>
+
     <ItemGroup Condition="'$(TargetFramework)' == 'net6.0'">
         <PackageReference Include="Microsoft.Extensions.Logging" Version="6.0.0" />
     </ItemGroup>
+
     <ItemGroup Condition="'$(TargetFramework)' == 'net7.0'">
-	    <PackageReference Include="Microsoft.Extensions.Logging" Version="7.0.0" />
-    </ItemGroup>
-    <ItemGroup>
-      <ProjectReference Include="..\SkyApm.Abstractions\SkyApm.Abstractions.csproj" />
+        <PackageReference Include="Microsoft.Extensions.Logging" Version="7.0.0" />
     </ItemGroup>
 
+    <ItemGroup>
+        <ProjectReference Include="..\SkyApm.Abstractions\SkyApm.Abstractions.csproj" />
+    </ItemGroup>
 </Project>

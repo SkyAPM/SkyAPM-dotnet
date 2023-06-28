@@ -1,16 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+        <OutputType>Exe</OutputType>
+        <TargetFrameworks>netcoreapp3.1;net5.0;net6.0;net7.0</TargetFrameworks>
+    </PropertyGroup>
 
-  <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <TargetFrameworks>netcoreapp3.1;net5.0;net6.0;net7.0</TargetFrameworks>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="BenchmarkDotNet" Version="0.*" />
-
-    <ProjectReference Include="..\..\src\SkyApm.Core\SkyApm.Core.csproj" />
-
-    <ProjectReference Include="..\..\src\SkyApm.Utilities.Configuration\SkyApm.Utilities.Configuration.csproj" />
-  </ItemGroup>
-
+    <ItemGroup>
+        <PackageReference Include="BenchmarkDotNet" Version="0.*" />
+        <ProjectReference Include="..\..\src\SkyApm.Core\SkyApm.Core.csproj" />
+        <ProjectReference Include="..\..\src\SkyApm.Utilities.Configuration\SkyApm.Utilities.Configuration.csproj" />
+    </ItemGroup>
 </Project>
