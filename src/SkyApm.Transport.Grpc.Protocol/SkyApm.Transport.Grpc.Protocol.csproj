@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
     <Import Project="..\..\build\common.props" />
 
     <PropertyGroup>
@@ -15,7 +15,7 @@
 
     <ItemGroup>
         <PackageReference Include="Google.Protobuf" Version="3.21.5" />
-        <PackageReference Include="Grpc.Net.Client" Version="2.47.0" />
+        <PackageReference Include="Grpc.Net.Client" Version="2.52.0" />
         <PackageReference Include="Grpc.Tools" Version="2.48.0">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>

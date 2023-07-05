@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk.Web">
     <PropertyGroup>
         <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
         <RootNamespace>SkyApm.Sample.Backend</RootNamespace>
@@ -7,7 +7,7 @@
 
     <ItemGroup>
         <PackageReference Include="System.Net.Http.Json" Version="5.0.0" />
-        <PackageReference Include="Grpc.Net.Client" Version="2.47.0" />
+        <PackageReference Include="Grpc.Net.Client" Version="2.52.0" />
     </ItemGroup>
 
     <ItemGroup>
