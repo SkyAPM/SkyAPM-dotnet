@@ -18,28 +18,31 @@
 
 namespace SkyApm.Config
 {
-    [Config("SkyWalking", "Transport")]
-    public class TransportConfig
+    [Config("SkyWalking", "Transport", "Kafka")]
+    public class KafkaConfig
     {
-        public int QueueSize { get; set; } = 30000;
+        /**
+         * e.g. address1:port1[,address2:port2...]
+         */
+        public string BootstrapServers { get; set; }
 
-        /// <summary>
-        /// Flush Interval Millisecond
-        /// </summary>
-        public int Interval { get; set; } = 3000;
+        public string ProducerConfig { get; set; }
 
-        /// <summary>
-        /// Data queued beyond this time will be discarded.
-        /// </summary>
-        public int BatchSize { get; set; } = 3000;
+        /**
+         * in milliseconds
+         */
+        public int GetTopicTimeout { get; set; }
 
-        public string ProtocolVersion { get; set; } = ProtocolVersions.V8;
+        public string TopicMeters { get; set; }
 
-        public string Reporter { get; set; } = "grpc";
-    }
+        public string TopicMetrics { get; set; }
 
-    public static class ProtocolVersions
-    {
-        public static string V8 { get; } = "v8";
+        public string TopicSegments { get; set; }
+
+        public string TopicProfilings { get; set; }
+
+        public string TopicManagements { get; set; }
+
+        public string TopicLogs { get; set; }
     }
 }

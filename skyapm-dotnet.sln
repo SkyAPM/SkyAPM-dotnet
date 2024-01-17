@@ -125,6 +125,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SkyApm.PeerFormatters.MySql
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SkyApm.Diagnostics.FreeRedis", "src\SkyApm.Diagnostics.FreeRedis\SkyApm.Diagnostics.FreeRedis.csproj", "{829F7955-3138-4CA2-8AA3-3E4D72C97599}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SkyApm.Transport.Kafka", "src\SkyApm.Transport.Kafka\SkyApm.Transport.Kafka.csproj", "{8BCBAFD0-2C88-8886-5ECF-82D8A88888CB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -287,6 +289,10 @@ Global
 		{829F7955-3138-4CA2-8AA3-3E4D72C97599}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{829F7955-3138-4CA2-8AA3-3E4D72C97599}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{829F7955-3138-4CA2-8AA3-3E4D72C97599}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8BCBAFD0-2C88-8886-5ECF-82D8A88888CB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8BCBAFD0-2C88-8886-5ECF-82D8A88888CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8BCBAFD0-2C88-8886-5ECF-82D8A88888CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8BCBAFD0-2C88-8886-5ECF-82D8A88888CB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -341,6 +347,7 @@ Global
 		{5DBE2053-EBAE-404F-A7B3-9CE3CD2152D9} = {D122E6AE-6FE7-4C1A-826F-5964ABBF2C9D}
 		{2A313B7E-CC41-4556-8055-D87266C398BF} = {D122E6AE-6FE7-4C1A-826F-5964ABBF2C9D}
 		{829F7955-3138-4CA2-8AA3-3E4D72C97599} = {B5E677CF-2920-4B0A-A056-E73F6B2CF2BC}
+		{8BCBAFD0-2C88-8886-5ECF-82D8A88888CB} = {CBFF7EE0-69D7-4D6A-9BBD-8E567FF4D810}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {94C0DA2C-CCCB-4314-93A2-9809B5DD0583}

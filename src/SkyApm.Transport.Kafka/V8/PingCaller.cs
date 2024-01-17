@@ -16,30 +16,29 @@
  *
  */
 
-namespace SkyApm.Config
+using System.Threading;
+using System.Threading.Tasks;
+
+using SkyApm.Config;
+using SkyApm.Logging;
+
+namespace SkyApm.Transport.Kafka.V8
 {
-    [Config("SkyWalking", "Transport")]
-    public class TransportConfig
+    internal class PingCaller : IPingCaller
     {
-        public int QueueSize { get; set; } = 30000;
+        private readonly ILogger _logger;
+        private readonly KafkaConfig _config;
 
-        /// <summary>
-        /// Flush Interval Millisecond
-        /// </summary>
-        public int Interval { get; set; } = 3000;
+        public PingCaller(ILoggerFactory loggerFactory,
+            IConfigAccessor configAccessor)
+        {
+            _logger = loggerFactory.CreateLogger(typeof(PingCaller));
+            _config = configAccessor.Get<KafkaConfig>();
+        }
 
-        /// <summary>
-        /// Data queued beyond this time will be discarded.
-        /// </summary>
-        public int BatchSize { get; set; } = 3000;
-
-        public string ProtocolVersion { get; set; } = ProtocolVersions.V8;
-
-        public string Reporter { get; set; } = "grpc";
-    }
-
-    public static class ProtocolVersions
-    {
-        public static string V8 { get; } = "v8";
+        public Task PingAsync(PingRequest request, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return Task.CompletedTask;
+        }
     }
 }

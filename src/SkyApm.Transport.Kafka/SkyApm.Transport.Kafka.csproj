@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <Import Project="..\..\build\common.props" />
+
+    <PropertyGroup>
+        <Description>$(Product) kafka data transmitter.</Description>
+        <AssemblyTitle>$(PackagePrefix).Transport.Kafka</AssemblyTitle>
+        <AssemblyName>$(PackagePrefix).Transport.Kafka</AssemblyName>
+        <PackageId>$(PackagePrefix).Transport.Kafka</PackageId>
+        <PackageTags>SkyWalking;Kafka</PackageTags>
+        <PackageReleaseNotes>
+        </PackageReleaseNotes>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <RootNamespace>SkyApm.Transport.Kafka</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Confluent.Kafka" Version="2.1.1"/>
+        <PackageReference Include="Google.Protobuf" Version="3.21.5"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\SkyApm.Abstractions\SkyApm.Abstractions.csproj"/>
+        <ProjectReference Include="..\SkyApm.Transport.Grpc.Protocol\SkyApm.Transport.Grpc.Protocol.csproj"/>
+    </ItemGroup>
+</Project>

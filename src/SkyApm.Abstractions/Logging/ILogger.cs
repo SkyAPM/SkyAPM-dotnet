@@ -32,4 +32,4 @@ namespace SkyApm.Logging
 
         void Trace(string message);
     }
-}
+} 

@@ -16,57 +16,61 @@
  *
  */
 
-using SkyApm.Common;
-using SkyApm.Config;
-using SkyApm.Logging;
-using SkyApm.Transport.Grpc.Common;
-using SkyWalking.NetworkProtocol.V3;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SkyApm.Transport.Grpc.V8
+using Confluent.Kafka;
+using Google.Protobuf;
+using SkyApm.Config;
+using SkyApm.Logging;
+using SkyApm.Transport.Kafka.Common;
+using SkyWalking.NetworkProtocol.V3;
+
+namespace SkyApm.Transport.Kafka.V8
 {
     internal class SegmentReporter : ISegmentReporter
     {
         private readonly ILogger _logger;
-        private readonly ConnectionManager _connectionManager;
-        private readonly GrpcConfig _config;
+        private readonly InstrumentConfig _instrumentConfig;
+        private readonly KafkaConfig _config;
+        private readonly ProducerConfig _producerConfig;
+        private readonly ProducerBuilder<string, byte[]> _producerBuilder;
+        private readonly IProducer<string, byte[]> _producer;
+        private readonly string _topic;
 
-        public SegmentReporter(ConnectionManager connectionManager, ILoggerFactory loggerFactory,
+        public SegmentReporter(ILoggerFactory loggerFactory,
             IConfigAccessor configAccessor)
         {
             _logger = loggerFactory.CreateLogger(typeof(SegmentReporter));
-            _connectionManager = connectionManager;
-            _config = configAccessor.Get<GrpcConfig>();
+            _instrumentConfig = configAccessor.Get<InstrumentConfig>();
+            _config = configAccessor.Get<KafkaConfig>();
+            _producerConfig = new ProducerConfig();
+            _producerConfig.BootstrapServers = _config.BootstrapServers;
+            _producerBuilder = new ProducerBuilder<string, byte[]>(_producerConfig);
+            _producer = _producerBuilder.Build();
+            _topic = _config.TopicSegments;
         }
 
         public async Task ReportAsync(IReadOnlyCollection<SegmentRequest> segmentRequests,
             CancellationToken cancellationToken = default(CancellationToken))
         {
-            if (!_connectionManager.Ready)
-            {
-                return;
-            }
-
-            var connection = _connectionManager.GetConnection();
+            // TODO
+            // check whether producer is okay?
 
             try
             {
                 var stopwatch = Stopwatch.StartNew();
-                var client = new TraceSegmentReportService.TraceSegmentReportServiceClient(connection);
-                using (var asyncClientStreamingCall =
-                    client.collect(_config.GetMeta(), _config.GetReportTimeout(), cancellationToken))
                 {
+
                     foreach (var segment in segmentRequests)
                     {
-                        await asyncClientStreamingCall.RequestStream.WriteAsync(SegmentV8Helpers.Map(segment));
+                        SegmentObject segmentObject = SegmentV8Helpers.Map(segment);
+                        byte[] byteArray = segmentObject.ToByteArray();
+                        await _producer.ProduceAsync(_topic, new Message<string, byte[]> { Key = segmentObject.TraceSegmentId, Value = byteArray });
                     }
-                    await asyncClientStreamingCall.RequestStream.CompleteAsync();
-                    await asyncClientStreamingCall.ResponseAsync;
                 }
                 stopwatch.Stop();
                 _logger.Information($"Report {segmentRequests.Count} trace segment. cost: {stopwatch.Elapsed}s");
@@ -74,7 +78,6 @@ namespace SkyApm.Transport.Grpc.V8
             catch (Exception ex)
             {
                 _logger.Error("Report trace segment fail.", ex);
-                _connectionManager.Failure(ex);
             }
         }
     }

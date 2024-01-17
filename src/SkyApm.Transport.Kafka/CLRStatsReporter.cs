@@ -16,14 +16,13 @@
  *
  */
 
-using System;
 using System.Threading;
 using System.Threading.Tasks;
+
 using SkyApm.Config;
 using SkyApm.Logging;
-using SkyWalking.NetworkProtocol.V3;
 
-namespace SkyApm.Transport.Grpc
+namespace SkyApm.Transport.Kafka
 {
     public class CLRStatsReporter : ICLRStatsReporter
     {
@@ -31,12 +30,12 @@ namespace SkyApm.Transport.Grpc
         private readonly TransportConfig _transportConfig;
         private readonly ICLRStatsReporter _clrStatsReporterV8;
 
-        public CLRStatsReporter(ConnectionManager connectionManager, ILoggerFactory loggerFactory,
-            IConfigAccessor configAccessor, IRuntimeEnvironment runtimeEnvironment)
+        public CLRStatsReporter(ILoggerFactory loggerFactory,
+            IConfigAccessor configAccessor)
         {
             _instrumentConfig = configAccessor.Get<InstrumentConfig>();
             _transportConfig = configAccessor.Get<TransportConfig>();
-            _clrStatsReporterV8 = new V8.CLRStatsReporter(connectionManager, loggerFactory, configAccessor, runtimeEnvironment);
+            _clrStatsReporterV8 = new V8.CLRStatsReporter(loggerFactory, configAccessor);
         }
 
         public async Task ReportAsync(CLRStatsRequest statsRequest,
