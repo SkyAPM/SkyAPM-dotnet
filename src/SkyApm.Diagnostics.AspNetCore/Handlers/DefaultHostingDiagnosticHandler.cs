@@ -53,7 +53,8 @@ namespace SkyApm.Diagnostics.AspNetCore.Handlers
 
         public void BeginRequest(ITracingContext tracingContext, HttpContext httpContext)
         {
-            var context = tracingContext.CreateEntrySegmentContext(httpContext.Request.Path,
+            var context = tracingContext.CreateEntrySegmentContext(
+                httpContext.Request.Method.ToUpper() + ":" + httpContext.Request.Path,
                 new HttpRequestCarrierHeaderCollection(httpContext.Request));
             context.Span.SpanLayer = SpanLayer.HTTP;
             context.Span.Component = Common.Components.ASPNETCORE;
