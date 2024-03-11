@@ -68,7 +68,7 @@ namespace SkyApm.Utilities.Configuration
                     .GetHostAddresses(hostName)
                     .First(x => x.AddressFamily == AddressFamily.InterNetwork).ToString();
 
-                return $"{ipAddress}@{guid}";
+                return $"{guid}@{ipAddress}";
             }
             catch (Exception)
             {
