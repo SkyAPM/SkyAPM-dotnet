@@ -14,6 +14,10 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="Grpc.Net.Client" Version="2.47.0" />
+    </ItemGroup>
+
+    <ItemGroup>
         <ProjectReference Include="..\SkyApm.Abstractions\SkyApm.Abstractions.csproj" />
         <ProjectReference Include="..\SkyApm.Transport.Grpc.Protocol\SkyApm.Transport.Grpc.Protocol.csproj" />
     </ItemGroup>
