@@ -19,6 +19,6 @@
 
     <ItemGroup>
         <ProjectReference Include="..\SkyApm.Abstractions\SkyApm.Abstractions.csproj" />
-        <ProjectReference Include="..\SkyApm.Transport.Grpc.Protocol\SkyApm.Transport.Grpc.Protocol.csproj" />
+        <ProjectReference Include="..\SkyApm.Transport.Protocol\SkyApm.Transport.Protocol.csproj" />
     </ItemGroup>
 </Project>
