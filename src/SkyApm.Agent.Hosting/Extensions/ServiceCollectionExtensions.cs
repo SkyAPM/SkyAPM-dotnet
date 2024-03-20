@@ -92,7 +92,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IExecutionService, RegisterService>();
             services.AddSingleton<IExecutionService, LogReportService>();
             services.AddSingleton<IExecutionService, PingService>();
-            services.AddSingleton<IExecutionService, SegmentReportService>();
+            services.AddSingleton<SegmentReportService>();
             services.AddSingleton<IExecutionService, CLRStatsService>();
             services.AddSingleton<IInstrumentStartup, InstrumentStartup>();
             services.AddSingleton<IRuntimeEnvironment>(RuntimeEnvironment.Instance);

@@ -18,26 +18,33 @@
 
 namespace SkyApm.Config
 {
-    [Config("SkyWalking", "Transport")]
-    public class TransportConfig
-    {
-        public int QueueSize { get; set; } = 30000;
-
-        /// <summary>
-        /// Flush Interval Millisecond
-        /// </summary>
-        public int Interval { get; set; } = 3000;
-
-        /// <summary>
-        /// Data queued beyond this time will be discarded.
-        /// </summary>
-        public int BatchSize { get; set; } = 3000;
-
-        public string ProtocolVersion { get; set; } = ProtocolVersions.V8;
-    }
-
     public static class ProtocolVersions
     {
         public static string V8 { get; } = "v8";
+    }
+
+    [Config("SkyWalking", "Transport")]
+    public class TransportConfig
+    {
+        public string ProtocolVersion { get; set; } = ProtocolVersions.V8;
+
+        /// <summary>
+        /// TotalQueueSize = QueueSize * Parallel
+        /// Elements will be dropped if queues are full.
+        /// </summary>
+        public int QueueSize { get; set; } = 10000;
+
+        /// <summary>
+        /// TotalBatchSize = BatchSize * Parallel
+        /// </summary>
+        public int BatchSize { get; set; } = 2000;
+
+        public int Parallel { get; set; } = 5;
+
+        /// <summary>
+        /// max interval between each batch, in milliseconds
+        /// -1 - waits for previous batch to complete
+        /// </summary>
+        public int Interval { get; set; } = 50;
     }
 }

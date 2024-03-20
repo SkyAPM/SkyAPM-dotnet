@@ -16,7 +16,6 @@
  *
  */
 
-using System;
 using System.Threading;
 using System.Threading.Tasks;
 using SkyApm.Config;
@@ -25,30 +24,23 @@ using SkyApm.Transport;
 
 namespace SkyApm.Service
 {
-    public class SegmentReportService : ExecutionService
+    /// <summary>
+    /// deprecated
+    /// </summary>
+    public class SegmentReportService
     {
+        protected readonly ILogger Logger;
         private readonly TransportConfig _config;
         private readonly ISegmentDispatcher _dispatcher;
 
         public SegmentReportService(IConfigAccessor configAccessor, ISegmentDispatcher dispatcher,
             IRuntimeEnvironment runtimeEnvironment, ILoggerFactory loggerFactory)
-            : base(runtimeEnvironment, loggerFactory)
         {
-            _dispatcher = dispatcher;
             _config = configAccessor.Get<TransportConfig>();
-            Period = TimeSpan.FromMilliseconds(_config.Interval);
+            _dispatcher = dispatcher;
         }
 
-        protected override TimeSpan DueTime { get; } = TimeSpan.FromSeconds(3);
-
-        protected override TimeSpan Period { get; }
-
-        protected override Task ExecuteAsync(CancellationToken cancellationToken)
-        {
-            return _dispatcher.Flush(cancellationToken);
-        }
-
-        protected override Task Stopping(CancellationToken cancellationToke)
+        protected Task Stopping(CancellationToken cancellationToke)
         {
             _dispatcher.Close();
             return Task.CompletedTask;
