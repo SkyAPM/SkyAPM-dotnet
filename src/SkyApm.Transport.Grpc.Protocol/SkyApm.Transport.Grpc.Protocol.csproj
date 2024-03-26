@@ -15,7 +15,8 @@
 
     <ItemGroup>
         <PackageReference Include="Google.Protobuf" Version="3.21.5" />
-        <PackageReference Include="Grpc.Net.Client" Version="2.47.0" />
+        <!-- Grpc.Tools is only used at build-time and has no runtime components. -->
+        <!-- https://github.com/grpc/grpc/blob/master/src/csharp/BUILD-INTEGRATION.md -->
         <PackageReference Include="Grpc.Tools" Version="2.48.0">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
@@ -23,7 +24,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Protobuf Include="protocol-v3/**/*.proto" ProtoRoot="protocol-v3" OutputDir="%(RelativePath)generated-v3" CompileOutputs="false" />
+        <Protobuf Include="protocol-v3/**/*.proto" ProtoRoot="protocol-v3" GrpcServices="Client" OutputDir="generated-v3" GrpcOutputDir="../SkyApm.Transport.Grpc/generated-v3" CompileOutputs="false" />
     </ItemGroup>
 
     <PropertyGroup>
