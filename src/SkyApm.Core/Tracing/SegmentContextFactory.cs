@@ -134,7 +134,7 @@ namespace SkyApm.Tracing
                 var parentReference = parentSegmentContext.References.FirstOrDefault();
                 var reference = new SegmentReference
                 {
-                    Reference = Reference.CrossThread,
+                    Reference = Reference.CrossProcess,
                     EntryEndpoint = parentReference?.EntryEndpoint ?? parentSegmentContext.Span.OperationName,
                     NetworkAddress = parentReference?.NetworkAddress ?? parentSegmentContext.Span.OperationName,
                     ParentEndpoint = parentSegmentContext.Span.OperationName,
