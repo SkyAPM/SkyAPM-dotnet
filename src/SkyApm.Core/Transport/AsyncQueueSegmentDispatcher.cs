@@ -16,6 +16,7 @@
  *
  */
 
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
@@ -35,7 +36,6 @@ namespace SkyApm.Transport
         private readonly ConcurrentQueue<SegmentRequest> _segmentQueue;
         private readonly IRuntimeEnvironment _runtimeEnvironment;
         private readonly CancellationTokenSource _cancellation;
-        private int _offset;
 
         public AsyncQueueSegmentDispatcher(IConfigAccessor configAccessor,
             ISegmentReporter segmentReporter, IRuntimeEnvironment runtimeEnvironment,
@@ -55,8 +55,7 @@ namespace SkyApm.Transport
             if (!_runtimeEnvironment.Initialized || segmentContext == null || !segmentContext.Sampled)
                 return false;
 
-            // todo performance optimization for ConcurrentQueue
-            if (_config.QueueSize < _offset || _cancellation.IsCancellationRequested)
+            if (_config.QueueSize < _segmentQueue.Count || _cancellation.IsCancellationRequested)
                 return false;
 
             var segment = _segmentContextMapper.Map(segmentContext);
@@ -66,32 +65,54 @@ namespace SkyApm.Transport
 
             _segmentQueue.Enqueue(segment);
 
-            Interlocked.Increment(ref _offset);
-
             _logger.Debug($"Dispatch trace segment. [SegmentId]={segmentContext.SegmentId}.");
             return true;
         }
 
         public Task Flush(CancellationToken token = default(CancellationToken))
         {
-            // todo performance optimization for ConcurrentQueue
-            //var queued = _segmentQueue.Count;
-            //var limit = queued <= _config.PendingSegmentLimit ? queued : _config.PendingSegmentLimit;
-            var limit = _config.BatchSize;
-            var index = 0;
-            var segments = new List<SegmentRequest>(limit);
-            while (index++ < limit && _segmentQueue.TryDequeue(out var request))
+            int batchSize = _config.BatchSize;
+            int parallel = _config.Parallel;
+            int pause = _config.Pause;
+            bool flag = true;
+            while (flag)
             {
-                segments.Add(request);
-                Interlocked.Decrement(ref _offset);
+                var tasks = new List<Task>(parallel);
+                for (int i = 0; i < parallel; ++ i)
+                {
+                    var segments = new List<SegmentRequest>(batchSize);
+                    for (int j = 0; j < batchSize; ++ j)
+                    {
+                        if (!_segmentQueue.TryDequeue(out var request))
+                        {
+                            flag = false;
+                            break;
+                        }
+                        segments.Add(request);
+                    }
+                    if (segments.Count > 0)
+                    {
+                        Task task = _segmentReporter.ReportAsync(segments, token);
+                        tasks.Add(task);
+                    }
+                    if (!flag)
+                    {
+                        break;
+                    }
+                }
+                if (tasks.Count > 0)
+                {
+                    try
+                    {
+                        // pause for a litte while
+                        Task.WaitAll(tasks.ToArray(), TimeSpan.FromMilliseconds(pause));
+                    }
+                    catch (Exception e)
+                    {
+                        _logger.Debug("Task.WaitAll failed." + parallel + "," + pause);
+                    }
+                }
             }
-
-            // send async
-            if (segments.Count > 0)
-                _segmentReporter.ReportAsync(segments, token);
-
-            Interlocked.Exchange(ref _offset, _segmentQueue.Count);
-
             return Task.CompletedTask;
         }
 
