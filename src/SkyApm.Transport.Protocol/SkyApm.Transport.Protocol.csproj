@@ -2,15 +2,15 @@
     <Import Project="..\..\build\common.props" />
 
     <PropertyGroup>
-        <Description>$(Product) gRPC data transmitter.</Description>
-        <AssemblyTitle>$(PackagePrefix).Transport.Grpc.Protocol</AssemblyTitle>
-        <AssemblyName>$(PackagePrefix).Transport.Grpc.Protocol</AssemblyName>
-        <PackageId>$(PackagePrefix).Transport.Grpc.Protocol</PackageId>
-        <PackageTags>SkyWalking;Grpc</PackageTags>
+        <Description>$(Product) data protocol.</Description>
+        <AssemblyTitle>$(PackagePrefix).Transport.Protocol</AssemblyTitle>
+        <AssemblyName>$(PackagePrefix).Transport.Protocol</AssemblyName>
+        <PackageId>$(PackagePrefix).Transport.Protocol</PackageId>
+        <PackageTags>SkyWalking;Protocol</PackageTags>
         <PackageReleaseNotes>
         </PackageReleaseNotes>
         <TargetFramework>netstandard2.0</TargetFramework>
-        <RootNamespace>SkyApm.Transport.Grpc.Protocol</RootNamespace>
+        <RootNamespace>SkyApm.Transport.Protocol</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
@@ -24,7 +24,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Protobuf Include="protocol-v3/**/*.proto" ProtoRoot="protocol-v3" GrpcServices="Client" OutputDir="generated-v3" GrpcOutputDir="../SkyApm.Transport.Grpc/generated-v3" CompileOutputs="false" />
+        <Protobuf Include="protocol-v3/**/*.proto" ProtoRoot="protocol-v3" OutputDir="generated-v3" GrpcServices="Client" GrpcOutputDir="../SkyApm.Transport.Grpc/generated-v3" CompileOutputs="false" />
     </ItemGroup>
 
     <PropertyGroup>

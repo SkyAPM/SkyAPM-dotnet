@@ -12,5 +12,5 @@ This document helps people to compile and build the project.
 - `git submodule init`
 - `git submodule update`
 - Run `dotnet restore`
-- Run `dotnet build src/SkyApm.Transport.Grpc.Protocol`
+- Run `dotnet build src/SkyApm.Transport.Protocol`
 - Run `dotnet build skyapm-dotnet.sln`

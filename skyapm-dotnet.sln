@@ -71,7 +71,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SkyApm.Utilities.Logging", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SkyApm.Agent.AspNetCore", "src\SkyApm.Agent.AspNetCore\SkyApm.Agent.AspNetCore.csproj", "{5CB2889E-33DD-4326-9403-4977849E065D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SkyApm.Transport.Grpc.Protocol", "src\SkyApm.Transport.Grpc.Protocol\SkyApm.Transport.Grpc.Protocol.csproj", "{BAF5C1ED-09C4-4B32-8190-47D16265F01E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SkyApm.Transport.Protocol", "src\SkyApm.Transport.Protocol\SkyApm.Transport.Protocol.csproj", "{BAF5C1ED-09C4-4B32-8190-47D16265F01E}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SkyApm.Core", "src\SkyApm.Core\SkyApm.Core.csproj", "{60D34708-45A2-4374-9500-5B3FF80C0AA9}"
 EndProject

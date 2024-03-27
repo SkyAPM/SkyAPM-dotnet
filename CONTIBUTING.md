@@ -24,7 +24,7 @@ git submodule update --init
 // Restore dependencies
 dotnet restore
 // Build Protocol
-dotnet build src/SkyApm.Transport.Grpc.Protocol --no-restore
+dotnet build src/SkyApm.Transport.Protocol --no-restore
 // Build
 dotnet build --no-restore
 // Test
