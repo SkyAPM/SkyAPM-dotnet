@@ -45,33 +45,43 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddSkyAPM(this IServiceCollection services, Action<SkyApmExtensions> extensionsSetup = null)
+        public static IServiceCollection AddSkyAPM(this IServiceCollection services,
+            Action<SkyApmExtensions> extensionsSetup = null)
         {
+            #region can be optimized
+
             string environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
             if (environment == null || environment.Length < 1)
             {
                 environment = "Development";
             }
+
             IConfigurationBuilder configurationBuilder = new ConfigurationBuilder();
             configurationBuilder.AddJsonFile("skyapm.json", true);
             configurationBuilder.AddJsonFile("skyapm." + environment + ".json", true);
             IConfiguration configuration = configurationBuilder.Build();
-            string enable = configuration?.GetSection("SkyWalking:Enable").Value ?? "false";
-            if (null == enable || !"true".Equals(enable.ToLower()))
+            string enable = configuration?.GetSection("SkyWalking:Enable").Value;
+            if (enable != null && "false".Equals(enable.ToLower()))
             {
                 return services;
             }
+
             string serviceName = configuration?.GetSection("SkyWalking:ServiceName").Value ?? "";
             if (null == serviceName || serviceName.Length < 1)
             {
                 return services;
             }
+
             Environment.SetEnvironmentVariable("SKYWALKING__SERVICENAME", serviceName);
+
+            #endregion
+
             services.AddSkyAPMCore(extensionsSetup);
             return services;
         }
 
-        private static IServiceCollection AddSkyAPMCore(this IServiceCollection services, Action<SkyApmExtensions> extensionsSetup = null)
+        private static IServiceCollection AddSkyAPMCore(this IServiceCollection services,
+            Action<SkyApmExtensions> extensionsSetup = null)
         {
             if (services == null)
             {
@@ -125,7 +135,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IBase64Formatter, Base64Formatter>();
             return services;
         }
-        
+
         private static IServiceCollection AddSampling(this IServiceCollection services)
         {
             services.AddSingleton<SimpleCountSamplingInterceptor>();
@@ -153,6 +163,5 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<ILoggerFactory, DefaultLoggerFactory>();
             return services;
         }
-
     }
 }
