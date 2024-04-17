@@ -69,7 +69,7 @@ namespace SkyApm.Transport.Grpc
                             Timestamp = logRequest.Date,
                             Service = _instrumentConfig.ServiceName,
                             ServiceInstance = _instrumentConfig.ServiceInstanceName,
-                            Endpoint = logRequest.Endpoint,
+                            Endpoint = logRequest.Endpoint ?? string.Empty,
                             Body = new LogDataBody()
                             {
                                 Type = "text",
