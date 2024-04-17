@@ -23,6 +23,8 @@ namespace SkyApm.Config
     [Config("SkyWalking")]
     public class InstrumentConfig
     {
+        public string Enable { get; set; }
+
         public string Namespace { get; set; }
 
         [Obsolete("Use ServiceName.")]

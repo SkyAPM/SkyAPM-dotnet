@@ -34,22 +34,29 @@ namespace SkyApm.Utilities.Configuration
             var defaultLogFile = Path.Combine("logs", "skyapm-{Date}.log");
             var defaultConfig = new Dictionary<string, string>
             {
-                {"SkyWalking:Namespace", configuration?.GetSection("SkyWalking:Namespace").Value ?? string.Empty },
-                {"SkyWalking:ServiceName", configuration?.GetSection("SkyWalking:ServiceName").Value ?? "My_Service" },
-                {"Skywalking:ServiceInstanceName", configuration?.GetSection("SkyWalking:ServiceInstanceName").Value ?? BuildDefaultServiceInstanceName() },
-                {"SkyWalking:HeaderVersions:0", configuration?.GetSection("SkyWalking:HeaderVersions:0").Value ?? HeaderVersions.SW8 },
-                {"SkyWalking:Sampling:SamplePer3Secs", configuration?.GetSection("SkyWalking:Sampling:SamplePer3Secs").Value ?? "-1" },
-                {"SkyWalking:Sampling:Percentage", configuration?.GetSection("SkyWalking:Sampling:Percentage").Value ?? "-1" },
-                {"SkyWalking:Logging:Level",  configuration?.GetSection("SkyWalking:Logging:Level").Value ?? "Information" },
-                {"SkyWalking:Logging:FilePath", configuration?.GetSection("SkyWalking:Logging:FilePath").Value ?? defaultLogFile },
-                {"SkyWalking:Transport:Interval", configuration?.GetSection("SkyWalking:Transport:Interval").Value ?? "3000" },
-                {"SkyWalking:Transport:ProtocolVersion", configuration?.GetSection("SkyWalking:Transport:ProtocolVersion").Value ?? ProtocolVersions.V8 },
-                {"SkyWalking:Transport:QueueSize", configuration?.GetSection("SkyWalking:Transport:QueueSize").Value ?? "30000" },
-                {"SkyWalking:Transport:BatchSize", configuration?.GetSection("SkyWalking:Transport:BatchSize").Value ?? "3000" },
-                {"SkyWalking:Transport:gRPC:Servers",configuration?.GetSection("SkyWalking:Transport:gRPC:Servers").Value ?? "localhost:11800" },
-                {"SkyWalking:Transport:gRPC:Timeout",configuration?.GetSection("SkyWalking:Transport:gRPC:Timeout").Value ?? "10000" },
-                {"SkyWalking:Transport:gRPC:ReportTimeout",configuration?.GetSection("SkyWalking:Transport:gRPC:ReportTimeout").Value ?? "600000" },
-                {"SkyWalking:Transport:gRPC:ConnectTimeout",configuration?.GetSection("SkyWalking:Transport:gRPC:ConnectTimeout").Value ?? "10000" }
+                { "SkyWalking:Enable", configuration?.GetSection("SkyWalking:Enable").Value ?? "true" },
+                { "SkyWalking:Namespace", configuration?.GetSection("SkyWalking:Namespace").Value ?? string.Empty },
+                { "SkyWalking:ServiceName", configuration?.GetSection("SkyWalking:ServiceName").Value ?? "My_Service" },
+                { "Skywalking:ServiceInstanceName", configuration?.GetSection("SkyWalking:ServiceInstanceName").Value ?? BuildDefaultServiceInstanceName() },
+                { "SkyWalking:HeaderVersions:0", configuration?.GetSection("SkyWalking:HeaderVersions:0").Value ?? HeaderVersions.SW8 },
+                { "SkyWalking:Sampling:SamplePer3Secs", configuration?.GetSection("SkyWalking:Sampling:SamplePer3Secs").Value ?? "-1" },
+                { "SkyWalking:Sampling:Percentage", configuration?.GetSection("SkyWalking:Sampling:Percentage").Value ?? "-1" },
+                { "SkyWalking:Logging:Level",  configuration?.GetSection("SkyWalking:Logging:Level").Value ?? "Information" },
+                { "SkyWalking:Logging:FilePath", configuration?.GetSection("SkyWalking:Logging:FilePath").Value ?? defaultLogFile },
+                { "SkyWalking:Logging:FileSizeLimitBytes", configuration?.GetSection("SkyWalking:Logging:FileSizeLimitBytes").Value ?? "268435456" },
+                { "SkyWalking:Logging:FlushToDiskInterval", configuration?.GetSection("SkyWalking:Logging:FlushToDiskInterval").Value ?? "1000" },
+                { "SkyWalking:Logging:RollingInterval", configuration?.GetSection("SkyWalking:Logging:RollingInterval").Value ?? "Day" },
+                { "SkyWalking:Logging:RollOnFileSizeLimit", configuration?.GetSection("SkyWalking:Logging:RollOnFileSizeLimit").Value ?? "false" },
+                { "SkyWalking:Logging:RetainedFileCountLimit", configuration?.GetSection("SkyWalking:Logging:RetainedFileCountLimit").Value ?? "10" },
+                { "SkyWalking:Logging:RetainedFileTimeLimit", configuration?.GetSection("SkyWalking:Logging:RetainedFileTimeLimit").Value ?? "864000000" },
+                { "SkyWalking:Transport:Interval", configuration?.GetSection("SkyWalking:Transport:Interval").Value ?? "3000" },
+                { "SkyWalking:Transport:ProtocolVersion", configuration?.GetSection("SkyWalking:Transport:ProtocolVersion").Value ?? ProtocolVersions.V8 },
+                { "SkyWalking:Transport:QueueSize", configuration?.GetSection("SkyWalking:Transport:QueueSize").Value ?? "30000" },
+                { "SkyWalking:Transport:BatchSize", configuration?.GetSection("SkyWalking:Transport:BatchSize").Value ?? "3000" },
+                { "SkyWalking:Transport:gRPC:Servers", configuration?.GetSection("SkyWalking:Transport:gRPC:Servers").Value ?? "localhost:11800" },
+                { "SkyWalking:Transport:gRPC:Timeout", configuration?.GetSection("SkyWalking:Transport:gRPC:Timeout").Value ?? "10000" },
+                { "SkyWalking:Transport:gRPC:ReportTimeout", configuration?.GetSection("SkyWalking:Transport:gRPC:ReportTimeout").Value ?? "600000" },
+                { "SkyWalking:Transport:gRPC:ConnectTimeout", configuration?.GetSection("SkyWalking:Transport:gRPC:ConnectTimeout").Value ?? "10000" }
             };
             return builder.AddInMemoryCollection(defaultConfig);
         }
@@ -68,7 +75,7 @@ namespace SkyApm.Utilities.Configuration
                     .GetHostAddresses(hostName)
                     .First(x => x.AddressFamily == AddressFamily.InterNetwork).ToString();
 
-                return $"{ipAddress}@{guid}";
+                return $"{guid}@{ipAddress}";
             }
             catch (Exception)
             {

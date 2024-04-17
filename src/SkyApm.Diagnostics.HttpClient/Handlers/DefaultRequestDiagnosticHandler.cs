@@ -47,7 +47,7 @@ namespace SkyApm.Diagnostics.HttpClient.Handlers
 
         public void Handle(ITracingContext tracingContext, HttpRequestMessage request)
         {
-            var operationName = request.RequestUri.GetLeftPart(UriPartial.Path);
+            var operationName = request.RequestUri.GetComponents(UriComponents.Path | UriComponents.KeepDelimiter, UriFormat.UriEscaped);
 
             var ignored = _httpClientDiagnosticConfig.IgnorePaths != null
                 && _httpClientDiagnosticConfig.IgnorePaths

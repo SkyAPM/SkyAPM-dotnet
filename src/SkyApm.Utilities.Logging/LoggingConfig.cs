@@ -26,5 +26,23 @@ namespace SkyApm.Utilities.Logging
         public string Level { get; set; }
         
         public string FilePath { get; set; }
+
+        public long? FileSizeLimitBytes { get; set; }
+
+        /// <summary>
+        /// in milliseconds
+        /// </summary>
+        public long? FlushToDiskInterval { get; set; }
+
+        public string RollingInterval { get; set; }
+
+        public bool? RollOnFileSizeLimit { get; set; }
+
+        public int? RetainedFileCountLimit { get; set; }
+
+        /// <summary>
+        /// in milliseconds
+        /// </summary>
+        public long? RetainedFileTimeLimit { get; set; }
     }
 }
