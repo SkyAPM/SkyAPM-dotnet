@@ -40,11 +40,13 @@ using SkyApm.Diagnostics.MSLogging;
 using SkyApm.PeerFormatters.SqlClient;
 using SkyApm.PeerFormatters.MySqlConnector;
 using ILoggerFactory = SkyApm.Logging.ILoggerFactory;
+using System.IO;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
     public static class ServiceCollectionExtensions
     {
+        private static string oldConfigName = "skywalking.json";
         public static IServiceCollection AddSkyAPM(this IServiceCollection services,
             Action<SkyApmExtensions> extensionsSetup = null)
         {
@@ -56,7 +58,13 @@ namespace Microsoft.Extensions.DependencyInjection
                 environment = "Development";
             }
 
+            if (File.Exists(oldConfigName))
+            {
+                throw new FileLoadException("The new configuration file name is skyapm.json, please update");
+            }
+
             IConfigurationBuilder configurationBuilder = new ConfigurationBuilder();
+          
             configurationBuilder.AddJsonFile("skyapm.json", true);
             configurationBuilder.AddJsonFile("skyapm." + environment + ".json", true);
             IConfiguration configuration = configurationBuilder.Build();
