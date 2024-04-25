@@ -15,7 +15,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Content Update="skywalking.json">
+        <Content Update="skyapm.json">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </Content>
     </ItemGroup>
