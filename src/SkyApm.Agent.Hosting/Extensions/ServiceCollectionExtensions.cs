@@ -48,8 +48,6 @@ namespace Microsoft.Extensions.DependencyInjection
         public static IServiceCollection AddSkyAPM(this IServiceCollection services,
             Action<SkyApmExtensions> extensionsSetup = null)
         {
-            #region can be optimized
-
             string environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
             if (environment == null || environment.Length < 1)
             {
@@ -60,6 +58,16 @@ namespace Microsoft.Extensions.DependencyInjection
             configurationBuilder.AddJsonFile("skyapm.json", true);
             configurationBuilder.AddJsonFile("skyapm." + environment + ".json", true);
             IConfiguration configuration = configurationBuilder.Build();
+
+            services.AddSkyAPM(configuration,extensionsSetup);
+            return services;
+        }
+
+        public static IServiceCollection AddSkyAPM(this IServiceCollection services, IConfiguration configuration,
+          Action<SkyApmExtensions> extensionsSetup = null)
+        {
+            #region can be optimized
+
             string enable = configuration?.GetSection("SkyWalking:Enable").Value;
             if (enable != null && "false".Equals(enable.ToLower()))
             {
