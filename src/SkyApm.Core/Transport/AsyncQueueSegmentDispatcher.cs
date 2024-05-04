@@ -16,6 +16,7 @@
  *
  */
 
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
@@ -32,22 +33,39 @@ namespace SkyApm.Transport
         private readonly TransportConfig _config;
         private readonly ISegmentReporter _segmentReporter;
         private readonly ISegmentContextMapper _segmentContextMapper;
-        private readonly ConcurrentQueue<SegmentRequest> _segmentQueue;
         private readonly IRuntimeEnvironment _runtimeEnvironment;
         private readonly CancellationTokenSource _cancellation;
-        private int _offset;
+        private readonly Random _random;
+        private long _produceCount = 0L;
+        private long _consumeCount = 0L;
+        private long _dropCount = 0L;
+        private readonly BlockingCollection<SegmentRequest>[] _queueArray;
+        private readonly long[] _countArray;
 
         public AsyncQueueSegmentDispatcher(IConfigAccessor configAccessor,
             ISegmentReporter segmentReporter, IRuntimeEnvironment runtimeEnvironment,
             ISegmentContextMapper segmentContextMapper, ILoggerFactory loggerFactory)
         {
+            _logger = loggerFactory.CreateLogger(typeof(AsyncQueueSegmentDispatcher));
+            _config = configAccessor.Get<TransportConfig>();
             _segmentReporter = segmentReporter;
             _segmentContextMapper = segmentContextMapper;
             _runtimeEnvironment = runtimeEnvironment;
-            _logger = loggerFactory.CreateLogger(typeof(AsyncQueueSegmentDispatcher));
-            _config = configAccessor.Get<TransportConfig>();
-            _segmentQueue = new ConcurrentQueue<SegmentRequest>();
             _cancellation = new CancellationTokenSource();
+            _random = new Random();
+            _queueArray = new BlockingCollection<SegmentRequest>[_config.Parallel];
+            _countArray = new long[_config.Parallel];
+            for (int i = 0; i < _config.Parallel; ++ i)
+            {
+                _queueArray[i] = new BlockingCollection<SegmentRequest>(_config.QueueSize);
+                _countArray[i] = 0;
+            }
+            for (int i = 0; i < _config.Parallel; ++ i)
+            {
+                int taskId = i;
+                Task.Run(() => Flush(taskId));
+            }
+            Task.Run(() => Statistics());
         }
 
         public bool Dispatch(SegmentContext segmentContext)
@@ -55,8 +73,7 @@ namespace SkyApm.Transport
             if (!_runtimeEnvironment.Initialized || segmentContext == null || !segmentContext.Sampled)
                 return false;
 
-            // todo performance optimization for ConcurrentQueue
-            if (_config.QueueSize < _offset || _cancellation.IsCancellationRequested)
+            if (_cancellation.IsCancellationRequested)
                 return false;
 
             var segment = _segmentContextMapper.Map(segmentContext);
@@ -64,40 +81,97 @@ namespace SkyApm.Transport
             if (segment == null)
                 return false;
 
-            _segmentQueue.Enqueue(segment);
+            int queueId = _random.Next(_config.Parallel);
 
-            Interlocked.Increment(ref _offset);
+            bool result = _queueArray[queueId].TryAdd(segment, 0);
 
-            _logger.Debug($"Dispatch trace segment. [SegmentId]={segmentContext.SegmentId}.");
-            return true;
-        }
-
-        public Task Flush(CancellationToken token = default(CancellationToken))
-        {
-            // todo performance optimization for ConcurrentQueue
-            //var queued = _segmentQueue.Count;
-            //var limit = queued <= _config.PendingSegmentLimit ? queued : _config.PendingSegmentLimit;
-            var limit = _config.BatchSize;
-            var index = 0;
-            var segments = new List<SegmentRequest>(limit);
-            while (index++ < limit && _segmentQueue.TryDequeue(out var request))
+            if (result)
             {
-                segments.Add(request);
-                Interlocked.Decrement(ref _offset);
+                Interlocked.Add(ref _produceCount, 1);
+                Interlocked.Add(ref _countArray[queueId], 1);
+            }
+            else
+            {
+                Interlocked.Add(ref _dropCount, 1);
             }
 
-            // send async
+            _logger.Debug($"Dispatch trace segment. [SegmentId]={segmentContext.SegmentId},[result=]{result}.");
+
+            return result;
+        }
+
+        private void Flush(int taskId)
+        {
+            while (!_cancellation.IsCancellationRequested)
+            {
+                // handle dedicated queue
+                {
+                    int count = DoFlush(taskId, taskId, 2000);
+                    if (count > 0)
+                    {
+                        continue;
+                    }
+                }
+                // handle other queue
+                {
+                    int queueId = _random.Next(_config.Parallel);
+                    if (queueId == taskId)
+                    {
+                        continue;
+                    }
+                    DoFlush(taskId, queueId, 0);
+                }
+            }
+        }
+
+        private int DoFlush(int taskId, int queueId, int timeout)
+        {
+            var segments = new List<SegmentRequest>(_config.BatchSize);
+            for (int i = 0; i < _config.BatchSize; ++ i)
+            {
+                if (!_queueArray[queueId].TryTake(out var request, timeout))
+                {
+                    // segments is not full
+                    break;
+                }
+                segments.Add(request);
+            }
             if (segments.Count > 0)
-                _segmentReporter.ReportAsync(segments, token);
-
-            Interlocked.Exchange(ref _offset, _segmentQueue.Count);
-
-            return Task.CompletedTask;
+            {
+                try
+                {
+                    Task[] task = new Task[1];
+                    task[0] = _segmentReporter.ReportAsync(segments, new CancellationToken());
+                    Task.WaitAll(task, _config.Interval);
+                }
+                catch (Exception e)
+                {
+                    _logger.Error("Task.WaitAll failed." + taskId + "," + queueId + "," + segments.Count, e);
+                }
+                Interlocked.Add(ref _consumeCount, segments.Count);
+                Interlocked.Add(ref _countArray[queueId], 0 - segments.Count);
+            }
+            return segments.Count;
         }
 
         public void Close()
         {
             _cancellation.Cancel();
+        }
+
+        private void Statistics()
+        {
+            while (!_cancellation.IsCancellationRequested)
+            {
+                string message =
+                    "statistics." +
+                    "produce=" + _produceCount + "," +
+                    "consume=" + _consumeCount + "," +
+                    "drop=" + _dropCount + "," +
+                    "detail=[" + String.Join(",", _countArray) + "],";
+                _logger.Information(message);
+                Thread.Sleep(1000 * 60);
+            }
         }
     }
 }

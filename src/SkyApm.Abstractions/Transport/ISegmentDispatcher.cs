@@ -16,8 +16,6 @@
  *
  */
 
-using System.Threading;
-using System.Threading.Tasks;
 using SkyApm.Tracing.Segments;
 
 namespace SkyApm.Transport
@@ -25,8 +23,6 @@ namespace SkyApm.Transport
     public interface ISegmentDispatcher
     {
         bool Dispatch(SegmentContext segmentContext);
-
-        Task Flush(CancellationToken token = default(CancellationToken));
 
         void Close();
     }
