@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Licensed to the SkyAPM under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -18,18 +18,19 @@
 
 using System;
 using System.Threading.Tasks;
+
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using SkyApm.Agent.GeneralHost;
 
-namespace SkyApm.Sample.GrpcServer
+namespace SkyApm.Sample.GrpcClient
 {
     class Program
     {
         public static async Task Main(string[] args)
         {
             var host = CreateHostBuilder(args).Build();
-            host.Services.StartGrpcServer();
+            host.Services.StartGrpcClient();
             await host.RunAsync();
         }
 

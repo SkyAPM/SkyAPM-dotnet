@@ -18,10 +18,11 @@
 
 using System;
 using System.Linq;
+
 using SkyApm.Common;
 using SkyWalking.NetworkProtocol.V3;
 
-namespace SkyApm.Transport.Grpc.Common
+namespace SkyApm.Transport.Kafka.Common
 {
     internal static class SegmentV8Helpers
     {

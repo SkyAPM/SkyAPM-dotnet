@@ -1,6 +1,6 @@
 {
     "SkyWalking": {
-        "ServiceName": "grpc-greeter-server",
+        "ServiceName": "grpc-greeter-client",
         "Namespace": "",
         "HeaderVersions": [
             "sw8"

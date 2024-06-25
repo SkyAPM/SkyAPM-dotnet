@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Licensed to the SkyAPM under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -17,33 +17,30 @@
  */
 
 using System;
-using Grpc.Core;
-using Grpc.Core.Interceptors;
+using System.Threading;
+
+using Grpc.Net.Client;
 using GrpcGreeter;
 using Microsoft.Extensions.DependencyInjection;
-using SkyApm.Diagnostics.Grpc.Server;
+using SkyApm.Diagnostics.Grpc.Client;
 
-namespace SkyApm.Sample.GrpcServer
+namespace SkyApm.Sample.GrpcClient
 {
     public static class Extensions
     {
-        public static IServiceProvider StartGrpcServer(this IServiceProvider provider)
+        public static IServiceProvider StartGrpcClient(this IServiceProvider provider)
         {
-            var interceptor = provider.GetService<ServerDiagnosticInterceptor>();
-            var definition = Greeter.BindService(new GreeterImpl());
-            if (interceptor != null)
+            GrpcChannel channel = GrpcChannel.ForAddress("http://localhost:12345");
+            var interceptor = provider.GetService<ClientDiagnosticInterceptor>();
+            Greeter.GreeterClient greeterClient = new Greeter.GreeterClient(channel);
+            for (int i = 0; i < 1000; ++ i)
             {
-                definition = definition.Intercept(interceptor);
+                HelloRequest helloRequest = new HelloRequest();
+                helloRequest.Name = "hello " + i;
+                HelloReply helloReply = greeterClient.SayHello(helloRequest);
+                Console.WriteLine(helloReply.Message);
+                Thread.Sleep(10000);
             }
-            int port = 12345;
-            Server server = new Server
-            {
-                Services = { definition },
-                Ports = { new ServerPort("localhost", port, ServerCredentials.Insecure) },
-            };
-            server.Start();
-
-            Console.WriteLine("Greeter server listening on port " + port);
             return provider;
         }
     }

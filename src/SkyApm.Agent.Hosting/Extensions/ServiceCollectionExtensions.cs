@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Licensed to the SkyAPM under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -19,27 +19,26 @@
 using System;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
+using SkyApm;
+using SkyApm.Agent.Hosting;
 using SkyApm.Config;
 using SkyApm.Diagnostics;
 using SkyApm.Diagnostics.EntityFrameworkCore;
 using SkyApm.Diagnostics.Grpc;
 using SkyApm.Diagnostics.Grpc.Net.Client;
 using SkyApm.Diagnostics.HttpClient;
+using SkyApm.Diagnostics.MSLogging;
 using SkyApm.Diagnostics.SqlClient;
+using SkyApm.Logging;
+using SkyApm.PeerFormatters.MySqlConnector;
+using SkyApm.PeerFormatters.SqlClient;
 using SkyApm.Sampling;
 using SkyApm.Service;
 using SkyApm.Tracing;
 using SkyApm.Transport;
-using SkyApm.Transport.Grpc;
 using SkyApm.Utilities.Configuration;
 using SkyApm.Utilities.DependencyInjection;
 using SkyApm.Utilities.Logging;
-using SkyApm;
-using SkyApm.Agent.Hosting;
-using SkyApm.Diagnostics.MSLogging;
-using SkyApm.PeerFormatters.SqlClient;
-using SkyApm.PeerFormatters.MySqlConnector;
-using ILoggerFactory = SkyApm.Logging.ILoggerFactory;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -111,7 +110,10 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IEnvironmentProvider, HostingEnvironmentProvider>();
             services.AddSingleton<ISkyApmLogDispatcher, AsyncQueueSkyApmLogDispatcher>();
             services.AddSingleton<IPeerFormatter, PeerFormatter>();
-            services.AddTracing().AddSampling().AddGrpcTransport().AddSkyApmLogging();
+            services.AddTracing();
+            services.AddSampling();
+            services.AddTransport();
+            services.AddSkyApmLogging();
             var extensions = services.AddSkyApmExtensions()
                 .AddHttpClient()
                 .AddGrpcClient()
@@ -154,15 +156,52 @@ namespace Microsoft.Extensions.DependencyInjection
             return services;
         }
 
-        private static IServiceCollection AddGrpcTransport(this IServiceCollection services)
+        private static IServiceCollection AddTransport(this IServiceCollection services)
         {
-            services.AddSingleton<ISegmentReporter, SegmentReporter>();
-            services.AddSingleton<ILogReporter, LogReporter>();
-            services.AddSingleton<ICLRStatsReporter, CLRStatsReporter>();
-            services.AddSingleton<ConnectionManager>();
-            services.AddSingleton<IPingCaller, PingCaller>();
-            services.AddSingleton<IServiceRegister, ServiceRegister>();
-            services.AddSingleton<IExecutionService, ConnectService>();
+            string environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+            if (environment == null || environment.Length < 1)
+            {
+                environment = "Development";
+            }
+            IConfigurationBuilder configurationBuilder = new ConfigurationBuilder();
+            configurationBuilder.AddJsonFile("skyapm.json", true);
+            configurationBuilder.AddJsonFile("skyapm." + environment + ".json", true);
+            IConfiguration configuration = configurationBuilder.Build();
+            string reporter = configuration?.GetSection("SkyWalking:Transport:Reporter").Value ?? "grpc";
+            switch (reporter.ToLower())
+            {
+                case "grpc":
+                    services.AddTransportGrpc();
+                    break;
+                case "kafka":
+                    services.AddTransportKafka();
+                    break;
+                default:
+                    services.AddTransportGrpc();
+                    break;
+            }
+            return services;
+        }
+
+        private static IServiceCollection AddTransportGrpc(this IServiceCollection services)
+        {
+            services.AddSingleton<ISegmentReporter, SkyApm.Transport.Grpc.SegmentReporter>();
+            services.AddSingleton<ILogReporter, SkyApm.Transport.Grpc.LogReporter>();
+            services.AddSingleton<ICLRStatsReporter, SkyApm.Transport.Grpc.CLRStatsReporter>();
+            services.AddSingleton<SkyApm.Transport.Grpc.ConnectionManager>();
+            services.AddSingleton<IPingCaller, SkyApm.Transport.Grpc.PingCaller>();
+            services.AddSingleton<IServiceRegister, SkyApm.Transport.Grpc.ServiceRegister>();
+            services.AddSingleton<IExecutionService, SkyApm.Transport.Grpc.ConnectService>();
+            return services;
+        }
+
+        private static IServiceCollection AddTransportKafka(this IServiceCollection services)
+        {
+            services.AddSingleton<ISegmentReporter, SkyApm.Transport.Kafka.SegmentReporter>();
+            services.AddSingleton<ILogReporter, SkyApm.Transport.Kafka.LogReporter>();
+            services.AddSingleton<ICLRStatsReporter, SkyApm.Transport.Kafka.CLRStatsReporter>();
+            services.AddSingleton<IPingCaller, SkyApm.Transport.Kafka.PingCaller>();
+            services.AddSingleton<IServiceRegister, SkyApm.Transport.Kafka.ServiceRegister>();
             return services;
         }
 

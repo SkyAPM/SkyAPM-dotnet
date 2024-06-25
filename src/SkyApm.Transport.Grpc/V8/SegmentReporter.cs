@@ -32,16 +32,16 @@ namespace SkyApm.Transport.Grpc.V8
 {
     internal class SegmentReporter : ISegmentReporter
     {
-        private readonly ConnectionManager _connectionManager;
         private readonly ILogger _logger;
+        private readonly ConnectionManager _connectionManager;
         private readonly GrpcConfig _config;
 
-        public SegmentReporter(ConnectionManager connectionManager, IConfigAccessor configAccessor,
-            ILoggerFactory loggerFactory)
+        public SegmentReporter(ConnectionManager connectionManager, ILoggerFactory loggerFactory,
+            IConfigAccessor configAccessor)
         {
+            _logger = loggerFactory.CreateLogger(typeof(SegmentReporter));
             _connectionManager = connectionManager;
             _config = configAccessor.Get<GrpcConfig>();
-            _logger = loggerFactory.CreateLogger(typeof(SegmentReporter));
         }
 
         public async Task ReportAsync(IReadOnlyCollection<SegmentRequest> segmentRequests,

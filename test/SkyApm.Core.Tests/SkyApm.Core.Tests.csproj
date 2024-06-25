@@ -12,5 +12,6 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <ProjectReference Include="..\..\src\SkyApm.Core\SkyApm.Core.csproj" />
+        <ProjectReference Include="..\..\src\SkyApm.Utilities.Logging\SkyApm.Utilities.Logging.csproj" />
     </ItemGroup>
 </Project>
