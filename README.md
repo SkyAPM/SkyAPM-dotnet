@@ -19,10 +19,10 @@ SkyAPM C#/.NET instrument agent
 
 ## Nuget Packages
 
-| Package Name |  NuGet | MyGet | Downloads 
-|--------------|  ------- |  ------- |  ---- 
-| SkyAPM.Agent.AspNetCore | [![nuget](https://img.shields.io/nuget/v/SkyAPM.Agent.AspNetCore.svg?style=flat-square)](https://www.nuget.org/packages/SkyAPM.Agent.AspNetCore) | [![myget](https://img.shields.io/myget/skyapm-dotnet/vpre/SkyAPM.Agent.AspNetCore.svg?style=flat-square)](https://www.myget.org/feed/skyapm-dotnet/package/nuget/SkyAPM.Agent.AspNetCore) | [![stats](https://img.shields.io/nuget/dt/SkyAPM.Agent.AspNetCore.svg?style=flat-square)](https://www.nuget.org/stats/packages/SkyAPM.Agent.AspNetCore?groupby=Version) 
-| SkyAPM.Agent.GeneralHost | [![nuget](https://img.shields.io/nuget/v/SkyAPM.Agent.GeneralHost.svg?style=flat-square)](https://www.nuget.org/packages/SkyAPM.Agent.GeneralHost) | [![myget](https://img.shields.io/myget/skyapm-dotnet/vpre/SkyAPM.Agent.GeneralHost.svg?style=flat-square)](https://www.myget.org/feed/skyapm-dotnet/package/nuget/SkyAPM.Agent.GeneralHost) | [![](https://img.shields.io/nuget/dt/SkyAPM.Agent.GeneralHost.svg?style=flat-square)](https://www.nuget.org/stats/packages/SkyAPM.Agent.GeneralHost?groupby=Version)  
+| Package Name |  NuGet | MyGet | Downloads
+|--------------|  ------- |  ------- |  ----
+| SkyAPM.Agent.AspNetCore | [![nuget](https://img.shields.io/nuget/v/SkyAPM.Agent.AspNetCore.svg?style=flat-square)](https://www.nuget.org/packages/SkyAPM.Agent.AspNetCore) | [![myget](https://img.shields.io/myget/skyapm-dotnet/vpre/SkyAPM.Agent.AspNetCore.svg?style=flat-square)](https://www.myget.org/feed/skyapm-dotnet/package/nuget/SkyAPM.Agent.AspNetCore) | [![stats](https://img.shields.io/nuget/dt/SkyAPM.Agent.AspNetCore.svg?style=flat-square)](https://www.nuget.org/stats/packages/SkyAPM.Agent.AspNetCore?groupby=Version)
+| SkyAPM.Agent.GeneralHost | [![nuget](https://img.shields.io/nuget/v/SkyAPM.Agent.GeneralHost.svg?style=flat-square)](https://www.nuget.org/packages/SkyAPM.Agent.GeneralHost) | [![myget](https://img.shields.io/myget/skyapm-dotnet/vpre/SkyAPM.Agent.GeneralHost.svg?style=flat-square)](https://www.myget.org/feed/skyapm-dotnet/package/nuget/SkyAPM.Agent.GeneralHost) | [![](https://img.shields.io/nuget/dt/SkyAPM.Agent.GeneralHost.svg?style=flat-square)](https://www.nuget.org/stats/packages/SkyAPM.Agent.GeneralHost?groupby=Version)
 
 > MyGet feed URL https://www.myget.org/F/skyapm-dotnet/api/v3/index.json
 
@@ -43,7 +43,7 @@ A quick list of SkyWalking .NET Core Agent's capabilities
 ## Deploy SkyWalking Backend And UI
 
 #### Requirements
-Start with v1.0.0, SkyAPM .NET Core Agent only supports SkyWalking 8.0 or higher. The SkyWalking doc is [here](https://skywalking.apache.org/docs/). 
+Start with v1.0.0, SkyAPM .NET Core Agent only supports SkyWalking 8.0 or higher. The SkyWalking doc is [here](https://skywalking.apache.org/docs/).
 
 ## Install SkyWalking .NET Core Agent
 
@@ -54,7 +54,7 @@ dotnet add package SkyAPM.Agent.AspNetCore
 ```
 
 ## How to use
-Set the `ASPNETCORE_HOSTINGSTARTUPASSEMBLIES` environment variable to support the activation of the SkyAPM .NET Core Agent. 
+Set the `ASPNETCORE_HOSTINGSTARTUPASSEMBLIES` environment variable to support the activation of the SkyAPM .NET Core Agent.
 
 - Add the assembly name of `SkyAPM.Agent.AspNetCore` to the `ASPNETCORE_HOSTINGSTARTUPASSEMBLIES` environment variable.
 
@@ -89,10 +89,20 @@ Install `SkyAPM.DotNet.CLI`
 dotnet tool install -g SkyAPM.DotNet.CLI
 ```
 
-Use `dotnet skyapm config [your_service_name] [your_servers]` to generate config file. 
+For 2.2.x or older, use `dotnet skyapm config [your_service_name] [your_servers]` to generate config file.
 
 ```
 dotnet skyapm config sample_app 192.168.0.1:11800
+```
+
+For 2.3.x or newer, use `dotnet skyapm config ${your_service_name} [--reporter=grpc|kafka] [--grpcservers=...] [--kafkaservers=...]` to generate config file.
+
+```
+# grpc
+dotnet skyapm config sample_app --reporter=grpc --grpcservers=192.168.0.1:11800
+
+# kafka
+dotnet skyapm config sample_app --reporter=kafka --kafkaservers=192.168.0.1:9092
 ```
 
 # Contributing
@@ -102,7 +112,7 @@ This section is in progress here: [Contributing to SkyAPM-dotnet](/CONTIBUTING.m
 * Submit an issue
 
 If you have issues about SkyWalking protocol, its official backend, ask questions at their Apache official channels. All following channels are not suitable for .net agent, but good if you are facing backend/UI issues.
-* Submit an official Apache SkyWalking [issue](https://github.com/apache/skywalking/issues). 
+* Submit an official Apache SkyWalking [issue](https://github.com/apache/skywalking/issues).
 * Mail list: **dev@skywalking.apache.org**. Mail to `dev-subscribe@skywalking.apache.org`, follow the reply to subscribe the mail list.
 * Join `skywalking` channel at [Apache Slack](https://join.slack.com/t/the-asf/shared_invite/enQtNzc2ODE3MjI1MDk1LTAyZGJmNTg1NWZhNmVmOWZjMjA2MGUyOGY4MjE5ZGUwOTQxY2Q3MDBmNTM5YTllNGU4M2QyMzQ4M2U4ZjQ5YmY). If the link is not working, find the latest one at [Apache INFRA WIKI](https://cwiki.apache.org/confluence/display/INFRA/Slack+Guest+Invites).
 * QQ Group: 392443393(2000/2000, not available), 901167865(available)

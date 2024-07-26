@@ -49,15 +49,32 @@ namespace SkyApm.Utilities.Configuration
                 { "SkyWalking:Logging:RollOnFileSizeLimit", configuration?.GetSection("SkyWalking:Logging:RollOnFileSizeLimit").Value ?? "false" },
                 { "SkyWalking:Logging:RetainedFileCountLimit", configuration?.GetSection("SkyWalking:Logging:RetainedFileCountLimit").Value ?? "10" },
                 { "SkyWalking:Logging:RetainedFileTimeLimit", configuration?.GetSection("SkyWalking:Logging:RetainedFileTimeLimit").Value ?? "864000000" },
+                { "Skywalking:MeterActive", configuration?.GetSection("SkyWalking:MeterActive").Value ?? "true" },
+                { "SkyWalking:MetricActive", configuration?.GetSection("SkyWalking:MetricActive").Value ?? "true" },
+                { "SkyWalking:SegmentActive", configuration?.GetSection("SkyWalking:SegmentActive").Value ?? "true" },
+                { "SkyWalking:ProfilingActive", configuration?.GetSection("SkyWalking:ProfilingActive").Value ?? "true" },
+                { "SkyWalking:ManagementActive",  configuration?.GetSection("SkyWalking:ManagementActive").Value ?? "true" },
+                { "SkyWalking:LogActive", configuration?.GetSection("SkyWalking:LogActive").Value ?? "true" },
                 { "SkyWalking:Transport:ProtocolVersion", configuration?.GetSection("SkyWalking:Transport:ProtocolVersion").Value ?? ProtocolVersions.V8 },
                 { "SkyWalking:Transport:QueueSize", configuration?.GetSection("SkyWalking:Transport:QueueSize").Value ?? "10000" },
                 { "SkyWalking:Transport:BatchSize", configuration?.GetSection("SkyWalking:Transport:BatchSize").Value ?? "2000" },
                 { "SkyWalking:Transport:Parallel", configuration?.GetSection("SkyWalking:Transport:Parallel").Value ?? "5" },
                 { "SkyWalking:Transport:Interval", configuration?.GetSection("SkyWalking:Transport:Interval").Value ?? "50" },
+                { "SkyWalking:Transport:Reporter", configuration?.GetSection("SkyWalking:Transport:Reporter").Value ?? "grpc" },
                 { "SkyWalking:Transport:gRPC:Servers", configuration?.GetSection("SkyWalking:Transport:gRPC:Servers").Value ?? "localhost:11800" },
                 { "SkyWalking:Transport:gRPC:Timeout", configuration?.GetSection("SkyWalking:Transport:gRPC:Timeout").Value ?? "10000" },
                 { "SkyWalking:Transport:gRPC:ReportTimeout", configuration?.GetSection("SkyWalking:Transport:gRPC:ReportTimeout").Value ?? "600000" },
-                { "SkyWalking:Transport:gRPC:ConnectTimeout", configuration?.GetSection("SkyWalking:Transport:gRPC:ConnectTimeout").Value ?? "10000" }
+                { "SkyWalking:Transport:gRPC:ConnectTimeout", configuration?.GetSection("SkyWalking:Transport:gRPC:ConnectTimeout").Value ?? "10000" },
+                { "SkyWalking:Transport:Kafka:BootstrapServers", configuration?.GetSection("SkyWalking:Transport:Kafka:BootstrapServers").Value ?? "localhost:9092" },
+                { "SkyWalking:Transport:Kafka:TopicTimeoutMs", configuration?.GetSection("SkyWalking:Transport:Kafka:TopicTimeoutMs").Value ?? "3000" },
+                { "SkyWalking:Transport:Kafka:MessageTimeoutMs", configuration?.GetSection("SkyWalking:Transport:Kafka:MessageTimeoutMs").Value ?? "5000" },
+                { "SkyWalking:Transport:Kafka:TopicMeters", configuration?.GetSection("SkyWalking:Transport:Kafka:TopicMeters").Value ?? "skywalking-meters" },
+                { "SkyWalking:Transport:Kafka:TopicCLRMetrics", configuration?.GetSection("SkyWalking:Transport:Kafka:TopicCLRMetrics").Value ?? "skywalking-clr-metrics" },
+                { "SkyWalking:Transport:Kafka:TopicSegments", configuration?.GetSection("SkyWalking:Transport:Kafka:TopicSegments").Value ?? "skywalking-segments" },
+                { "SkyWalking:Transport:Kafka:TopicProfilings", configuration?.GetSection("SkyWalking:Transport:Kafka:TopicProfilings").Value ?? "skywalking-profilings" },
+                { "SkyWalking:Transport:Kafka:TopicManagements", configuration?.GetSection("SkyWalking:Transport:Kafka:TopicManagements").Value ?? "skywalking-managements" },
+                { "SkyWalking:Transport:Kafka:TopicLogs", configuration?.GetSection("SkyWalking:Transport:Kafka:TopicLogs").Value ?? "skywalking-logs" },
+                { "SkyWalking:Component:HttpClient:IgnorePaths:0", configuration?.GetSection("SkyWalking:Component:HttpClient:IgnorePaths:0").Value ?? "" }
             };
             return builder.AddInMemoryCollection(defaultConfig);
         }
@@ -85,4 +102,3 @@ namespace SkyApm.Utilities.Configuration
         }
     }
 }
-

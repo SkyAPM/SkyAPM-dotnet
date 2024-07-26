@@ -36,9 +36,9 @@ namespace SkyApm.Transport
         private readonly IRuntimeEnvironment _runtimeEnvironment;
         private readonly CancellationTokenSource _cancellation;
         private readonly Random _random;
+        private long _dropCount = 0L;
         private long _produceCount = 0L;
         private long _consumeCount = 0L;
-        private long _dropCount = 0L;
         private readonly BlockingCollection<SegmentRequest>[] _queueArray;
         private readonly long[] _countArray;
 
@@ -102,6 +102,11 @@ namespace SkyApm.Transport
 
         private void Flush(int taskId)
         {
+            _logger.Information(
+                "Flush." +
+                "threadId=" + Thread.CurrentThread.ManagedThreadId + "," +
+                "threadName=" + Thread.CurrentThread.Name + "," +
+                taskId + ",");
             while (!_cancellation.IsCancellationRequested)
             {
                 // handle dedicated queue
@@ -142,11 +147,29 @@ namespace SkyApm.Transport
                 {
                     Task[] task = new Task[1];
                     task[0] = _segmentReporter.ReportAsync(segments, new CancellationToken());
-                    Task.WaitAll(task, _config.Interval);
+                    bool result = Task.WaitAll(task, _config.Interval);
+                    if (!result)
+                    {
+                        _logger.Warning(
+                            "Task.WaitAll failed." +
+                            "threadId=" + Thread.CurrentThread.ManagedThreadId + "," +
+                            "threadName=" + Thread.CurrentThread.Name + "," +
+                            "taskId=" + taskId + "," +
+                            "queueId=" + queueId + "," +
+                            "count=" + segments.Count + "," +
+                            "timeout=" + _config.Interval + ",");
+                    }
                 }
                 catch (Exception e)
                 {
-                    _logger.Error("Task.WaitAll failed." + taskId + "," + queueId + "," + segments.Count, e);
+                    _logger.Error(
+                        "Task.WaitAll failed." +
+                        "threadId=" + Thread.CurrentThread.ManagedThreadId + "," +
+                        "threadName=" + Thread.CurrentThread.Name + "," +
+                        "taskId=" + taskId + "," +
+                        "queueId=" + queueId + "," +
+                        "count=" + segments.Count + ",",
+                        e);
                 }
                 Interlocked.Add(ref _consumeCount, segments.Count);
                 Interlocked.Add(ref _countArray[queueId], 0 - segments.Count);
@@ -161,15 +184,19 @@ namespace SkyApm.Transport
 
         private void Statistics()
         {
+            _logger.Information("Statistics." + 
+                "threadId=" + Thread.CurrentThread.ManagedThreadId + "," +
+                "threadName=" + Thread.CurrentThread.Name + ",");
             while (!_cancellation.IsCancellationRequested)
             {
-                string message =
+                _logger.Information(
                     "statistics." +
+                    "threadId=" + Thread.CurrentThread.ManagedThreadId + "," +
+                    "threadName=" + Thread.CurrentThread.Name + "," +
+                    "drop=" + _dropCount + "," +
                     "produce=" + _produceCount + "," +
                     "consume=" + _consumeCount + "," +
-                    "drop=" + _dropCount + "," +
-                    "detail=[" + String.Join(",", _countArray) + "],";
-                _logger.Information(message);
+                    "detail=[" + String.Join(",", _countArray) + "],");
                 Thread.Sleep(1000 * 60);
             }
         }

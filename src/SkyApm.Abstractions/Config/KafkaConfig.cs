@@ -18,35 +18,40 @@
 
 namespace SkyApm.Config
 {
-    public static class ProtocolVersions
+    [Config("SkyWalking", "Transport", "Kafka")]
+    public class KafkaConfig
     {
-        public static string V8 { get; } = "v8";
-    }
-
-    [Config("SkyWalking", "Transport")]
-    public class TransportConfig
-    {
-        public string ProtocolVersion { get; set; } = ProtocolVersions.V8;
-
+        ///
         /// <summary>
-        /// TotalQueueSize = QueueSize * Parallel
-        /// Elements will be dropped if queues are full.
+        /// e.g. address1:port1[,address2:port2...]
         /// </summary>
-        public int QueueSize { get; set; } = 10000;
+        ///
+        public string BootstrapServers { get; set; }
 
+        ///
         /// <summary>
-        /// TotalBatchSize = BatchSize * Parallel
+        /// in milliseconds
         /// </summary>
-        public int BatchSize { get; set; } = 2000;
+        ///
+        public int TopicTimeoutMs { get; set; } = 3000;
 
-        public int Parallel { get; set; } = 5;
-
+        ///
         /// <summary>
-        /// max interval between each batch, in milliseconds
-        /// -1 - waits for previous batch to complete
+        /// in milliseconds
         /// </summary>
-        public int Interval { get; set; } = 50;
+        ///
+        public int MessageTimeoutMs { get; set; } = 5000;
 
-        public string Reporter { get; set; } = "grpc";
+        public string TopicMeters { get; set; }
+
+        public string TopicCLRMetrics { get; set; }
+
+        public string TopicSegments { get; set; }
+
+        public string TopicProfilings { get; set; }
+
+        public string TopicManagements { get; set; }
+
+        public string TopicLogs { get; set; }
     }
 }
