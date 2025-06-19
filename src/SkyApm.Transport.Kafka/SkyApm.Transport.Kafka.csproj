@@ -9,7 +9,7 @@
         <PackageTags>SkyWalking;Kafka</PackageTags>
         <PackageReleaseNotes>
         </PackageReleaseNotes>
-        <TargetFramework>netstandard2.0</TargetFramework>
+        <TargetFrameworks>netstandard2.0;net6.0</TargetFrameworks>
         <RootNamespace>SkyApm.Transport.Kafka</RootNamespace>
     </PropertyGroup>
 

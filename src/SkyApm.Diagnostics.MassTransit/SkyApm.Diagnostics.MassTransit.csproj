@@ -11,6 +11,9 @@
         <PackageReference Include="SkyAPM.Agent.Hosting" Version="2.0.0" />
         <PackageReference Include="SkyAPM.Diagnostics.AspNetCore" Version="2.0.0" />
         <PackageReference Include="SkyAPM.Utilities.DependencyInjection" Version="2.0.0" />
-        <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="5.0.1" />
+    </ItemGroup>
+  
+    <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp3.1'">
+        <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="5.0.1" />    
     </ItemGroup>
 </Project>
