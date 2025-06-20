@@ -1,6 +1,4 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-    <Import Project="..\..\build\common.props" />
-
     <PropertyGroup>
         <Description>$(PackagePrefix).Diagnostics.CAP notifies of CAP messages.</Description>
         <AssemblyTitle>$(PackagePrefix).Diagnostics.CAP</AssemblyTitle>
@@ -8,7 +6,6 @@
         <PackageId>$(PackagePrefix).Diagnostics.CAP</PackageId>
         <PackageTags>SkyWalking;APM;CAP</PackageTags>
         <RootNamespace>SkyApm.Diagnostics.CAP</RootNamespace>
-        <TargetFrameworks>netcoreapp3.1;net5.0;net6.0;net7.0</TargetFrameworks>
     </PropertyGroup>
 
     <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp3.1'">
@@ -23,8 +20,8 @@
         <PackageReference Include="DotNetCore.CAP" Version="6.2.1" />
     </ItemGroup>
 
-    <ItemGroup Condition="'$(TargetFramework)' == 'net7.0'">
-        <PackageReference Include="DotNetCore.CAP" Version="7.0.1" />
+    <ItemGroup Condition="'$(TargetFramework)' == 'net8.0'">
+        <PackageReference Include="DotNetCore.CAP" Version="8.0.0" />
     </ItemGroup>
 
     <ItemGroup>

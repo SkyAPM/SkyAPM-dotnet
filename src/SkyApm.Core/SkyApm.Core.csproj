@@ -1,6 +1,4 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-    <Import Project="..\..\build\common.props" />
-
     <PropertyGroup>
         <Description>$(Product) core components.</Description>
         <AssemblyTitle>$(PackagePrefix).Core</AssemblyTitle>
@@ -10,12 +8,15 @@
         <PackageReleaseNotes>
         </PackageReleaseNotes>
         <RootNamespace>SkyApm</RootNamespace>
-        <TargetFramework>netstandard2.0</TargetFramework>
+        <TargetFrameworks>netstandard2.0;net6.0;net8.0</TargetFrameworks>
         <DefineConstants Condition="'$(TargetFramework)' == 'netcoreapp2.1'">$(DefineConstants);SPAN</DefineConstants>
     </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="AspectCore.Extensions.Reflection" Version="2.3.0" />
+    </ItemGroup>
+  
+    <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
         <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="7.0.0" />
         <PackageReference Include="System.Memory" Version="4.5.5" />
         <PackageReference Include="System.ValueTuple" Version="4.5.0" />

@@ -1,4 +1,4 @@
-name: NET7 CI AND IT
+name: NET CI AND IT
 
 on:
   push:
@@ -17,7 +17,7 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 7.0.100
+        dotnet-version: 8.0.x
     - name: Setup Submodule
       run: git submodule update --init
     - name: Restore dependencies
@@ -27,4 +27,4 @@ jobs:
     - name: Build
       run: dotnet build --no-restore
     - name: Test
-      run: dotnet test --no-build --verbosity normal --framework net7.0
+      run: dotnet test --no-build --verbosity normal --framework net8.0
