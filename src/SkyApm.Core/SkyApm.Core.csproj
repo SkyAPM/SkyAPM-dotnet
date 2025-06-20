@@ -1,6 +1,4 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-    <Import Project="..\..\build\common.props" />
-
     <PropertyGroup>
         <Description>$(Product) core components.</Description>
         <AssemblyTitle>$(PackagePrefix).Core</AssemblyTitle>
@@ -10,7 +8,7 @@
         <PackageReleaseNotes>
         </PackageReleaseNotes>
         <RootNamespace>SkyApm</RootNamespace>
-        <TargetFrameworks>netstandard2.0;net6.0</TargetFrameworks>
+        <TargetFrameworks>netstandard2.0;net6.0;net8.0</TargetFrameworks>
         <DefineConstants Condition="'$(TargetFramework)' == 'netcoreapp2.1'">$(DefineConstants);SPAN</DefineConstants>
     </PropertyGroup>
 

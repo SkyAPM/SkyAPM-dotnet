@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
     <Import Project="..\..\build\common.props"/>
 
     <PropertyGroup>
@@ -10,7 +10,6 @@
         <PackageReleaseNotes>
         </PackageReleaseNotes>
         <RootNamespace>SkyApm.Agent.GeneralHost</RootNamespace>
-        <TargetFrameworks>netcoreapp3.1;net5.0;net6.0;net7.0</TargetFrameworks>
     </PropertyGroup>
 
     <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp3.1'">
@@ -25,8 +24,8 @@
         <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="6.0.0"/>
     </ItemGroup>
 
-    <ItemGroup Condition="'$(TargetFramework)' == 'net7.0'">
-        <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="7.0.0"/>
+    <ItemGroup Condition="'$(TargetFramework)' == 'net8.0'">
+        <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="8.0.0"/>
     </ItemGroup>
 
     <ItemGroup>

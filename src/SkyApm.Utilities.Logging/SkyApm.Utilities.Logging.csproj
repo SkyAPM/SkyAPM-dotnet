@@ -1,10 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-    <Import Project="..\..\build\common.props" />
-
     <PropertyGroup>
         <Description>Microsoft.Utilities.Logging support for $(Product).</Description>
         <AssemblyTitle>$(PackagePrefix).Utilities.Logging</AssemblyTitle>
-        <TargetFrameworks>netcoreapp3.1;net5.0;net6.0;net7.0</TargetFrameworks>
         <AssemblyName>$(PackagePrefix).Utilities.Logging</AssemblyName>
         <PackageId>$(PackagePrefix).Utilities.Logging</PackageId>
         <PackageTags>SkyWalking;APM;Diagnostics</PackageTags>
@@ -35,8 +32,8 @@
         <PackageReference Include="Microsoft.Extensions.Logging" Version="6.0.0" />
     </ItemGroup>
 
-    <ItemGroup Condition="'$(TargetFramework)' == 'net7.0'">
-        <PackageReference Include="Microsoft.Extensions.Logging" Version="7.0.0" />
+    <ItemGroup Condition="'$(TargetFramework)' == 'net8.0'">
+        <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0" />
     </ItemGroup>
 
     <ItemGroup>
