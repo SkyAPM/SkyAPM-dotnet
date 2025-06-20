@@ -17,7 +17,7 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 9.0.100
+        dotnet-version: 8.0.x
     - name: Setup Submodule
       run: git submodule update --init
     - name: Restore dependencies
