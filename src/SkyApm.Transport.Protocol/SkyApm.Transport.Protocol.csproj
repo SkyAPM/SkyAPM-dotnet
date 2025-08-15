@@ -7,7 +7,7 @@
         <PackageTags>SkyWalking;Protocol</PackageTags>
         <PackageReleaseNotes>
         </PackageReleaseNotes>
-        <TargetFrameworks>netstandard2.0;net6.0;net8.0</TargetFrameworks>
+        <TargetFrameworks>netstandard2.0</TargetFrameworks>
         <RootNamespace>SkyApm.Transport.Protocol</RootNamespace>
     </PropertyGroup>
 
