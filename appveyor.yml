@@ -10,6 +10,9 @@ skip_commits:
   files:
     - LICENSE
 install:
+- ps: |
+    Invoke-WebRequest -Uri 'https://dot.net/v1/dotnet-install.ps1' -UseBasicParsing -OutFile "$env:temp\dotnet-install.ps1"
+    & $env:temp\dotnet-install.ps1 -Architecture x64 -Version '5.0.408' -InstallDir "$env:ProgramFiles\dotnet"
 - git submodule update --init
 - dotnet build -c Release src/SkyApm.Transport.Protocol
 build_script:

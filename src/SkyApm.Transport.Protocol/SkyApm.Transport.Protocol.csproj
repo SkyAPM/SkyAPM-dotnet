@@ -1,6 +1,4 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-    <Import Project="..\..\build\common.props" />
-
     <PropertyGroup>
         <Description>$(Product) data protocol.</Description>
         <AssemblyTitle>$(PackagePrefix).Transport.Protocol</AssemblyTitle>
@@ -9,7 +7,7 @@
         <PackageTags>SkyWalking;Protocol</PackageTags>
         <PackageReleaseNotes>
         </PackageReleaseNotes>
-        <TargetFramework>netstandard2.0</TargetFramework>
+        <TargetFrameworks>netstandard2.0</TargetFrameworks>
         <RootNamespace>SkyApm.Transport.Protocol</RootNamespace>
     </PropertyGroup>
 
