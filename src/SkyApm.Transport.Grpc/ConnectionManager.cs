@@ -67,7 +67,7 @@ namespace SkyApm.Transport.Grpc
                     //https://docs.microsoft.com/en-us/aspnet/core/grpc/troubleshoot?view=aspnetcore-3.0#call-insecure-grpc-services-with-net-core-client-2
                     AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
                     
-                    _channel = GrpcChannel.ForAddress(_server);
+                    _channel = GrpcChannel.ForAddress(_server, new GrpcChannelOptions { DisposeHttpClient = true });
                     _state = ConnectionState.Connected;
                     _logger.Information($"Connected server[{_channel.Target}].");
                 }
@@ -97,6 +97,7 @@ namespace SkyApm.Transport.Grpc
             }
             finally
             {
+                _channel?.Dispose();
                 _state = ConnectionState.Failure;
             }
         }
