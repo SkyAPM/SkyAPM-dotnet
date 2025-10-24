@@ -33,20 +33,44 @@ namespace SkyApm.Config
         public int ReportTimeout { get; set; }
 
         public string Authentication { get; set; }
+
+        public bool? EnableSSL { get; set; }
     }
 
     public static class GrpcConfigExtensions
     {
+        public static bool ShouldEnableSSL(this GrpcConfig config)
+        {
+            // If user explicitly set EnableSSL to true, enable SSL
+            if (config.EnableSSL == true)
+            {
+                return true;
+            }
+
+            // If user explicitly set EnableSSL to false, disable SSL
+            if (config.EnableSSL == false)
+            {
+                return false;
+            }
+
+            // Auto-detect SSL if any server starts with https://
+            var servers = config.Servers?.Split(',') ?? Array.Empty<string>();
+            return servers.Any(s => s.Trim().StartsWith("https://", StringComparison.OrdinalIgnoreCase));
+        }
+
         public static string[] GetServers(this GrpcConfig config)
         {
             var servers = config.Servers.Split(',').ToArray();
+            var enableSSL = config.EnableSSL == true;
+            
             for (int i = 0; i < servers.Length; i++)
             {
                 // Support gRPC load balancing schemes like dns://, static:// etc.
-                // Only add http:// prefix if no scheme is specified (no :// present)
+                // Only add http:// or https:// prefix if no scheme is specified (no :// present)
                 if (!servers[i].Contains("://"))
                 {
-                    servers[i] = $"http://{servers[i]}";
+                    var scheme = enableSSL ? "https://" : "http://";
+                    servers[i] = $"{scheme}{servers[i]}";
                 }
             } 
 

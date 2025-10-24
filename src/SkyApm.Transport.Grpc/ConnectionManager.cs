@@ -64,8 +64,12 @@ namespace SkyApm.Transport.Grpc
                 
                 try
                 {
-                    //https://docs.microsoft.com/en-us/aspnet/core/grpc/troubleshoot?view=aspnetcore-3.0#call-insecure-grpc-services-with-net-core-client-2
-                    AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
+                    // Enable unencrypted HTTP/2 only when SSL is disabled
+                    // https://docs.microsoft.com/en-us/aspnet/core/grpc/troubleshoot?view=aspnetcore-3.0#call-insecure-grpc-services-with-net-core-client-2
+                    if (!_config.ShouldEnableSSL())
+                    {
+                        AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
+                    }
                     
                     _channel = GrpcChannel.ForAddress(_server, new GrpcChannelOptions { DisposeHttpClient = true });
                     _state = ConnectionState.Connected;

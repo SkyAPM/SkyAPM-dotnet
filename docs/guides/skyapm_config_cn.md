@@ -32,6 +32,7 @@ gRPC配置节点
 1. Servers gRPC地址，多个用逗号","
 2. Timeout 创建gRPC链接的超时时间，毫秒
 3. ConnectTimeout gRPC最长链接时间，毫秒
+4. EnableSSL 启用gRPC传输的SSL/TLS。当服务器地址包含https://前缀时自动检测（默认：false）
 
 # skyapm.json 示例
 ```
@@ -59,7 +60,39 @@ gRPC配置节点
         "Servers": "localhost:11800",
         "Timeout": 10000,
         "ConnectTimeout": 10000,
-        "ReportTimeout": 600000
+        "ReportTimeout": 600000,
+        "EnableSSL": false
+      }
+    }
+  }
+}
+```
+
+## SSL配置示例
+
+### HTTPS服务器自动检测
+当服务器地址包含`https://`前缀时，自动启用SSL：
+```json
+{
+  "SkyWalking": {
+    "Transport": {
+      "gRPC": {
+        "Servers": "https://skywalking-oap.example.com:11800"
+      }
+    }
+  }
+}
+```
+
+### 显式SSL配置
+您可以显式设置`EnableSSL`来覆盖自动检测：
+```json
+{
+  "SkyWalking": {
+    "Transport": {
+      "gRPC": {
+        "Servers": "skywalking-oap:11800",
+        "EnableSSL": true
       }
     }
   }

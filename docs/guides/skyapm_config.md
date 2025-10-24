@@ -30,6 +30,7 @@ gRPC Configuration Section
 1. Servers, gRPC Service address,Multiple addresses separated by commas (",")
 2. Timeout, Timeout for creating a link,(unit:Millisecond)
 3. ConnectTimeout, gRPC Connectioning timed out,(unit:Millisecond)
+4. EnableSSL, Enable SSL/TLS for gRPC transport. Auto-detected when servers contain https:// prefix (default: false)
 
 # skyapm.json sample
 ```
@@ -57,7 +58,39 @@ gRPC Configuration Section
         "Servers": "localhost:11800",
         "Timeout": 10000,
         "ConnectTimeout": 10000,
-        "ReportTimeout": 600000
+        "ReportTimeout": 600000,
+        "EnableSSL": false
+      }
+    }
+  }
+}
+```
+
+## SSL Configuration Examples
+
+### Auto-detection with HTTPS servers
+When servers contain `https://` prefix, SSL is automatically enabled:
+```json
+{
+  "SkyWalking": {
+    "Transport": {
+      "gRPC": {
+        "Servers": "https://skywalking-oap.example.com:11800"
+      }
+    }
+  }
+}
+```
+
+### Explicit SSL configuration
+You can explicitly set `EnableSSL` to override auto-detection:
+```json
+{
+  "SkyWalking": {
+    "Transport": {
+      "gRPC": {
+        "Servers": "skywalking-oap:11800",
+        "EnableSSL": true
       }
     }
   }
