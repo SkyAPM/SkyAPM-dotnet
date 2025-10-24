@@ -42,8 +42,9 @@ namespace SkyApm.Config
             var servers = config.Servers.Split(',').ToArray();
             for (int i = 0; i < servers.Length; i++)
             {
-                if (!servers[i].StartsWith("http://", StringComparison.InvariantCultureIgnoreCase)
-                        && !servers[i].StartsWith("https://", StringComparison.InvariantCultureIgnoreCase))
+                // Support gRPC load balancing schemes like dns://, static:// etc.
+                // Only add http:// prefix if no scheme is specified (no :// present)
+                if (!servers[i].Contains("://"))
                 {
                     servers[i] = $"http://{servers[i]}";
                 }
