@@ -13,18 +13,16 @@ SkyAPM C#/.NET instrument agent
 
 ## CI Build Status
 
-| Platform | Build Server | Master Status  |
-|--------- |------------- |---------|
-| AppVeyor |  Windows/Linux |[![Build status](https://ci.appveyor.com/api/projects/status/fl6vucwfn1vu94dv/branch/master?svg=true)](https://ci.appveyor.com/project/wu-sheng/skywalking-csharp/branch/master)|
+| Platform | Build Server | Main Status | Publish Status |
+|--------- |------------- |------------ |---------------|
+| GitHub Actions |  Windows |[![Build & Test](https://github.com/SkyAPM/SkyAPM-dotnet/workflows/NET%20CI%20AND%20IT/badge.svg)](https://github.com/SkyAPM/SkyAPM-dotnet/actions)|[![Publish](https://github.com/SkyAPM/SkyAPM-dotnet/workflows/Publish%20NuGet%20Packages/badge.svg)](https://github.com/SkyAPM/SkyAPM-dotnet/actions)|
 
-## Nuget Packages
+## NuGet Packages
 
-| Package Name |  NuGet | MyGet | Downloads
-|--------------|  ------- |  ------- |  ----
-| SkyAPM.Agent.AspNetCore | [![nuget](https://img.shields.io/nuget/v/SkyAPM.Agent.AspNetCore.svg?style=flat-square)](https://www.nuget.org/packages/SkyAPM.Agent.AspNetCore) | [![myget](https://img.shields.io/myget/skyapm-dotnet/vpre/SkyAPM.Agent.AspNetCore.svg?style=flat-square)](https://www.myget.org/feed/skyapm-dotnet/package/nuget/SkyAPM.Agent.AspNetCore) | [![stats](https://img.shields.io/nuget/dt/SkyAPM.Agent.AspNetCore.svg?style=flat-square)](https://www.nuget.org/stats/packages/SkyAPM.Agent.AspNetCore?groupby=Version)
-| SkyAPM.Agent.GeneralHost | [![nuget](https://img.shields.io/nuget/v/SkyAPM.Agent.GeneralHost.svg?style=flat-square)](https://www.nuget.org/packages/SkyAPM.Agent.GeneralHost) | [![myget](https://img.shields.io/myget/skyapm-dotnet/vpre/SkyAPM.Agent.GeneralHost.svg?style=flat-square)](https://www.myget.org/feed/skyapm-dotnet/package/nuget/SkyAPM.Agent.GeneralHost) | [![](https://img.shields.io/nuget/dt/SkyAPM.Agent.GeneralHost.svg?style=flat-square)](https://www.nuget.org/stats/packages/SkyAPM.Agent.GeneralHost?groupby=Version)
-
-> MyGet feed URL https://www.myget.org/F/skyapm-dotnet/api/v3/index.json
+| Package Name |  NuGet | Downloads
+|--------------|  ------- |  ----
+| SkyAPM.Agent.AspNetCore | [![nuget](https://img.shields.io/nuget/v/SkyAPM.Agent.AspNetCore.svg?style=flat-square)](https://www.nuget.org/packages/SkyAPM.Agent.AspNetCore) | [![stats](https://img.shields.io/nuget/dt/SkyAPM.Agent.AspNetCore.svg?style=flat-square)](https://www.nuget.org/stats/packages/SkyAPM.Agent.AspNetCore?groupby=Version)
+| SkyAPM.Agent.GeneralHost | [![nuget](https://img.shields.io/nuget/v/SkyAPM.Agent.GeneralHost.svg?style=flat-square)](https://www.nuget.org/packages/SkyAPM.Agent.GeneralHost) | [![](https://img.shields.io/nuget/dt/SkyAPM.Agent.GeneralHost.svg?style=flat-square)](https://www.nuget.org/stats/packages/SkyAPM.Agent.GeneralHost?groupby=Version)
 
 # Supported
 - This project currently supports apps targeting netcoreapp3.1、net5.0、net6.0 or higher.

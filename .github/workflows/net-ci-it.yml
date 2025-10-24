@@ -9,7 +9,7 @@ on:
   pull_request:
 
 jobs:
-  net7:
+  build-and-test:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -27,3 +27,22 @@ jobs:
       run: dotnet build --no-restore
     - name: Test
       run: dotnet test --no-build --verbosity normal --framework net8.0
+    - name: Generate version suffix
+      id: version
+      run: |
+        if [[ $GITHUB_REF == refs/tags/* ]]; then
+          echo "suffix=" >> $GITHUB_OUTPUT
+        elif [[ $GITHUB_REF == refs/heads/main ]]; then
+          echo "suffix=prerelease.$(date +%Y%m%d).${GITHUB_RUN_NUMBER}" >> $GITHUB_OUTPUT
+        else
+          echo "suffix=preview.$(date +%Y%m%d).${GITHUB_RUN_NUMBER}" >> $GITHUB_OUTPUT
+        fi
+    - name: Pack NuGet packages
+      run: |
+        dotnet pack --configuration Release --no-build --output ./artifacts/packages --version-suffix "${{ steps.version.outputs.suffix }}"
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: nuget-packages
+        path: artifacts/packages/*.nupkg
+        retention-days: 7

@@ -1,0 +1,41 @@
+name: Publish NuGet Packages
+
+on:
+  workflow_run:
+    workflows: ["NET CI AND IT"]
+    types:
+      - completed
+    branches:
+      - main
+
+jobs:
+  publish:
+    runs-on: windows-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' && startsWith(github.event.workflow_run.head_branch, 'v') }}
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+
+    - name: Download build artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: nuget-packages
+        path: artifacts/packages
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        repository: ${{ github.repository }}
+        run-id: ${{ github.event.workflow_run.id }}
+
+    - name: Publish to NuGet (tagged release)
+      run: |
+        $packages = Get-ChildItem -Path "artifacts/packages" -Filter "*.nupkg" -Exclude "*.symbols.nupkg"
+        foreach ($package in $packages) {
+          dotnet nuget push $package.FullName --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+        }
+      env:
+        NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
