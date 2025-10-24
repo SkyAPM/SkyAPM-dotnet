@@ -9,7 +9,7 @@ on:
   pull_request:
 
 jobs:
-  net7:
+  build-and-test:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -27,3 +27,46 @@ jobs:
       run: dotnet build --no-restore
     - name: Test
       run: dotnet test --no-build --verbosity normal --framework net8.0
+    - name: Generate version info
+      id: version
+      run: |
+        if [[ $GITHUB_REF == refs/tags/* ]]; then
+          # Extract version from tag (remove 'v' prefix)
+          TAG_NAME=${GITHUB_REF#refs/tags/}
+          VERSION=${TAG_NAME#v}
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+        elif [[ $GITHUB_REF == refs/heads/main ]]; then
+          echo "suffix=prerelease.$(date +%Y%m%d).${GITHUB_RUN_NUMBER}" >> $GITHUB_OUTPUT
+        else
+          echo "suffix=preview.$(date +%Y%m%d).${GITHUB_RUN_NUMBER}" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Update version.props for tagged releases
+      if: startsWith(github.ref, 'refs/tags/')
+      run: |
+        VERSION=${{ steps.version.outputs.version }}
+        IFS='.' read -ra VERSION_PARTS <<< "$VERSION"
+        MAJOR=${VERSION_PARTS[0]}
+        MINOR=${VERSION_PARTS[1]}
+        PATCH=${VERSION_PARTS[2]}
+        
+        # Update version.props
+        sed -i "s/<VersionMajor>[0-9]*<\/VersionMajor>/<VersionMajor>$MAJOR<\/VersionMajor>/g" build/version.props
+        sed -i "s/<VersionMinor>[0-9]*<\/VersionMinor>/<VersionMinor>$MINOR<\/VersionMinor>/g" build/version.props
+        sed -i "s/<VersionPatch>[0-9]*<\/VersionPatch>/<VersionPatch>$PATCH<\/VersionPatch>/g" build/version.props
+        
+        echo "Updated version.props to $MAJOR.$MINOR.$PATCH"
+
+    - name: Pack NuGet packages
+      run: |
+        if [[ $GITHUB_REF == refs/tags/* ]]; then
+          dotnet pack --configuration Release --no-build --output ./artifacts/packages --version "${{ steps.version.outputs.version }}"
+        else
+          dotnet pack --configuration Release --no-build --output ./artifacts/packages --version-suffix "${{ steps.version.outputs.suffix }}"
+        fi
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: nuget-packages
+        path: artifacts/packages/*.nupkg
+        retention-days: 7
