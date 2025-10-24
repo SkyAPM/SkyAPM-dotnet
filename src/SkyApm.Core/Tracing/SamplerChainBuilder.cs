@@ -53,10 +53,6 @@ namespace SkyApm.Tracing
                 return _sampler = sampler;
             }
 
-            while (_sampler == null)
-            {
-            }
-
             return _sampler;
         }
     }
