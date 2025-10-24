@@ -35,7 +35,8 @@ namespace SkyApm.Diagnostics.EntityFrameworkCore
         
         public bool Match(DbConnection connection)
         {
-            return connection.GetType().FullName == "MySql.Data.MySqlClient.MySqlConnection";
+            var type = connection.GetType().FullName;
+            return type == "MySql.Data.MySqlClient.MySqlConnection" || type == "MySqlConnector.MySqlConnection";
         }
 
         public string GetPeer(DbConnection connection)
