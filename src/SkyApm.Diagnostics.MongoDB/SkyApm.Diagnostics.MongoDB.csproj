@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <ItemGroup>
-        <PackageReference Include="MongoDB.Driver.Core" Version="2.18.0" />
+        <PackageReference Include="MongoDB.Driver.Core" Version="2.30.0" />
     </ItemGroup>
   
     <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp3.1'">
