@@ -24,7 +24,7 @@ jobs:
     - name: Build Protocol
       run: dotnet build src/SkyApm.Transport.Protocol --no-restore
     - name: Build
-      run: dotnet build --no-restore
+      run: dotnet build --no-restore --configuration Release --verbosity normal
     - name: Test
       run: dotnet test --no-build --verbosity normal --framework net8.0
     - name: Generate version info
@@ -60,9 +60,9 @@ jobs:
     - name: Pack NuGet packages
       run: |
         if [[ $GITHUB_REF == refs/tags/* ]]; then
-          dotnet pack --configuration Release --no-build --output ./artifacts/packages --version "${{ steps.version.outputs.version }}"
+          dotnet pack --configuration Release --output ./artifacts/packages --version "${{ steps.version.outputs.version }}"
         else
-          dotnet pack --configuration Release --no-build --output ./artifacts/packages --version-suffix "${{ steps.version.outputs.suffix }}"
+          dotnet pack --configuration Release --output ./artifacts/packages --version-suffix "${{ steps.version.outputs.suffix }}"
         fi
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
