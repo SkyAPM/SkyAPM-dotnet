@@ -2,9 +2,6 @@
 title: "Plugins"
 weight: 6
 ---
-
-# Plugins
-
 The SkyAPM .NET agent ships **16 diagnostic plugins** that auto-instrument common
 frameworks and libraries. Each plugin observes a `DiagnosticListener` / `ActivitySource`
 (or registers an interceptor) and produces SkyWalking **sw8 / v8** spans that the agent

@@ -2,9 +2,6 @@
 title: "Configuration Reference"
 weight: 3
 ---
-
-# SkyAPM .NET Agent Configuration Reference
-
 This is the authoritative configuration reference for the SkyAPM .NET agent
 (SkyAPM-dotnet) — a C#/.NET auto-instrumentation agent for the .NET ecosystem that reports to an Apache SkyWalking backend.
 Every key lives under the top-level `SkyWalking` root and reports to the

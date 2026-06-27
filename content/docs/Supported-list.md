@@ -2,9 +2,6 @@
 title: "Supported Components"
 weight: 2
 ---
-
-# Supported components
-
 This page lists the libraries and frameworks that the SkyAPM .NET agent can
 auto-instrument, what each one captures, and whether it is enabled by default or
 must be opted in. SkyAPM-dotnet is the C#/.NET auto-instrumentation agent for

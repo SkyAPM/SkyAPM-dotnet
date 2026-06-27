@@ -2,9 +2,6 @@
 title: "Transports"
 weight: 5
 ---
-
-# Transports (Reporters)
-
 The SkyAPM .NET agent buffers the tracing, metrics, profiling, management, and
 log data it collects, then ships it to the SkyWalking OAP backend through a
 **transport** (also called a **reporter**). This guide explains how to pick a

@@ -1,4 +1,3 @@
-# How to build project
 
 This document helps people to compile and build the SkyAPM-dotnet project from source.
 

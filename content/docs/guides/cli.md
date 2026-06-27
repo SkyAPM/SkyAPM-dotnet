@@ -2,9 +2,6 @@
 title: "CLI"
 weight: 8
 ---
-
-# SkyApm.DotNet.CLI
-
 `SkyApm.DotNet.CLI` is a [.NET global tool](https://learn.microsoft.com/dotnet/core/tools/global-tools) that scaffolds the configuration file for the SkyAPM .NET agent. It generates a ready-to-edit `skyapm.json` so you do not have to author the configuration by hand.
 
 ## Install

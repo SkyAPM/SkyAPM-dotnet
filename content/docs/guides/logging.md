@@ -2,9 +2,6 @@
 title: "Logging"
 weight: 7
 ---
-
-# Logging
-
 The SkyAPM .NET agent deals with logs in two completely separate ways, and it is
 important not to confuse them:
 

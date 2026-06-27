@@ -2,9 +2,6 @@
 title: "配置参考（中文）"
 weight: 4
 ---
-
-# SkyAPM .NET agent 配置参考
-
 本文档是 SkyAPM .NET agent（SkyAPM-dotnet，面向 Apache SkyWalking 的 C#/.NET 自动埋点探针）的权威配置参考。文档列出全部配置项及其类型、默认值与含义，说明配置的加载顺序与环境变量覆盖规则，并在结尾给出一份完整、正确的 `skyapm.json` 示例。英文版本见 [Configuration Reference](skyapm_config.md)。
 
 ## 概览
