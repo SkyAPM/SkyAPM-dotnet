@@ -1,7 +1,7 @@
 SkyAPM C#/.NET instrument agent
 ==========
 
-<img src="https://skyapmtest.github.io/page-resources/SkyAPM/skyapm.png" alt="Sky Walking logo" height="90px" align="right" />
+<img src="https://skyapmtest.github.io/page-resources/SkyAPM/skyapm.png" alt="SkyAPM logo" height="90px" align="right" />
 
 **SkyAPM-dotnet** is a community, open-source C#/.NET auto-instrumentation agent for the .NET ecosystem. It provides distributed tracing, application topology, and metrics for ASP.NET Core and .NET applications, and reports the collected telemetry to an [Apache SkyWalking](https://skywalking.apache.org/) backend over the `sw8` / `v8` protocol. It is an independent project and is not affiliated with or endorsed by the Apache Software Foundation.
 
@@ -10,112 +10,48 @@ SkyAPM C#/.NET instrument agent
 [![releases](https://img.shields.io/github/release/skyapm/skyapm-dotnet.svg?style=flat-square)](https://github.com/SkyAPM/SkyAPM-dotnet/releases)
 [![Twitter Follow](https://img.shields.io/twitter/follow/asfskywalking.svg?style=flat-square&label=Follow&logo=twitter)](https://twitter.com/AsfSkyWalking)
 
+## 📖 Documentation
+
+**Full documentation lives at [skyapm.github.io/SkyAPM-dotnet](https://skyapm.github.io/SkyAPM-dotnet/)** — getting started, installation & activation, the complete configuration reference (EN / 中文), transports (gRPC / Kafka), the supported-component list, plugins, logging, the CLI, and troubleshooting.
+
 ## CI Build Status
 
 [![NET CI AND IT](https://github.com/SkyAPM/SkyAPM-dotnet/actions/workflows/net-ci-it.yml/badge.svg)](https://github.com/SkyAPM/SkyAPM-dotnet/actions/workflows/net-ci-it.yml)
 
-## Nuget Packages
+## NuGet Packages
 
 | Package Name |  NuGet | Downloads |
 |--------------|  ------- |  ---- |
 | SkyAPM.Agent.AspNetCore | [![nuget](https://img.shields.io/nuget/v/SkyAPM.Agent.AspNetCore.svg?style=flat-square)](https://www.nuget.org/packages/SkyAPM.Agent.AspNetCore) | [![stats](https://img.shields.io/nuget/dt/SkyAPM.Agent.AspNetCore.svg?style=flat-square)](https://www.nuget.org/stats/packages/SkyAPM.Agent.AspNetCore?groupby=Version) |
 | SkyAPM.Agent.GeneralHost | [![nuget](https://img.shields.io/nuget/v/SkyAPM.Agent.GeneralHost.svg?style=flat-square)](https://www.nuget.org/packages/SkyAPM.Agent.GeneralHost) | [![stats](https://img.shields.io/nuget/dt/SkyAPM.Agent.GeneralHost.svg?style=flat-square)](https://www.nuget.org/stats/packages/SkyAPM.Agent.GeneralHost?groupby=Version) |
 
-# Supported
-- This project currently supports apps targeting net8.0 and net10.0 (the active .NET LTS releases). Apps on newer runtimes (e.g. net9.0) are covered via the net8.0 assemblies.
-- [Supported middlewares, frameworks and libraries.](docs/Supported-list.md)
+## Quick start
 
-# Features
-A quick list of the SkyAPM .NET agent's capabilities:
-- Application Topology
-- Distributed Tracing over the SkyWalking sw8 (v8) protocol
-- ASP.NET Core and ASP.NET diagnostics
-- HttpClient and gRPC client/server diagnostics
-- EntityFrameworkCore diagnostics (SqlServer, Sqlite, PostgreSQL/Npgsql, Pomelo MySQL)
-- SqlClient and MySqlConnector peer formatters
-- MongoDB, SmartSql, FreeSql, FreeRedis, MassTransit and CAP diagnostics
-- Microsoft.Extensions.Logging (MSLogging) integration
+Supported runtimes: **net8.0** and **net10.0**.
 
-For the full plugin set, see [Supported middlewares, frameworks and libraries](docs/Supported-list.md). Browse all guides from the [docs index](docs/README.md).
-
-# Getting Started
-
-## Deploy SkyWalking Backend And UI
-
-#### Requirements
-Start with v1.0.0, SkyAPM .NET Core Agent only supports SkyWalking 8.0 or higher. The SkyWalking doc is [here](https://skywalking.apache.org/docs/).
-
-## Install SkyWalking .NET Core Agent
-
-You can run the following command to install the SkyWalking .NET Core Agent in your project.
-
-```
-dotnet add package SkyAPM.Agent.AspNetCore
-```
-
-## How to use
-Set the `ASPNETCORE_HOSTINGSTARTUPASSEMBLIES` environment variable to support the activation of the SkyAPM .NET Core Agent.
-
-- Add the assembly name of `SkyAPM.Agent.AspNetCore` to the `ASPNETCORE_HOSTINGSTARTUPASSEMBLIES` environment variable.
-
-### Examples
-- On windows
-
-```
-dotnet new mvc -n sampleapp
-cd sampleapp
-dotnet add package SkyAPM.Agent.AspNetCore
-set ASPNETCORE_HOSTINGSTARTUPASSEMBLIES=SkyAPM.Agent.AspNetCore
-set SKYWALKING__SERVICENAME=sample_app
+```bash
+dotnet add package SkyApm.Agent.AspNetCore
+export ASPNETCORE_HOSTINGSTARTUPASSEMBLIES=SkyApm.Agent.AspNetCore
+export SKYWALKING__SERVICENAME=my_service
 dotnet run
 ```
 
-- On macOS/Linux
+See [**Getting Started**](https://skyapm.github.io/SkyAPM-dotnet/docs/guides/getting-started/) for the full walkthrough, and the [**Configuration reference**](https://skyapm.github.io/SkyAPM-dotnet/docs/guides/skyapm_config/) for every option.
 
-```
-dotnet new mvc -n sampleapp
-cd sampleapp
-dotnet add package SkyAPM.Agent.AspNetCore
-export ASPNETCORE_HOSTINGSTARTUPASSEMBLIES=SkyAPM.Agent.AspNetCore
-export SKYWALKING__SERVICENAME=sample_app
-dotnet run
-```
+## Contributing
 
-## Configuration
+See [Contributing to SkyAPM-dotnet](./CONTRIBUTING.md).
 
-Install `SkyAPM.DotNet.CLI`
+## Contact Us
 
-```
-dotnet tool install -g SkyAPM.DotNet.CLI
-```
+* Submit an issue on this repository for questions about the **.NET agent**.
 
-For 2.2.x or older, use `dotnet skyapm config [your_service_name] [your_servers]` to generate config file.
-
-```
-dotnet skyapm config sample_app 192.168.0.1:11800
-```
-
-For 2.3.x or newer, use `dotnet skyapm config ${your_service_name} [--reporter=grpc|kafka] [--grpcservers=...] [--kafkaservers=...]` to generate config file.
-
-```
-# grpc
-dotnet skyapm config sample_app --reporter=grpc --grpcservers=192.168.0.1:11800
-
-# kafka
-dotnet skyapm config sample_app --reporter=kafka --kafkaservers=192.168.0.1:9092
-```
-
-# Contributing
-This section is in progress here: [Contributing to SkyAPM-dotnet](./CONTRIBUTING.md)
-
-# Contact Us
-* Submit an issue
-
-If you have issues about SkyWalking protocol, its official backend, ask questions at their Apache official channels. All following channels are not suitable for .net agent, but good if you are facing backend/UI issues.
+For questions about the **SkyWalking protocol or its backend/UI**, use the official Apache SkyWalking channels (these are not suitable for the .NET agent):
 * Submit an official Apache SkyWalking [issue](https://github.com/apache/skywalking/issues).
 * Mail list: **dev@skywalking.apache.org**. Mail to `dev-subscribe@skywalking.apache.org`, follow the reply to subscribe the mail list.
-* Join `skywalking` channel at [Apache Slack](https://join.slack.com/t/the-asf/shared_invite/enQtNzc2ODE3MjI1MDk1LTAyZGJmNTg1NWZhNmVmOWZjMjA2MGUyOGY4MjE5ZGUwOTQxY2Q3MDBmNTM5YTllNGU4M2QyMzQ4M2U4ZjQ5YmY). If the link is not working, find the latest one at [Apache INFRA WIKI](https://cwiki.apache.org/confluence/display/INFRA/Slack+Guest+Invites).
+* Join the `skywalking` channel at [Apache Slack](https://join.slack.com/t/the-asf/shared_invite/enQtNzc2ODE3MjI1MDk1LTAyZGJmNTg1NWZhNmVmOWZjMjA2MGUyOGY4MjE5ZGUwOTQxY2Q3MDBmNTM5YTllNGU4M2QyMzQ4M2U4ZjQ5YmY). If the link is not working, find the latest one at the [Apache INFRA WIKI](https://cwiki.apache.org/confluence/display/INFRA/Slack+Guest+Invites).
 * QQ Group: 392443393(2000/2000, not available), 901167865(available)
 
-# License
+## License
+
 [Apache 2.0 License.](/LICENSE)
