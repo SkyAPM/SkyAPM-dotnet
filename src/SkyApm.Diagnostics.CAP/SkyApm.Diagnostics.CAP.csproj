@@ -24,6 +24,10 @@
         <PackageReference Include="DotNetCore.CAP" Version="8.0.0" />
     </ItemGroup>
 
+    <ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
+        <PackageReference Include="DotNetCore.CAP" Version="10.0.0" />
+    </ItemGroup>
+
     <ItemGroup>
         <ProjectReference Include="..\SkyApm.Abstractions\SkyApm.Abstractions.csproj" />
         <ProjectReference Include="..\SkyApm.Core\SkyApm.Core.csproj" />

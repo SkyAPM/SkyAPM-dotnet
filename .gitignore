@@ -271,3 +271,8 @@ generated-v3/
 /sample/java-integration-demo/agent
 
 .DS_Store
+
+# Hugo
+/public/
+/resources/_gen/
+.hugo_build.lock
