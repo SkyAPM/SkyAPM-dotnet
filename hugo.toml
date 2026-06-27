@@ -3,6 +3,7 @@ title = "SkyAPM .NET Agent"
 theme = "hextra"
 enableGitInfo = true
 enableInlineShortcodes = true
+enableRobotsTXT = true
 
 [markup]
   [markup.highlight]
