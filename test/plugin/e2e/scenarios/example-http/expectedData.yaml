@@ -1,0 +1,43 @@
+# Example Layer-2 expectedData.yaml — the format the SkyWalking validator asserts
+# against the actualData.yaml dumped from the mock collector's REST API.
+#
+# Operators (a bare value means exact-equals): null | not null | not blank | eq |
+# nq | gt | ge | start with | end with. Use them as `key: <operator> <value>`.
+#
+# This example expects ONE inbound ASP.NET Core request span (entry) plus one
+# outbound HttpClient span (exit) in a single segment.
+
+segmentItems:
+  - serviceName: example-http-service
+    segmentSize: ge 1
+    segments:
+      - segmentId: not null
+        spans:
+          - operationName: GET:/api/values          # entry span (ASP.NET Core)
+            operationId: 0
+            parentSpanId: -1
+            spanId: 0
+            spanLayer: Http
+            startTime: gt 0
+            endTime: gt 0
+            componentId: 6004                        # AspNetCore component id
+            isError: false
+            spanType: Entry
+            peer: ''
+            skipAnalysis: false
+            tags:
+              - { key: http.method, value: GET }
+              - { key: url, value: not blank }
+              - { key: status_code, value: '200' }
+          - operationName: not blank                 # exit span (HttpClient)
+            parentSpanId: 0
+            spanId: 1
+            spanLayer: Http
+            componentId: 6005                         # HttpClient component id
+            isError: false
+            spanType: Exit
+            peer: not blank
+            tags:
+              - { key: http.method, value: GET }
+              - { key: url, value: not blank }
+            refs: []

@@ -1,0 +1,72 @@
+name: Release
+
+# Publishes all NuGet packages + a GitHub Release when a vX.Y.Z tag is pushed.
+# Requires the NUGET_API_KEY secret (see RELEASING.md). The strong-name key is
+# committed in the repo, so no signing secret is needed.
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write   # create the GitHub Release
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.0.x
+            10.0.x
+
+      - name: Derive & verify version
+        id: ver
+        run: |
+          set -euo pipefail
+          VERSION="${GITHUB_REF_NAME#v}"
+          BASE="${VERSION%%-*}"   # strip any -rc/-beta suffix for the props comparison
+          PROPS="$(grep -oE '<VersionPrefix>[^<]+' build/version.props | sed 's/<VersionPrefix>//')"
+          echo "tag version: $VERSION (base $BASE) · version.props: $PROPS"
+          if [ "$BASE" != "$PROPS" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME (base $BASE) does not match build/version.props VersionPrefix $PROPS. Bump version.props first."
+            exit 1
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          if [[ "$VERSION" == *-* ]]; then echo "prerelease=true" >> "$GITHUB_OUTPUT"; else echo "prerelease=false" >> "$GITHUB_OUTPUT"; fi
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Build protocol (codegen) first
+        run: dotnet build src/SkyApm.Transport.Protocol -c Release --no-restore
+
+      - name: Pack
+        run: |
+          dotnet pack skyapm-dotnet.sln -c Release --no-restore \
+            -p:Version=${{ steps.ver.outputs.version }} \
+            -p:ContinuousIntegrationBuild=true \
+            -p:IncludeSymbols=true -p:SymbolPackageFormat=snupkg \
+            -o artifacts
+
+      - name: Push packages to NuGet
+        run: |
+          dotnet nuget push "artifacts/*.nupkg" \
+            --source https://api.nuget.org/v3/index.json \
+            --api-key "${{ secrets.NUGET_API_KEY }}" \
+            --skip-duplicate
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          PRERELEASE_FLAG=""
+          if [ "${{ steps.ver.outputs.prerelease }}" = "true" ]; then PRERELEASE_FLAG="--prerelease"; fi
+          gh release create "${GITHUB_REF_NAME}" --generate-notes $PRERELEASE_FLAG artifacts/*.nupkg

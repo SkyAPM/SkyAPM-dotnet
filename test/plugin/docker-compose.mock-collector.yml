@@ -1,0 +1,29 @@
+# Layer-2 (end-to-end) mock OAP collector for plugin tests.
+#
+# Reuses the Apache SkyWalking agent-test-tool UNCHANGED — it speaks the same
+# sw8/v8 gRPC protocol the .NET agent already uses. Point the agent at it:
+#   SkyWalking:Transport:gRPC:Servers = localhost:19876
+#
+# Then drive your sample app, and read the collected data back over REST:
+#   GET    http://localhost:12800/receiveData   -> dumps actualData.yaml
+#   DELETE http://localhost:12800/receiveData   -> clears captured data
+#   HEAD   http://localhost:12800/healthCheck    -> readiness
+#
+# NOTE: the mock collector persists/returns only SEGMENTS, METERS, and LOGS.
+# CLR metrics, management (register/keepalive), and events are ACKed but NOT
+# retrievable — assert those with in-process capture-fakes (Layer 1) instead.
+#
+# Usage:  docker compose -f test/plugin/docker-compose.mock-collector.yml up -d
+
+services:
+  mock-collector:
+    image: ghcr.io/apache/skywalking-agent-test-tool/mock-collector:latest
+    container_name: skyapm-mock-collector
+    ports:
+      - "19876:19876"   # gRPC receiver (point the agent here)
+      - "12800:12800"   # REST: receiveData / clearData / healthCheck / dataValidate
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://127.0.0.1:12800/healthCheck || exit 1"]
+      interval: 5s
+      timeout: 10s
+      retries: 30
