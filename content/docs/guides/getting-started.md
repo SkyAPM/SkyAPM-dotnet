@@ -2,9 +2,6 @@
 title: "Getting Started"
 weight: 1
 ---
-
-# Getting Started
-
 This quickstart walks you through instrumenting an ASP.NET Core application with the
 SkyAPM .NET agent end to end: stand up a SkyWalking OAP backend, install the package,
 generate a config file, activate the agent with a single environment variable, then send

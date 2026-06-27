@@ -2,9 +2,6 @@
 title: "Documentation"
 weight: 1
 ---
-
-# SkyAPM .NET Agent Documentation
-
 **SkyAPM-dotnet** is a community, open-source **.NET auto-instrumentation agent** for the .NET ecosystem. It provides distributed tracing, application topology, metrics, and log correlation for ASP.NET Core and .NET hosted applications, and reports the collected telemetry to an [Apache SkyWalking](https://skywalking.apache.org/) backend. It is an independent project, not an Apache Software Foundation or SkyWalking sub-project.
 
 The agent targets `net8.0` and `net10.0` (the active .NET LTS releases); foundational libraries also build for `netstandard2.0`. Apps on newer runtimes (e.g. `net9.0`) are covered via the `net8.0` assemblies. The current version is **2.3.0**.

@@ -2,9 +2,6 @@
 title: "Installation & Activation"
 weight: 2
 ---
-
-# Installation
-
 This guide explains how to attach the SkyAPM .NET agent to your application and how
 instrumentation plugins are enabled. SkyAPM-dotnet is a C#/.NET auto-instrumentation
 agent for the .NET ecosystem; it reports traces and logs to an Apache SkyWalking OAP backend over gRPC

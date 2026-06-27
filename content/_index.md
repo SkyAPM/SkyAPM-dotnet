@@ -2,9 +2,6 @@
 title: SkyAPM .NET Agent
 toc: false
 ---
-
-# SkyAPM .NET Agent
-
 **SkyAPM-dotnet** is a community, open-source **.NET auto-instrumentation agent** for the .NET ecosystem — distributed tracing, service topology, and metrics for ASP.NET Core and .NET apps, reported to an [Apache SkyWalking](https://skywalking.apache.org/) backend over the **sw8 / v8** protocol. It is an independent project (not an Apache/SkyWalking sub-project) and targets **net8.0** and **net10.0**.
 
 {{< cards >}}

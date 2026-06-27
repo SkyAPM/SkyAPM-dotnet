@@ -2,9 +2,6 @@
 title: "Troubleshooting"
 weight: 9
 ---
-
-# Troubleshooting & FAQ
-
 Common problems when running the SkyAPM .NET agent and how to fix them. Each
 item follows a **symptom → cause → fix** shape. For configuration reference see
 [Configuration](skyapm_config.md); the docs index is [docs/README.md](/docs/).
