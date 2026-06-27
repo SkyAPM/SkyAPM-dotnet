@@ -9,14 +9,16 @@ on:
   pull_request:
 
 jobs:
-  net7:
+  build-and-test:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - name: Setup .NET
-      uses: actions/setup-dotnet@v1
+      uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: 8.0.x
+        dotnet-version: |
+          8.0.x
+          10.0.x
     - name: Setup Submodule
       run: git submodule update --init
     - name: Restore dependencies
@@ -25,5 +27,7 @@ jobs:
       run: dotnet build src/SkyApm.Transport.Protocol --no-restore
     - name: Build
       run: dotnet build --no-restore
-    - name: Test
+    - name: Test net8.0
       run: dotnet test --no-build --verbosity normal --framework net8.0
+    - name: Test net10.0
+      run: dotnet test --no-build --verbosity normal --framework net10.0

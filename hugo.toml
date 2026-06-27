@@ -1,0 +1,50 @@
+baseURL = "https://skyapm.github.io/SkyAPM-dotnet/"
+title = "SkyAPM .NET Agent"
+theme = "hextra"
+enableGitInfo = true
+enableInlineShortcodes = true
+
+[markup]
+  [markup.highlight]
+    noClasses = false
+  [markup.goldmark.renderer]
+    unsafe = true
+
+[menu]
+  [[menu.main]]
+    identifier = "documentation"
+    name = "Documentation"
+    pageRef = "/docs"
+    weight = 1
+  [[menu.main]]
+    name = "Search"
+    weight = 2
+    [menu.main.params]
+      type = "search"
+  [[menu.main]]
+    name = "GitHub"
+    weight = 3
+    url = "https://github.com/SkyAPM/SkyAPM-dotnet"
+    [menu.main.params]
+      icon = "github"
+
+[params]
+  description = "Documentation for SkyAPM-dotnet, a .NET auto-instrumentation agent that reports tracing and metrics to an Apache SkyWalking backend."
+
+  [params.navbar]
+    displayTitle = true
+    displayLogo = true
+    [params.navbar.logo]
+      path = "logo.png"
+
+  [params.theme]
+    default = "system"
+    displayToggle = true
+
+  [params.footer]
+    enable = true
+    displayCopyright = true
+
+  [params.editURL]
+    enable = true
+    base = "https://github.com/SkyAPM/SkyAPM-dotnet/edit/main/content"

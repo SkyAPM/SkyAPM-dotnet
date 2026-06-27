@@ -2,3 +2,6 @@
 [submodule "src/SkyApm.Transport.Protocol/protocol-v3"]
 	path = src/SkyApm.Transport.Protocol/protocol-v3
 	url = https://github.com/apache/skywalking-data-collect-protocol
+[submodule "themes/hextra"]
+	path = themes/hextra
+	url = https://github.com/imfing/hextra
