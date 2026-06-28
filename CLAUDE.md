@@ -45,3 +45,4 @@ themes/hugo-... , hugo.toml, i18n/   docs site theme + config (.github/workflows
 - Plugins: a fixed default set is auto-registered; others are opt-in via the `AddSkyAPM(ext => …)` lambda.
 - The repo also pins per-TFM package versions via `Condition="'$(TargetFramework)' == 'netX'"` blocks.
 - Project is **independent** — reports to Apache SkyWalking but is not an ASF/SkyWalking sub-project.
+- Commits: do **not** add a `Co-Authored-By: Claude …` trailer (or any AI co-author trailer) to commit messages.

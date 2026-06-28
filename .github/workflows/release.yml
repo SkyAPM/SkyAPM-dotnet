@@ -1,0 +1,167 @@
+name: Release
+
+# Manually-run release. From the Actions tab → "Release" → "Run workflow", enter
+# the release version and the next development version. The job then:
+#   1. bumps build/version.props to the release version, commits & pushes it,
+#   2. tags v<release> and pushes the tag,
+#   3. packs + publishes all NuGet packages (Trusted Publishing / OIDC),
+#   4. creates a GitHub Release on the tag,
+#   5. opens a PR bumping build/version.props to the next development version.
+#
+# It is dispatch-driven and does NOT trigger off a tag push. NuGet auth uses
+# Trusted Publishing — no API-key secret. Configure a trusted-publisher policy on
+# nuget.org (Workflow file: release.yml) and the NUGET_USER repo variable; see
+# RELEASING.md. The strong-name key is committed, so no signing secret either.
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_version:
+        description: 'Release version to publish, e.g. 2.3.0 (or 2.4.0-rc1 for a prerelease)'
+        required: true
+        type: string
+      next_version:
+        description: 'Next development version (number only), e.g. 2.4.0'
+        required: true
+        type: string
+
+permissions:
+  contents: write        # commit the bump, push the tag, create the Release
+  id-token: write        # OIDC for NuGet Trusted Publishing
+  pull-requests: write   # open the next-version PR
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.0.x
+            10.0.x
+
+      - name: Validate inputs & resolve versions
+        id: ver
+        run: |
+          set -euo pipefail
+          REL="${{ inputs.release_version }}"
+          NEXT="${{ inputs.next_version }}"
+          [[ "$REL"  =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]] || { echo "::error::release_version '$REL' is not X.Y.Z[-suffix]"; exit 1; }
+          [[ "$NEXT" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]                  || { echo "::error::next_version '$NEXT' is not X.Y.Z"; exit 1; }
+          BASE="${REL%%-*}"
+          {
+            echo "release=$REL"
+            echo "base=$BASE"
+            echo "next=$NEXT"
+            echo "tag=v$REL"
+            if [[ "$REL" == *-* ]]; then echo "prerelease=true"; else echo "prerelease=false"; fi
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Bump version & commit
+        env:
+          REL:  ${{ steps.ver.outputs.release }}
+          BASE: ${{ steps.ver.outputs.base }}
+        run: |
+          set -euo pipefail
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          bash build/set-version.sh "$BASE"
+          if git diff --quiet -- build/version.props; then
+            echo "version.props already at $BASE — no release commit needed"
+          else
+            git commit -m "Release $REL" build/version.props
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Build protocol (codegen) first
+        # -p:GeneratePackageOnBuild=false avoids a stray, mis-versioned protocol nupkg
+        # (the global default packs on build); the real package is produced by Pack below.
+        run: dotnet build src/SkyApm.Transport.Protocol -c Release --no-restore -p:GeneratePackageOnBuild=false
+
+      - name: Pack
+        run: |
+          dotnet pack skyapm-dotnet.sln -c Release --no-restore \
+            -p:Version=${{ steps.ver.outputs.release }} \
+            -p:ContinuousIntegrationBuild=true \
+            -p:IncludeSymbols=true -p:SymbolPackageFormat=snupkg \
+            -o artifacts
+
+      # Guard against an irreversible push of a non-shipping package (nuget.org
+      # packages cannot be deleted, only unlisted). Samples/tests/benchmark/the e2e
+      # demo are IsPackable=false; this catches any future project that forgets to.
+      - name: Verify only shipping packages are staged
+        run: |
+          set -euo pipefail
+          if ls artifacts/ | grep -iE 'benchmark|sample|test|demo'; then
+            echo "::error::A non-shipping package is staged in artifacts/ — aborting before push."
+            exit 1
+          fi
+          echo "Packages to publish:"; ls -1 artifacts/*.nupkg
+
+      # Exchange the GitHub OIDC token for a short-lived nuget.org API key.
+      # Requires a Trusted Publisher policy on nuget.org + the NUGET_USER variable.
+      - name: NuGet login (Trusted Publishing / OIDC)
+        id: nuget-login
+        uses: NuGet/login@v1
+        with:
+          user: ${{ vars.NUGET_USER }}
+
+      - name: Push packages to NuGet
+        run: |
+          dotnet nuget push "artifacts/*.nupkg" \
+            --source https://api.nuget.org/v3/index.json \
+            --api-key "${{ steps.nuget-login.outputs.NUGET_API_KEY }}" \
+            --skip-duplicate
+
+      # Tag only after a successful publish, so a failed publish leaves no orphan
+      # tag/Release; the run is then retryable (the bump commit is idempotent).
+      - name: Tag the release
+        env:
+          REL: ${{ steps.ver.outputs.release }}
+          TAG: ${{ steps.ver.outputs.tag }}
+        run: |
+          set -euo pipefail
+          git tag -a "$TAG" -m "Release $REL"
+          git push origin "$TAG"
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.ver.outputs.tag }}
+        run: |
+          set -euo pipefail
+          PRERELEASE_FLAG=""
+          if [ "${{ steps.ver.outputs.prerelease }}" = "true" ]; then PRERELEASE_FLAG="--prerelease"; fi
+          gh release create "$TAG" --generate-notes $PRERELEASE_FLAG artifacts/*.nupkg artifacts/*.snupkg
+
+      - name: Open next-version PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REL:  ${{ steps.ver.outputs.release }}
+          NEXT: ${{ steps.ver.outputs.next }}
+        run: |
+          set -euo pipefail
+          bash build/set-version.sh "$NEXT"
+          if git diff --quiet -- build/version.props; then
+            echo "version.props already at $NEXT — no next-version PR needed"
+            exit 0
+          fi
+          BR="chore/bump-to-${NEXT}"
+          git checkout -b "$BR"
+          git commit -m "Prepare for next development version $NEXT" build/version.props
+          git push --force-with-lease origin "$BR"
+          gh pr create --base "${GITHUB_REF_NAME}" --head "$BR" \
+            --title "Prepare for next development version $NEXT" \
+            --body "Bumps \`build/version.props\` to \`$NEXT\` following the \`$REL\` release. Opened automatically by the Release workflow."

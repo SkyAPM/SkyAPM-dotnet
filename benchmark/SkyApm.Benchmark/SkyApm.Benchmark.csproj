@@ -1,6 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+        <!-- Internal benchmark harness — never publish it to nuget.org. -->
+        <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+        <IsPackable>false</IsPackable>
         <OutputType>Exe</OutputType>
     </PropertyGroup>
 
