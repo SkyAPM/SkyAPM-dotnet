@@ -25,7 +25,21 @@ namespace SkyApm.Transport.Grpc
 {
     public class ConnectService: ExecutionService
     {
+        // The timer ticks at BasePeriod; while the server is unreachable, reconnect attempts back off
+        // exponentially up to MaxBackoff so a long outage doesn't rebuild a channel every tick (issue #608).
+        private static readonly TimeSpan BasePeriod = TimeSpan.FromSeconds(15);
+        private static readonly TimeSpan MaxBackoff = TimeSpan.FromMinutes(5);
+
         private readonly ConnectionManager _connectionManager;
+
+        // _running guards against re-entrancy: the base timer is periodic and its callback is async void,
+        // so it re-fires every BasePeriod even while a previous connect attempt is still awaiting (a probe
+        // can take up to ConnectTimeout). Without this guard, attempts would stack up and rebuild a channel
+        // per tick, defeating the backoff (issue #608). Because it serialises ExecuteAsync, _backoff and
+        // _nextAttemptUtc are only ever touched by a single thread and need no further synchronisation.
+        private int _running;
+        private TimeSpan _backoff = BasePeriod;
+        private DateTime _nextAttemptUtc = DateTime.MinValue;
 
         public ConnectService(ConnectionManager connectionManager,
             IRuntimeEnvironment runtimeEnvironment,
@@ -35,16 +49,54 @@ namespace SkyApm.Transport.Grpc
         }
 
         protected override TimeSpan DueTime { get; } = TimeSpan.Zero;
-        protected override TimeSpan Period { get; } = TimeSpan.FromSeconds(15);
+        protected override TimeSpan Period { get; } = BasePeriod;
 
         protected override async Task ExecuteAsync(CancellationToken cancellationToken)
         {
-            if (!_connectionManager.Ready)
+            if (Interlocked.CompareExchange(ref _running, 1, 0) != 0)
             {
-                await _connectionManager.ConnectAsync();
+                // A previous attempt is still in flight; skip this tick.
+                return;
+            }
+
+            try
+            {
+                if (DateTime.UtcNow < _nextAttemptUtc)
+                {
+                    // Still inside the backoff window: skip until it elapses.
+                    return;
+                }
+
+                if (!_connectionManager.Ready)
+                {
+                    await _connectionManager.ConnectAsync(cancellationToken);
+                }
+
+                if (_connectionManager.Ready)
+                {
+                    // Connected: reset backoff so the next outage reconnects immediately.
+                    _backoff = BasePeriod;
+                    _nextAttemptUtc = DateTime.MinValue;
+                }
+                else
+                {
+                    // Still unreachable: defer the next attempt by the current backoff,
+                    // then grow it (capped at MaxBackoff) for the attempt after.
+                    _nextAttemptUtc = DateTime.UtcNow.Add(_backoff);
+                    var doubled = TimeSpan.FromTicks(_backoff.Ticks * 2);
+                    _backoff = doubled < MaxBackoff ? doubled : MaxBackoff;
+                }
+            }
+            finally
+            {
+                Interlocked.Exchange(ref _running, 0);
             }
         }
 
         protected override bool CanExecute() => !_connectionManager.Ready;
+
+        // Dispose the reused channel when the agent shuts down.
+        protected override Task Stopping(CancellationToken cancellationToken)
+            => _connectionManager.ShutdownAsync();
     }
 }
