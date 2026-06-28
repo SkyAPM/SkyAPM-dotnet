@@ -42,6 +42,10 @@ It is inert until a NuGet **Trusted Publisher** policy + the `NUGET_USER` repo v
 6. **Creates a GitHub Release** for the tag with auto-generated notes
    (`gh release create --generate-notes`), marked **prerelease** when the tag has a `-suffix`.
 
+> The Actions path derives the version from the **tag** (and prerelease from its `-suffix`), so
+> `VersionQuality` / `build/version.cake` are **not** consulted — editing them has no effect on a
+> GitHub Actions release.
+
 ## 3. Cutting a release
 
 1. **Bump the version** in `build/version.props` (`VersionMajor`/`Minor`/`Patch`) on a PR and merge
@@ -62,10 +66,16 @@ NuGet.org recommends **Trusted Publishing** (OIDC) over long-lived API keys for 
 **no secret is stored**:
 
 1. **Create a trusted-publisher policy on nuget.org.** Sign in with the account that owns the
-   `SkyApm.*` / `SkyAPM.*` packages → **Account → Trusted Publishing → Add** → **GitHub Actions**:
-   - Repository owner `SkyAPM`, repository `SkyAPM-dotnet`
-   - Workflow file `release.yml`
-   - (optional) restrict to the `SkyApm.*` / `SkyAPM.*` package glob
+   `SkyApm.*` / `SkyAPM.*` packages → click your **username → Trusted Publishing** → add a new policy:
+   - **Policy owner:** the nuget.org user/org that owns the packages. Trusted Publishing has **no
+     per-package glob** — the policy covers *all* packages owned by the selected owner.
+   - **Repository owner** `SkyAPM`, **Repository** `SkyAPM-dotnet`
+   - **Workflow file** `release.yml` — the file name only, **not** the `.github/workflows/` path
+   - (leave Environment empty — the workflow doesn't use a GitHub Environment)
+
+   > A new policy is "temporarily active for 7 days" until the first successful publish locks in the
+   > repo/owner IDs (resurrection-attack protection). Only relevant if the repo is private —
+   > SkyAPM-dotnet is public, so it activates permanently on the first publish.
 2. **Add a `NUGET_USER` repo variable** (repo → Settings → Secrets and variables → Actions →
    **Variables**, or at the SkyAPM org level) = your nuget.org username (the policy owner). This is a
    plain *variable*, not a secret.

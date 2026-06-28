@@ -37,9 +37,11 @@ jobs:
           VERSION="${GITHUB_REF_NAME#v}"
           BASE="${VERSION%%-*}"   # strip any -rc/-beta suffix for the props comparison
           # VersionPrefix is "$(VersionMajor).$(VersionMinor).$(VersionPatch)" — resolve from the parts.
-          MAJOR="$(grep -oE '<VersionMajor>[0-9]+' build/version.props | grep -oE '[0-9]+')"
-          MINOR="$(grep -oE '<VersionMinor>[0-9]+' build/version.props | grep -oE '[0-9]+')"
-          PATCH="$(grep -oE '<VersionPatch>[0-9]+' build/version.props | grep -oE '[0-9]+')"
+          read_part() { grep -oE "<$1>[0-9]+</$1>" build/version.props | grep -oE '[0-9]+' | head -1 || true; }
+          MAJOR="$(read_part VersionMajor)"; MINOR="$(read_part VersionMinor)"; PATCH="$(read_part VersionPatch)"
+          for p in MAJOR MINOR PATCH; do
+            [ -n "${!p}" ] || { echo "::error::could not read Version$p from build/version.props"; exit 1; }
+          done
           PROPS="${MAJOR}.${MINOR}.${PATCH}"
           echo "tag version: $VERSION (base $BASE) · version.props: $PROPS"
           if [ "$BASE" != "$PROPS" ]; then
@@ -53,7 +55,9 @@ jobs:
         run: dotnet restore
 
       - name: Build protocol (codegen) first
-        run: dotnet build src/SkyApm.Transport.Protocol -c Release --no-restore
+        # -p:GeneratePackageOnBuild=false avoids a stray, mis-versioned protocol nupkg
+        # (the global default packs on build); the real package is produced by Pack below.
+        run: dotnet build src/SkyApm.Transport.Protocol -c Release --no-restore -p:GeneratePackageOnBuild=false
 
       - name: Pack
         run: |
@@ -62,6 +66,18 @@ jobs:
             -p:ContinuousIntegrationBuild=true \
             -p:IncludeSymbols=true -p:SymbolPackageFormat=snupkg \
             -o artifacts
+
+      # Guard against an irreversible push of a non-shipping package (nuget.org
+      # packages cannot be deleted, only unlisted). Samples/tests/the e2e demo are
+      # IsPackable=false; this catches any future project that forgets to opt out.
+      - name: Verify only shipping packages are staged
+        run: |
+          set -euo pipefail
+          if ls artifacts/ | grep -iE 'benchmark|sample|test|demo'; then
+            echo "::error::A non-shipping package is staged in artifacts/ — aborting before push."
+            exit 1
+          fi
+          echo "Packages to publish:"; ls -1 artifacts/*.nupkg
 
       # Exchange the GitHub OIDC token for a short-lived nuget.org API key.
       # Requires a Trusted Publisher policy on nuget.org + the NUGET_USER variable.
@@ -84,4 +100,4 @@ jobs:
         run: |
           PRERELEASE_FLAG=""
           if [ "${{ steps.ver.outputs.prerelease }}" = "true" ]; then PRERELEASE_FLAG="--prerelease"; fi
-          gh release create "${GITHUB_REF_NAME}" --generate-notes $PRERELEASE_FLAG artifacts/*.nupkg
+          gh release create "${GITHUB_REF_NAME}" --generate-notes $PRERELEASE_FLAG artifacts/*.nupkg artifacts/*.snupkg
