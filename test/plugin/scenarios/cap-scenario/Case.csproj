@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <!-- TFM + CapVersion are supplied per matrix entry (Docker build args); the
+         defaults match the plugin's net8 baseline so the project builds standalone.
+         TargetFrameworks (plural) overrides the repo-wide net8.0;net10.0 from
+         Directory.Build.props so each matrix entry restores a single TFM. -->
+    <TargetFrameworks Condition="'$(TFM)' != ''">$(TFM)</TargetFrameworks>
+    <TargetFrameworks Condition="'$(TFM)' == ''">net8.0</TargetFrameworks>
+    <CapVersion Condition="'$(CapVersion)' == ''">8.0.0</CapVersion>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>SkyApm.PluginTest.Cap</RootNamespace>
+    <IsPackable>false</IsPackable>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- the agent + the CAP plugin, built FROM SOURCE so the test exercises current code -->
+    <ProjectReference Include="../../../../src/SkyApm.Agent.AspNetCore/SkyApm.Agent.AspNetCore.csproj" />
+    <ProjectReference Include="../../../../src/SkyApm.Diagnostics.CAP/SkyApm.Diagnostics.CAP.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- the instrumented library, at the version under test (NuGet unifies it for the
+         plugin too, so a newer CAP than the plugin compiled against is exercised) -->
+    <PackageReference Include="DotNetCore.CAP" Version="$(CapVersion)" />
+    <PackageReference Include="DotNetCore.CAP.InMemoryStorage" Version="$(CapVersion)" />
+    <PackageReference Include="Savorboard.CAP.InMemoryMessageQueue" Version="$(CapVersion)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <RuntimeHostConfigurationOption Include="System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport" Value="true" Trim="false" />
+    <Content Update="skyapm.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+</Project>

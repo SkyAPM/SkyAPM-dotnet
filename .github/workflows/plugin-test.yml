@@ -1,0 +1,50 @@
+name: Plugin Test
+
+# Per-plugin tests: each plugin scenario runs against a dedicated mock collector and asserts the REAL
+# emitted segments, version-by-version (see test/plugin/). One matrix job PER PLUGIN so results show
+# per plugin in the checks UI (like apache/skywalking-java's plugin-test). Heavier than unit tests
+# (Docker + a Java collector build), so it runs only when the agent, a plugin, or the framework changes.
+on:
+  push:
+    branches: [main]
+    paths: ['src/**', 'test/plugin/**', '.github/workflows/plugin-test.yml']
+  pull_request:
+    paths: ['src/**', 'test/plugin/**', '.github/workflows/plugin-test.yml']
+
+concurrency:
+  group: plugin-test-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Discover the scenarios so each becomes its own matrix entry (no need to edit this file per plugin).
+  discover:
+    runs-on: ubuntu-latest
+    outputs:
+      scenarios: ${{ steps.list.outputs.scenarios }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: list
+        run: |
+          scenarios=$(ls -d test/plugin/scenarios/*/ | xargs -n1 basename | jq -R . | jq -cs .)
+          echo "scenarios=$scenarios" >> "$GITHUB_OUTPUT"
+          echo "scenarios: $scenarios"
+
+  plugin-test:
+    needs: discover
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        scenario: ${{ fromJSON(needs.discover.outputs.scenarios) }}
+    name: ${{ matrix.scenario }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive   # the protocol-v3 codegen source
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '11'
+      - name: Run ${{ matrix.scenario }} (build collector + per-version build/run/validate)
+        run: bash test/plugin/run.sh ${{ matrix.scenario }}

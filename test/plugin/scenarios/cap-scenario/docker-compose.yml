@@ -1,0 +1,35 @@
+# CAP plugin-test stack: the dedicated mock collector (skyapm/mock-collector) + the
+# scenario app (agent attached, reporting to mock-collector:19876). The runner sets
+# TFM / CAP_VERSION / DOTNET_VERSION per matrix entry. Driven by ../../run.sh.
+services:
+  mock-collector:
+    # Built by ../../run.sh from the pinned apache/skywalking-agent-test-tool commit
+    # (the published :latest is from 2019 and predances the V8 management protocol).
+    image: ${COLLECTOR_IMAGE:-skyapm/mock-collector:dev}
+    networks: [plugin]
+    expose: ["19876"]
+    ports:
+      - "12800:12800"   # HTTP: /receiveData, /dataValidate, /healthCheck
+    healthcheck:
+      test: ["CMD", "bash", "-c", "echo > /dev/tcp/127.0.0.1/12800"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  case:
+    build:
+      context: ../../../..          # repo root (so src/ + the submodule are in the build context)
+      dockerfile: test/plugin/scenarios/cap-scenario/Dockerfile
+      args:
+        DOTNET_VERSION: "${DOTNET_VERSION:-8.0}"
+        TFM: "${TFM:-net8.0}"
+        CAP_VERSION: "${CAP_VERSION:-8.0.0}"
+    depends_on:
+      mock-collector:
+        condition: service_healthy
+    networks: [plugin]
+    ports:
+      - "8080:8080"
+
+networks:
+  plugin: {}

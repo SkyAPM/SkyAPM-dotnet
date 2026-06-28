@@ -17,6 +17,7 @@
  */
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using SkyApm.Logging;
@@ -26,6 +27,7 @@ namespace SkyApm.Diagnostics
     internal class TracingDiagnosticObserver : IObserver<KeyValuePair<string, object>>
     {
         private readonly Dictionary<string, TracingDiagnosticMethod> _methodCollection;
+        private readonly ConcurrentDictionary<string, byte> _disabledDiagnostics = new ConcurrentDictionary<string, byte>();
         private readonly ILogger _logger;
 
         public TracingDiagnosticObserver(ITracingDiagnosticProcessor tracingDiagnosticProcessor,
@@ -54,9 +56,25 @@ namespace SkyApm.Diagnostics
             if (!_methodCollection.TryGetValue(value.Key, out var method))
                 return;
 
+            if (_disabledDiagnostics.ContainsKey(value.Key))
+                return;
+
             try
             {
                 method.Invoke(value.Key, value.Value);
+            }
+            catch (Exception exception) when (exception is MissingMemberException || exception is TypeLoadException)
+            {
+                // A binding/structural error means the instrumented library's version is incompatible
+                // with this plugin (e.g. a diagnostic event type or property changed across versions).
+                // It fails deterministically for every event, so disable this handler after logging once
+                // instead of spamming the same error on every call (issue #565).
+                if (_disabledDiagnostics.TryAdd(value.Key, 0))
+                {
+                    _logger.Warning($"Disabled diagnostic handler '{value.Key}' due to an incompatible " +
+                                    "instrumented library version; ensure the installed package version matches " +
+                                    $"this SkyAPM plugin. {exception.GetType().Name}: {exception.Message}");
+                }
             }
             catch (Exception exception)
             {
