@@ -9,6 +9,11 @@ FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 ARG TFM=net8.0
 WORKDIR /src
 COPY . .
+# Build the protocol project FIRST so the gRPC/protobuf code is generated from the
+# protocol-v3 submodule before the transports compile (mirrors the repo CI). A
+# clean checkout has no generated-v3/ (it is gitignored), so without this the
+# Transport.Kafka build fails with missing SegmentObject/SpanObject types.
+RUN dotnet build src/SkyApm.Transport.Protocol -c Release
 RUN dotnet publish test/e2e/demo/Demo.csproj -c Release -f ${TFM} -o /app
 
 FROM mcr.microsoft.com/dotnet/aspnet:${DOTNET_VERSION} AS run
