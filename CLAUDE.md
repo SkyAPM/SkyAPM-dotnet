@@ -43,6 +43,11 @@ themes/hugo-... , hugo.toml, i18n/   docs site theme + config (.github/workflows
 - Config: `skyapm.json` (or env `SKYWALKING__...`, double-underscore). Agent no-ops if `ServiceName`
   empty or `SkyWalking:Enable=false`. Full reference: `content/docs/guides/skyapm_config.md`.
 - Plugins: a fixed default set is auto-registered; others are opt-in via the `AddSkyAPM(ext => …)` lambda.
+- Plugin tests (`test/plugin/`): each scenario runs the **real** instrumented library against a dedicated
+  mock collector and asserts the **real emitted segments**, version-by-version (`run.sh`). Tests must reflect
+  an **actual run** — never fabricate or assume a trace: capture via the collector's `/receiveData`, validate
+  via `/dataValidate`, and base `config/expectedData.yaml` on that. Only list a `<TFM> <version>` in
+  `support-version.list` once it has actually been run and passed (don't declare versions you haven't validated).
 - The repo also pins per-TFM package versions via `Condition="'$(TargetFramework)' == 'netX'"` blocks.
 - Project is **independent** — reports to Apache SkyWalking but is not an ASF/SkyWalking sub-project.
 - Commits: do **not** add a `Co-Authored-By: Claude …` trailer (or any AI co-author trailer) to commit messages.

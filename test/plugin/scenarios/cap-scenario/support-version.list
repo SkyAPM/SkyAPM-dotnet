@@ -1,10 +1,8 @@
 # Library versions to test the CAP plugin against, one per line: "<TFM> <DotNetCore.CAP version>".
 # Following the SkyWalking convention, list only the LATEST PATCH of each supported MINOR.
-# The plugin pins CAP 8.0.0 (net8) / 10.0.0 (net10) at compile time; thanks to NuGet
-# unification the scenario runs the plugin against the version listed here, so a newer CAP
-# than the plugin compiled against is genuinely exercised (this is what would catch #565).
+# ONLY list a version once it has actually been run and validated against the mock collector
+# (config/expectedData.yaml must reflect a real run, never an assumed shape) -- see CLAUDE.md.
+# The plugin pins CAP 8.0.0 (net8) / 10.0.0 (net10) at compile time; NuGet unification runs the
+# plugin against the version listed here, so a newer CAP than it compiled against is exercised.
 net8.0 8.0.0
-# net10.0 10.0.0 — pending: CAP 10's in-memory queue dispatches the publish synchronously inside
-# the HTTP request, so the publisher span is an Exit (with a ref) rather than the standalone Entry
-# seen on CAP 8; this scenario's expectedData would need a net10 variant. (Validating net10 already
-# surfaced + fixed the CapCarrierHeaderCollection duplicate-sw8 bug.)
+net10.0 10.0.0
