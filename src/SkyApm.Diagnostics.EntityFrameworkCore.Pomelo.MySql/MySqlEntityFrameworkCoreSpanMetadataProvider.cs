@@ -35,7 +35,12 @@ namespace SkyApm.Diagnostics.EntityFrameworkCore
         
         public bool Match(DbConnection connection)
         {
-            return connection.GetType().FullName == "MySql.Data.MySqlClient.MySqlConnection";
+            // Pomelo.EntityFrameworkCore.MySql switched to MySqlConnector in its 3.0 release; older
+            // 2.x versions used MySql.Data. Match both so the command is recorded as an exit span
+            // (required for virtual-database detection). Mirrors MySqlConnectorPeerFormatter. (#536)
+            var fullName = connection.GetType().FullName;
+            return fullName == "MySql.Data.MySqlClient.MySqlConnection"
+                || fullName == "MySqlConnector.MySqlConnection";
         }
 
         public string GetPeer(DbConnection connection)
