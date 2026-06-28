@@ -91,10 +91,14 @@ jobs:
         run: dotnet build src/SkyApm.Transport.Protocol -c Release --no-restore -p:GeneratePackageOnBuild=false
 
       - name: Pack
+        # -p:GeneratePackageOnBuild=false is REQUIRED: build/common.props sets it true
+        # globally, which makes `dotnet pack` try to pack-on-build before all TFMs
+        # (net8/net10/netstandard2.0) are built — failing with NU5026 "dll not found".
         run: |
           dotnet pack skyapm-dotnet.sln -c Release --no-restore \
             -p:Version=${{ steps.ver.outputs.release }} \
             -p:ContinuousIntegrationBuild=true \
+            -p:GeneratePackageOnBuild=false \
             -p:IncludeSymbols=true -p:SymbolPackageFormat=snupkg \
             -o artifacts
 
