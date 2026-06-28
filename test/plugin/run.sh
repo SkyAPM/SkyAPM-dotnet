@@ -51,23 +51,21 @@ ensure_collector() {
   rm -rf "$work" "$ctx"
 }
 
-# Wait until the collector has received at least one segment, then validate.
+# Segments flush to the collector asynchronously (CAP dispatches on background threads, and the
+# agent batches), so a single shot can validate before everything arrives. Each attempt FIRES
+# TRAFFIC, WAITS, then VALIDATES; we retry the whole loop until it passes or the attempts run out.
+VALIDATE_ATTEMPTS="${VALIDATE_ATTEMPTS:-10}"
+VALIDATE_WAIT="${VALIDATE_WAIT:-20}"
+
+drive_traffic() {
+  for _ in 1 2 3 4 5; do curl -sf --max-time 5 "http://localhost:${ENTRY_PORT}/case/cap" >/dev/null 2>&1 || true; done
+}
+
 validate() {
   local expected="$1"
-  for _ in $(seq 1 30); do
-    if curl -sf --max-time 10 "$COLLECTOR_HTTP/receiveData" 2>/dev/null | grep -q "segmentId:"; then
-      break
-    fi
-    sleep 2
-  done
   local code; code="$(curl -s -o /tmp/plugin-validate.out -w '%{http_code}' --max-time 20 \
     -X POST --data-binary @"$expected" "$COLLECTOR_HTTP/dataValidate")"
-  if [ "$code" = "200" ]; then
-    return 0
-  fi
-  log "VALIDATION FAILED (HTTP $code):"
-  sed -n '/cause by/,$p' /tmp/plugin-validate.out | head -40
-  return 1
+  [ "$code" = "200" ]
 }
 
 run_case() {
@@ -79,13 +77,20 @@ run_case() {
     TFM="$tfm" CAP_VERSION="$ver" DOTNET_VERSION="$dotnet" \
       docker compose up -d --build --quiet-pull
   )
-  local rc=0
-  # health-gate the app, then drive the entry endpoint a few times
+  # health-gate the app
   for _ in $(seq 1 30); do
     curl -sf --max-time 5 "http://localhost:${ENTRY_PORT}/case/healthCheck" >/dev/null 2>&1 && break || sleep 2
   done
-  for _ in $(seq 1 5); do curl -sf --max-time 5 "http://localhost:${ENTRY_PORT}/case/cap" >/dev/null 2>&1 || true; sleep 1; done
-  validate "$scen/config/expectedData.yaml" || rc=1
+  local rc=1
+  for attempt in $(seq 1 "$VALIDATE_ATTEMPTS"); do
+    drive_traffic
+    sleep "$VALIDATE_WAIT"
+    if validate "$scen/config/expectedData.yaml"; then rc=0; break; fi
+    log "attempt $attempt/$VALIDATE_ATTEMPTS: not valid yet, retrying"
+  done
+  if [ "$rc" -ne 0 ]; then
+    log "VALIDATION FAILED:"; sed -n '/cause by/,$p' /tmp/plugin-validate.out | head -40
+  fi
   ( cd "$scen" && docker compose down -v >/dev/null 2>&1 || true )
   return $rc
 }
