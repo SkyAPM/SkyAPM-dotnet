@@ -11,7 +11,8 @@ cd "$(dirname "$0")"
 COMPOSE="docker compose -f docker-compose.yml"
 OAP_GRAPHQL="http://localhost:12800/graphql"
 
-cleanup() { $COMPOSE down -v >/dev/null 2>&1 || true; }
+# Set SKIP_CLEANUP=1 (e.g. in CI) to leave the stack up so logs can be collected.
+cleanup() { [ -n "${SKIP_CLEANUP:-}" ] && return 0; $COMPOSE down -v >/dev/null 2>&1 || true; }
 trap cleanup EXIT
 
 echo "==> (1/4) build + start stack (OAP + BanyanDB + demo-net8 + demo-net10)"
