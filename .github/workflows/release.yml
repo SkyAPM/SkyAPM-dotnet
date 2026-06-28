@@ -1,8 +1,10 @@
 name: Release
 
 # Publishes all NuGet packages + a GitHub Release when a vX.Y.Z tag is pushed.
-# Requires the NUGET_API_KEY secret (see RELEASING.md). The strong-name key is
-# committed in the repo, so no signing secret is needed.
+# Uses NuGet **Trusted Publishing** (OIDC) — no API-key secret to store. Configure
+# a trusted-publisher policy on nuget.org (repo + this workflow) and set the
+# NUGET_USER repo variable; see RELEASING.md. The strong-name key is committed,
+# so no signing secret is needed either.
 
 on:
   push:
@@ -11,6 +13,7 @@ on:
 
 permissions:
   contents: write   # create the GitHub Release
+  id-token: write   # OIDC token for NuGet Trusted Publishing
 
 jobs:
   release:
@@ -60,11 +63,19 @@ jobs:
             -p:IncludeSymbols=true -p:SymbolPackageFormat=snupkg \
             -o artifacts
 
+      # Exchange the GitHub OIDC token for a short-lived nuget.org API key.
+      # Requires a Trusted Publisher policy on nuget.org + the NUGET_USER variable.
+      - name: NuGet login (Trusted Publishing / OIDC)
+        id: nuget-login
+        uses: NuGet/login@v1
+        with:
+          user: ${{ vars.NUGET_USER }}
+
       - name: Push packages to NuGet
         run: |
           dotnet nuget push "artifacts/*.nupkg" \
             --source https://api.nuget.org/v3/index.json \
-            --api-key "${{ secrets.NUGET_API_KEY }}" \
+            --api-key "${{ steps.nuget-login.outputs.NUGET_API_KEY }}" \
             --skip-duplicate
 
       - name: Create GitHub Release

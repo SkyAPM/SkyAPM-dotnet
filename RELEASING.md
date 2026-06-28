@@ -3,8 +3,9 @@
 Status: **proposed automation** · Goal: pushing a `vX.Y.Z` tag **automatically** builds, packs,
 signs, publishes all NuGet packages to nuget.org, and creates a GitHub Release.
 
-The draft workflow that implements this is [`.github/workflows/release.yml`](.github/workflows/release.yml).
-It is inert until the `NUGET_API_KEY` secret is added (see [§4](#4-one-time-setup)).
+The workflow that implements this is [`.github/workflows/release.yml`](.github/workflows/release.yml).
+It is inert until a NuGet **Trusted Publisher** policy + the `NUGET_USER` repo variable are configured
+(see [§4](#4-one-time-setup-nuget-trusted-publishing--no-api-key)).
 
 ---
 
@@ -35,7 +36,9 @@ It is inert until the `NUGET_API_KEY` secret is added (see [§4](#4-one-time-set
    `dotnet pack -p:Version=$VERSION -p:ContinuousIntegrationBuild=true -p:SymbolPackageFormat=snupkg`
    → `./artifacts`. (Samples are excluded via `sample/Directory.Build.props` → `IsPackable=false`;
    test projects are already `IsPackable=false`.)
-5. **Pushes** `*.nupkg` + `*.snupkg` to nuget.org with `--skip-duplicate` (re-runs are safe).
+5. **Authenticates via OIDC** — the `NuGet/login` action exchanges the GitHub OIDC token for a
+   short-lived nuget.org key (Trusted Publishing; needs `permissions: id-token: write`) — then
+   **pushes** `*.nupkg` + `*.snupkg` with `--skip-duplicate` (re-runs are safe).
 6. **Creates a GitHub Release** for the tag with auto-generated notes
    (`gh release create --generate-notes`), marked **prerelease** when the tag has a `-suffix`.
 
@@ -53,12 +56,25 @@ It is inert until the `NUGET_API_KEY` secret is added (see [§4](#4-one-time-set
 4. **Prereleases:** tag like `v2.4.0-rc1` → published as a NuGet prerelease and a GitHub
    *pre-release*. (`version.props` may stay at `2.4.0`; only the base is compared.)
 
-## 4. One-time setup
+## 4. One-time setup (NuGet Trusted Publishing — no API key)
 
-- **Add the `NUGET_API_KEY` secret** (repo → Settings → Secrets and variables → Actions, or at the
-  SkyAPM org level). Create the key on nuget.org scoped to **Glob `SkyApm.*` and `SkyAPM.*`** with
-  push + push-new-package rights.
-- That's the only required secret. The strong-name key is already in the repo.
+NuGet.org recommends **Trusted Publishing** (OIDC) over long-lived API keys for CI. Set it up once —
+**no secret is stored**:
+
+1. **Create a trusted-publisher policy on nuget.org.** Sign in with the account that owns the
+   `SkyApm.*` / `SkyAPM.*` packages → **Account → Trusted Publishing → Add** → **GitHub Actions**:
+   - Repository owner `SkyAPM`, repository `SkyAPM-dotnet`
+   - Workflow file `release.yml`
+   - (optional) restrict to the `SkyApm.*` / `SkyAPM.*` package glob
+2. **Add a `NUGET_USER` repo variable** (repo → Settings → Secrets and variables → Actions →
+   **Variables**, or at the SkyAPM org level) = your nuget.org username (the policy owner). This is a
+   plain *variable*, not a secret.
+
+The strong-name key is already committed, so there is no signing secret either. The workflow's
+`permissions: id-token: write` (already set) lets `NuGet/login` perform the OIDC exchange.
+
+> **Fallback:** for local/manual publishing or unsupported CI, an API key still works:
+> `dotnet nuget push <pkg> --api-key <key> --source https://api.nuget.org/v3/index.json`.
 
 ## 5. Decisions taken (no-ask defaults) & open questions
 
