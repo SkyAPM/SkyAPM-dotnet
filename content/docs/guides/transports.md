@@ -124,6 +124,25 @@ leaves them untouched:
 }
 ```
 
+### TLS / SSL
+
+Because the `http://` prefix is only added when the address has no scheme, giving an
+explicit **`https://`** address makes the agent connect to OAP over **TLS** — point it
+at the OAP's TLS gRPC port:
+
+```json
+{
+  "SkyWalking:Transport:gRPC:Servers": "https://your-oap-host:443"
+}
+```
+
+The server certificate is validated against the host's trust store (system CA roots),
+so this works out of the box for certificates issued by a trusted CA. There is
+currently **no** option for a custom / self-signed CA or for mutual (client) TLS —
+those would require a custom `HttpClientHandler`, which the agent does not expose
+today. (`Authentication`, below, is unrelated to TLS — it is an application token
+sent as gRPC metadata.)
+
 ### Authentication
 
 If the OAP backend has token authentication enabled, set `Authentication` to the
