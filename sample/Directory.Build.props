@@ -1,0 +1,12 @@
+<Project>
+  <!-- Import the repo-root props (TargetFrameworks, common.props, version, signing). -->
+  <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
+
+  <PropertyGroup>
+    <!-- Sample apps are not published to NuGet. This keeps `dotnet pack` (release)
+         from emitting sample packages even though common.props sets
+         GeneratePackageOnBuild=True. -->
+    <IsPackable>false</IsPackable>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+  </PropertyGroup>
+</Project>
