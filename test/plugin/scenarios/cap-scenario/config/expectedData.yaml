@@ -23,6 +23,13 @@ segmentItems:
             tags:
               - {key: mq.topic, value: skyapm.plugin.test.cap}
               - {key: mq.broker, value: localhost}
+            # the publish is traced from the request's context: a cross-process ref back to the
+            # GET:/case/cap entry span (CAP dispatches the send on a background thread, so the
+            # publisher is a linked segment rather than a nested child).
+            refs:
+              - {parentEndpoint: GET:/case/cap, networkAddress: not null, refType: CrossProcess,
+                 parentSpanId: 0, parentTraceSegmentId: not null, parentServiceInstance: not null,
+                 parentService: cap-scenario, traceId: not null}
             logs:
               - logEvent:
                   - {key: event, value: Event Publishing Start}
@@ -49,6 +56,12 @@ segmentItems:
             tags:
               - {key: mq.topic, value: skyapm.plugin.test.cap}
               - {key: mq.broker, value: localhost}
+            # the consume is also traced from the request's context: a cross-process ref back to
+            # the GET:/case/cap entry span (carried via the injected sw8 header).
+            refs:
+              - {parentEndpoint: GET:/case/cap, networkAddress: not null, refType: CrossProcess,
+                 parentSpanId: 0, parentTraceSegmentId: not null, parentServiceInstance: not null,
+                 parentService: cap-scenario, traceId: not null}
             logs:
               - logEvent:
                   - {key: event, value: Event Persistence Start}
