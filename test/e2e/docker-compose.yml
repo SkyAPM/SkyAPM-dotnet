@@ -1,0 +1,72 @@
+# End-to-end stack: a PINNED Apache SkyWalking OAP + BanyanDB storage, plus the
+# .NET 8 and .NET 10 demo services (agent built from source). Everything runs on
+# one Docker network so the agent reaches OAP's plaintext gRPC (h2c) directly —
+# do NOT rely on host port-forwarding for the agent->OAP gRPC (Docker Desktop on
+# macOS mangles cleartext HTTP/2 over the host forward).
+#
+#   docker compose -f test/e2e/docker-compose.yml up -d --build
+#
+# Pin the SkyWalking/BanyanDB versions here (override via env if needed).
+
+services:
+  banyandb:
+    image: ${BANYANDB_IMAGE:-ghcr.io/apache/skywalking-banyandb:7ae98e0b6addfe216b32712c57c054eabee5a4c2}
+    command: ["standalone"]
+    networks: [e2e]
+    expose: ["17912"]
+    healthcheck:
+      test: ["CMD", "sh", "-c", "nc -nz 127.0.0.1 17912"]
+      interval: 5s
+      timeout: 60s
+      retries: 60
+
+  oap:
+    image: ${OAP_IMAGE:-ghcr.io/apache/skywalking/oap:bb16533009a597dbb41ab6f013ac300509abbb3e}
+    depends_on:
+      banyandb:
+        condition: service_healthy
+    networks: [e2e]
+    ports:
+      - "12800:12800"   # query/GraphQL (swctl verifies here over HTTP — host-forward is fine for HTTP/1.1)
+    environment:
+      SW_STORAGE: banyandb
+      SW_STORAGE_BANYANDB_TARGETS: banyandb:17912
+      SW_HEALTH_CHECKER: default
+      JAVA_OPTS: "-Xms512m -Xmx512m"
+    healthcheck:
+      test: ["CMD", "bash", "-c", "cat < /dev/null > /dev/tcp/127.0.0.1/12800"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 90s
+
+  demo-net8:
+    build:
+      context: ../..
+      dockerfile: test/e2e/demo/Dockerfile
+      args: { DOTNET_VERSION: "8.0", TFM: "net8.0" }
+    depends_on:
+      oap:
+        condition: service_healthy
+    networks: [e2e]
+    ports: ["18801:8080"]
+    environment:
+      SKYWALKING__SERVICENAME: e2e-demo-net8
+      SKYWALKING__TRANSPORT__GRPC__SERVERS: oap:11800
+
+  demo-net10:
+    build:
+      context: ../..
+      dockerfile: test/e2e/demo/Dockerfile
+      args: { DOTNET_VERSION: "10.0", TFM: "net10.0" }
+    depends_on:
+      oap:
+        condition: service_healthy
+    networks: [e2e]
+    ports: ["18802:8080"]
+    environment:
+      SKYWALKING__SERVICENAME: e2e-demo-net10
+      SKYWALKING__TRANSPORT__GRPC__SERVERS: oap:11800
+
+networks:
+  e2e: {}

@@ -1,0 +1,14 @@
+# Keep the e2e demo build context small (src + protocol-v3 submodule + build props).
+**/bin/
+**/obj/
+artifacts/
+public/
+resources/
+.git/
+themes/
+content/
+i18n/
+node_modules/
+*.log
+test/e2e/**/app*.log
+test/e2e/**/actualData.yaml
