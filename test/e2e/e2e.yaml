@@ -1,0 +1,36 @@
+# Apache skywalking-infra-e2e configuration. Run with the `e2e` CLI:
+#   e2e run -c test/e2e/e2e.yaml
+# (or via the apache/skywalking-infra-e2e GitHub Action in CI.)
+#
+# Boots the pinned OAP + BanyanDB + the .NET 8 / .NET 10 demos (docker-compose.yml),
+# drives traffic, then verifies the services/traces are present in OAP via swctl.
+# swctl must be on PATH and pointed at http://localhost:12800.
+
+setup:
+  env: compose
+  file: docker-compose.yml
+  timeout: 25m
+  init-system-environment: ../../skywalking-infra-e2e/script/env  # optional; ignore if absent
+  steps:
+    - name: generate traffic on both demos
+      command: |
+        for i in $(seq 1 15); do
+          curl -sf http://localhost:18801/work >/dev/null || true
+          curl -sf http://localhost:18802/work >/dev/null || true
+          sleep 1
+        done
+        # allow OAP/BanyanDB to index traces, logs and metrics
+        sleep 45
+
+cleanup:
+  on: always
+
+verify:
+  retry:
+    count: 20
+    interval: 10s
+  cases:
+    # Asserts trace + log + CLR metric reached OAP for both demo services, via
+    # the OAP GraphQL API (version-robust). stdout is `result: PASSED` on success.
+    - query: python3 verify.py
+      expected: expected/result.yml
