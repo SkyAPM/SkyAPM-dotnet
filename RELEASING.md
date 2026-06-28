@@ -77,8 +77,10 @@ NuGet.org recommends **Trusted Publishing** (OIDC) over long-lived API keys for 
    > repo/owner IDs (resurrection-attack protection). Only relevant if the repo is private —
    > SkyAPM-dotnet is public, so it activates permanently on the first publish.
 2. **Add a `NUGET_USER` repo variable** (repo → Settings → Secrets and variables → Actions →
-   **Variables**, or at the SkyAPM org level) = your nuget.org username (the policy owner). This is a
-   plain *variable*, not a secret.
+   **Variables**, or at the SkyAPM org level) = your **individual nuget.org username / profile name**
+   (e.g. `wu-sheng`) — **not** your email, and **not** the org name, even when the policy *owner* is
+   the `skyapm` org. You must stay an active member of that org for the policy to remain valid. This
+   is a plain *variable*, not a secret.
 
 The strong-name key is already committed, so there is no signing secret either. The workflow's
 `permissions: id-token: write` (already set) lets `NuGet/login` perform the OIDC exchange.
