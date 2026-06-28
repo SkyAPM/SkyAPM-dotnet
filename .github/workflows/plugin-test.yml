@@ -1,0 +1,39 @@
+name: Plugin Test
+
+# Per-plugin tests: run each plugin scenario against a dedicated mock collector and assert the
+# REAL emitted segments, version-by-version (see test/plugin/). Heavier than unit tests (Docker +
+# a Java collector build), so it runs only when the agent, a plugin, or the framework changes.
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'test/plugin/**'
+      - '.github/workflows/plugin-test.yml'
+  pull_request:
+    paths:
+      - 'src/**'
+      - 'test/plugin/**'
+      - '.github/workflows/plugin-test.yml'
+
+concurrency:
+  group: plugin-test-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  plugin-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive   # the protocol-v3 codegen source
+
+      # Needed to build the mock collector from the pinned agent-test-tool commit.
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '11'
+
+      - name: Run plugin scenarios (build collector + per-version build/run/validate)
+        run: bash test/plugin/run.sh

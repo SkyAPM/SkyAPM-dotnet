@@ -1,0 +1,13 @@
+{
+  "SkyWalking": {
+    "ServiceName": "cap-scenario",
+    "Sampling": {
+      "SamplePer3Secs": -1
+    },
+    "Transport": {
+      "gRPC": {
+        "Servers": "mock-collector:19876"
+      }
+    }
+  }
+}

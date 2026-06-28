@@ -1,0 +1,60 @@
+# Expected emitted segments for the CAP plugin scenario, validated against the data
+# the mock collector actually received (POST to /dataValidate). Variable fields use
+# matchers (nq 0 = not-equal-0, "not null", "not blank"); the CAP publisher and
+# subscriber segments are matched as a subset of all captured segments.
+segmentItems:
+  - serviceName: cap-scenario
+    segmentSize: nq 0
+    segments:
+      # CAP publisher span (created on ICapPublisher.PublishAsync)
+      - segmentId: not null
+        spans:
+          - operationName: CAP/skyapm.plugin.test.cap/Publisher
+            parentSpanId: -1
+            spanId: 0
+            spanLayer: MQ
+            startTime: nq 0
+            endTime: nq 0
+            componentId: 3004
+            isError: false
+            spanType: Entry
+            peer: localhost
+            skipAnalysis: false
+            tags:
+              - {key: mq.topic, value: skyapm.plugin.test.cap}
+              - {key: mq.broker, value: localhost}
+            logs:
+              - logEvent:
+                  - {key: event, value: Event Publishing Start}
+              - logEvent:
+                  - {key: message, value: CAP message publishing start...}
+              - logEvent:
+                  - {key: event, value: Event Publishing End}
+              - logEvent:
+                  - {key: message, value: not blank}
+      # CAP subscriber (message persistence) span
+      - segmentId: not null
+        spans:
+          - operationName: CAP/cap.queue.case.v1/skyapm.plugin.test.cap/Subscriber
+            parentSpanId: -1
+            spanId: 0
+            spanLayer: Database
+            startTime: nq 0
+            endTime: nq 0
+            componentId: 3004
+            isError: false
+            spanType: Entry
+            peer: localhost
+            skipAnalysis: false
+            tags:
+              - {key: mq.topic, value: skyapm.plugin.test.cap}
+              - {key: mq.broker, value: localhost}
+            logs:
+              - logEvent:
+                  - {key: event, value: Event Persistence Start}
+              - logEvent:
+                  - {key: message, value: CAP message persistence start...}
+              - logEvent:
+                  - {key: event, value: Event Persistence End}
+              - logEvent:
+                  - {key: message, value: not blank}
