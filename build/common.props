@@ -8,7 +8,7 @@
         <PackagePrefix>SkyAPM</PackagePrefix>
         <PackageIconUrl>https://avatars2.githubusercontent.com/u/32165127</PackageIconUrl>
         <PackageProjectUrl>https://github.com/SkyAPM/SkyAPM-dotnet</PackageProjectUrl>
-        <PackageLicenseExpression>APACHE-2.0</PackageLicenseExpression>
+        <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
         <RepositoryType>git</RepositoryType>
         <RepositoryUrl>https://github.com/SkyAPM/SkyAPM-dotnet</RepositoryUrl>
         <GenerateAssemblyConfigurationAttribute>True</GenerateAssemblyConfigurationAttribute>
