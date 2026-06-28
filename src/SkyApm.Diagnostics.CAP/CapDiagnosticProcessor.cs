@@ -112,34 +112,29 @@ namespace SkyApm.Diagnostics.CAP
         [DiagnosticName(CapEvents.BeforePublish)]
         public void BeforePublish([Object] CapEventDataPubSend eventData)
         {
-            SegmentContext context = null;
+            var operationName = OperateNamePrefix + eventData.Operation + ProducerOperateNameSuffix;
             var host = eventData.BrokerAddress.Endpoint?.Replace("-1", "5672");
-            if (_contexts.TryGetValue(eventData.TransportMessage.GetId(), out var ctx))
+
+            // A publish is outbound, so it must be an EXIT span. CAP performs the actual send on a
+            // background dispatcher thread where the originating request's entry context isn't present;
+            // restore the context stashed at publish-store time so the exit is created as a child of
+            // that request (and the consumer, extracting the injected sw8, continues from this exit).
+            var restoredEntry = false;
+            if (_entrySegmentContextAccessor.Context == null
+                && _contexts.TryGetValue(eventData.TransportMessage.GetId(), out var ctx) && ctx != null)
             {
-                var header = new CapCarrierHeaderCollection(eventData.TransportMessage);
-                if (_entrySegmentContextAccessor.Context == null)
-                {
-                    _carrierPropagator.Inject(ctx, header);
-                    context = _tracingContext.CreateEntrySegmentContext(
-                        OperateNamePrefix + eventData.Operation + ProducerOperateNameSuffix,
-                        header);
-                }
-                else
-                {
-                    context = _tracingContext.CreateExitSegmentContext(
-                        OperateNamePrefix + eventData.Operation + ProducerOperateNameSuffix,
-                        host, header);
-                    _carrierPropagator.Inject(context, new CapCarrierHeaderCollection(eventData.TransportMessage));
-                }
-            }
-            else
-            {
-                // may be come from retry loop
-                var carrierHeader = new CapCarrierHeaderCollection(eventData.TransportMessage);
-                var operationName = OperateNamePrefix + eventData.Operation + ProducerOperateNameSuffix;
-                context = _tracingContext.CreateEntrySegmentContext(operationName, carrierHeader);
+                _entrySegmentContextAccessor.Context = ctx;
+                restoredEntry = true;
             }
 
+            // CreateExitSegmentContext injects the carrier (sw8) header so the consumer continues this trace.
+            var context = _tracingContext.CreateExitSegmentContext(operationName, host,
+                new CapCarrierHeaderCollection(eventData.TransportMessage));
+
+            if (restoredEntry)
+            {
+                _entrySegmentContextAccessor.Context = null;
+            }
 
             context.Span.SpanLayer = SpanLayer.MQ;
             context.Span.Component = GetComponent(eventData.BrokerAddress, true);
