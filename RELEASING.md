@@ -52,12 +52,19 @@ It is inert until a NuGet **Trusted Publisher** policy + the `NUGET_USER` repo v
 ## 3. Cutting a release
 
 1. Go to **Actions → Release → Run workflow** and enter:
-   - **release_version** — e.g. `2.3.0` (or `2.4.0-rc1` for a prerelease)
-   - **next_version** — the next development version, e.g. `2.4.0`
+   - **release_version** — e.g. `2.3.0` (or `2.3.0-rc1` for a prerelease)
+   - **next_version** — the next development version, a **plain number** e.g. `2.4.0`
 2. The run bumps + commits + tags, publishes to nuget.org, creates the GitHub Release, and opens the
    next-version PR. **Merge that PR** to continue development on `next_version`.
-3. **Prereleases:** `release_version` `2.4.0-rc1` → published as a NuGet prerelease + GitHub
-   *pre-release*; `version.props` is set to the base `2.4.0`.
+3. **Prereleases (e.g. an RC):** set `release_version` to `2.3.0-rc1` → published as a NuGet
+   prerelease + GitHub *pre-release*; `version.props` is set to the base `2.3.0`. **For an RC, set
+   `next_version` to the same base** (`2.3.0`) — the next-version PR is then skipped, so you don't
+   prematurely bump to the next minor before the stable release. (An RC whose base equals the current
+   `version.props` makes no release commit at all — only the tag — so it doesn't touch `main`.)
+
+> **Dev-version convention:** `version.props` carries a **plain** number between releases (no
+> `-dev`/`-preview` suffix). That matches every committed version in this repo's history — the old
+> `-preview`/`-dev` suffixes were build-time stamps from the (now-unused) Cake script, never committed.
 
 > **Requirements:** the workflow pushes the release commit + tag directly, so branch protection on
 > the run branch must allow the `github-actions` bot to push (or have no direct-push restriction).
