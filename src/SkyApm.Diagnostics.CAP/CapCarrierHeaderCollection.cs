@@ -44,7 +44,10 @@ namespace SkyApm.Diagnostics.CAP
 
         public void Add(string key, string value)
         {
-            _messageHeaders.Add(key, value);
+            // Overwrite rather than Dictionary.Add: a message can already carry an sw8 header when
+            // the transport re-publishes it (e.g. CAP's in-memory queue), and Add throws on a
+            // duplicate key. Injecting the carrier must be idempotent.
+            _messageHeaders[key] = value;
         }
 
         IEnumerator IEnumerable.GetEnumerator()
