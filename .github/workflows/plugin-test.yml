@@ -46,6 +46,5 @@ jobs:
         with:
           distribution: temurin
           java-version: '11'
-          cache: maven            # cache the mock-collector build deps
       - name: Run ${{ matrix.scenario }} (build collector + per-version build/run/validate)
         run: bash test/plugin/run.sh ${{ matrix.scenario }}
