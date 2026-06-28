@@ -2,22 +2,40 @@ name: E2E
 
 # Builds the .NET 8 / .NET 10 demo services (agent from source), boots a pinned
 # SkyWalking OAP + BanyanDB, and verifies trace/log/metric reached OAP.
-# Heavy (~10-15 min), so it only runs when the agent or the e2e changes.
+#
+# Runs on any change that could affect code or packaging — and SKIPS only pure
+# docs/website and CI-config changes. This is a deny-list (paths-ignore) on
+# purpose: any new code/build path triggers e2e automatically, which is safer
+# than an allow-list that silently misses things (e.g. build/** previously did).
 
 on:
   push:
     branches: [main]
-    paths:
-      - 'src/**'
-      - 'test/e2e/**'
-      - '.dockerignore'
-      - '.github/workflows/e2e.yml'
+    paths-ignore:
+      - '**/*.md'
+      - 'content/**'
+      - 'themes/**'
+      - 'i18n/**'
+      - 'layouts/**'
+      - 'static/**'
+      - 'hugo.toml'
+      - 'LICENSE'
+      - '.github/workflows/docs.yml'
+      - '.github/workflows/release.yml'
+      - '.github/workflows/net-ci-it.yml'
   pull_request:
-    paths:
-      - 'src/**'
-      - 'test/e2e/**'
-      - '.dockerignore'
-      - '.github/workflows/e2e.yml'
+    paths-ignore:
+      - '**/*.md'
+      - 'content/**'
+      - 'themes/**'
+      - 'i18n/**'
+      - 'layouts/**'
+      - 'static/**'
+      - 'hugo.toml'
+      - 'LICENSE'
+      - '.github/workflows/docs.yml'
+      - '.github/workflows/release.yml'
+      - '.github/workflows/net-ci-it.yml'
   workflow_dispatch:
 
 permissions:
