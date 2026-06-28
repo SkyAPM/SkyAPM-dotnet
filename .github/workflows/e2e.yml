@@ -1,0 +1,47 @@
+name: E2E
+
+# Builds the .NET 8 / .NET 10 demo services (agent from source), boots a pinned
+# SkyWalking OAP + BanyanDB, and verifies trace/log/metric reached OAP.
+# Heavy (~10-15 min), so it only runs when the agent or the e2e changes.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'test/e2e/**'
+      - '.dockerignore'
+      - '.github/workflows/e2e.yml'
+  pull_request:
+    paths:
+      - 'src/**'
+      - 'test/e2e/**'
+      - '.dockerignore'
+      - '.github/workflows/e2e.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive   # protocol-v3 is needed to build the agent in the demo image
+          fetch-depth: 0
+
+      - name: Run end-to-end test (OAP + BanyanDB + net8/net10 demos)
+        env:
+          SKIP_CLEANUP: "1"       # let the steps below collect logs / tear down
+        run: bash test/e2e/run.sh
+
+      - name: Dump container logs on failure
+        if: failure()
+        run: docker compose -f test/e2e/docker-compose.yml logs --tail=200 || true
+
+      - name: Tear down
+        if: always()
+        run: docker compose -f test/e2e/docker-compose.yml down -v || true

@@ -45,6 +45,7 @@ enableRobotsTXT = true
   [params.footer]
     enable = true
     displayCopyright = true
+    displayPoweredBy = false
 
   [params.editURL]
     enable = true

@@ -48,6 +48,10 @@ This agent speaks the SkyWalking **v8** protocol and propagates context with the
 
 - [How to Build](guides/how-to-build.md) — compile the agent from source, including the Git submodule and protocol-build steps.
 
+### End-to-End Testing
+
+- [End-to-End Testing](guides/e2e.md) — the containerized e2e (OAP + BanyanDB + .NET 8/10 demos) that verifies trace, log, and metric reporting.
+
 ## Quick Reference
 
 | Topic | Default | Notes |

@@ -1,0 +1,10 @@
+{
+  "SkyWalking": {
+    "ServiceName": "e2e-demo",
+    "Transport": {
+      "gRPC": {
+        "Servers": "localhost:19876"
+      }
+    }
+  }
+}
