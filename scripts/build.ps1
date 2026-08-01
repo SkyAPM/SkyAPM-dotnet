@@ -162,7 +162,7 @@ if(-Not $SkipToolPackageRestore.IsPresent) {
     $NuGetOutput = Invoke-Expression "&`"$NUGET_EXE`" install -ExcludeVersion -OutputDirectory `"$TOOLS_DIR`""
 
     if ($LASTEXITCODE -ne 0) {
-        Throw "An error occured while restoring NuGet tools."
+        Throw "An error occurred while restoring NuGet tools."
     }
     else
     {
