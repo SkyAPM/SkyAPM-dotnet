@@ -2,9 +2,12 @@
     <ItemGroup>
         <PackageReference Include="MassTransit.Abstractions" Version="8.0.0" />
         <PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" Version="2.0.0" />
-        <PackageReference Include="SkyAPM.Agent.Hosting" Version="2.0.0" />
-        <PackageReference Include="SkyAPM.Diagnostics.AspNetCore" Version="2.0.0" />
-        <PackageReference Include="SkyAPM.Utilities.DependencyInjection" Version="2.0.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\SkyApm.Agent.Hosting\SkyApm.Agent.Hosting.csproj" />
+        <ProjectReference Include="..\SkyApm.Diagnostics.AspNetCore\SkyApm.Diagnostics.AspNetCore.csproj" />
+        <ProjectReference Include="..\SkyApm.Utilities.DependencyInjection\SkyApm.Utilities.DependencyInjection.csproj" />
     </ItemGroup>
   
     <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp3.1'">
